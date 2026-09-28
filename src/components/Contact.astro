@@ -1,58 +1,47 @@
 ---
 import Arrow from './Arrow.astro';
-import type { ContactRoute } from '../site';
+import { site } from '../site';
 
-interface Props {
-  routes: ContactRoute[];
-}
-
-const { routes } = Astro.props;
+const { contact, press } = site.emails;
 ---
 
 <section id="contact" class="contact section" aria-labelledby="contact-title">
-  <div class="container">
-    <div class="contact__intro" data-reveal>
+  <div class="container contact__grid">
+    <div data-reveal>
       <p class="eyebrow">Contact</p>
       <h2 id="contact-title" class="heading-2 contact__title">Get in touch.</h2>
-      <p class="contact__text lead">Choose the address that best fits your message.</p>
+      <p class="contact__text lead">For questions, partnerships and anything else.</p>
     </div>
 
-    <ul class="contact__list">
-      {
-        routes.map((route) => (
-          <li class="contact__item" data-reveal>
-            <h3 class="contact__label">{route.label}</h3>
-            <p class="contact__description">{route.description}</p>
-            <div class="contact__address">
-              <a class="contact__email" href={`mailto:${route.email}`}>
-                <span>{route.email}</span>
-                <Arrow class="contact__arrow" />
-              </a>
-              {/* Shown by script only where the Clipboard API is available. */}
-              <button class="contact__copy" type="button" data-copy={route.email} aria-label={`Copy ${route.email}`} hidden>
-                <svg class="contact__icon contact__icon--copy" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                  <rect x="5.25" y="5.25" width="8" height="8" rx="1.75" />
-                  <path d="M10.75 5.25V4.5a1.75 1.75 0 0 0-1.75-1.75H4.5A1.75 1.75 0 0 0 2.75 4.5V9a1.75 1.75 0 0 0 1.75 1.75h.75" />
-                </svg>
-                <svg class="contact__icon contact__icon--done" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                  <path d="M3 8.5 6.5 12 13 4.5" />
-                </svg>
-              </button>
-            </div>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="contact__panel" data-reveal>
+      <a class="contact__email" href={`mailto:${contact}`}>
+        <span>{contact}</span>
+        <Arrow class="contact__arrow" />
+      </a>
 
-    <p class="visually-hidden" role="status" data-copy-status></p>
+      <div class="contact__actions">
+        {/* Shown by script only where the Clipboard API is available. */}
+        <button class="contact__copy" type="button" data-copy={contact} hidden>
+          <span class="contact__copy-idle">Copy address</span>
+          <span class="contact__copy-done" aria-hidden="true">Copied</span>
+        </button>
+        <p class="visually-hidden" role="status" data-copy-status></p>
+      </div>
 
-    <p class="contact__note" data-reveal>
-      Found a security issue? Read our <a href="/security">security policy</a>.
-    </p>
+      <p class="contact__note">
+        Journalists can reach us at <a href={`mailto:${press}`}>{press}</a>.<br />
+        Found a security issue? Read our <a href="/security">security policy</a>.
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
+  .contact__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
   .contact__title {
     margin-top: 1.25rem;
   }
@@ -61,46 +50,18 @@ const { routes } = Astro.props;
     margin-top: 1.25rem;
   }
 
-  .contact__list {
+  .contact__panel {
     display: grid;
-    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
-  }
-
-  .contact__item {
-    display: grid;
-    align-content: start;
-    padding-block: 1.5rem 2rem;
-    border-top: 1px solid var(--color-line);
-  }
-
-  .contact__label {
-    font-size: var(--text-base);
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: -0.011em;
-  }
-
-  .contact__description {
-    margin-top: 0.25rem;
-    font-size: var(--text-sm);
-    color: var(--color-muted);
-  }
-
-  .contact__address {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    align-content: end;
+    justify-items: start;
+    gap: 1.25rem;
   }
 
   .contact__email {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-    min-height: 2.75rem;
-    font-size: 1.125rem;
+    gap: 0.75rem;
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.875rem);
     font-weight: 500;
     letter-spacing: -0.015em;
     text-decoration: none;
@@ -127,64 +88,58 @@ const { routes } = Astro.props;
     transform: translateX(3px);
   }
 
+  .contact__actions {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .contact__actions:has(.contact__copy[hidden]) {
+    display: none;
+  }
+
   .contact__copy {
     display: inline-grid;
-    flex: none;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    margin-right: -0.625rem;
-    padding: 0;
-    border: 0;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--color-line-strong);
     border-radius: 999px;
     background: transparent;
-    color: var(--color-muted);
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
     cursor: pointer;
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
+    transition: border-color 0.2s ease;
+  }
+
+  /* Both labels share one grid cell, so the button keeps its width when the text changes. */
+  .contact__copy-idle,
+  .contact__copy-done {
+    grid-area: 1 / 1;
+    align-self: center;
+    transition: opacity 0.2s ease;
+  }
+
+  .contact__copy-done,
+  .contact__copy[data-copied] .contact__copy-idle {
+    opacity: 0;
+  }
+
+  .contact__copy[data-copied] .contact__copy-done {
+    opacity: 1;
   }
 
   /* Hover only on devices with a real pointer; on touch screens it would stick after a tap. */
   @media (hover: hover) {
     .contact__copy:hover {
-      background: var(--color-surface);
-      color: var(--color-ink);
+      border-color: var(--color-ink);
     }
   }
 
-  .contact__icon {
-    grid-area: 1 / 1;
-    width: 1rem;
-    height: 1rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    transition:
-      opacity 0.2s ease,
-      transform 0.3s var(--ease-out);
-  }
-
-  .contact__icon--done,
-  .contact__copy[data-copied] .contact__icon--copy {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-
-  .contact__copy[data-copied] {
-    color: var(--color-ink);
-  }
-
-  .contact__copy[data-copied] .contact__icon--done {
-    opacity: 1;
-    transform: none;
-  }
-
   .contact__note {
-    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
     font-size: var(--text-sm);
+    line-height: 1.8;
     color: var(--color-muted);
   }
 
@@ -197,24 +152,20 @@ const { routes } = Astro.props;
     text-decoration-color: currentColor;
   }
 
-  @media (min-width: 40rem) {
-    .contact__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(1.5rem, 3vw, 3rem);
-    }
-  }
-
   @media (min-width: 64rem) {
-    .contact__list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .contact__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: end;
     }
 
-    .contact__item:nth-child(3n + 2) {
-      --reveal-delay: 0.08s;
+    .contact__grid > :first-child {
+      grid-column: 1 / span 6;
     }
 
-    .contact__item:nth-child(3n + 3) {
-      --reveal-delay: 0.16s;
+    .contact__panel {
+      --reveal-delay: 0.12s;
+      grid-column: 8 / -1;
     }
   }
 </style>

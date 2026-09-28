@@ -23,16 +23,16 @@ Requires Node 22.12 or later.
 ## Editing content
 
 - [`src/site.ts`](src/site.ts): company name, country, title, description, products, the email
-  addresses and the contact directory shown on the homepage:
+  addresses shown on the homepage. Each address appears only where it is needed:
 
-  | Address                 | Used for                                        |
-  | ----------------------- | ----------------------------------------------- |
-  | `contact@zagrosian.com` | Main contact: business, partnerships, security |
-  | `hello@zagrosian.com`   | General questions                               |
-  | `press@zagrosian.com`   | Media and press                                 |
-  | `careers@zagrosian.com` | Jobs and applications                           |
-  | `privacy@zagrosian.com` | Privacy questions and data requests             |
-  | `legal@zagrosian.com`   | Legal matters                                   |
+  | Address                 | Where it appears                                       |
+  | ----------------------- | ------------------------------------------------------ |
+  | `contact@zagrosian.com` | Contact section, security policy and `security.txt`   |
+  | `press@zagrosian.com`   | Contact section (one line for journalists)             |
+  | `privacy@zagrosian.com` | Privacy policy                                         |
+  | `legal@zagrosian.com`   | Terms of use                                           |
+  | `careers@zagrosian.com` | Privacy policy (job applications); add it to a careers page when you have one |
+  | `hello@zagrosian.com`   | Not on the site                                        |
 
 - [`src/components/`](src/components/): homepage sections.
 - [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
@@ -62,8 +62,9 @@ src/
   16-colour PNGs at 96–960 px wide (`griffin-*.png`), which for black line art are smaller than WebP or
   AVIF. To regenerate a variant:
   `node -e "require('sharp')('src/assets/brand/griffin-source.png').resize({ width: 480 }).png({ palette: true, colours: 16, dither: 0 }).toFile('src/assets/brand/griffin-480.png')"`
-- **Sun** (`src/assets/brand/sun.svg`, drawn by `src/components/Sun.astro`): the 21-ray sun, used for
-  the favicon and app icons, where the griffin is too detailed to read.
+- **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
+  footer mark uses the black version on light backgrounds and the white version in dark mode
+  (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
 
 The site follows the visitor's light or dark system setting. Colours are tokens in
 `src/styles/global.css`; line art is inverted on dark surfaces.
@@ -121,7 +122,7 @@ Recommended settings outside the code:
 
 - **Cloudflare:** enable DNSSEC, set SSL/TLS to *Full (strict)*, turn on *Always Use HTTPS*, set the
   minimum TLS version to 1.2, and add CAA records for the certificate authorities you use.
-- **Email:** make sure all six addresses receive mail (for example with Cloudflare Email Routing), and
+- **Email:** make sure all six addresses receive mail, including the ones not shown on the site, (for example with Cloudflare Email Routing), and
   add SPF, DKIM and DMARC records so nobody can send email pretending to be zagrosian.com.
 - **Accounts:** use two-factor authentication on Cloudflare, GitHub and your domain registrar, and
   enable the registrar lock.

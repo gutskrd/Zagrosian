@@ -5,7 +5,7 @@ import Hero from '../components/Hero.astro';
 import Principles from '../components/Principles.astro';
 import ProductShowcase from '../components/ProductShowcase.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { contactRoutes, hevalo, site } from '../site';
+import { hevalo, site } from '../site';
 
 const home = `${site.url}/`;
 
@@ -35,11 +35,10 @@ const structuredData = {
       description: site.description,
       email: site.emails.contact,
       address: { '@type': 'PostalAddress', addressCountry: 'NL' },
-      contactPoint: contactRoutes.map((route) => ({
-        '@type': 'ContactPoint',
-        contactType: route.contactType,
-        email: route.email,
-      })),
+      contactPoint: [
+        { '@type': 'ContactPoint', contactType: 'general inquiries', email: site.emails.contact },
+        { '@type': 'ContactPoint', contactType: 'press', email: site.emails.press },
+      ],
       brand: site.products.map((product) => ({
         '@type': 'Brand',
         name: product.name,
@@ -57,5 +56,5 @@ const structuredData = {
   <ProductShowcase product={hevalo} />
   <Principles />
   <About />
-  <Contact routes={contactRoutes} />
+  <Contact />
 </BaseLayout>
