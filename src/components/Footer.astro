@@ -1,5 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
+import Sun from './Sun.astro';
 import { footerNav, legalNav, site } from '../site';
 
 const year = new Date().getFullYear();
@@ -9,8 +10,11 @@ const year = new Date().getFullYear();
   <div class="container">
     <div class="site-footer__top">
       <p class="site-footer__about">
-        Independent technology company<br />
-        based in {site.country}.
+        <Sun class="site-footer__sun" />
+        <span>
+          Independent technology company<br />
+          based in {site.country}.
+        </span>
       </p>
 
       <nav aria-label="Footer">
@@ -46,6 +50,12 @@ const year = new Date().getFullYear();
               </li>
             ))
           }
+          <li>
+            <a class="site-footer__link" href="#top">
+              Back to top
+              <Arrow direction="up" />
+            </a>
+          </li>
         </ul>
       </nav>
     </div>
@@ -65,7 +75,17 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__about {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
     color: var(--color-muted);
+  }
+
+  .site-footer__about :global(.site-footer__sun) {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    color: var(--color-ink);
   }
 
   .site-footer__links {

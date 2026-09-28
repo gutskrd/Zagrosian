@@ -34,13 +34,28 @@ Requires Node 22.12 or later.
 ```
 public/            Favicons, logo, social image, manifest, robots.txt and Cloudflare _headers
 src/
+  assets/brand/    Griffin emblem (source and sized variants) and the 21-ray sun
   components/      Header, Footer, Hero, ProductShowcase, Principles, About, Contact, …
   layouts/         BaseLayout (document and SEO), LegalLayout (legal pages), NoticeLayout (404)
   pages/           Homepage, legal pages, 404, sitemap.xml and .well-known/security.txt
-  scripts/site.ts  Header state, mobile menu, scroll reveals, legal table of contents
+  scripts/site.ts  Header, mobile menu, section highlighting, scroll reveals, copy button,
+                   legal table of contents
   styles/          Font, design tokens and base styles
   site.ts          Site configuration and content
 ```
+
+## Brand assets
+
+- **Griffin** (`src/assets/brand/griffin-source.png`): the emblem, used in the header, the hero, the
+  Google logo (`public/logo.png`) and the social image (`public/og.png`). The site serves it as
+  16-colour PNGs at 96–960 px wide (`griffin-*.png`), which for black line art are smaller than WebP or
+  AVIF. To regenerate a variant:
+  `node -e "require('sharp')('src/assets/brand/griffin-source.png').resize({ width: 480 }).png({ palette: true, colours: 16, dither: 0 }).toFile('src/assets/brand/griffin-480.png')"`
+- **Sun** (`src/assets/brand/sun.svg`, drawn by `src/components/Sun.astro`): the 21-ray sun, used for
+  the favicon and app icons, where the griffin is too detailed to read.
+
+The site follows the visitor's light or dark system setting. Colours are tokens in
+`src/styles/global.css`; line art is inverted on dark surfaces.
 
 ## Deploying to Cloudflare Pages
 
@@ -85,6 +100,9 @@ that, [`public/_headers`](public/_headers) sets:
 - **cross-origin isolation** (COOP, COEP, CORP), `X-Frame-Options: DENY`, `nosniff`, a strict referrer
   policy and a Permissions-Policy that disables every powerful browser feature.
 
+`robots.txt`, `sitemap.xml` and `security.txt` get their own sandboxed policy, so browsers' built-in text
+and XML viewers can style them.
+
 If you add a third-party script, such as analytics, embeds or Cloudflare Web Analytics, you must
 allow it in the Content-Security-Policy and describe it in the privacy policy.
 
@@ -100,4 +118,4 @@ Recommended settings outside the code:
   HTTPS.
 
 Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) opens monthly dependency update pull
-requests.
+requests. It skips TypeScript 7, which `astro check` does not support yet.

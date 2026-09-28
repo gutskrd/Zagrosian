@@ -15,6 +15,8 @@ export default defineConfig({
     build: {
       // Never inline scripts or assets as data: URIs; the CSP only allows 'self'.
       assetsInlineLimit: 0,
+      // One small stylesheet for the whole site: a single request, cached across pages.
+      cssCodeSplit: false,
     },
   },
 });

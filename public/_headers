@@ -10,7 +10,7 @@
 # Analytics) requires listing it here, or it will be blocked.
 
 /*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types 'none'
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -21,6 +21,21 @@
   Cross-Origin-Resource-Policy: same-origin
   X-Permitted-Cross-Domain-Policies: none
   ! Access-Control-Allow-Origin
+
+# Plain-text and XML files: browsers display these with built-in viewers that
+# use inline styles, which the page policy above would block. They get their
+# own policy instead: sandboxed, no scripts, only the viewer's styling.
+/robots.txt
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+
+/sitemap.xml
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:
+
+/.well-known/security.txt
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
 # Fingerprinted build assets never change.
 /_astro/*

@@ -1,12 +1,14 @@
 ---
 import Arrow from './Arrow.astro';
+import Griffin from './Griffin.astro';
 import Wordmark from './Wordmark.astro';
-import { hevalo, primaryNav } from '../site';
+import { hevalo, legalNav, primaryNav, site } from '../site';
 ---
 
 <header class="site-header" data-site-header>
   <div class="container site-header__inner">
-    <a class="site-header__home" href="/">
+    <a class="site-header__home" href="/" aria-label={`${site.name}, home`}>
+      <Griffin class="site-header__griffin" sizes="37px" loading="eager" />
       <Wordmark />
     </a>
 
@@ -15,23 +17,28 @@ import { hevalo, primaryNav } from '../site';
         {
           primaryNav.map((link) => (
             <li>
-              <a class="site-nav__link" href={link.href}>
+              <a class="site-nav__link" href={link.href} data-nav-section={link.href.split('#')[1]}>
                 {link.label}
               </a>
             </li>
           ))
         }
       </ul>
+      <a class="site-nav__cta" href={hevalo.url}>
+        Visit {hevalo.name}
+        <Arrow direction="up-right" />
+      </a>
     </nav>
 
     <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu">
       <span class="menu-toggle__label menu-toggle__label--open">Menu</span>
       <span class="menu-toggle__label menu-toggle__label--close" aria-hidden="true">Close</span>
+      <span class="menu-toggle__icon" aria-hidden="true"></span>
     </button>
   </div>
 
   <nav id="mobile-menu" class="mobile-menu" popover aria-label="Menu" data-mobile-menu>
-    <div class="container">
+    <div class="container mobile-menu__inner">
       <ul class="mobile-menu__list">
         {
           primaryNav.map((link) => (
@@ -43,10 +50,24 @@ import { hevalo, primaryNav } from '../site';
           ))
         }
       </ul>
-      <a class="mobile-menu__external" href={hevalo.url}>
+
+      <a class="mobile-menu__cta" href={hevalo.url}>
         Visit {hevalo.name}
         <Arrow direction="up-right" />
       </a>
+
+      <div class="mobile-menu__meta">
+        <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>
+        <ul>
+          {
+            legalNav.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
     </div>
   </nav>
 </header>
@@ -56,11 +77,12 @@ import { hevalo, primaryNav } from '../site';
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgb(255 255 255 / 0.86);
+    background: var(--header-bg);
     -webkit-backdrop-filter: saturate(180%) blur(16px);
     backdrop-filter: saturate(180%) blur(16px);
     box-shadow: 0 1px 0 transparent;
     transition: box-shadow 0.3s ease;
+    view-transition-name: site-header;
   }
 
   .site-header[data-scrolled] {
@@ -71,28 +93,39 @@ import { hevalo, primaryNav } from '../site';
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 1.5rem;
     height: var(--header-height);
   }
 
   .site-header__home {
     display: inline-flex;
     align-items: center;
+    gap: 0.625rem;
     min-height: 2.75rem;
     text-decoration: none;
+  }
+
+  .site-header__home :global(.site-header__griffin) {
+    width: auto;
+    height: 2.5rem;
+    margin-block: -0.25rem;
   }
 
   /* Desktop navigation */
 
   .site-nav {
     display: none;
+    align-items: center;
+    gap: 2rem;
   }
 
   .site-nav__list {
     display: flex;
-    gap: 2.25rem;
+    gap: 2rem;
   }
 
   .site-nav__link {
+    position: relative;
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
@@ -103,8 +136,45 @@ import { hevalo, primaryNav } from '../site';
     transition: color 0.2s ease;
   }
 
-  .site-nav__link:hover {
+  .site-nav__link::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0.55rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s var(--ease-out);
+  }
+
+  .site-nav__link:hover,
+  .site-nav__link[aria-current] {
     color: var(--color-ink);
+  }
+
+  .site-nav__link[aria-current]::after {
+    transform: scaleX(1);
+  }
+
+  .site-nav__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .site-nav__cta:hover {
+    background: var(--color-solid-hover);
   }
 
   /* Mobile menu */
@@ -112,6 +182,7 @@ import { hevalo, primaryNav } from '../site';
   .menu-toggle {
     display: inline-flex;
     align-items: center;
+    gap: 0.625rem;
     min-height: 2.75rem;
     margin-right: -0.5rem;
     padding: 0 0.5rem;
@@ -122,6 +193,48 @@ import { hevalo, primaryNav } from '../site';
     font-size: var(--text-sm);
     font-weight: 500;
     cursor: pointer;
+  }
+
+  /* Two lines that become a cross when the menu is open. */
+  .menu-toggle__icon {
+    position: relative;
+    width: 1rem;
+    height: 0.625rem;
+  }
+
+  .menu-toggle__icon::before,
+  .menu-toggle__icon::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    border-radius: 1px;
+    background: currentColor;
+    transition:
+      transform 0.35s var(--ease-out),
+      top 0.35s var(--ease-out);
+  }
+
+  .menu-toggle__icon::before {
+    top: 0;
+  }
+
+  .menu-toggle__icon::after {
+    top: calc(100% - 1.5px);
+  }
+
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__icon::before,
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__icon::after {
+    top: calc(50% - 0.75px);
+  }
+
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__icon::before {
+    transform: rotate(45deg);
+  }
+
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__icon::after {
+    transform: rotate(-45deg);
   }
 
   .menu-toggle__label--close,
@@ -141,29 +254,26 @@ import { hevalo, primaryNav } from '../site';
     max-width: none;
     max-height: none;
     margin: 0;
-    padding: 1.5rem 0 3rem;
+    padding: 0;
     border: 0;
     background: var(--color-paper);
     color: var(--color-ink);
     overflow-y: auto;
+    overscroll-behavior: contain;
     opacity: 0;
-    transform: translateY(-0.5rem);
     transition:
       opacity 0.3s var(--ease-out),
-      transform 0.3s var(--ease-out),
       overlay 0.3s allow-discrete,
       display 0.3s allow-discrete;
   }
 
   .mobile-menu:popover-open {
     opacity: 1;
-    transform: none;
   }
 
   @starting-style {
     .mobile-menu:popover-open {
       opacity: 0;
-      transform: translateY(-0.5rem);
     }
   }
 
@@ -171,30 +281,101 @@ import { hevalo, primaryNav } from '../site';
     background: transparent;
   }
 
+  .mobile-menu__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding-block: 1.5rem max(2rem, env(safe-area-inset-bottom));
+  }
+
   .mobile-menu__list {
     border-top: 1px solid var(--color-line);
+  }
+
+  .mobile-menu__list li {
+    border-bottom: 1px solid var(--color-line);
   }
 
   .mobile-menu__link {
     display: flex;
     align-items: center;
     min-height: 4.5rem;
-    border-bottom: 1px solid var(--color-line);
-    font-size: 1.875rem;
+    font-size: 2rem;
     font-weight: 560;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
     text-decoration: none;
   }
 
-  .mobile-menu__external {
+  /* Links rise in one after another when the menu opens. */
+  @media (prefers-reduced-motion: no-preference) {
+    .mobile-menu__list li,
+    .mobile-menu__cta {
+      transition:
+        opacity 0.5s var(--ease-out),
+        transform 0.5s var(--ease-out);
+    }
+
+    .mobile-menu:not(:popover-open) .mobile-menu__list li,
+    .mobile-menu:not(:popover-open) .mobile-menu__cta {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+
+    @starting-style {
+      .mobile-menu:popover-open .mobile-menu__list li,
+      .mobile-menu:popover-open .mobile-menu__cta {
+        opacity: 0;
+        transform: translateY(0.75rem);
+      }
+    }
+
+    .mobile-menu__list li:nth-child(2) {
+      transition-delay: 0.04s;
+    }
+
+    .mobile-menu__list li:nth-child(3) {
+      transition-delay: 0.08s;
+    }
+
+    .mobile-menu__cta {
+      transition-delay: 0.12s;
+    }
+  }
+
+  .mobile-menu__cta {
     display: inline-flex;
     align-items: center;
+    align-self: flex-start;
     gap: 0.5rem;
-    min-height: 2.75rem;
+    min-height: 3.25rem;
     margin-top: 2rem;
-    font-size: var(--text-base);
+    padding: 0 1.5rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-paper);
     font-weight: 500;
-    color: var(--color-ink-soft);
+    text-decoration: none;
+  }
+
+  .mobile-menu__meta {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: auto;
+    padding-top: 3rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .mobile-menu__meta ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+  }
+
+  .mobile-menu__meta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     text-decoration: none;
   }
 
@@ -206,7 +387,7 @@ import { hevalo, primaryNav } from '../site';
 
   @media (min-width: 48rem) {
     .site-nav {
-      display: block;
+      display: flex;
     }
 
     .menu-toggle,

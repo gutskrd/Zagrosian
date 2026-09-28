@@ -3,7 +3,7 @@
  * Arrows are drawn rather than typed: the Latin subset of Inter does not
  * include them, and a fallback glyph would sit off the baseline.
  */
-export type ArrowDirection = 'right' | 'left' | 'up-right' | 'down';
+export type ArrowDirection = 'right' | 'left' | 'up' | 'up-right' | 'down';
 
 interface Props {
   direction?: ArrowDirection;
@@ -15,6 +15,7 @@ const { direction = 'right', class: className } = Astro.props;
 const paths: Record<ArrowDirection, string> = {
   right: 'M2.5 8h11M9 3.5 13.5 8 9 12.5',
   left: 'M13.5 8h-11M7 3.5 2.5 8 7 12.5',
+  up: 'M8 13.5v-11M3.5 7 8 2.5 12.5 7',
   'up-right': 'M4.5 11.5l7-7M5.5 4.5h6v6',
   down: 'M8 2.5v11M3.5 9 8 13.5 12.5 9',
 };

@@ -10,3 +10,8 @@ updates:
       dependencies:
         patterns:
           - '*'
+    ignore:
+      # `astro check` (run by `npm run build`) does not support TypeScript 7 yet.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major

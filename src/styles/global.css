@@ -32,19 +32,30 @@
    ========================================================================== */
 
 :root {
-  /* Colour: black and white, with a small set of neutrals. */
+  /* Colour: black and white, with a small set of neutrals. Light is the default;
+     the dark palette below follows the visitor's system setting. */
   --color-paper: #ffffff;
   --color-ink: #0a0a0a;
   --color-ink-soft: #3d3d3d;
   --color-muted: #6b6b6b;
   --color-line: #e5e5e5;
+  --color-line-strong: #d4d4d2;
   --color-surface: #f5f5f4;
+  --color-underline: #c4c4c4;
+  --color-solid-hover: #2b2b2b;
+  --color-ridge: #cfcfcf;
+  --header-bg: rgb(255 255 255 / 0.84);
 
   /* Inverse surfaces (the product showcase). */
   --color-night: #0a0a0a;
   --color-night-ink: #fafafa;
   --color-night-muted: #a3a3a3;
   --color-night-line: #2a2a2a;
+  --color-night-edge: transparent;
+  --color-inverse-hover: #d9d9d9;
+
+  /* Line-art brand images are black; they are inverted on dark surfaces. */
+  --art-filter: none;
 
   --focus-ring: var(--color-ink);
 
@@ -68,7 +79,29 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 0.9s;
 
-  color-scheme: light;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #0a0a0a;
+    --color-ink: #f2f2f2;
+    --color-ink-soft: #bdbdbd;
+    --color-muted: #8f8f8f;
+    --color-line: #242424;
+    --color-line-strong: #333333;
+    --color-surface: #121212;
+    --color-underline: #555555;
+    --color-solid-hover: #d4d4d4;
+    --color-ridge: #3a3a3a;
+    --header-bg: rgb(10 10 10 / 0.8);
+
+    --color-night: #141414;
+    --color-night-line: #2e2e2e;
+    --color-night-edge: #242424;
+
+    --art-filter: invert(1);
+  }
 }
 
 /* ==========================================================================
@@ -183,6 +216,9 @@ svg {
   --focus-ring: var(--color-night-ink);
   background: var(--color-night);
   color: var(--color-night-ink);
+  box-shadow:
+    inset 0 1px 0 var(--color-night-edge),
+    inset 0 -1px 0 var(--color-night-edge);
 }
 
 .inverse ::selection {
@@ -243,6 +279,61 @@ svg {
 
 .skip-link:focus-visible {
   transform: none;
+}
+
+/* ==========================================================================
+   Page transitions
+   Browsers that support cross-document view transitions fade between
+   pages; the header keeps its place. Others navigate normally.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+}
+
+/* ==========================================================================
+   Print
+   ========================================================================== */
+
+@media print {
+  :root {
+    color-scheme: light;
+    --color-paper: #fff;
+    --color-ink: #000;
+    --color-ink-soft: #222;
+    --color-muted: #555;
+    --color-line: #ccc;
+    --color-surface: #fff;
+    --art-filter: none;
+  }
+
+  .skip-link,
+  .site-header,
+  .site-footer,
+  .legal__toc,
+  .ridgeline,
+  .cta,
+  .menu-toggle {
+    display: none !important;
+  }
+
+  .legal__content a[href^='http']::after,
+  .legal__content a[href^='mailto']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.875em;
+  }
+
+  h2,
+  h3 {
+    break-after: avoid;
+  }
 }
 
 /* ==========================================================================

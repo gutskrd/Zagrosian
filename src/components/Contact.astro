@@ -9,18 +9,38 @@ const { email } = Astro.props;
 ---
 
 <section id="contact" class="contact section" aria-labelledby="contact-title">
-  <div class="container" data-reveal>
-    <p class="eyebrow">Contact</p>
-    <h2 id="contact-title" class="heading-2 contact__title">Get in touch.</h2>
-    <p class="contact__text lead">For general questions, partnerships and press.</p>
-    <a class="contact__email" href={`mailto:${email}`}>
-      <span>{email}</span>
-      <Arrow class="contact__arrow" />
-    </a>
+  <div class="container contact__grid">
+    <div data-reveal>
+      <p class="eyebrow">Contact</p>
+      <h2 id="contact-title" class="heading-2 contact__title">Get in touch.</h2>
+      <p class="contact__text lead">For general questions, partnerships and press.</p>
+    </div>
+
+    <div class="contact__panel" data-reveal>
+      <a class="contact__email" href={`mailto:${email}`}>
+        <span>{email}</span>
+        <Arrow class="contact__arrow" />
+      </a>
+
+      <div class="contact__actions">
+        {/* Shown by script only where the Clipboard API is available. */}
+        <button class="contact__copy" type="button" data-copy={email} hidden>Copy address</button>
+        <p class="visually-hidden" role="status" data-copy-status></p>
+      </div>
+
+      <p class="contact__note">
+        Found a security issue? Read our <a href="/security">security policy</a>.
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
+  .contact__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
   .contact__title {
     margin-top: 1.25rem;
   }
@@ -29,11 +49,17 @@ const { email } = Astro.props;
     margin-top: 1.25rem;
   }
 
+  .contact__panel {
+    display: grid;
+    align-content: end;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
   .contact__email {
     display: inline-flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
     font-size: clamp(1.25rem, 1rem + 1vw, 1.875rem);
     font-weight: 500;
     letter-spacing: -0.015em;
@@ -43,7 +69,7 @@ const { email } = Astro.props;
 
   .contact__email span {
     text-decoration: underline;
-    text-decoration-color: var(--color-line);
+    text-decoration-color: var(--color-line-strong);
     text-decoration-thickness: 1px;
     text-underline-offset: 0.25em;
     transition: text-decoration-color 0.25s ease;
@@ -59,5 +85,67 @@ const { email } = Astro.props;
 
   .contact__email:hover :global(.contact__arrow) {
     transform: translateX(3px);
+  }
+
+  .contact__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 2.75rem;
+  }
+
+  .contact__actions:has(.contact__copy[hidden]) {
+    display: none;
+  }
+
+  .contact__copy {
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .contact__copy:hover {
+    border-color: var(--color-ink);
+  }
+
+  .contact__note {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .contact__note a {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-underline);
+  }
+
+  .contact__note a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  @media (min-width: 64rem) {
+    .contact__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: end;
+    }
+
+    .contact__grid > :first-child {
+      grid-column: 1 / span 6;
+    }
+
+    .contact__panel {
+      --reveal-delay: 0.12s;
+      grid-column: 8 / -1;
+    }
   }
 </style>

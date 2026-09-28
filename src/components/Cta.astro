@@ -46,7 +46,7 @@ const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro
   }
 
   .cta--solid:hover {
-    background: #2b2b2b;
+    background: var(--color-solid-hover);
   }
 
   .cta--inverse {
@@ -55,7 +55,7 @@ const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro
   }
 
   .cta--inverse:hover {
-    background: #d9d9d9;
+    background: var(--color-inverse-hover);
   }
 
   .cta--text {

@@ -68,7 +68,75 @@ function initTableOfContents() {
   });
 }
 
+/**
+ * Highlights the navigation link of the section being read. A section counts
+ * as current while it crosses a thin band a little above the middle of the screen.
+ */
+function initSectionNav() {
+  const links = new Map<string, HTMLAnchorElement>();
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-nav-section]')) {
+    const id = link.dataset.navSection;
+    if (id && document.getElementById(id)) links.set(id, link);
+  }
+  if (links.size === 0 || !('IntersectionObserver' in window)) return;
+
+  const visible = new Set<string>();
+  const update = () => {
+    const current = [...links.keys()].find((id) => visible.has(id));
+    for (const [id, link] of links) {
+      if (id === current) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    }
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visible.add(entry.target.id);
+        else visible.delete(entry.target.id);
+      }
+      update();
+    },
+    { rootMargin: '-40% 0px -55% 0px' },
+  );
+
+  for (const id of links.keys()) observer.observe(document.getElementById(id)!);
+}
+
+/** "Copy address" buttons. They stay hidden where the Clipboard API is unavailable. */
+function initCopyButtons() {
+  if (!navigator.clipboard?.writeText) return;
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    const status = button.parentElement?.querySelector<HTMLElement>('[data-copy-status]');
+    const label = button.textContent ?? '';
+    let reset: number | undefined;
+
+    const announce = (buttonText: string, message: string) => {
+      button.textContent = buttonText;
+      if (status) status.textContent = message;
+      window.clearTimeout(reset);
+      reset = window.setTimeout(() => {
+        button.textContent = label;
+        if (status) status.textContent = '';
+      }, 2500);
+    };
+
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? '');
+        announce('Copied', 'Email address copied to the clipboard.');
+      } catch {
+        announce(label, 'Could not copy. Select the address to copy it instead.');
+      }
+    });
+  }
+}
+
 initHeader();
 initMobileMenu();
 initReveal();
 initTableOfContents();
+initSectionNav();
+initCopyButtons();
