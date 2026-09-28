@@ -1,5 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
+import SplitText from './SplitText.astro';
 import { site } from '../site';
 
 const { contact, press } = site.emails;
@@ -7,10 +8,10 @@ const { contact, press } = site.emails;
 
 <section id="contact" class="contact section" aria-labelledby="contact-title">
   <div class="container contact__grid">
-    <div data-reveal>
-      <p class="eyebrow">Contact</p>
-      <h2 id="contact-title" class="heading-2 contact__title">Get in touch.</h2>
-      <p class="contact__text lead">For questions, partnerships and anything else.</p>
+    <div>
+      <p class="eyebrow" data-reveal>Contact</p>
+      <SplitText id="contact-title" class="heading-2 contact__title" text="Get in touch." />
+      <p class="contact__text lead" data-reveal>For questions, partnerships and anything else.</p>
     </div>
 
     <div class="contact__panel" data-reveal>
@@ -110,7 +111,13 @@ const { contact, press } = site.emails;
     font-size: var(--text-sm);
     font-weight: 500;
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s var(--ease-out);
+  }
+
+  .contact__copy:active {
+    transform: scale(0.97);
   }
 
   /* Both labels share one grid cell, so the button keeps its width when the text changes. */

@@ -44,6 +44,9 @@
   --color-underline: #c4c4c4;
   --color-solid-hover: #2b2b2b;
   --color-ridge: #cfcfcf;
+  /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the About surface,
+     above the 3:1 minimum for large text. */
+  --color-dim: #878785;
   --header-bg: rgb(255 255 255 / 0.84);
 
   /* Inverse surfaces (the product showcase). */
@@ -94,6 +97,7 @@
     --color-underline: #555555;
     --color-solid-hover: #d4d4d4;
     --color-ridge: #3a3a3a;
+    --color-dim: #666666;
     --header-bg: rgb(10 10 10 / 0.8);
 
     --color-night: #141414;
@@ -318,6 +322,7 @@ svg {
   .site-header,
   .site-footer,
   .legal__toc,
+  .reading-progress,
   .ridgeline,
   .cta,
   .menu-toggle {
@@ -352,6 +357,57 @@ svg {
 [data-reveal='pending'] {
   opacity: 0;
   transform: translateY(1.25rem);
+}
+
+/* Split headings (src/components/SplitText.astro): each word rises from behind
+   its own mask. The script staggers them with the Web Animations API. */
+.split__word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* Room inside the mask for descenders and for glyphs that overhang the
+     tight letter-spacing; the negative margins keep the layout unchanged. */
+  padding: 0 0.08em 0.2em;
+  margin: 0 -0.08em -0.2em;
+}
+
+.split__inner {
+  display: inline-block;
+}
+
+[data-split='pending'] .split__inner {
+  transform: translateY(110%);
+}
+
+/* Scroll-highlighted headings: words brighten as the reader scrolls past. */
+[data-highlight='active'] .split__word {
+  transition: color 0.45s var(--ease-out);
+}
+
+[data-highlight='active'] .split__word:not([data-lit]) {
+  color: var(--color-dim);
+}
+
+/* Hairline rules that draw across when their block is revealed. */
+.rule {
+  position: relative;
+}
+
+.rule::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--rule-color, var(--color-line));
+  transform-origin: left;
+  transition: transform 1.4s var(--ease-out) var(--reveal-delay, 0s);
+}
+
+[data-reveal='pending'].rule::before,
+[data-reveal='pending'] .rule::before {
+  transform: scaleX(0);
 }
 
 @media (prefers-reduced-motion: reduce) {

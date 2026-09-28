@@ -1,4 +1,5 @@
 ---
+import SplitText from './SplitText.astro';
 import { hevalo, site } from '../site';
 
 const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
@@ -9,13 +10,18 @@ const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
     <p class="eyebrow" data-reveal>About</p>
 
     <div class="about__body" data-reveal>
-      <h2 id="about-title" class="about__statement">An independent technology company with Kurdish&nbsp;roots.</h2>
+      <SplitText
+        id="about-title"
+        class="about__statement"
+        effect="highlight"
+        text="An independent technology company with Kurdish roots."
+      />
       <p class="about__text lead">
         {site.name} takes its name from the Zagros mountains. We are privately owned, based in {site.country}, and
         we design, build and operate our products ourselves.
       </p>
 
-      <dl class="about__facts">
+      <dl class="about__facts rule">
         <div>
           <dt>Based in</dt>
           <dd>{basedIn}</dd>
@@ -56,7 +62,7 @@ const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
     gap: 1.25rem;
     margin: clamp(3rem, 2rem + 3vw, 5rem) 0 0;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--color-line-strong);
+    --rule-color: var(--color-line-strong);
     font-size: var(--text-sm);
   }
 

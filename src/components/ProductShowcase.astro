@@ -1,5 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
+import SplitText from './SplitText.astro';
 import Cta from './Cta.astro';
 import { site, type Product } from '../site';
 
@@ -17,9 +18,9 @@ const domain = new URL(product.url).hostname;
     <p class="eyebrow" data-reveal>Products</p>
 
     <div class="showcase__body">
-      <div class="showcase__identity" data-reveal>
-        <h2 id={`${id}-title`} class="showcase__name">{product.name}</h2>
-        <p class="showcase__byline">A product by {site.name}</p>
+      <div class="showcase__identity">
+        <SplitText id={`${id}-title`} class="showcase__name" text={product.name} />
+        <p class="showcase__byline" data-reveal>A product by {site.name}</p>
       </div>
 
       <div class="showcase__details" data-reveal>
@@ -28,7 +29,7 @@ const domain = new URL(product.url).hostname;
       </div>
     </div>
 
-    <dl class="showcase__facts" data-reveal>
+    <dl class="showcase__facts rule" data-reveal>
       <div>
         <dt>Category</dt>
         <dd>{product.category}</dd>
@@ -95,7 +96,7 @@ const domain = new URL(product.url).hostname;
     gap: 1.25rem;
     margin: clamp(5rem, 3rem + 7vw, 9rem) 0 0;
     padding-top: 1.5rem;
-    border-top: 1px solid var(--color-night-line);
+    --rule-color: var(--color-night-line);
     font-size: var(--text-sm);
   }
 

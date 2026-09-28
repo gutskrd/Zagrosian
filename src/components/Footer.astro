@@ -33,7 +33,7 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    <div class="site-footer__mark" aria-hidden="true">
+    <div class="site-footer__mark" aria-hidden="true" data-rise>
       <span>{site.name}</span>
     </div>
 
@@ -116,6 +116,7 @@ const year = new Date().getFullYear();
   /* The wordmark spans the full content width at every screen size. */
   .site-footer__mark {
     container-type: inline-size;
+    overflow: hidden;
     margin-top: clamp(3.5rem, 2rem + 5vw, 7rem);
     user-select: none;
   }

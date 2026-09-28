@@ -80,8 +80,28 @@ import { hevalo, legalNav, primaryNav, site } from '../site';
     -webkit-backdrop-filter: saturate(180%) blur(16px);
     backdrop-filter: saturate(180%) blur(16px);
     box-shadow: 0 1px 0 transparent;
-    transition: box-shadow 0.3s ease;
+    color: var(--color-ink);
+    transition:
+      box-shadow 0.3s ease,
+      background-color 0.3s ease,
+      color 0.3s ease;
     view-transition-name: site-header;
+  }
+
+  /* Over a dark section, the header takes on the dark palette. */
+  .site-header[data-on-dark] {
+    --color-paper: #0a0a0a;
+    --color-ink: #f2f2f2;
+    --color-ink-soft: #bdbdbd;
+    --color-line: #262626;
+    --color-solid-hover: #d4d4d4;
+    --header-bg: rgb(10 10 10 / 0.8);
+    --art-filter: invert(1);
+    --focus-ring: #f2f2f2;
+  }
+
+  .site-header :global(.griffin) {
+    transition: filter 0.3s ease;
   }
 
   .site-header[data-scrolled] {
@@ -169,11 +189,18 @@ import { hevalo, legalNav, primaryNav, site } from '../site';
     font-size: var(--text-sm);
     font-weight: 500;
     text-decoration: none;
-    transition: background-color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s var(--ease-out);
   }
 
   .site-nav__cta:hover {
     background: var(--color-solid-hover);
+  }
+
+  .site-nav__cta:active,
+  .mobile-menu__cta:active {
+    transform: scale(0.97);
   }
 
   /* Mobile menu */

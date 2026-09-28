@@ -30,7 +30,13 @@ const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro
     white-space: nowrap;
     transition:
       background-color 0.25s ease,
-      color 0.25s ease;
+      color 0.25s ease,
+      transform 0.2s var(--ease-out);
+  }
+
+  /* A slight give under the finger or cursor. */
+  .cta:active {
+    transform: scale(0.97);
   }
 
   .cta--solid,

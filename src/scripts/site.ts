@@ -1,11 +1,37 @@
-/** Adds a hairline under the sticky header once the page has scrolled. */
+import { initMotion } from './motion';
+
+/**
+ * Adds a hairline under the sticky header once the page has scrolled, and
+ * switches the header to its dark treatment while it sits over a dark section.
+ */
 function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-site-header]');
   if (!header) return;
 
-  const update = () => header.toggleAttribute('data-scrolled', window.scrollY > 4);
+  const darkSections = [...document.querySelectorAll<HTMLElement>('.inverse')];
+  let queued = false;
+
+  const update = () => {
+    queued = false;
+    const line = header.offsetHeight / 2;
+    const onDark = darkSections.some((section) => {
+      const rect = section.getBoundingClientRect();
+      return rect.top <= line && rect.bottom >= line;
+    });
+    header.toggleAttribute('data-scrolled', window.scrollY > 4);
+    header.toggleAttribute('data-on-dark', onDark);
+  };
+
   update();
-  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    },
+    { passive: true },
+  );
 }
 
 /** The popover handles open, close, Escape and focus; links just need to close it. */
@@ -140,3 +166,4 @@ initReveal();
 initTableOfContents();
 initSectionNav();
 initCopyButtons();
+initMotion();

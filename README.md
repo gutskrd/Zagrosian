@@ -69,6 +69,31 @@ src/
 The site follows the visitor's light or dark system setting. Colours are tokens in
 `src/styles/global.css`; line art is inverted on dark surfaces.
 
+## Motion
+
+Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
+the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
+
+- **Hero:** the headline rises line by line from behind masks on load; the griffin fades in and
+  drifts slightly slower than the page (`data-parallax`).
+- **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
+  time. `effect="rise"` makes the words rise one after another as it enters the viewport;
+  `effect="highlight"` brightens them as the reader scrolls past (the About statement).
+- **Sections:** blocks marked `data-reveal` fade up; elements with the `rule` class draw their top
+  hairline across.
+- **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
+- **Header:** switches to the dark palette while it sits over a dark section.
+- **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
+
+Rules the code follows:
+
+- Only `transform`, `opacity` and colour change, so animations stay smooth on the compositor.
+- Everything is visible without JavaScript, and nothing moves when the visitor has turned on
+  *reduce motion*.
+- No HTML is generated in the browser and no `style` attributes are written, so the
+  Content-Security-Policy and Trusted Types rules in `public/_headers` stay strict.
+- Split headings keep their full text as their accessible name.
+
 ## Deploying to Cloudflare Pages
 
 Connect the repository in Cloudflare Pages with these settings:

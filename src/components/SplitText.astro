@@ -1,0 +1,53 @@
+---
+/**
+ * A heading split into words at build time, for word-by-word animation.
+ *
+ * - `rise`: words slide up from behind a mask as the heading scrolls into view.
+ * - `highlight`: words brighten one after another as the reader scrolls past.
+ *
+ * The heading keeps its full text as its accessible name; the split copy is
+ * hidden from assistive technology. Nothing is generated in the browser, so
+ * this works under the site's Trusted Types policy, and without JavaScript the
+ * heading simply shows as normal text.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'h2'> {
+  text: string;
+  as?: 'h1' | 'h2' | 'h3';
+  effect?: 'rise' | 'highlight';
+  id?: string;
+  class?: string;
+}
+
+// Remaining attributes include the parent component's style scope, so its
+// scoped styles still apply to the heading.
+const { text, as: Tag = 'h2', effect = 'rise', id, class: className, ...attributes } = Astro.props;
+
+const words = text.split(' ');
+// Keep the last two words together, so the heading never ends on a lone word.
+if (words.length > 2) {
+  const last = words.pop();
+  words[words.length - 1] += ` ${last}`;
+}
+---
+
+<Tag
+  {...attributes}
+  id={id}
+  class:list={['split', className]}
+  aria-label={text}
+  data-split={effect === 'rise' ? '' : undefined}
+  data-highlight={effect === 'highlight' ? '' : undefined}
+>
+  {
+    words.map((word, index) => (
+      <>
+        {index > 0 && ' '}
+        <span class="split__word" aria-hidden="true">
+          <span class="split__inner">{word}</span>
+        </span>
+      </>
+    ))
+  }
+</Tag>

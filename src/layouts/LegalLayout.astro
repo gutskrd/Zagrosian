@@ -27,6 +27,8 @@ const sections = headings.filter((heading) => heading.depth === 2);
 ---
 
 <BaseLayout title={`${title} — ${site.name}`} description={description}>
+  <div class="reading-progress" aria-hidden="true" data-reading-progress><span></span></div>
+
   <article class="legal" aria-labelledby="legal-title">
     <header class="container legal__header">
       <p class="eyebrow">{eyebrow}</p>
@@ -54,7 +56,7 @@ const sections = headings.filter((heading) => heading.depth === 2);
         )
       }
 
-      <div class="legal__content">
+      <div class="legal__content" data-legal-content>
         <slot />
       </div>
     </div>
@@ -62,6 +64,25 @@ const sections = headings.filter((heading) => heading.depth === 2);
 </BaseLayout>
 
 <style>
+  /* A hairline under the header that fills as you read. Without JavaScript it stays empty. */
+  .reading-progress {
+    position: fixed;
+    top: var(--header-height);
+    right: 0;
+    left: 0;
+    z-index: 40;
+    height: 2px;
+    pointer-events: none;
+  }
+
+  .reading-progress span {
+    display: block;
+    height: 100%;
+    background: var(--color-ink);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
   .legal {
     padding-block: clamp(4.5rem, 2.5rem + 7vw, 8rem) var(--section-space);
   }
@@ -131,6 +152,11 @@ const sections = headings.filter((heading) => heading.depth === 2);
     color: var(--color-muted);
     text-decoration: none;
     transition: color 0.2s ease;
+  }
+
+  .legal__toc a[aria-current] {
+    color: var(--color-ink);
+    font-weight: 500;
   }
 
   .legal__toc a:hover {

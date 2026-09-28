@@ -1,4 +1,6 @@
 ---
+import SplitText from './SplitText.astro';
+
 const principles = [
   {
     title: 'Community',
@@ -17,15 +19,15 @@ const principles = [
 
 <section class="principles section" aria-labelledby="principles-title">
   <div class="container">
-    <div class="principles__intro" data-reveal>
-      <p class="eyebrow">What we do</p>
-      <h2 id="principles-title" class="heading-2">We build for the Kurdish language and the people who speak&nbsp;it.</h2>
+    <div class="principles__intro">
+      <p class="eyebrow" data-reveal>What we do</p>
+      <SplitText id="principles-title" class="heading-2" text="We build for the Kurdish language and the people who speak it." />
     </div>
 
     <ol class="principles__list">
       {
         principles.map((principle, index) => (
-          <li class="principles__item" data-reveal>
+          <li class="principles__item rule" data-reveal>
             <span class="principles__index" aria-hidden="true">
               {String(index + 1).padStart(2, '0')}
             </span>
@@ -55,7 +57,6 @@ const principles = [
     align-content: start;
     column-gap: 1rem;
     padding-block: 2rem 2.5rem;
-    border-top: 1px solid var(--color-line);
   }
 
   .principles__index {
