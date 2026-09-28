@@ -1,7 +1,8 @@
 ---
 import Arrow from './Arrow.astro';
+import SocialIcon from './SocialIcon.astro';
 import Sun from './Sun.astro';
-import { footerNav, legalNav, site } from '../site';
+import { footerNav, legalNav, site, socialProfiles } from '../site';
 
 const year = new Date().getFullYear();
 ---
@@ -9,28 +10,48 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__top">
-      <p class="site-footer__about">
+      <div class="site-footer__about">
         <Sun class="site-footer__sun" />
-        <span>
-          Independent technology company<br />
-          based in {site.country}.
-        </span>
-      </p>
+        <div>
+          <p class="site-footer__motto" lang="ku">Ji Kurdan, ji bo Kurdan.</p>
+          <p>
+            Independent technology company<br />
+            based in {site.country}.
+          </p>
+        </div>
+      </div>
 
-      <nav aria-label="Footer">
-        <ul class="site-footer__links">
-          {
-            footerNav.map((link) => (
-              <li>
-                <a class="site-footer__link" href={link.href}>
-                  {link.label}
-                  {link.external && <Arrow direction="up-right" class="site-footer__external" />}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
+      <div class="site-footer__navs">
+        <nav aria-label="Footer">
+          <ul class="site-footer__links">
+            {
+              footerNav.map((link) => (
+                <li>
+                  <a class="site-footer__link" href={link.href}>
+                    {link.label}
+                    {link.external && <Arrow direction="up-right" class="site-footer__external" />}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <nav aria-label="Social media">
+          <ul class="site-footer__social">
+            {
+              socialProfiles.map((profile) => (
+                <li>
+                  <a class="site-footer__link" href={profile.url} rel="me">
+                    <SocialIcon name={profile.icon} class="site-footer__social-icon" />
+                    {profile.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
     </div>
 
     <div class="site-footer__mark" aria-hidden="true" data-rise>
@@ -81,16 +102,41 @@ const year = new Date().getFullYear();
     color: var(--color-muted);
   }
 
+  .site-footer__motto {
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
   .site-footer__about :global(.site-footer__sun) {
     width: 1.25rem;
     height: 1.25rem;
     margin-top: 0.125rem;
   }
 
-  .site-footer__links {
+  .site-footer__navs {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .site-footer__links,
+  .site-footer__social {
     display: flex;
     flex-wrap: wrap;
     gap: 0 1.75rem;
+  }
+
+  .site-footer__social .site-footer__link {
+    gap: 0.5rem;
+    color: var(--color-muted);
+  }
+
+  .site-footer__social .site-footer__link:hover {
+    color: var(--color-ink);
+  }
+
+  :global(.site-footer__social-icon) {
+    font-size: 1rem;
   }
 
   .site-footer__link {
@@ -172,12 +218,20 @@ const year = new Date().getFullYear();
       align-items: start;
     }
 
-    .site-footer__links {
+    .site-footer__navs {
+      justify-items: end;
+      gap: 1rem;
+    }
+
+    .site-footer__links,
+    .site-footer__social {
+      justify-content: flex-end;
       gap: 0 2.25rem;
     }
 
-    .site-footer__links .site-footer__link {
-      min-height: auto;
+    .site-footer__links .site-footer__link,
+    .site-footer__social .site-footer__link {
+      min-height: 1.5rem;
     }
   }
 </style>

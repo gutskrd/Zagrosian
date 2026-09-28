@@ -2,10 +2,11 @@
 import About from '../components/About.astro';
 import Contact from '../components/Contact.astro';
 import Hero from '../components/Hero.astro';
+import Motto from '../components/Motto.astro';
 import Principles from '../components/Principles.astro';
 import ProductShowcase from '../components/ProductShowcase.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { hevalo, site } from '../site';
+import { hevalo, site, socialProfiles } from '../site';
 
 const home = `${site.url}/`;
 
@@ -39,6 +40,7 @@ const structuredData = {
         { '@type': 'ContactPoint', contactType: 'general inquiries', email: site.emails.contact },
         { '@type': 'ContactPoint', contactType: 'press', email: site.emails.press },
       ],
+      sameAs: socialProfiles.map((profile) => profile.url),
       brand: site.products.map((product) => ({
         '@type': 'Brand',
         name: product.name,
@@ -54,6 +56,7 @@ const structuredData = {
 
   <Hero />
   <ProductShowcase product={hevalo} />
+  <Motto />
   <Principles />
   <About />
   <Contact />

@@ -144,6 +144,21 @@ function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
   };
 }
 
+/** The sun turns slowly as its section passes through the viewport. */
+function spin(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
+  let angle = 0;
+  return {
+    target: frame,
+    measure(viewportHeight) {
+      const rect = frame.getBoundingClientRect();
+      angle = clamp((viewportHeight - rect.top) / (viewportHeight + rect.height)) * 60;
+    },
+    render() {
+      layer.style.transform = `rotate(${angle.toFixed(2)}deg)`;
+    },
+  };
+}
+
 /** Words in a heading light up one by one as the reader scrolls past it. */
 function highlight(heading: HTMLElement): ScrollEffect {
   const words = [...heading.querySelectorAll<HTMLElement>('.split__word')];
@@ -235,6 +250,11 @@ export function initMotion() {
     for (const frame of document.querySelectorAll<HTMLElement>('[data-rise]')) {
       const layer = frame.firstElementChild;
       if (layer instanceof HTMLElement) effects.push(rise(frame, layer));
+    }
+
+    for (const frame of document.querySelectorAll<HTMLElement>('[data-spin]')) {
+      const layer = frame.firstElementChild;
+      if (layer instanceof HTMLElement) effects.push(spin(frame, layer));
     }
 
     for (const heading of document.querySelectorAll<HTMLElement>('[data-highlight]')) {

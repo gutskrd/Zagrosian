@@ -1,17 +1,18 @@
 ---
 layout: ../layouts/LegalLayout.astro
 title: Privacy Policy
-description: How Zagrosian handles personal data when you visit zagrosian.com or contact us.
+description: How Zagrosian handles personal data when you visit zagrosian.com, contact us or visit our social media profiles.
 updated: 2026-09-28
 ---
 
-This policy explains what personal data we process when you visit zagrosian.com or contact us, why we process it, and what rights you have. We collect very little, so it is short.
+This policy explains what personal data we process when you visit zagrosian.com, contact us or visit our social media profiles, why we process it, and what rights you have. We collect very little, so it is short.
 
 ## Summary
 
 - zagrosian.com has no accounts, forms, advertising, analytics or tracking.
 - We do not set cookies. Our hosting provider may set a strictly necessary security cookie when it needs to check that traffic is legitimate.
 - To deliver the website, our hosting provider processes technical data such as your IP address.
+- zagrosian.com links to our Instagram and TikTok profiles but loads nothing from those platforms. On the platforms themselves, their own privacy policies apply.
 - If you email us, we use your message only to reply and follow up. Job applications are deleted within four weeks after the application process ends, unless you agree that we keep them longer.
 - We do not sell personal data, and we do not use it for advertising or profiling.
 
@@ -47,6 +48,21 @@ If you send an application to [careers@zagrosian.com](mailto:careers@zagrosian.c
 
 We do not make decisions about you based solely on automated processing, and we do not profile visitors or applicants.
 
+## Social media
+
+We have profiles on [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) and [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com only links to them: it does not embed posts or load anything from these platforms, so they receive no data from our website until you follow a link.
+
+When you visit, follow or interact with our profiles, the platform processes your personal data under its own privacy policy and is responsible for that processing:
+
+- **Instagram** is provided in the European Union by Meta Platforms Ireland Limited. See the [Instagram Privacy Policy](https://privacycenter.instagram.com/policy).
+- **TikTok** is provided in the European Economic Area by TikTok Technology Limited, Ireland. See the [TikTok Privacy Policy](https://www.tiktok.com/legal/page/eea/privacy-policy/en).
+
+Both platforms show us aggregated statistics about our profiles and posts, such as the number of views and followers and the countries they come from. These statistics do not identify you, and we cannot influence how the platforms compile them. For Instagram, we and Meta are jointly responsible for these statistics under Meta's [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum). Meta has taken primary responsibility for them, including for handling requests about your rights, but you can also contact us.
+
+If you comment on our posts or send us a message on these platforms, we see your username, your public profile and your message, and use them only to reply. We handle messages the same way as email.
+
+**Legal basis:** our legitimate interest in presenting our company and our products and in communicating with people interested in them (Article 6(1)(f) GDPR).
+
 ## Cookies
 
 zagrosian.com does not use analytics, advertising or tracking cookies, and does not store anything else in your browser.
@@ -71,7 +87,7 @@ We only use email providers that offer equivalent safeguards for any transfer ou
 ## How long we keep data
 
 - **Technical data:** we do not store it. Cloudflare keeps request data for a limited period for security and operational purposes, as described in its privacy policy.
-- **Email:** we keep correspondence for as long as we need it to handle your message and any follow-up, and delete it no later than two years after our last contact, unless we must keep it longer to meet a legal obligation or to handle a dispute.
+- **Email and social media messages:** we keep correspondence for as long as we need it to handle your message and any follow-up, and delete it no later than two years after our last contact, unless we must keep it longer to meet a legal obligation or to handle a dispute.
 - **Job applications:** we delete them no later than four weeks after the application process ends. With your permission, we may keep your application for up to one year, in case another suitable role opens. You can withdraw that permission at any time.
 
 ## Your rights

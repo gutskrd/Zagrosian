@@ -34,6 +34,16 @@ Requires Node 22.12 or later.
   | `careers@zagrosian.com` | Privacy policy (job applications); add it to a careers page when you have one |
   | `hello@zagrosian.com`   | Not on the site                                        |
 
+- Social profiles (Instagram [@zagrosiano](https://www.instagram.com/zagrosiano/), TikTok
+  [@zagrosianofficial](https://www.tiktok.com/@zagrosianofficial)) are listed in `socialProfiles` in
+  `src/site.ts`. They appear in the footer and in the homepage structured data (`sameAs`), which helps
+  Google connect them to the company. The icons are inline SVGs from
+  [Simple Icons](https://simpleicons.org) (CC0), so the site never loads anything from either platform.
+  If you add or remove a profile, update the Social media section of the privacy policy too.
+- Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
+  *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement after
+  the Hevalo section, in [`Motto.astro`](src/components/Motto.astro). *Ji Kurdan, ji bo Kurdan.*
+  ("By Kurds, for Kurds") is in the footer.
 - [`src/components/`](src/components/): homepage sections.
 - [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
   [`security.md`](src/pages/security.md): legal pages, written in Markdown. When you change one, update
@@ -46,7 +56,8 @@ Requires Node 22.12 or later.
 public/            Favicons, logo, social image, manifest, robots.txt and Cloudflare _headers
 src/
   assets/brand/    Griffin emblem (source and sized variants) and the 21-ray sun
-  components/      Header, Footer, Hero, ProductShowcase, Principles, About, Contact, …
+  assets/fonts/    Inter subset with the Kurmanji letters Ş and ş
+  components/      Header, Footer, Hero, ProductShowcase, Motto, Principles, About, Contact, …
   layouts/         BaseLayout (document and SEO), LegalLayout (legal pages), NoticeLayout (404)
   pages/           Homepage, legal pages, 404, sitemap.xml and .well-known/security.txt
   scripts/site.ts  Header, mobile menu, section highlighting, scroll reveals, copy button,
@@ -66,6 +77,14 @@ src/
   footer mark uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
 
+- **Font:** Inter, self-hosted. The main file covers basic Latin, which already includes ê, î and û;
+  `src/assets/fonts/inter-kurmanji-opsz.woff2` adds Ş and ş, the only Kurmanji letters missing from
+  it, and loads only on pages that use them. It was cut from Fontsource's Inter Latin Extended file
+  (OFL, licence alongside it) with fontTools:
+  `pyftsubset node_modules/@fontsource-variable/inter/files/inter-latin-ext-opsz-normal.woff2
+  --unicodes=U+015E,U+015F --layout-features='*' --flavor=woff2
+  --output-file=src/assets/fonts/inter-kurmanji-opsz.woff2`.
+
 The site follows the visitor's light or dark system setting. Colours are tokens in
 `src/styles/global.css`; line art is inverted on dark surfaces.
 
@@ -81,6 +100,8 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
 - **Sections:** blocks marked `data-reveal` fade up; elements with the `rule` class draw their top
   hairline across.
+- **Motto:** the sun turns slowly as the section scrolls past (`data-spin`), and the Kurdish
+  sentence rises word by word.
 - **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
 - **Header:** switches to the dark palette while it sits over a dark section.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.

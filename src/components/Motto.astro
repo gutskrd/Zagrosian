@@ -1,0 +1,40 @@
+---
+import SplitText from './SplitText.astro';
+import Sun from './Sun.astro';
+---
+
+<section class="motto section" aria-labelledby="motto-title">
+  <div class="container motto__inner">
+    <div class="motto__sun" data-spin>
+      <Sun />
+    </div>
+    <SplitText id="motto-title" class="motto__text" lang="ku" text="Jiyan bi kurdî xweştire." />
+    <p class="motto__translation lead" data-reveal>Life is sweeter in Kurdish.</p>
+  </div>
+</section>
+
+<style>
+  .motto__inner {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .motto__sun {
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .motto__text {
+    /* "kurdî xweştire." stays on one line and is about 5.9em wide, so the size
+       is capped to fit narrow screens. */
+    font-size: min(var(--text-display), calc((100vw - 2 * var(--gutter)) / 6.2));
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+
+  .motto__translation {
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    color: var(--color-muted);
+  }
+</style>

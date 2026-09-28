@@ -5,6 +5,10 @@
  * - `rise`: words slide up from behind a mask as the heading scrolls into view.
  * - `highlight`: words brighten one after another as the reader scrolls past.
  *
+ * Inter's circumflex on î is wider than the letter, so at tight display
+ * tracking it touches a preceding ascender (the d in "kurdî"). Such an î is
+ * wrapped in `split__kern`, which adds a little space before it.
+ *
  * The heading keeps its full text as its accessible name; the split copy is
  * hidden from assistive technology. Nothing is generated in the browser, so
  * this works under the site's Trusted Types policy, and without JavaScript the
@@ -30,6 +34,9 @@ if (words.length > 2) {
   const last = words.pop();
   words[words.length - 1] += ` ${last}`;
 }
+
+/** Splits a word so that the odd-indexed parts are an î after an ascender. */
+const kernParts = (word: string) => word.split(/(?<=[bdfhklt])(î)/);
 ---
 
 <Tag
@@ -45,7 +52,7 @@ if (words.length > 2) {
       <>
         {index > 0 && ' '}
         <span class="split__word" aria-hidden="true">
-          <span class="split__inner">{word}</span>
+          <span class="split__inner">{kernParts(word).map((part, i) => (i % 2 ? <span class="split__kern">{part}</span> : part))}</span>
         </span>
       </>
     ))

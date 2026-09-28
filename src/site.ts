@@ -5,6 +5,13 @@ export interface Product {
   description: string;
 }
 
+export interface SocialProfile {
+  label: string;
+  handle: string;
+  url: string;
+  icon: 'instagram' | 'tiktok';
+}
+
 export interface NavLink {
   label: string;
   href: string;
@@ -35,8 +42,8 @@ export interface SiteConfig {
 export const hevalo: Product = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
-  category: 'Community platform',
-  description: 'A community platform for Kurdish people, wherever they live.',
+  category: 'Kurdish language learning',
+  description: 'Learn Kurdish with short lessons, multiplayer games and friends.',
 };
 
 export const site: SiteConfig = {
@@ -47,13 +54,18 @@ export const site: SiteConfig = {
   tagline: 'Software for Kurdish communities.',
   title: 'Zagrosian — Software for Kurdish communities',
   description:
-    'Zagrosian is an independent technology company building software for Kurdish communities worldwide, including Hevalo, a community platform for Kurdish people.',
+    'Zagrosian is an independent technology company building software for Kurdish communities worldwide, including Hevalo, an app for learning Kurdish.',
   emails: {
     contact: 'contact@zagrosian.com',
     press: 'press@zagrosian.com',
   },
   products: [hevalo],
 };
+
+export const socialProfiles: SocialProfile[] = [
+  { label: 'Instagram', handle: 'zagrosiano', url: 'https://www.instagram.com/zagrosiano/', icon: 'instagram' },
+  { label: 'TikTok', handle: 'zagrosianofficial', url: 'https://www.tiktok.com/@zagrosianofficial', icon: 'tiktok' },
+];
 
 export const primaryNav: NavLink[] = [
   { label: 'Hevalo', href: '/#hevalo' },
