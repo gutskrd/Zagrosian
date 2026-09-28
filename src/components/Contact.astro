@@ -12,6 +12,7 @@ const { email } = Astro.props;
   <div class="container" data-reveal>
     <p class="eyebrow">Contact</p>
     <h2 id="contact-title" class="heading-2 contact__title">Get in touch.</h2>
+    <p class="contact__text lead">For general questions, partnerships and press.</p>
     <a class="contact__email" href={`mailto:${email}`}>
       <span>{email}</span>
       <Arrow class="contact__arrow" />
@@ -21,6 +22,10 @@ const { email } = Astro.props;
 
 <style>
   .contact__title {
+    margin-top: 1.25rem;
+  }
+
+  .contact__text {
     margin-top: 1.25rem;
   }
 

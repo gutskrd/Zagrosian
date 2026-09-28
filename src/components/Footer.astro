@@ -1,7 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
-import Wordmark from './Wordmark.astro';
-import { footerNav, site } from '../site';
+import { footerNav, legalNav, site } from '../site';
 
 const year = new Date().getFullYear();
 ---
@@ -9,12 +8,10 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__top">
-      <div class="site-footer__brand">
-        <a class="site-footer__home" href="/">
-          <Wordmark />
-        </a>
-        <p class="site-footer__tagline">{site.tagline}</p>
-      </div>
+      <p class="site-footer__about">
+        Independent technology company<br />
+        based in {site.country}.
+      </p>
 
       <nav aria-label="Footer">
         <ul class="site-footer__links">
@@ -32,38 +29,49 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    <p class="site-footer__legal">
-      <small>&copy; {year} {site.name}</small>
-    </p>
+    <div class="site-footer__mark" aria-hidden="true">
+      <span>{site.name}</span>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p><small>&copy; {year} {site.legalName}</small></p>
+      <nav aria-label="Legal">
+        <ul class="site-footer__legal">
+          {
+            legalNav.map((link) => (
+              <li>
+                <a class="site-footer__link" href={link.href}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    padding-block: 4rem 2.5rem;
+    padding-block: 4rem 2rem;
     border-top: 1px solid var(--color-line);
     font-size: var(--text-sm);
   }
 
   .site-footer__top {
     display: grid;
-    gap: 3rem;
+    gap: 2.5rem;
   }
 
-  .site-footer__home {
-    display: inline-flex;
-    text-decoration: none;
-  }
-
-  .site-footer__tagline {
-    margin-top: 1rem;
+  .site-footer__about {
     color: var(--color-muted);
   }
 
   .site-footer__links {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.25rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.75rem;
   }
 
   .site-footer__link {
@@ -86,18 +94,57 @@ const year = new Date().getFullYear();
     color: var(--color-muted);
   }
 
-  .site-footer__legal {
-    margin-top: 4rem;
+  /* The wordmark spans the full content width at every screen size. */
+  .site-footer__mark {
+    container-type: inline-size;
+    margin-top: clamp(3.5rem, 2rem + 5vw, 7rem);
+    user-select: none;
+  }
+
+  .site-footer__mark span {
+    display: block;
+    font-size: 24.2cqi;
+    font-weight: 600;
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    /* Optical alignment with the text column. */
+    margin-left: -0.04em;
+    padding-bottom: 0.2em;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-line);
     color: var(--color-muted);
   }
 
-  .site-footer__legal small {
+  .site-footer__bottom small {
     font-size: inherit;
+  }
+
+  .site-footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+  }
+
+  .site-footer__legal .site-footer__link {
+    color: var(--color-muted);
+  }
+
+  .site-footer__legal .site-footer__link:hover {
+    color: var(--color-ink);
   }
 
   @media (min-width: 48rem) {
     .site-footer {
-      padding-block: 5rem 3rem;
+      padding-block: 5rem 2rem;
     }
 
     .site-footer__top {
@@ -106,17 +153,11 @@ const year = new Date().getFullYear();
     }
 
     .site-footer__links {
-      display: flex;
-      flex-wrap: wrap;
       gap: 0 2.25rem;
     }
 
-    .site-footer__link {
+    .site-footer__links .site-footer__link {
       min-height: auto;
-    }
-
-    .site-footer__legal {
-      margin-top: 6rem;
     }
   }
 </style>

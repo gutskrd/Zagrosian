@@ -1,13 +1,32 @@
 # Cloudflare Pages response headers
 # https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Cloudflare joins a header with a comma when more than one matching rule sets
+# it, which would corrupt policies such as the CSP. Each security header is
+# therefore defined exactly once, in the /* rule.
+#
+# Content-Security-Policy: the site only loads its own files and runs no inline
+# code. Adding a third-party script (analytics, embeds, Cloudflare Web
+# Analytics) requires listing it here, or it will be blocked.
 
 /*
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types 'none'
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=()
-  Strict-Transport-Security: max-age=31536000
+  Permissions-Policy: accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), gamepad=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-create=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), usb=(), xr-spatial-tracking=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  ! Access-Control-Allow-Origin
 
 # Fingerprinted build assets never change.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Keep the default *.pages.dev address out of search results, so Google only
+# indexes zagrosian.com. (Preview deployments are noindex by default.)
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

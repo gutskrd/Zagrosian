@@ -7,27 +7,50 @@ import ProductShowcase from '../components/ProductShowcase.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { hevalo, site } from '../site';
 
-const organization = {
+const home = `${site.url}/`;
+
+// WebSite gives Google the site name; Organization gives it the logo and company details.
+const structuredData = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: site.name,
-  url: site.url,
-  description: site.description,
-  ...(site.contactEmail ? { email: site.contactEmail } : {}),
-  brand: site.products.map((product) => ({
-    '@type': 'Brand',
-    name: product.name,
-    url: product.url,
-  })),
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${home}#website`,
+      name: site.name,
+      url: home,
+      publisher: { '@id': `${home}#organization` },
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${home}#organization`,
+      name: site.name,
+      url: home,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${site.url}/logo.png`,
+        width: 512,
+        height: 512,
+      },
+      description: site.description,
+      email: site.contactEmail,
+      address: { '@type': 'PostalAddress', addressCountry: 'NL' },
+      brand: site.products.map((product) => ({
+        '@type': 'Brand',
+        name: product.name,
+        url: product.url,
+      })),
+    },
+  ],
 };
 ---
 
 <BaseLayout>
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(organization)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(structuredData)} />
 
   <Hero />
   <ProductShowcase product={hevalo} />
   <Principles />
   <About />
-  {site.contactEmail && <Contact email={site.contactEmail} />}
+  <Contact email={site.contactEmail} />
 </BaseLayout>

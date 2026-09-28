@@ -1,6 +1,7 @@
 export interface Product {
   name: string;
   url: string;
+  category: string;
   description: string;
 }
 
@@ -12,47 +13,52 @@ export interface NavLink {
 
 export interface SiteConfig {
   name: string;
+  /** Name used in legal documents. Update when the company is registered. */
+  legalName: string;
   url: string;
+  country: string;
   tagline: string;
   title: string;
   description: string;
-  /**
-   * Official contact address. Leave `null` until one exists: the Contact
-   * section and every contact link stay hidden while it is unset.
-   */
-  contactEmail: string | null;
+  /** Official address for general, privacy and security enquiries. */
+  contactEmail: string;
   products: Product[];
 }
 
 export const hevalo: Product = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
-  description: 'A Kurdish community platform, built to bring language, culture and people together.',
+  category: 'Community platform',
+  description: 'A community platform for Kurdish people, wherever they live.',
 };
 
 export const site: SiteConfig = {
   name: 'Zagrosian',
+  legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
-  tagline: 'Technology for our people.',
-  title: 'Zagrosian — Technology for our people',
+  country: 'the Netherlands',
+  tagline: 'Software for Kurdish communities.',
+  title: 'Zagrosian — Software for Kurdish communities',
   description:
-    'Zagrosian is the independent technology company behind Hevalo, building modern products for Kurdish language, culture and community.',
-  contactEmail: null,
+    'Zagrosian is an independent technology company building software for Kurdish communities worldwide, including Hevalo, a community platform for Kurdish people.',
+  contactEmail: 'contact@zagrosian.com',
   products: [hevalo],
 };
-
-const contactLinks: NavLink[] = site.contactEmail ? [{ label: 'Contact', href: '/#contact' }] : [];
 
 export const primaryNav: NavLink[] = [
   { label: 'Hevalo', href: '/#hevalo' },
   { label: 'About', href: '/#about' },
-  ...contactLinks,
+  { label: 'Contact', href: '/#contact' },
 ];
 
 export const footerNav: NavLink[] = [
   { label: 'Hevalo', href: hevalo.url, external: true },
   { label: 'About', href: '/#about' },
-  ...contactLinks,
+  { label: 'Contact', href: '/#contact' },
+];
+
+export const legalNav: NavLink[] = [
   { label: 'Privacy', href: '/privacy' },
   { label: 'Terms', href: '/terms' },
+  { label: 'Security', href: '/security' },
 ];

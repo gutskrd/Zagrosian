@@ -1,0 +1,260 @@
+---
+import type { MarkdownLayoutProps } from 'astro';
+import { site } from '../site';
+import BaseLayout from './BaseLayout.astro';
+
+type Props = MarkdownLayoutProps<{
+  title: string;
+  description: string;
+  /** Small label above the title. */
+  eyebrow?: string;
+  /** Date of the last material change, e.g. 2026-09-28. */
+  updated: string | Date;
+}>;
+
+const { frontmatter, headings } = Astro.props;
+const { title, description, eyebrow = 'Legal' } = frontmatter;
+
+const updated = new Date(frontmatter.updated);
+const updatedLabel = updated.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+const sections = headings.filter((heading) => heading.depth === 2);
+---
+
+<BaseLayout title={`${title} — ${site.name}`} description={description}>
+  <article class="legal" aria-labelledby="legal-title">
+    <header class="container legal__header">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 id="legal-title" class="legal__title">{title}</h1>
+      <p class="legal__updated">
+        Last updated <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
+      </p>
+    </header>
+
+    <div class="container legal__grid">
+      {
+        sections.length > 0 && (
+          <nav class="legal__toc" aria-label="On this page">
+            <details class="legal__toc-details" data-toc>
+              <summary class="legal__toc-title">On this page</summary>
+              <ol>
+                {sections.map((section) => (
+                  <li>
+                    <a href={`#${section.slug}`}>{section.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          </nav>
+        )
+      }
+
+      <div class="legal__content">
+        <slot />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-block: clamp(4.5rem, 2.5rem + 7vw, 8rem) var(--section-space);
+  }
+
+  .legal__title {
+    margin-top: 1.25rem;
+    font-size: var(--text-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .legal__updated {
+    margin-top: 1.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .legal__grid {
+    display: grid;
+    gap: 3rem;
+    margin-top: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  /* Table of contents */
+
+  .legal__toc {
+    border-block: 1px solid var(--color-line);
+    font-size: var(--text-sm);
+  }
+
+  .legal__toc-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.25rem;
+    font-weight: 500;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .legal__toc-title::-webkit-details-marker {
+    display: none;
+  }
+
+  /* A plus that turns into a minus when open. */
+  .legal__toc-title::after {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    background:
+      linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+  }
+
+  .legal__toc-details[open] .legal__toc-title::after {
+    background: linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat;
+  }
+
+  .legal__toc ol {
+    display: grid;
+    padding-bottom: 1rem;
+  }
+
+  .legal__toc a {
+    display: block;
+    padding-block: 0.3rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .legal__toc a:hover {
+    color: var(--color-ink);
+  }
+
+  /* Long-form text */
+
+  .legal__content {
+    max-width: 42rem;
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--color-ink-soft);
+  }
+
+  .legal__content > :global(p:first-child) {
+    font-size: var(--text-lead);
+    line-height: 1.55;
+    letter-spacing: -0.011em;
+    color: var(--color-ink);
+  }
+
+  .legal__content :global(h2) {
+    margin-top: 3.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-line);
+    font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+  }
+
+  .legal__content :global(h3) {
+    margin-top: 2.25rem;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+  }
+
+  .legal__content :global(:is(p, ul, ol)) {
+    margin-top: 1.125rem;
+  }
+
+  .legal__content :global(:is(h2, h3) + :is(p, ul, ol)) {
+    margin-top: 1rem;
+  }
+
+  .legal__content :global(ul) {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .legal__content :global(ol) {
+    padding-left: 1.25rem;
+    list-style: decimal;
+  }
+
+  .legal__content :global(li) {
+    padding-left: 0.25rem;
+  }
+
+  .legal__content :global(li + li) {
+    margin-top: 0.5rem;
+  }
+
+  .legal__content :global(li::marker) {
+    color: var(--color-muted);
+  }
+
+  .legal__content :global(strong) {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .legal__content :global(a) {
+    color: var(--color-ink);
+    text-decoration-color: #c4c4c4;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .legal__content :global(a:hover) {
+    text-decoration-color: currentColor;
+  }
+
+  .legal__content :global(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 0.25rem;
+    background: var(--color-surface);
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.875em;
+    color: var(--color-ink);
+  }
+
+  @media (min-width: 64rem) {
+    .legal__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: start;
+    }
+
+    .legal__toc {
+      grid-column: 1 / span 3;
+      position: sticky;
+      top: calc(var(--header-height) + 2rem);
+      border: 0;
+    }
+
+    .legal__toc-title {
+      min-height: auto;
+      margin-bottom: 0.75rem;
+      pointer-events: none;
+    }
+
+    .legal__toc-title::after {
+      display: none;
+    }
+
+    .legal__content {
+      grid-column: 5 / span 7;
+    }
+
+    .legal__content :global(h2:first-child) {
+      margin-top: 0;
+    }
+  }
+</style>

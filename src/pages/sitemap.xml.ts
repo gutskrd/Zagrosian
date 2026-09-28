@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 import { site } from '../site';
 
-/** Indexable pages only; placeholder and error pages are `noindex`. */
-const paths = ['/'];
+/** Every indexable page. The 404 page is `noindex` and left out. */
+const paths = ['/', '/privacy', '/terms', '/security'];
 
 export const GET: APIRoute = () => {
   const urls = paths.map((path) => `  <url><loc>${new URL(path, site.url).href}</loc></url>`).join('\n');

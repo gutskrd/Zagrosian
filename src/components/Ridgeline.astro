@@ -63,6 +63,9 @@ const front = ridge(42);
   .ridgeline {
     overflow: hidden;
     pointer-events: none;
+    /* Let the ridge fade out at the screen edges instead of being cut off. */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
   }
 
   svg {

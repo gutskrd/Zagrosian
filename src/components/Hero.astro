@@ -1,20 +1,23 @@
 ---
+import { site } from '../site';
 import Cta from './Cta.astro';
 import Ridgeline from './Ridgeline.astro';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
-  <div class="container hero__content">
-    <h1 id="hero-title" class="hero__title intro">Technology for our&nbsp;people.</h1>
+  <div class="container">
+    <h1 id="hero-title" class="hero__title intro">
+      Software for <span class="hero__keep">Kurdish communities.</span>
+    </h1>
 
     <p class="hero__lead lead intro">
-      Zagrosian is an independent technology company. We build products that connect Kurdish people with their
-      language, their culture and each other.
+      {site.name} is an independent technology company based in {site.country}. We build products for Kurdish
+      communities around the world, starting with Hevalo.
     </p>
 
     <div class="hero__actions intro">
-      <Cta href="#hevalo" arrow="down">Discover Hevalo</Cta>
-      <Cta href="#about" variant="text">About Zagrosian</Cta>
+      <Cta href="#hevalo" arrow="down">Explore Hevalo</Cta>
+      <Cta href="#about" variant="text">About the company</Cta>
     </div>
   </div>
 
@@ -23,20 +26,17 @@ import Ridgeline from './Ridgeline.astro';
 
 <style>
   .hero {
-    display: flex;
-    flex-direction: column;
     padding-top: clamp(4.5rem, 2rem + 10vw, 10rem);
   }
 
   .hero__title {
-    max-width: 11ch;
     font-size: var(--text-display);
     line-height: 0.98;
     letter-spacing: -0.045em;
   }
 
   .hero__lead {
-    max-width: 34rem;
+    max-width: 36rem;
     margin-top: clamp(1.75rem, 1rem + 2vw, 2.75rem);
   }
 
@@ -44,12 +44,19 @@ import Ridgeline from './Ridgeline.astro';
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.75rem 1.5rem;
+    gap: 0.75rem 1.75rem;
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
   }
 
   .hero__ridge {
     margin-top: clamp(4.5rem, 2rem + 8vw, 9rem);
+  }
+
+  @media (min-width: 48rem) {
+    /* Keep the second line together once there is room for it. */
+    .hero__keep {
+      white-space: nowrap;
+    }
   }
 
   @media (prefers-reduced-motion: no-preference) {

@@ -46,6 +46,29 @@ function initReveal() {
   }
 }
 
+/**
+ * Legal pages: the table of contents is collapsed on small screens and
+ * always open on wide ones, where it sits in a sticky sidebar.
+ */
+function initTableOfContents() {
+  const toc = document.querySelector<HTMLDetailsElement>('[data-toc]');
+  if (!toc) return;
+
+  const wide = window.matchMedia('(min-width: 64rem)');
+  const sync = () => {
+    toc.open = wide.matches;
+  };
+  sync();
+  wide.addEventListener('change', sync);
+
+  toc.addEventListener('click', (event) => {
+    if (!wide.matches && event.target instanceof Element && event.target.closest('a')) {
+      toc.open = false;
+    }
+  });
+}
+
 initHeader();
 initMobileMenu();
 initReveal();
+initTableOfContents();

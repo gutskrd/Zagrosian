@@ -1,0 +1,12 @@
+# Monthly dependency updates, grouped into a single pull request.
+# Security updates are raised separately as soon as an advisory is published.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      dependencies:
+        patterns:
+          - '*'
