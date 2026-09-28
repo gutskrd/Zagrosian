@@ -1,0 +1,217 @@
+---
+import Arrow from './Arrow.astro';
+import Wordmark from './Wordmark.astro';
+import { hevalo, primaryNav } from '../site';
+---
+
+<header class="site-header" data-site-header>
+  <div class="container site-header__inner">
+    <a class="site-header__home" href="/">
+      <Wordmark />
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <ul class="site-nav__list">
+        {
+          primaryNav.map((link) => (
+            <li>
+              <a class="site-nav__link" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu">
+      <span class="menu-toggle__label menu-toggle__label--open">Menu</span>
+      <span class="menu-toggle__label menu-toggle__label--close" aria-hidden="true">Close</span>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" class="mobile-menu" popover aria-label="Menu" data-mobile-menu>
+    <div class="container">
+      <ul class="mobile-menu__list">
+        {
+          primaryNav.map((link) => (
+            <li>
+              <a class="mobile-menu__link" href={link.href}>
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="mobile-menu__external" href={hevalo.url}>
+        Visit {hevalo.name}
+        <Arrow direction="up-right" />
+      </a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(255 255 255 / 0.86);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    backdrop-filter: saturate(180%) blur(16px);
+    box-shadow: 0 1px 0 transparent;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .site-header[data-scrolled] {
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+  }
+
+  .site-header__home {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    text-decoration: none;
+  }
+
+  /* Desktop navigation */
+
+  .site-nav {
+    display: none;
+  }
+
+  .site-nav__list {
+    display: flex;
+    gap: 2.25rem;
+  }
+
+  .site-nav__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--text-sm);
+    font-weight: 450;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .site-nav__link:hover {
+    color: var(--color-ink);
+  }
+
+  /* Mobile menu */
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-right: -0.5rem;
+    padding: 0 0.5rem;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .menu-toggle__label--close,
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__label--open {
+    display: none;
+  }
+
+  .site-header:has(.mobile-menu:popover-open) .menu-toggle__label--close {
+    display: inline;
+  }
+
+  .mobile-menu {
+    position: fixed;
+    inset: var(--header-height) 0 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1.5rem 0 3rem;
+    border: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    transition:
+      opacity 0.3s var(--ease-out),
+      transform 0.3s var(--ease-out),
+      overlay 0.3s allow-discrete,
+      display 0.3s allow-discrete;
+  }
+
+  .mobile-menu:popover-open {
+    opacity: 1;
+    transform: none;
+  }
+
+  @starting-style {
+    .mobile-menu:popover-open {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+  }
+
+  .mobile-menu::backdrop {
+    background: transparent;
+  }
+
+  .mobile-menu__list {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .mobile-menu__link {
+    display: flex;
+    align-items: center;
+    min-height: 4.5rem;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 1.875rem;
+    font-weight: 560;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+  }
+
+  .mobile-menu__external {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    margin-top: 2rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    :global(html:has(.mobile-menu:popover-open)) {
+      overflow: hidden;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .site-nav {
+      display: block;
+    }
+
+    .menu-toggle,
+    .mobile-menu {
+      display: none;
+    }
+  }
+</style>

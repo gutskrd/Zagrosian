@@ -1,0 +1,52 @@
+---
+import Cta from '../components/Cta.astro';
+import { site } from '../site';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  /** Short page name, used in the document title. */
+  title: string;
+  eyebrow: string;
+  heading: string;
+  description: string;
+}
+
+const { title, eyebrow, heading, description } = Astro.props;
+---
+
+<BaseLayout title={`${title} — ${site.name}`} description={description} noindex>
+  <section class="notice" aria-labelledby="notice-title">
+    <div class="container">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 id="notice-title" class="notice__title">{heading}</h1>
+      <div class="notice__body lead">
+        <slot />
+      </div>
+      <Cta class="notice__back" href="/" variant="text" arrow="left">Back to homepage</Cta>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notice {
+    padding-block: clamp(5rem, 3rem + 8vw, 10rem) var(--section-space);
+  }
+
+  .notice__title {
+    max-width: 14ch;
+    margin-top: 1.25rem;
+    font-size: var(--text-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .notice__body {
+    max-width: 34rem;
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+  }
+
+  .notice :global(.notice__back) {
+    flex-direction: row-reverse;
+    margin-top: 2rem;
+  }
+</style>

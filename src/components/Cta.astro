@@ -1,0 +1,95 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import Arrow, { type ArrowDirection } from './Arrow.astro';
+
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+  /** `solid` on light backgrounds, `inverse` on dark ones, `text` for a quiet secondary link. */
+  variant?: 'solid' | 'inverse' | 'text';
+  arrow?: ArrowDirection;
+}
+
+const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro.props;
+---
+
+<a class:list={['cta', `cta--${variant}`, className]} {...attrs}>
+  <span><slot /></span>
+  <Arrow direction={arrow} class="cta__arrow" />
+</a>
+
+<style>
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.006em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .cta--solid,
+  .cta--inverse {
+    min-height: 3.25rem;
+    padding: 0 1.5rem;
+    border-radius: 999px;
+  }
+
+  .cta--solid {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .cta--solid:hover {
+    background: #2b2b2b;
+  }
+
+  .cta--inverse {
+    background: var(--color-night-ink);
+    color: var(--color-night);
+  }
+
+  .cta--inverse:hover {
+    background: #d9d9d9;
+  }
+
+  .cta--text {
+    min-height: 3.25rem;
+    color: var(--color-ink);
+  }
+
+  .cta--text span {
+    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+    padding-bottom: 0.125rem;
+    transition: background-size 0.4s var(--ease-out);
+  }
+
+  .cta--text:hover span {
+    background-size: 100% 1px;
+  }
+
+  :global(.cta__arrow) {
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .cta:hover :global(.arrow--right) {
+    transform: translateX(3px);
+  }
+
+  .cta:hover :global(.arrow--left) {
+    transform: translateX(-3px);
+  }
+
+  .cta:hover :global(.arrow--down) {
+    transform: translateY(2px);
+  }
+
+  .cta:hover :global(.arrow--up-right) {
+    transform: translate(2px, -2px);
+  }
+</style>

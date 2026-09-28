@@ -1,0 +1,75 @@
+---
+import Cta from './Cta.astro';
+import Ridgeline from './Ridgeline.astro';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__content">
+    <h1 id="hero-title" class="hero__title intro">Technology for our&nbsp;people.</h1>
+
+    <p class="hero__lead lead intro">
+      Zagrosian is an independent technology company. We build products that connect Kurdish people with their
+      language, their culture and each other.
+    </p>
+
+    <div class="hero__actions intro">
+      <Cta href="#hevalo" arrow="down">Discover Hevalo</Cta>
+      <Cta href="#about" variant="text">About Zagrosian</Cta>
+    </div>
+  </div>
+
+  <Ridgeline class="hero__ridge" />
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    flex-direction: column;
+    padding-top: clamp(4.5rem, 2rem + 10vw, 10rem);
+  }
+
+  .hero__title {
+    max-width: 11ch;
+    font-size: var(--text-display);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+
+  .hero__lead {
+    max-width: 34rem;
+    margin-top: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+
+  .hero__ridge {
+    margin-top: clamp(4.5rem, 2rem + 8vw, 9rem);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .intro {
+      animation: intro 1.1s var(--ease-out) both;
+    }
+
+    .hero__lead {
+      animation-delay: 0.12s;
+    }
+
+    .hero__actions {
+      animation-delay: 0.22s;
+    }
+  }
+
+  @keyframes intro {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+</style>

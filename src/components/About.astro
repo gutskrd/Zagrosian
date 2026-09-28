@@ -1,0 +1,52 @@
+<section id="about" class="about section" aria-labelledby="about-title">
+  <div class="container about__grid">
+    <p class="eyebrow" data-reveal>About</p>
+
+    <div class="about__body" data-reveal>
+      <h2 id="about-title" class="about__statement">Built from our roots. Designed for what comes&nbsp;next.</h2>
+      <p class="about__text lead">
+        Zagrosian takes its name from the Zagros mountains. We are an independent technology company with Kurdish
+        roots, building modern products for Kurdish people wherever they live.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    background: var(--color-surface);
+  }
+
+  .about__grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .about__statement {
+    max-width: 16ch;
+    font-size: var(--text-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .about__text {
+    max-width: 36rem;
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .about__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+    }
+
+    .about__grid > .eyebrow {
+      grid-column: 1 / span 3;
+      padding-top: 0.6rem;
+    }
+
+    .about__body {
+      grid-column: 4 / -1;
+    }
+  }
+</style>

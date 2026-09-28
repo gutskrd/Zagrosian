@@ -1,0 +1,246 @@
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+:root {
+  /* Colour: black and white, with a small set of neutrals. */
+  --color-paper: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #3d3d3d;
+  --color-muted: #6b6b6b;
+  --color-line: #e5e5e5;
+  --color-surface: #f5f5f4;
+
+  /* Inverse surfaces (the product showcase). */
+  --color-night: #0a0a0a;
+  --color-night-ink: #fafafa;
+  --color-night-muted: #a3a3a3;
+  --color-night-line: #2a2a2a;
+
+  --focus-ring: var(--color-ink);
+
+  /* Type */
+  --font-sans: var(--font-inter);
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lead: clamp(1.1875rem, 1.05rem + 0.55vw, 1.5rem);
+  --text-h3: 1.25rem;
+  --text-h2: clamp(2.25rem, 1.35rem + 3.6vw, 4.75rem);
+  --text-display: clamp(3.5rem, 1.5rem + 7.2vw, 8.5rem);
+
+  /* Layout */
+  --container: 86rem;
+  --gutter: clamp(1.25rem, 0.75rem + 2.5vw, 3rem);
+  --section-space: clamp(6rem, 3.5rem + 10vw, 11rem);
+  --header-height: 4rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration: 0.9s;
+
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--header-height);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-optical-sizing: auto;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* ==========================================================================
+   Primitives
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: var(--section-space);
+}
+
+.inverse {
+  --focus-ring: var(--color-night-ink);
+  background: var(--color-night);
+  color: var(--color-night-ink);
+}
+
+.inverse ::selection {
+  background: var(--color-night-ink);
+  color: var(--color-night);
+}
+
+.eyebrow {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-muted);
+}
+
+.inverse .eyebrow {
+  color: var(--color-night-muted);
+}
+
+.heading-2 {
+  font-size: var(--text-h2);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  letter-spacing: -0.011em;
+  color: var(--color-ink-soft);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ==========================================================================
+   Motion
+   Content below the fold rises in once as it enters the viewport.
+   `data-reveal="pending"` is only ever set by script, and never when the
+   visitor prefers reduced motion, so content is always visible without JS.
+   ========================================================================== */
+
+[data-reveal] {
+  transition:
+    opacity var(--duration) var(--ease-out) var(--reveal-delay, 0s),
+    transform var(--duration) var(--ease-out) var(--reveal-delay, 0s);
+}
+
+[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(1.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

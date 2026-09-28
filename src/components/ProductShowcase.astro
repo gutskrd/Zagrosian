@@ -1,0 +1,100 @@
+---
+import Cta from './Cta.astro';
+import type { Product } from '../site';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const id = product.name.toLowerCase();
+---
+
+<section id={id} class="showcase inverse" aria-labelledby={`${id}-title`}>
+  <div class="container">
+    <p class="eyebrow" data-reveal>Our products</p>
+
+    <div class="showcase__body">
+      <div class="showcase__identity" data-reveal>
+        <h2 id={`${id}-title`} class="showcase__name">{product.name}</h2>
+        <p class="showcase__byline">A product by Zagrosian</p>
+      </div>
+
+      <div class="showcase__details" data-reveal>
+        <p class="showcase__description">{product.description}</p>
+        <Cta href={product.url} variant="inverse">Visit {product.name}</Cta>
+      </div>
+    </div>
+
+    <p class="showcase__note" data-reveal>
+      {product.name} is our first product. It won’t be the last.
+    </p>
+  </div>
+</section>
+
+<style>
+  .showcase {
+    padding-block: var(--section-space) clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .showcase__body {
+    display: grid;
+    gap: clamp(3rem, 2rem + 4vw, 4.5rem);
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .showcase__name {
+    font-size: clamp(4.5rem, 1.75rem + 13vw, 13.5rem);
+    font-weight: 600;
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    /* Optical alignment: the H's stem sits slightly inside the text box. */
+    margin-left: -0.05em;
+  }
+
+  .showcase__byline {
+    margin-top: 1.5rem;
+    font-size: var(--text-lead);
+    letter-spacing: -0.011em;
+    color: var(--color-night-muted);
+  }
+
+  .showcase__details {
+    display: grid;
+    justify-items: start;
+    gap: 2rem;
+  }
+
+  .showcase__description {
+    max-width: 30rem;
+    font-size: var(--text-lead);
+    line-height: 1.45;
+    letter-spacing: -0.011em;
+  }
+
+  .showcase__note {
+    margin-top: clamp(5rem, 3rem + 7vw, 10rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-night-line);
+    font-size: var(--text-sm);
+    color: var(--color-night-muted);
+  }
+
+  @media (min-width: 64rem) {
+    .showcase__body {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      align-items: end;
+      column-gap: 2rem;
+    }
+
+    .showcase__identity {
+      grid-column: 1 / span 7;
+    }
+
+    .showcase__details {
+      --reveal-delay: 0.12s;
+      grid-column: 8 / -1;
+      padding-bottom: 0.25rem;
+    }
+  }
+</style>

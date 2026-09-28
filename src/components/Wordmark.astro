@@ -1,0 +1,23 @@
+---
+/**
+ * The Zagrosian wordmark. Typographic until a drawn logo exists;
+ * swap the contents here and it updates everywhere.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['wordmark', className]}>Zagrosian</span>
+
+<style>
+  .wordmark {
+    font-size: 1.1875rem;
+    font-weight: 620;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+</style>
