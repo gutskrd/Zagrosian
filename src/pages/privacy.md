@@ -12,14 +12,14 @@ This policy explains what personal data we process when you visit zagrosian.com 
 - zagrosian.com has no accounts, forms, advertising, analytics or tracking.
 - We do not set cookies. Our hosting provider may set a strictly necessary security cookie when it needs to check that traffic is legitimate.
 - To deliver the website, our hosting provider processes technical data such as your IP address.
-- If you email us, we use your message only to reply and follow up.
+- If you email us, we use your message only to reply and follow up. Job applications are deleted within four weeks after the application process ends, unless you agree that we keep them longer.
 - We do not sell personal data, and we do not use it for advertising or profiling.
 
 ## Who we are
 
 Zagrosian, based in the Netherlands, is responsible for the processing of personal data described in this policy (the "controller" under the General Data Protection Regulation, or GDPR).
 
-You can reach us about anything in this policy at [contact@zagrosian.com](mailto:contact@zagrosian.com). We are not required to appoint a data protection officer and have not done so.
+For anything in this policy, including requests about your personal data, email [privacy@zagrosian.com](mailto:privacy@zagrosian.com). We are not required to appoint a data protection officer and have not done so.
 
 This policy covers zagrosian.com only. Hevalo and our other products have their own privacy policies.
 
@@ -35,11 +35,17 @@ Our hosting provider, Cloudflare, uses this information to deliver the website, 
 
 ### When you email us
 
-If you email us, we process your email address, your name if you provide it, your message and anything else you choose to include. We use this only to read and answer your message and to follow up on it.
+If you email any of our addresses, we process your email address, your name if you provide it, your message and anything else you choose to include. We use this only to read and answer your message and to follow up on it.
 
 **Legal basis:** our legitimate interest in responding to enquiries (Article 6(1)(f) GDPR) or, if your message is about entering into an agreement with us, taking steps at your request before doing so (Article 6(1)(b) GDPR).
 
-We do not make decisions about you based solely on automated processing, and we do not profile visitors.
+### When you apply for a job
+
+If you send an application to [careers@zagrosian.com](mailto:careers@zagrosian.com), we process your contact details, your CV and anything else you include, only to assess your application and to communicate with you about it. Please do not send us special categories of personal data, such as health information, unless we ask for it.
+
+**Legal basis:** taking steps at your request before entering into an employment or other working agreement (Article 6(1)(b) GDPR).
+
+We do not make decisions about you based solely on automated processing, and we do not profile visitors or applicants.
 
 ## Cookies
 
@@ -66,6 +72,7 @@ We only use email providers that offer equivalent safeguards for any transfer ou
 
 - **Technical data:** we do not store it. Cloudflare keeps request data for a limited period for security and operational purposes, as described in its privacy policy.
 - **Email:** we keep correspondence for as long as we need it to handle your message and any follow-up, and delete it no later than two years after our last contact, unless we must keep it longer to meet a legal obligation or to handle a dispute.
+- **Job applications:** we delete them no later than four weeks after the application process ends. With your permission, we may keep your application for up to one year, in case another suitable role opens. You can withdraw that permission at any time.
 
 ## Your rights
 
@@ -78,7 +85,7 @@ Under the GDPR you have the right to:
 - object to processing based on our legitimate interests;
 - receive your data in a portable format, where this applies.
 
-To exercise any of these rights, email [contact@zagrosian.com](mailto:contact@zagrosian.com). We will respond within one month. We may ask you to confirm your identity before we act on a request.
+To exercise any of these rights, email [privacy@zagrosian.com](mailto:privacy@zagrosian.com). We will respond within one month. We may ask you to confirm your identity before we act on a request.
 
 You also have the right to lodge a complaint with a data protection authority. In the Netherlands this is the [Autoriteit Persoonsgegevens](https://www.autoriteitpersoonsgegevens.nl/). You can also contact the authority in the EU country where you live or work. We would appreciate the chance to address your concern first.
 
@@ -96,4 +103,4 @@ We may update this policy when our website, our services or the law change. The 
 
 ## Contact
 
-For questions about this policy or your personal data, email [contact@zagrosian.com](mailto:contact@zagrosian.com).
+For questions about this policy or your personal data, email [privacy@zagrosian.com](mailto:privacy@zagrosian.com). For anything else, see the [contact section](/#contact) on our homepage.

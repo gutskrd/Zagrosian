@@ -22,11 +22,22 @@ Requires Node 22.12 or later.
 
 ## Editing content
 
-- [`src/site.ts`](src/site.ts): company name, contact email, country, title, description and products.
+- [`src/site.ts`](src/site.ts): company name, country, title, description, products, the email
+  addresses and the contact directory shown on the homepage:
+
+  | Address                 | Used for                                        |
+  | ----------------------- | ----------------------------------------------- |
+  | `contact@zagrosian.com` | Main contact: business, partnerships, security |
+  | `hello@zagrosian.com`   | General questions                               |
+  | `press@zagrosian.com`   | Media and press                                 |
+  | `careers@zagrosian.com` | Jobs and applications                           |
+  | `privacy@zagrosian.com` | Privacy questions and data requests             |
+  | `legal@zagrosian.com`   | Legal matters                                   |
+
 - [`src/components/`](src/components/): homepage sections.
 - [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
   [`security.md`](src/pages/security.md): legal pages, written in Markdown. When you change one, update
-  its `updated:` date. The contact email and company details are written out in these files, so update
+  its `updated:` date. Email addresses and company details are written out in these files, so update
   them there too if they change.
 
 ## Structure
@@ -110,7 +121,8 @@ Recommended settings outside the code:
 
 - **Cloudflare:** enable DNSSEC, set SSL/TLS to *Full (strict)*, turn on *Always Use HTTPS*, set the
   minimum TLS version to 1.2, and add CAA records for the certificate authorities you use.
-- **Email:** set up `contact@zagrosian.com` with Cloudflare Email Routing and add a DMARC record.
+- **Email:** make sure all six addresses receive mail (for example with Cloudflare Email Routing), and
+  add SPF, DKIM and DMARC records so nobody can send email pretending to be zagrosian.com.
 - **Accounts:** use two-factor authentication on Cloudflare, GitHub and your domain registrar, and
   enable the registrar lock.
 - **HSTS preload:** once the site has run on HTTPS without issues, you can submit the domain at

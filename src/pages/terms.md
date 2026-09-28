@@ -50,4 +50,4 @@ These terms are governed by the laws of the Netherlands. Disputes will be submit
 
 ## Contact
 
-For questions about these terms, email [contact@zagrosian.com](mailto:contact@zagrosian.com).
+For questions about these terms or other legal matters, email [legal@zagrosian.com](mailto:legal@zagrosian.com).

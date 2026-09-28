@@ -103,33 +103,33 @@ function initSectionNav() {
   for (const id of links.keys()) observer.observe(document.getElementById(id)!);
 }
 
-/** "Copy address" buttons. They stay hidden where the Clipboard API is unavailable. */
+/**
+ * Copy buttons next to email addresses. They stay hidden where the Clipboard
+ * API is unavailable. The icon turns into a check mark, and a live region
+ * announces the result to screen readers.
+ */
 function initCopyButtons() {
   if (!navigator.clipboard?.writeText) return;
 
   for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
-    const status = button.parentElement?.querySelector<HTMLElement>('[data-copy-status]');
-    const label = button.textContent ?? '';
+    const status = button.closest('section')?.querySelector<HTMLElement>('[data-copy-status]');
+    const value = button.dataset.copy ?? '';
     let reset: number | undefined;
-
-    const announce = (buttonText: string, message: string) => {
-      button.textContent = buttonText;
-      if (status) status.textContent = message;
-      window.clearTimeout(reset);
-      reset = window.setTimeout(() => {
-        button.textContent = label;
-        if (status) status.textContent = '';
-      }, 2500);
-    };
 
     button.hidden = false;
     button.addEventListener('click', async () => {
+      window.clearTimeout(reset);
       try {
-        await navigator.clipboard.writeText(button.dataset.copy ?? '');
-        announce('Copied', 'Email address copied to the clipboard.');
+        await navigator.clipboard.writeText(value);
+        button.toggleAttribute('data-copied', true);
+        if (status) status.textContent = `${value} copied to the clipboard.`;
       } catch {
-        announce(label, 'Could not copy. Select the address to copy it instead.');
+        if (status) status.textContent = `Could not copy. Select ${value} to copy it instead.`;
       }
+      reset = window.setTimeout(() => {
+        button.removeAttribute('data-copied');
+        if (status) status.textContent = '';
+      }, 2000);
     });
   }
 }

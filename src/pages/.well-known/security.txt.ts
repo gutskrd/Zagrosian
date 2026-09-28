@@ -12,7 +12,7 @@ export const GET: APIRoute = () => {
   expires.setUTCHours(0, 0, 0, 0);
 
   const body = [
-    `Contact: mailto:${site.contactEmail}`,
+    `Contact: mailto:${site.emails.contact}`,
     `Expires: ${expires.toISOString()}`,
     'Preferred-Languages: en, nl',
     `Canonical: ${site.url}/.well-known/security.txt`,
