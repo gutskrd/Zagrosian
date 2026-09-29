@@ -62,10 +62,10 @@ export const site: SiteConfig = {
   legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
   country: 'the Netherlands',
-  tagline: 'Technology for Kurdish communities.',
-  title: 'Zagrosian — Technology for Kurdish communities',
+  tagline: 'Technology for everyday life.',
+  title: 'Zagrosian — Technology for everyday life',
   description:
-    'Zagrosian is an independent technology company building consumer products for Kurdish speakers worldwide, including the language-learning app Hevalo.',
+    'Zagrosian is an independent technology company based in the Netherlands. We design and build consumer products, starting with Hevalo, an app for learning Kurdish.',
   emails: {
     contact: 'contact@zagrosian.com',
     press: 'press@zagrosian.com',
@@ -81,11 +81,11 @@ export const headquarters = site.country.replace(/^the /, '');
  * built from this, so they always say the same thing.
  */
 export const home = {
-  headline: ['Technology', 'for Kurdish', 'communities.'],
-  lead: `${site.name} is an independent technology company. We build consumer products for Kurdish speakers worldwide, including the language-learning app ${hevalo.name}.`,
+  headline: ['Technology for', 'everyday life.'],
+  lead: `${site.name} is an independent technology company based in ${site.country}. We design and build consumer products, starting with ${hevalo.name}, an app for learning Kurdish.`,
   motto: { ku: 'Jiyan bi kurdî xweştire.', en: 'Life is sweeter in Kurdish.' },
-  mission: 'Our mission is to support the Kurdish language and its speakers through technology.',
-  approach: `${site.name} is privately owned. We design and build our products in-house, with a strong focus on quality and privacy.`,
+  mission: 'Our mission is to build software people enjoy using every day: fast, private and well designed.',
+  approach: `${site.name} is privately owned. We design and build our products in-house.`,
   contact: 'For general enquiries and partnerships, please contact us by email.',
   footerMotto: { ku: 'Ji Kurdan, ji bo Kurdan.', en: 'By Kurds, for Kurds.' },
 };
