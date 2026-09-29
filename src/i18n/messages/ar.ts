@@ -18,6 +18,7 @@ export const ar: Messages = {
     menu: 'القائمة',
     close: 'إغلاق',
     backToTop: 'العودة إلى الأعلى',
+    loading: 'جارٍ التحميل',
   },
   nav: {
     home: 'الرئيسية',
@@ -35,6 +36,13 @@ export const ar: Messages = {
     system: 'حسب النظام',
     light: 'فاتح',
     dark: 'داكن',
+  },
+  sound: {
+    label: 'الصوت',
+    on: 'تشغيل الصوت',
+    off: 'إيقاف الصوت',
+    prompt: 'التجربة أجمل مع الصوت.',
+    dismiss: 'لا، شكرًا',
   },
   language: {
     label: 'اللغة',

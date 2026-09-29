@@ -79,7 +79,9 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   ink.ts (the hero horseman in WebGL), language.ts, theme.ts and theme-init.js
+                   ink.ts (the hero horseman in WebGL), intro.ts (opening screen), sound.ts,
+                   cursor.ts, magnetic.ts, smooth.ts, text.ts, language.ts, theme.ts and
+                   theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -176,8 +178,9 @@ Rules the code follows:
 - Only `transform`, `opacity` and colour change, so animations stay smooth on the compositor.
 - Everything is visible without JavaScript, and nothing moves when the visitor has turned on
   *reduce motion*.
-- No HTML is generated in the browser and no `style` attributes are written, so the
-  Content-Security-Policy and Trusted Types rules in `public/_headers` stay strict.
+- No HTML is generated in the browser and no `style` attributes are written (styles are set through
+  the CSSOM, and new elements are built with the DOM API), so the Content-Security-Policy and Trusted
+  Types rules in `public/_headers` stay strict.
 - Split headings keep their full text as their accessible name.
 
 ### The horseman in ink
@@ -204,7 +207,54 @@ returns (within about three seconds).
 
 It costs nothing while nothing moves: frames are drawn only during the entrance, the wind or a
 scroll, and only while the hero is on screen. Phones and low-memory devices get fewer, larger
-particles.
+particles. On the first visit of a session the ink waits for the opening screen to lift.
+
+## The studio experience
+
+The site behaves like a design studio's: an opening screen, sound, a custom cursor, magnetic
+buttons, rolling labels, smooth scrolling and cinematic page changes. All of it is original: the
+sounds are synthesised in the browser, and nothing is borrowed from another site. Every piece steps
+back for visitors who prefer reduced motion, and the site works fully without it.
+
+- **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
+  [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
+  the horseman fills in as a counter runs to 100 (in the page's own digits, so Persian and Arabic
+  count in theirs). It follows the page's real loading and takes at least 1.4 seconds; then the
+  curtain rises and the hero's entrance plays from the start. It is decoration, hidden from screen
+  readers, never shown without JavaScript or with *reduce motion*, and lifts by itself after four
+  seconds should the script not start.
+- **Sound** ([`sound.ts`](src/scripts/sound.ts)): off until the visitor turns it on, from the header
+  (the level meter), the mobile menu, quick navigation, or a small card offered once. Everything is
+  synthesised with the Web Audio API, so nothing is downloaded and the Content-Security-Policy needs
+  no media sources:
+  - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
+    soft wind, and now and then a bell, in a generated reverb;
+  - interface sounds: a tick when the pointer or keyboard reaches a control, a tap on a click, air
+    when a menu opens or closes, a sweep when leaving for another page, and bells when sound is
+    switched on or off.
+
+  The choice is remembered. Browsers only allow audio after an interaction, so on a new page the score
+  resumes at once where the browser allows it (Chrome, within the site) or with the first click or key
+  press. It pauses while the tab is hidden.
+- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a dot and a trailing ring that
+  invert what is under them. Over a link or a plain button the ring becomes a lens; over an external
+  link it adds an arrow; over a magnetic button it steps aside while the button answers; over the ink
+  horseman it widens like a breath of wind. Over text fields, and while a dialog or menu is open, the
+  system cursor returns.
+- **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`magnetic.ts`](src/scripts/magnetic.ts),
+  [`RollText.astro`](src/components/RollText.astro)): magnetic (they lean towards the pointer on a
+  spring), their colour pours in from where the pointer entered, labels roll letter by letter (Arabic
+  script, whose letters join, rolls as one piece) and arrows slide out as a copy slides in. Header
+  links roll too.
+- **Text** ([`text.ts`](src/scripts/text.ts)): paragraphs marked `data-lines` rise line by line from
+  behind masks, then are put back as they were; section labels are small monospace capitals that decode
+  from random characters as they appear (Latin script). Headlines are set large and fairly light.
+- **Scrolling** ([`smooth.ts`](src/scripts/smooth.ts), [Lenis](https://github.com/darkroomengineering/lenis),
+  MIT): wheel and trackpad scrolling is eased and weighted; touch screens keep their own. The page still
+  scrolls natively, so anchors, the keyboard and assistive technology work as usual. Large type
+  (`data-velocity`: the Hevalo name, the footer wordmark) leans with the speed of the scroll.
+- **Page changes:** in browsers with cross-document view transitions, the next page rises over the
+  last like a card laid on top while the old one sinks back and darkens.
 
 ## Readable by machines
 
@@ -302,8 +352,8 @@ is missing.
 - **Instant navigation:** a `Speculation-Rules` header points Chrome and Edge to
   [`public/speculation-rules.json`](public/speculation-rules.json), which prerenders a page on this site
   when a visitor hovers or starts to tap a link to it. Other browsers ignore it.
-- **Page transitions:** browsers that support cross-document view transitions cross-fade between
-  pages, with the header staying in place.
+- **Page transitions:** browsers that support cross-document view transitions lay the next page over
+  the last (see *The studio experience*), with the header staying in place.
 - **Accessibility preferences:** besides light and dark mode and *reduce motion*, the site responds to
   *increase contrast* (darker secondary text and lines), to *reduce transparency* (a solid header and
   a plain dimmed backdrop behind quick navigation) and to Windows' forced colours (high contrast),

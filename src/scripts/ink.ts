@@ -512,8 +512,10 @@ export async function initInk() {
   };
 
   function request() {
-    if (!frameId && onScreen && !stopped) frameId = requestAnimationFrame(frame);
+    // The ink gathers once the opening screen has gone (intro.ts).
+    if (!frameId && onScreen && !stopped && root.dataset.intro === undefined) frameId = requestAnimationFrame(frame);
   }
+  document.addEventListener('intro:end', () => request(), { once: true });
 
   /* ------------------------------------------------------------------------ */
   /* Input                                                                    */

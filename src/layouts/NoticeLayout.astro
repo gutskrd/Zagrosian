@@ -24,7 +24,7 @@ const { t, localize } = i18n(Astro.url);
       <div class="notice__body lead">
         <slot />
       </div>
-      <Cta class="notice__back" href={localize('/')} variant="text" arrow="left">{t.notFound.back}</Cta>
+      <Cta class="notice__back" href={localize('/')} variant="outline" arrow="left" label={t.notFound.back} />
     </div>
   </section>
 </BaseLayout>

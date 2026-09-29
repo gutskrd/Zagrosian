@@ -17,6 +17,7 @@ export const nl: Messages = {
     menu: 'Menu',
     close: 'Sluiten',
     backToTop: 'Terug naar boven',
+    loading: 'Laden',
   },
   nav: {
     home: 'Home',
@@ -34,6 +35,13 @@ export const nl: Messages = {
     system: 'Systeem',
     light: 'Licht',
     dark: 'Donker',
+  },
+  sound: {
+    label: 'Geluid',
+    on: 'Geluid aanzetten',
+    off: 'Geluid uitzetten',
+    prompt: 'Het mooist met geluid.',
+    dismiss: 'Nee, bedankt',
   },
   language: {
     label: 'Taal',

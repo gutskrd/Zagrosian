@@ -17,6 +17,7 @@ export const tr: Messages = {
     menu: 'Menü',
     close: 'Kapat',
     backToTop: 'Başa dön',
+    loading: 'Yükleniyor',
   },
   nav: {
     home: 'Ana sayfa',
@@ -34,6 +35,13 @@ export const tr: Messages = {
     system: 'Sistem',
     light: 'Açık',
     dark: 'Koyu',
+  },
+  sound: {
+    label: 'Ses',
+    on: 'Sesi aç',
+    off: 'Sesi kapat',
+    prompt: 'Sesle daha güzel.',
+    dismiss: 'Hayır, teşekkürler',
   },
   language: {
     label: 'Dil',

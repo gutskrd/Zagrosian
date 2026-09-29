@@ -23,6 +23,7 @@ export const en = {
     menu: 'Menu',
     close: 'Close',
     backToTop: 'Back to top',
+    loading: 'Loading',
   },
   nav: {
     home: 'Home',
@@ -40,6 +41,15 @@ export const en = {
     system: 'System',
     light: 'Light',
     dark: 'Dark',
+  },
+  sound: {
+    /** The header button that switches sound on and off (its state is announced as pressed). */
+    label: 'Sound',
+    on: 'Turn sound on',
+    off: 'Turn sound off',
+    /** Offered once to first-time visitors, with the `on` and `dismiss` buttons. */
+    prompt: 'Best experienced with sound.',
+    dismiss: 'No thanks',
   },
   language: {
     label: 'Language',

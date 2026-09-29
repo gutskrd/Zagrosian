@@ -11,6 +11,7 @@
  * attributes and sets text, so the Content-Security-Policy and Trusted Types
  * stay strict.
  */
+import { play, setSound, soundEnabled } from './sound';
 import { currentPreference, setThemePreference, type Preference } from './theme';
 
 /** Lowercase, without accents or Arabic vowel marks: "Français" → "francais". */
@@ -78,11 +79,13 @@ export function initCommandMenu() {
     setActive(visible[0], false);
   }
 
-  function markTheme() {
-    const preference = currentPreference();
+  /** Marks the current theme and sound setting. */
+  function markSettings() {
+    const current = { theme: currentPreference(), sound: soundEnabled() ? 'on' : 'off' };
     for (const option of options) {
-      if (option.dataset.action !== 'theme') continue;
-      if (option.dataset.value === preference) option.setAttribute('aria-current', 'true');
+      const { action, value } = option.dataset;
+      if (action !== 'theme' && action !== 'sound') continue;
+      if (value === current[action]) option.setAttribute('aria-current', 'true');
       else option.removeAttribute('aria-current');
     }
   }
@@ -90,15 +93,18 @@ export function initCommandMenu() {
   function open() {
     if (dialog!.open) return;
     input!.value = '';
-    markTheme();
+    markSettings();
     filter();
     dialog!.showModal();
     input!.focus();
+    play('open');
   }
 
   function close() {
     if (dialog!.open) dialog!.close();
   }
+
+  dialog.addEventListener('close', () => play('close'));
 
   function announce(message: string) {
     if (!status) return;
@@ -113,6 +119,10 @@ export function initCommandMenu() {
 
     if (action === 'theme') {
       setThemePreference(value as Preference);
+      return;
+    }
+    if (action === 'sound') {
+      setSound(value === 'on');
       return;
     }
     if (action === 'copy') {

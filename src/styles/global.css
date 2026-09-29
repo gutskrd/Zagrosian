@@ -85,6 +85,9 @@
   /* Kurdish phrases use the same serif as Hevalo (hevalo.app): fonts already on the
      device, so nothing is downloaded. */
   --font-kurdish: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  /* Small labels: the system's monospace (nothing is downloaded); Arabic script
+     falls through to Vazirmatn. */
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', 'Vazirmatn Variable', monospace;
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
@@ -101,6 +104,9 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  /* A little overshoot, for things that spring back into place. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration: 0.9s;
 
   color-scheme: light;
@@ -188,10 +194,11 @@ figure {
   margin: 0;
 }
 
+/* Display type is set large and fairly light, with tight spacing. */
 h1,
 h2,
 h3 {
-  font-weight: 600;
+  font-weight: 500;
   text-wrap: balance;
 }
 
@@ -263,11 +270,33 @@ svg {
   padding-block: var(--section-space);
 }
 
+/* Section labels: small monospace capitals after a dot, like a studio's
+   index. Arabic script has no capitals and keeps its own face and size. */
 .eyebrow {
-  font-size: var(--text-sm);
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 450;
   line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-muted);
+}
+
+.eyebrow::before {
+  content: '';
+  flex: none;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+:root:is([lang='ar'], [lang='ckb'], [lang='fa']) .eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
 }
 
 .kurdish {
@@ -360,19 +389,48 @@ svg {
 
 /* ==========================================================================
    Page transitions
-   Browsers that support cross-document view transitions fade between
-   pages; the header keeps its place. Others navigate normally.
+   In browsers with cross-document view transitions, the next page rises over
+   the last like a card laid on top, wiping up from the bottom, while the old
+   one sinks back and darkens. The header keeps its place. Other browsers
+   navigate normally.
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
     navigation: auto;
   }
+
+  ::view-transition-group(root) {
+    animation-duration: 0.8s;
+  }
+
+  ::view-transition-old(root) {
+    animation: page-sink 0.8s var(--ease-in-out) both;
+    transform-origin: 50% 0;
+  }
+
+  ::view-transition-new(root) {
+    animation: page-rise 0.8s var(--ease-in-out) both;
+  }
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.25s;
+@keyframes page-sink {
+  to {
+    transform: translateY(-4%) scale(0.96);
+    filter: brightness(0.45);
+  }
+}
+
+@keyframes page-rise {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(8%);
+  }
+
+  to {
+    clip-path: inset(0);
+    transform: none;
+  }
 }
 
 /* Switching theme: the new colours spread out in a circle from the control
@@ -386,6 +444,376 @@ svg {
 
 :root[data-theme-switching] .site-header {
   view-transition-name: none;
+}
+
+/* ==========================================================================
+   Rolling labels (src/components/RollText.astro)
+   Each letter carries a copy of itself below it (a text shadow); on hover
+   the letters slide up one after another, so the copies take their place.
+   ========================================================================== */
+
+.roll {
+  display: inline-block;
+}
+
+.roll__track {
+  display: inline-flex;
+  overflow: hidden;
+  /* Room for accents and descenders inside the mask. */
+  padding-block: 0.2em;
+  margin-block: -0.2em;
+  line-height: 1.2;
+}
+
+.roll__piece {
+  display: inline-block;
+  text-shadow: 0 1.4em currentColor;
+}
+
+.roll__space {
+  white-space: pre;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .roll__piece {
+    transition: translate 0.6s var(--ease-out);
+  }
+
+  :is(a, button):is(:hover, :focus-visible) .roll__piece {
+    translate: 0 -1.4em;
+  }
+}
+
+/* One after another, 16 ms apart. */
+.roll__piece:nth-child(2) {
+  transition-delay: 0.016s;
+}
+
+.roll__piece:nth-child(3) {
+  transition-delay: 0.032s;
+}
+
+.roll__piece:nth-child(4) {
+  transition-delay: 0.048s;
+}
+
+.roll__piece:nth-child(5) {
+  transition-delay: 0.064s;
+}
+
+.roll__piece:nth-child(6) {
+  transition-delay: 0.080s;
+}
+
+.roll__piece:nth-child(7) {
+  transition-delay: 0.096s;
+}
+
+.roll__piece:nth-child(8) {
+  transition-delay: 0.112s;
+}
+
+.roll__piece:nth-child(9) {
+  transition-delay: 0.128s;
+}
+
+.roll__piece:nth-child(10) {
+  transition-delay: 0.144s;
+}
+
+.roll__piece:nth-child(11) {
+  transition-delay: 0.160s;
+}
+
+.roll__piece:nth-child(12) {
+  transition-delay: 0.176s;
+}
+
+.roll__piece:nth-child(13) {
+  transition-delay: 0.192s;
+}
+
+.roll__piece:nth-child(14) {
+  transition-delay: 0.208s;
+}
+
+.roll__piece:nth-child(15) {
+  transition-delay: 0.224s;
+}
+
+.roll__piece:nth-child(16) {
+  transition-delay: 0.240s;
+}
+
+.roll__piece:nth-child(17) {
+  transition-delay: 0.256s;
+}
+
+.roll__piece:nth-child(18) {
+  transition-delay: 0.272s;
+}
+
+.roll__piece:nth-child(19) {
+  transition-delay: 0.288s;
+}
+
+.roll__piece:nth-child(20) {
+  transition-delay: 0.304s;
+}
+
+.roll__piece:nth-child(21) {
+  transition-delay: 0.320s;
+}
+
+.roll__piece:nth-child(22) {
+  transition-delay: 0.336s;
+}
+
+.roll__piece:nth-child(23) {
+  transition-delay: 0.352s;
+}
+
+.roll__piece:nth-child(24) {
+  transition-delay: 0.368s;
+}
+
+.roll__piece:nth-child(25) {
+  transition-delay: 0.384s;
+}
+
+.roll__piece:nth-child(26) {
+  transition-delay: 0.400s;
+}
+
+.roll__piece:nth-child(27) {
+  transition-delay: 0.416s;
+}
+
+.roll__piece:nth-child(28) {
+  transition-delay: 0.432s;
+}
+
+.roll__piece:nth-child(29) {
+  transition-delay: 0.448s;
+}
+
+.roll__piece:nth-child(30) {
+  transition-delay: 0.464s;
+}
+
+.roll__piece:nth-child(31) {
+  transition-delay: 0.480s;
+}
+
+.roll__piece:nth-child(32) {
+  transition-delay: 0.496s;
+}
+
+.roll__piece:nth-child(33) {
+  transition-delay: 0.512s;
+}
+
+.roll__piece:nth-child(34) {
+  transition-delay: 0.528s;
+}
+
+.roll__piece:nth-child(35) {
+  transition-delay: 0.544s;
+}
+
+.roll__piece:nth-child(36) {
+  transition-delay: 0.560s;
+}
+
+.roll__piece:nth-child(37) {
+  transition-delay: 0.576s;
+}
+
+.roll__piece:nth-child(38) {
+  transition-delay: 0.592s;
+}
+
+.roll__piece:nth-child(39) {
+  transition-delay: 0.608s;
+}
+
+.roll__piece:nth-child(40) {
+  transition-delay: 0.624s;
+}
+
+/* ==========================================================================
+   Custom cursor (src/scripts/cursor.ts)
+   A dot that follows the pointer exactly and a ring that trails it. It
+   inverts what is under it, so it shows on light and dark alike. Only with a
+   mouse or trackpad, and not when reduced motion or forced colours are on.
+   ========================================================================== */
+
+/* Dialogs and menus open in the browser's top layer, above the custom
+   cursor, so while one is open the system cursor comes back. */
+:root.has-cursor:not(:has(dialog[open], :popover-open)),
+:root.has-cursor:not(:has(dialog[open], :popover-open)) * {
+  cursor: none !important;
+}
+
+:root.has-cursor :is(input, textarea, select, [contenteditable]) {
+  cursor: text !important;
+}
+
+:root:has(dialog[open], :popover-open) .cursor {
+  visibility: hidden;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cursor[data-visible] {
+  opacity: 1;
+}
+
+.cursor__dot,
+.cursor__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.cursor__dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: #fff;
+  transition: scale 0.3s var(--ease-out);
+}
+
+.cursor__ring {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+}
+
+/* The ring's look lives on an inner layer, so it can grow without fighting
+   the position set on the ring itself. */
+.cursor__shape {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: transparent;
+  transition:
+    scale 0.45s var(--ease-out),
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.cursor__label {
+  grid-area: 1 / 1;
+  width: 1rem;
+  height: 1rem;
+  color: #000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Over a link: the ring fills, and becomes a lens that inverts the text. */
+.cursor[data-state='link'] .cursor__shape {
+  scale: 1.6;
+  background: #fff;
+}
+
+.cursor[data-state='link'] .cursor__dot,
+.cursor[data-state='external'] .cursor__dot,
+.cursor[data-state='button'] .cursor__dot,
+.cursor[data-state='text'] .cursor__dot {
+  scale: 0;
+}
+
+/* An external link: the same lens, with an arrow out. */
+.cursor[data-state='external'] .cursor__shape {
+  scale: 1.9;
+  background: #fff;
+}
+
+.cursor[data-state='external'] .cursor__label {
+  opacity: 1;
+}
+
+/* Over a button, the button itself answers (it is magnetic), and the
+   cursor steps aside. */
+.cursor[data-state='button'] .cursor__shape,
+.cursor[data-state='text'] .cursor__shape {
+  scale: 0;
+}
+
+/* Over the ink horseman: a wide, light ring, like a breath of wind. */
+.cursor[data-state='wind'] .cursor__shape {
+  scale: 2.6;
+  border-color: rgb(255 255 255 / 0.5);
+}
+
+.cursor[data-pressed] .cursor__shape {
+  scale: 0.75;
+}
+
+.cursor[data-pressed][data-state='link'] .cursor__shape,
+.cursor[data-pressed][data-state='external'] .cursor__shape {
+  scale: 1.3;
+}
+
+/* ==========================================================================
+   Smooth scrolling (Lenis, src/scripts/smooth.ts)
+   ========================================================================== */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* ==========================================================================
+   Lines that rise (src/scripts/text.ts)
+   Paragraphs marked data-lines are split into their lines as they come into
+   view; each line rises from behind its own mask, then the paragraph is put
+   back as it was.
+   ========================================================================== */
+
+.line {
+  display: block;
+  overflow: hidden;
+  /* Room for descenders inside the mask; the margin keeps the spacing. */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.line__inner {
+  display: block;
+}
+
+[data-lines='pending'] {
+  visibility: hidden;
 }
 
 /* ==========================================================================

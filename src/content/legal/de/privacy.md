@@ -9,7 +9,7 @@ Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wen
 ## Zusammenfassung
 
 - Auf zagrosian.com gibt es keine Benutzerkonten, Formulare, Werbung, Analysedienste oder Tracking.
-- Wir setzen keine Cookies. Unser Hosting-Anbieter kann ein technisch notwendiges Sicherheits-Cookie setzen, wenn er prüfen muss, ob Zugriffe legitim sind. Wenn Sie ein Design oder eine Sprache wählen, speichert Ihr Browser diese Wahl ausschließlich auf Ihrem Gerät.
+- Wir setzen keine Cookies. Unser Hosting-Anbieter kann ein technisch notwendiges Sicherheits-Cookie setzen, wenn er prüfen muss, ob Zugriffe legitim sind. Wenn Sie ein Design oder eine Sprache wählen oder den Ton ein- oder ausschalten, speichert Ihr Browser diese Wahl ausschließlich auf Ihrem Gerät.
 - Um die Website auszuliefern, verarbeitet unser Hosting-Anbieter technische Daten wie Ihre IP-Adresse.
 - zagrosian.com verlinkt auf unsere Profile bei Instagram und TikTok, lädt aber nichts von diesen Plattformen. Auf den Plattformen selbst gelten deren eigene Datenschutzrichtlinien.
 - Wenn Sie uns eine E-Mail schreiben, verwenden wir Ihre Nachricht nur, um zu antworten und die Angelegenheit weiterzuverfolgen. Bewerbungen löschen wir spätestens vier Wochen nach Abschluss des Bewerbungsverfahrens, sofern Sie nicht in eine längere Aufbewahrung einwilligen.
@@ -66,7 +66,7 @@ Wenn Sie unsere Beiträge auf diesen Plattformen kommentieren oder uns dort eine
 
 zagrosian.com verwendet keine Analyse-, Werbe- oder Tracking-Cookies.
 
-Wenn Sie ein helles oder dunkles Design oder eine Sprache wählen oder den Hinweis schließen, die Website in Ihrer Sprache zu lesen, speichert Ihr Browser diese Wahl in seinem lokalen Speicher (unter den Namen `theme` und `language-chosen`), damit die Website sie bei Ihrem nächsten Besuch berücksichtigen kann. Diese Information bleibt auf Ihrem Gerät, wird weder an uns noch an Dritte übermittelt und lässt sich jederzeit entfernen, indem Sie die Websitedaten in Ihrem Browser löschen.
+Wenn Sie ein helles oder dunkles Design oder eine Sprache wählen, den Ton ein- oder ausschalten oder den Hinweis schließen, die Website in Ihrer Sprache zu lesen, speichert Ihr Browser diese Wahl in seinem lokalen Speicher (unter den Namen `theme`, `language-chosen` und `sound`), damit die Website sie bei Ihrem nächsten Besuch berücksichtigen kann. Für die Dauer Ihres Besuchs vermerkt er außerdem in seinem Sitzungsspeicher (unter dem Namen `intro`), dass Sie die Eröffnungsanimation gesehen haben, damit sie nicht erneut abgespielt wird. Diese Information bleibt auf Ihrem Gerät, wird weder an uns noch an Dritte übermittelt und lässt sich jederzeit entfernen, indem Sie die Websitedaten in Ihrem Browser löschen.
 
 Cloudflare kann ein technisch notwendiges Cookie wie `__cf_bm` oder `cf_clearance` setzen, wenn es Menschen von automatisierten Zugriffen unterscheiden muss oder nachdem Sie eine Sicherheitsprüfung abgeschlossen haben. Diese Cookies sind kurzlebig, dienen ausschließlich dem Schutz der Website und werden nicht dazu verwendet, Sie über andere Websites hinweg zu verfolgen. Da sie für die Sicherheit technisch notwendig sind, ist dafür keine Einwilligung erforderlich.
 

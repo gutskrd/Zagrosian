@@ -10,7 +10,7 @@ import { i18n } from '../i18n';
 const { t } = i18n(Astro.url);
 ---
 
-<button class="theme-toggle" type="button" aria-pressed="false" data-theme-toggle>
+<button class="theme-toggle" type="button" aria-pressed="false" data-theme-toggle data-magnetic>
   <span class="visually-hidden">{t.theme.toggle}</span>
   <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <mask id="theme-toggle-shadow" maskUnits="userSpaceOnUse">

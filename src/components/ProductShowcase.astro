@@ -19,13 +19,13 @@ const { t } = i18n(Astro.url);
             <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
           </span>
         </div>
-        <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
+        <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} data-velocity />
         <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
       </div>
 
       <div class="showcase__details" data-reveal>
-        <p class="showcase__description">{t.hevalo.description}</p>
-        <Cta href={hevalo.url}>{t.hevalo.visit}</Cta>
+        <p class="showcase__description" data-lines>{t.hevalo.description}</p>
+        <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
       </div>
     </div>
 
@@ -34,7 +34,7 @@ const { t } = i18n(Astro.url);
         <p class="showcase__status"><span class="status-dot" aria-hidden="true"></span>{t.hevalo.comingSoon}</p>
         <h3 class="showcase__soon-title">{t.hevalo.comingSoonTitle}</h3>
       </div>
-      <p class="showcase__soon-text">{t.hevalo.comingSoonNote}</p>
+      <p class="showcase__soon-text" data-lines>{t.hevalo.comingSoonNote}</p>
     </div>
   </div>
 </section>

@@ -1,27 +1,48 @@
 ---
+/**
+ * A pill-shaped button link.
+ *
+ * Under a mouse it is magnetic (it leans towards the pointer; magnetic.ts), its
+ * colour pours in from where the pointer entered, the label rolls letter by
+ * letter (RollText) and the arrow slides out as a copy slides in behind it.
+ */
 import type { HTMLAttributes } from 'astro/types';
 import Arrow, { type ArrowDirection } from './Arrow.astro';
+import RollText from './RollText.astro';
 
 interface Props extends HTMLAttributes<'a'> {
   href: string;
-  /** `solid` for the main action, `text` for a quiet secondary link. */
-  variant?: 'solid' | 'text';
+  label: string;
+  /** `solid` for the main action, `outline` for a secondary one. */
+  variant?: 'solid' | 'outline';
   arrow?: ArrowDirection;
 }
 
-const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro.props;
+const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro.props;
 ---
 
-<a class:list={['cta', `cta--${variant}`, className]} {...attrs}>
-  <span><slot /></span>
-  <Arrow direction={arrow} class="cta__arrow" />
+<a class:list={['cta', `cta--${variant}`, `cta--${arrow}`, className]} data-magnetic data-pour {...attrs}>
+  <span class="cta__pour" aria-hidden="true"></span>
+  <span class="cta__content" data-magnetic-inner>
+    <RollText text={label} />
+    <span class="cta__arrows" aria-hidden="true">
+      <Arrow direction={arrow} class="cta__arrow" />
+      <Arrow direction={arrow} class="cta__arrow cta__arrow--next" />
+    </span>
+  </span>
 </a>
 
 <style>
   .cta {
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
-    gap: 0.625rem;
+    min-height: 3.375rem;
+    padding: 0 1.625rem;
+    overflow: hidden;
+    border: 1px solid var(--color-ink);
+    border-radius: 999px;
     font-size: 1rem;
     font-weight: 500;
     line-height: 1;
@@ -29,60 +50,112 @@ const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro
     text-decoration: none;
     white-space: nowrap;
     transition:
-      background-color 0.25s ease,
-      color 0.25s ease,
-      transform 0.2s var(--ease-out);
+      color 0.5s var(--ease-out),
+      border-color 0.5s var(--ease-out),
+      scale 0.3s var(--ease-out);
   }
 
-  /* A slight give under the finger or cursor. */
   .cta:active {
-    transform: scale(0.97);
+    scale: 0.97;
   }
 
   .cta--solid {
-    min-height: 3.25rem;
-    padding: 0 1.5rem;
-    border-radius: 999px;
     background: var(--color-ink);
     color: var(--color-paper);
   }
 
-  .cta--solid:hover {
-    background: var(--color-solid-hover);
-  }
-
-  .cta--text {
-    min-height: 3.25rem;
+  .cta--outline {
+    border-color: var(--color-line-strong);
     color: var(--color-ink);
   }
 
-  .cta--text span {
-    background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
-    padding-bottom: 0.125rem;
-    transition: background-size 0.4s var(--ease-out);
+  .cta__content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
-  .cta--text:hover span {
-    background-size: 100% 1px;
+  /* The colour that pours in from the pointer (magnetic.ts sets --pour-x/y). */
+  .cta__pour {
+    position: absolute;
+    z-index: -1;
+    top: var(--pour-y, 50%);
+    left: var(--pour-x, 50%);
+    width: 260%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    translate: -50% -50%;
+    scale: 0;
+    transition: scale 0.7s var(--ease-out);
   }
 
-  :global(.cta__arrow) {
-    transition: transform 0.4s var(--ease-out);
+  .cta--solid .cta__pour {
+    background: var(--color-paper);
   }
 
-  .cta:hover :global(.arrow--right) {
-    transform: translateX(3px);
+  .cta--outline .cta__pour {
+    background: var(--color-ink);
   }
 
-  .cta:hover :global(.arrow--left) {
-    transform: translateX(-3px);
+  /* The arrow leaves in the direction it points; its copy follows it in. */
+  .cta__arrows {
+    display: inline-grid;
+    width: 1em;
+    height: 1em;
+    /* A mask, not a scroll box: the waiting arrow must not count as overflow. */
+    clip-path: inset(0);
   }
 
-  .cta:hover :global(.arrow--down) {
-    transform: translateY(2px);
+  .cta__arrows :global(.cta__arrow) {
+    grid-area: 1 / 1;
+    transition: translate 0.55s var(--ease-out);
   }
 
-  .cta:hover :global(.arrow--up-right) {
-    transform: translate(2px, -2px);
+  .cta {
+    --arrow-x: calc(var(--direction) * 130%);
+    --arrow-y: 0%;
+  }
+
+  .cta--left {
+    --arrow-x: calc(var(--direction) * -130%);
+  }
+
+  .cta--down {
+    --arrow-x: 0%;
+    --arrow-y: 130%;
+  }
+
+  .cta--up-right {
+    --arrow-y: -130%;
+  }
+
+  .cta__arrows :global(.cta__arrow--next) {
+    translate: calc(-1 * var(--arrow-x)) calc(-1 * var(--arrow-y));
+  }
+
+  @media (hover: hover) {
+    .cta:hover .cta__pour {
+      scale: 1;
+    }
+
+    .cta--solid:hover {
+      color: var(--color-ink);
+    }
+
+    .cta--outline:hover {
+      border-color: var(--color-ink);
+      color: var(--color-paper);
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .cta:is(:hover, :focus-visible) .cta__arrows :global(.cta__arrow) {
+      translate: var(--arrow-x) var(--arrow-y);
+    }
+
+    .cta:is(:hover, :focus-visible) .cta__arrows :global(.cta__arrow--next) {
+      translate: 0 0;
+      transition-delay: 0.08s;
+    }
   }
 </style>

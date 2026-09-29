@@ -20,6 +20,7 @@ export const ckb: Messages = {
     menu: 'لیست',
     close: 'داخستن',
     backToTop: 'گەڕانەوە بۆ سەرەوە',
+    loading: 'بار دەکرێت',
   },
   nav: {
     home: 'پەڕەی سەرەکی',
@@ -37,6 +38,13 @@ export const ckb: Messages = {
     system: 'سیستەم',
     light: 'ڕووناک',
     dark: 'تاریک',
+  },
+  sound: {
+    label: 'دەنگ',
+    on: 'دەنگ هەڵبکە',
+    off: 'دەنگ بکوژێنەوە',
+    prompt: 'بە دەنگەوە خۆشترە.',
+    dismiss: 'نا، سوپاس',
   },
   language: {
     label: 'زمان',

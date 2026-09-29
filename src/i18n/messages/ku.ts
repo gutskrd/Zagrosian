@@ -19,6 +19,7 @@ export const ku: Messages = {
     menu: 'Menû',
     close: 'Bigire',
     backToTop: 'Vegere jor',
+    loading: 'Tê barkirin',
   },
   nav: {
     home: 'Rûpela sereke',
@@ -36,6 +37,13 @@ export const ku: Messages = {
     system: 'Pergal',
     light: 'Ronî',
     dark: 'Tarî',
+  },
+  sound: {
+    label: 'Deng',
+    on: 'Deng vêxe',
+    off: 'Deng vemirîne',
+    prompt: 'Bi deng xweştir e.',
+    dismiss: 'Na, spas',
   },
   language: {
     label: 'Ziman',

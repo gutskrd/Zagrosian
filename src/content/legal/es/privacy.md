@@ -9,7 +9,7 @@ Esta política explica qué datos personales tratamos cuando visitas zagrosian.c
 ## Resumen
 
 - zagrosian.com no tiene cuentas de usuario, formularios, publicidad, analítica ni seguimiento.
-- No instalamos cookies. Nuestro proveedor de alojamiento puede instalar una cookie de seguridad estrictamente necesaria cuando tiene que comprobar que el tráfico es legítimo. Si eliges un tema o un idioma, tu navegador recuerda esa elección solo en tu dispositivo.
+- No instalamos cookies. Nuestro proveedor de alojamiento puede instalar una cookie de seguridad estrictamente necesaria cuando tiene que comprobar que el tráfico es legítimo. Si eliges un tema o un idioma, o activas o desactivas el sonido, tu navegador recuerda esa elección solo en tu dispositivo.
 - Para que el sitio web funcione, nuestro proveedor de alojamiento trata datos técnicos como tu dirección IP.
 - zagrosian.com enlaza a nuestros perfiles de Instagram y TikTok, pero no carga nada de esas plataformas. En las propias plataformas se aplican sus políticas de privacidad.
 - Si nos escribes por correo electrónico, usamos tu mensaje solo para responderte y hacer el seguimiento. Las candidaturas se eliminan en un plazo de cuatro semanas desde el final del proceso de selección, salvo que aceptes que las conservemos más tiempo.
@@ -66,7 +66,7 @@ Si comentas nuestras publicaciones o nos envías un mensaje en estas plataformas
 
 zagrosian.com no utiliza cookies analíticas, publicitarias ni de seguimiento.
 
-Si eliges un tema claro u oscuro o un idioma, o cierras la sugerencia de leer el sitio en tu idioma, tu navegador guarda esa elección en su almacenamiento local (con los nombres `theme` y `language-chosen`) para que el sitio web pueda respetarla en tu próxima visita. Esta información se queda en tu dispositivo, nunca se envía a nosotros ni a nadie más, y puedes eliminarla en cualquier momento borrando los datos del sitio en tu navegador.
+Si eliges un tema claro u oscuro o un idioma, activas o desactivas el sonido, o cierras la sugerencia de leer el sitio en tu idioma, tu navegador guarda esa elección en su almacenamiento local (con los nombres `theme`, `language-chosen` y `sound`) para que el sitio web pueda respetarla en tu próxima visita. Mientras dura tu visita, también anota en su almacenamiento de sesión (con el nombre `intro`) que ya has visto la animación de apertura, para que no vuelva a reproducirse. Esta información se queda en tu dispositivo, nunca se envía a nosotros ni a nadie más, y puedes eliminarla en cualquier momento borrando los datos del sitio en tu navegador.
 
 Cloudflare puede instalar una cookie estrictamente necesaria, como `__cf_bm` o `cf_clearance`, cuando necesita distinguir a las personas del tráfico automatizado o después de que superes una comprobación de seguridad. Estas cookies son de corta duración, se usan únicamente para proteger el sitio web y no sirven para seguirte en otros sitios web. Como son estrictamente necesarias para la seguridad, no requieren tu consentimiento.
 

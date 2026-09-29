@@ -12,7 +12,7 @@ const { t } = i18n(Astro.url);
 
     <div class="about__body" data-reveal>
       <SplitText id="about-title" class="about__statement" effect="highlight" text={t.about.mission} />
-      <p class="about__text lead">{t.about.approach}</p>
+      <p class="about__text lead" data-lines>{t.about.approach}</p>
 
       <dl class="about__facts rule">
         <div>

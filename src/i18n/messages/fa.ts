@@ -20,6 +20,7 @@ export const fa: Messages = {
     menu: 'منو',
     close: 'بستن',
     backToTop: 'بازگشت به بالا',
+    loading: 'در حال بارگذاری',
   },
   nav: {
     home: 'صفحهٔ اصلی',
@@ -37,6 +38,13 @@ export const fa: Messages = {
     system: 'سیستم',
     light: 'روشن',
     dark: 'تیره',
+  },
+  sound: {
+    label: 'صدا',
+    on: 'روشن کردن صدا',
+    off: 'خاموش کردن صدا',
+    prompt: 'با صدا دلنشین‌تر است.',
+    dismiss: 'نه، ممنون',
   },
   language: {
     label: 'زبان',

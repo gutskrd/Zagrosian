@@ -9,7 +9,7 @@ This policy explains what personal data we process when you visit zagrosian.com,
 ## Summary
 
 - zagrosian.com has no accounts, forms, advertising, analytics or tracking.
-- We do not set cookies. Our hosting provider may set a strictly necessary security cookie when it needs to check that traffic is legitimate. If you choose a theme or a language, your browser remembers that choice on your device only.
+- We do not set cookies. Our hosting provider may set a strictly necessary security cookie when it needs to check that traffic is legitimate. If you choose a theme or a language, or turn sound on or off, your browser remembers that choice on your device only.
 - To deliver the website, our hosting provider processes technical data such as your IP address.
 - zagrosian.com links to our Instagram and TikTok profiles but loads nothing from those platforms. On the platforms themselves, their own privacy policies apply.
 - If you email us, we use your message only to reply and follow up. Job applications are deleted within four weeks after the application process ends, unless you agree that we keep them longer.
@@ -66,7 +66,7 @@ If you comment on our posts or send us a message on these platforms, we see your
 
 zagrosian.com does not use analytics, advertising or tracking cookies.
 
-If you choose a light or dark theme or a language, or close the suggestion to read the site in your language, your browser saves that choice in its local storage (under the names `theme` and `language-chosen`), so the website can respect it on your next visit. This information stays on your device, is never sent to us or to anyone else, and you can remove it at any time by clearing the site data in your browser.
+If you choose a light or dark theme or a language, turn sound on or off, or close the suggestion to read the site in your language, your browser saves that choice in its local storage (under the names `theme`, `language-chosen` and `sound`), so the website can respect it on your next visit. For the length of your visit, it also notes in its session storage (under the name `intro`) that you have seen the opening animation, so that it does not play again. This information stays on your device, is never sent to us or to anyone else, and you can remove it at any time by clearing the site data in your browser.
 
 Cloudflare may set a strictly necessary cookie, such as `__cf_bm` or `cf_clearance`, when it needs to tell people apart from automated traffic or after you complete a security check. These cookies are short-lived, are used only to protect the website, and are not used to follow you across other websites. Because they are strictly necessary for security, they do not require your consent.
 

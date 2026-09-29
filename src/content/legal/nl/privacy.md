@@ -9,7 +9,7 @@ Deze verklaring legt uit welke persoonsgegevens wij verwerken wanneer u zagrosia
 ## Samenvatting
 
 - zagrosian.com heeft geen accounts, formulieren, advertenties, analysediensten of tracking.
-- Wij plaatsen geen cookies. Onze hostingprovider kan een strikt noodzakelijke beveiligingscookie plaatsen als hij moet controleren of verkeer legitiem is. Als u een thema of een taal kiest, onthoudt uw browser die keuze alleen op uw eigen apparaat.
+- Wij plaatsen geen cookies. Onze hostingprovider kan een strikt noodzakelijke beveiligingscookie plaatsen als hij moet controleren of verkeer legitiem is. Als u een thema of een taal kiest, of het geluid aan- of uitzet, onthoudt uw browser die keuze alleen op uw eigen apparaat.
 - Om de website te kunnen leveren, verwerkt onze hostingprovider technische gegevens zoals uw IP-adres.
 - zagrosian.com linkt naar onze profielen op Instagram en TikTok, maar laadt niets van die platforms. Op de platforms zelf gelden hun eigen privacybeleidsregels.
 - Als u ons e-mailt, gebruiken wij uw bericht alleen om te antwoorden en om de zaak af te handelen. Sollicitaties verwijderen wij binnen vier weken na afloop van de sollicitatieprocedure, tenzij u ermee instemt dat wij ze langer bewaren.
@@ -66,7 +66,7 @@ Als u op deze platforms reageert op onze berichten of ons een bericht stuurt, zi
 
 zagrosian.com gebruikt geen analytische, advertentie- of trackingcookies.
 
-Als u een licht of donker thema of een taal kiest, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme` en `language-chosen`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
+Als u een licht of donker thema of een taal kiest, het geluid aan- of uitzet, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme`, `language-chosen` en `sound`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Zolang uw bezoek duurt, noteert hij bovendien in zijn sessieopslag (onder de naam `intro`) dat u de openingsanimatie hebt gezien, zodat die niet opnieuw wordt afgespeeld. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
 
 Cloudflare kan een strikt noodzakelijke cookie plaatsen, zoals `__cf_bm` of `cf_clearance`, als het mensen moet onderscheiden van geautomatiseerd verkeer of nadat u een beveiligingscontrole heeft doorlopen. Deze cookies zijn kortlevend, worden alleen gebruikt om de website te beschermen en worden niet gebruikt om u over andere websites te volgen. Omdat ze strikt noodzakelijk zijn voor de beveiliging, is er geen toestemming voor nodig.
 

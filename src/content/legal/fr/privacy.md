@@ -9,7 +9,7 @@ Cette politique explique quelles données personnelles nous traitons lorsque vou
 ## En bref
 
 - zagrosian.com ne comporte ni comptes, ni formulaires, ni publicité, ni outils de mesure d’audience, ni pistage.
-- Nous ne déposons pas de cookies. Notre hébergeur peut déposer un cookie de sécurité strictement nécessaire lorsqu’il doit vérifier que le trafic est légitime. Si vous choisissez un thème ou une langue, votre navigateur mémorise ce choix sur votre appareil uniquement.
+- Nous ne déposons pas de cookies. Notre hébergeur peut déposer un cookie de sécurité strictement nécessaire lorsqu’il doit vérifier que le trafic est légitime. Si vous choisissez un thème ou une langue, ou si vous activez ou coupez le son, votre navigateur mémorise ce choix sur votre appareil uniquement.
 - Pour diffuser le site, notre hébergeur traite des données techniques telles que votre adresse IP.
 - zagrosian.com renvoie vers nos profils Instagram et TikTok, mais ne charge rien depuis ces plateformes. Sur les plateformes elles-mêmes, leurs propres politiques de confidentialité s’appliquent.
 - Si vous nous écrivez par e-mail, nous utilisons votre message uniquement pour vous répondre et assurer le suivi. Les candidatures sont supprimées dans les quatre semaines suivant la fin du processus de recrutement, sauf si vous acceptez que nous les conservions plus longtemps.
@@ -66,7 +66,7 @@ Si vous commentez nos publications ou nous envoyez un message sur ces plateforme
 
 zagrosian.com n’utilise aucun cookie de mesure d’audience, de publicité ou de pistage.
 
-Si vous choisissez un thème clair ou sombre ou une langue, ou si vous fermez la suggestion de lire le site dans votre langue, votre navigateur enregistre ce choix dans son stockage local (sous les noms `theme` et `language-chosen`), afin que le site puisse le respecter lors de votre prochaine visite. Cette information reste sur votre appareil, n’est jamais transmise ni à nous ni à qui que ce soit, et vous pouvez la supprimer à tout moment en effaçant les données du site dans votre navigateur.
+Si vous choisissez un thème clair ou sombre ou une langue, si vous activez ou coupez le son, ou si vous fermez la suggestion de lire le site dans votre langue, votre navigateur enregistre ce choix dans son stockage local (sous les noms `theme`, `language-chosen` et `sound`), afin que le site puisse le respecter lors de votre prochaine visite. Pendant votre visite, il note aussi dans son stockage de session (sous le nom `intro`) que vous avez vu l’animation d’ouverture, afin qu’elle ne soit pas rejouée. Cette information reste sur votre appareil, n’est jamais transmise ni à nous ni à qui que ce soit, et vous pouvez la supprimer à tout moment en effaçant les données du site dans votre navigateur.
 
 Cloudflare peut déposer un cookie strictement nécessaire, comme `__cf_bm` ou `cf_clearance`, lorsqu’il doit distinguer les personnes du trafic automatisé ou après que vous avez passé une vérification de sécurité. Ces cookies ont une durée de vie courte, servent uniquement à protéger le site et ne sont pas utilisés pour vous suivre sur d’autres sites. Comme ils sont strictement nécessaires à la sécurité, ils ne nécessitent pas votre consentement.
 

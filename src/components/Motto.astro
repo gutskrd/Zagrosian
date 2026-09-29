@@ -13,7 +13,7 @@ const { t } = i18n(Astro.url);
       <Sun />
     </div>
     <SplitText id="motto-title" class="motto__text kurdish" lang="ku" dir="ltr" text={kurdish.motto} />
-    {t.motto && <p class="motto__translation lead" data-reveal>{t.motto}</p>}
+    {t.motto && <p class="motto__translation lead" data-lines>{t.motto}</p>}
   </div>
 </section>
 

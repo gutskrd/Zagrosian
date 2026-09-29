@@ -1,4 +1,10 @@
 import { initCommandMenu } from './command';
+import { initCursor } from './cursor';
+import { initIntro } from './intro';
+import { initMagnetic } from './magnetic';
+import { initSmoothScroll } from './smooth';
+import { initSound } from './sound';
+import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { initMotion } from './motion';
 import { initTheme } from './theme';
@@ -235,6 +241,8 @@ function initLegalTools() {
   }
 }
 
+// First, so the opening screen's counter starts at once.
+initIntro();
 initHeader();
 initMobileMenu();
 initReveal();
@@ -248,6 +256,11 @@ initTheme();
 initLanguageMenu();
 initLanguageSuggestion();
 initMotion();
+initText();
+initSound();
+initCursor();
+initMagnetic();
+initSmoothScroll();
 
 // The hero horseman in ink particles, loaded separately and only when
 // theme-init.js has found it welcome and the page has a hero.

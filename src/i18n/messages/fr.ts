@@ -18,6 +18,7 @@ export const fr: Messages = {
     menu: 'Menu',
     close: 'Fermer',
     backToTop: 'Haut de page',
+    loading: 'Chargement',
   },
   nav: {
     home: 'Accueil',
@@ -35,6 +36,13 @@ export const fr: Messages = {
     system: 'Système',
     light: 'Clair',
     dark: 'Sombre',
+  },
+  sound: {
+    label: 'Son',
+    on: 'Activer le son',
+    off: 'Couper le son',
+    prompt: 'À découvrir avec le son.',
+    dismiss: 'Non merci',
   },
   language: {
     label: 'Langue',

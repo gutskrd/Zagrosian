@@ -35,12 +35,12 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       <p class="hero__lead lead intro">{t.hero.lead}</p>
 
       <div class="hero__actions intro">
-        <Cta href="#hevalo" arrow="down">{t.hero.products}</Cta>
-        <Cta href="#about" variant="text">{t.hero.about}</Cta>
+        <Cta href="#hevalo" arrow="down" label={t.hero.products} />
+        <Cta href="#about" variant="outline" label={t.hero.about} />
       </div>
     </div>
 
-    <figure class="hero__emblem intro" data-parallax="0.08" data-depth>
+    <figure class="hero__emblem intro" data-parallax="0.08" data-depth data-cursor="wind">
       <div class="hero__art">
         <Emblem alt={t.hero.emblemAlt} loading="eager" />
         <canvas class="hero__ink" aria-hidden="true" data-ink-canvas></canvas>

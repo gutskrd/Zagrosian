@@ -9,7 +9,7 @@ Bu politika, zagrosian.com’u ziyaret ettiğinizde, bizimle iletişime geçtiğ
 ## Özet
 
 - zagrosian.com’da hesap, form, reklam, analiz veya izleme yoktur.
-- Çerez kullanmıyoruz. Barındırma sağlayıcımız, trafiğin meşru olduğunu doğrulaması gerektiğinde kesinlikle gerekli bir güvenlik çerezi yerleştirebilir. Bir tema veya dil seçtiğinizde tarayıcınız bu tercihi yalnızca kendi cihazınızda hatırlar.
+- Çerez kullanmıyoruz. Barındırma sağlayıcımız, trafiğin meşru olduğunu doğrulaması gerektiğinde kesinlikle gerekli bir güvenlik çerezi yerleştirebilir. Bir tema veya dil seçtiğinizde ya da sesi açıp kapattığınızda tarayıcınız bu tercihi yalnızca kendi cihazınızda hatırlar.
 - Web sitesini sunabilmek için barındırma sağlayıcımız IP adresiniz gibi teknik verileri işler.
 - zagrosian.com, Instagram ve TikTok profillerimize bağlantı verir ancak bu platformlardan hiçbir şey yüklemez. Platformların kendisinde ise kendi gizlilik politikaları geçerlidir.
 - Bize e-posta gönderirseniz mesajınızı yalnızca yanıt vermek ve gerekli takibi yapmak için kullanırız. İş başvuruları, daha uzun süre saklamamızı kabul etmediğiniz sürece, başvuru süreci sona erdikten sonra dört hafta içinde silinir.
@@ -66,7 +66,7 @@ Bu platformlarda gönderilerimize yorum yaparsanız veya bize mesaj gönderirsen
 
 zagrosian.com analiz, reklam veya izleme çerezleri kullanmaz.
 
-Açık veya koyu bir tema ya da bir dil seçerseniz veya siteyi kendi dilinizde okuma önerisini kapatırsanız tarayıcınız bu tercihi, web sitesinin bir sonraki ziyaretinizde dikkate alabilmesi için yerel depolamasına (`theme` ve `language-chosen` adlarıyla) kaydeder. Bu bilgi cihazınızda kalır, hiçbir zaman bize veya başka birine gönderilmez ve tarayıcınızdaki site verilerini temizleyerek istediğiniz zaman silebilirsiniz.
+Açık veya koyu bir tema ya da bir dil seçerseniz, sesi açıp kapatırsanız veya siteyi kendi dilinizde okuma önerisini kapatırsanız tarayıcınız bu tercihi, web sitesinin bir sonraki ziyaretinizde dikkate alabilmesi için yerel depolamasına (`theme`, `language-chosen` ve `sound` adlarıyla) kaydeder. Ziyaretiniz boyunca açılış animasyonunu gördüğünüzü de oturum depolamasına (`intro` adıyla) not eder; böylece animasyon yeniden oynatılmaz. Bu bilgi cihazınızda kalır, hiçbir zaman bize veya başka birine gönderilmez ve tarayıcınızdaki site verilerini temizleyerek istediğiniz zaman silebilirsiniz.
 
 Cloudflare, insanları otomatik trafikten ayırt etmesi gerektiğinde veya bir güvenlik kontrolünü tamamladıktan sonra `__cf_bm` ya da `cf_clearance` gibi kesinlikle gerekli bir çerez yerleştirebilir. Bu çerezler kısa ömürlüdür, yalnızca web sitesini korumak için kullanılır ve sizi başka web sitelerinde izlemek için kullanılmaz. Güvenlik açısından kesinlikle gerekli olduklarından onayınızı gerektirmezler.
 

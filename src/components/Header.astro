@@ -1,6 +1,8 @@
 ---
 import Arrow from './Arrow.astro';
+import RollText from './RollText.astro';
 import LanguagePicker from './LanguagePicker.astro';
+import SoundToggle from './SoundToggle.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import Wordmark from './Wordmark.astro';
 import { i18n, localizePath, locales, navigation } from '../i18n';
@@ -25,22 +27,25 @@ const nav = navigation(locale);
             nav.sections.map((link) => (
               <li>
                 <a class="site-nav__link" href={link.href} data-nav-section={link.href.split('#')[1]}>
-                  {link.label}
+                  <RollText text={link.label} />
                 </a>
               </li>
             ))
           }
         </ul>
-        <a class="site-nav__cta" href={hevalo.url}>
-          {t.nav.visitHevalo}
-          <Arrow direction="up-right" />
+        <a class="site-nav__cta" href={hevalo.url} data-magnetic data-pour>
+          <span class="site-nav__cta-pour" aria-hidden="true"></span>
+          <span class="site-nav__cta-content" data-magnetic-inner>
+            <RollText text={t.nav.visitHevalo} />
+            <Arrow direction="up-right" />
+          </span>
         </a>
       </nav>
 
       <button
         class="command-trigger"
+        data-magnetic
         type="button"
-        aria-label={t.command.open}
         aria-haspopup="dialog"
         aria-keyshortcuts="Control+K Meta+K"
         data-command-open
@@ -49,16 +54,19 @@ const nav = navigation(locale);
           <circle cx="8.75" cy="8.75" r="5.75"></circle>
           <path d="M13 13l4.25 4.25"></path>
         </svg>
-        <kbd class="command-trigger__keys" aria-hidden="true" data-command-shortcut></kbd>
+        <span class="visually-hidden">{t.command.open}</span>
+        {/* Part of the button's name, so the name includes what is shown. */}
+        <kbd class="command-trigger__keys" data-command-shortcut></kbd>
       </button>
 
       <div class="site-header__language">
         <LanguagePicker />
       </div>
 
+      <SoundToggle class="site-header__sound" />
       <ThemeToggle />
 
-      <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu">
+      <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu" data-magnetic>
         <span class="menu-toggle__label menu-toggle__label--open">{t.common.menu}</span>
         <span class="menu-toggle__label menu-toggle__label--close" aria-hidden="true">{t.common.close}</span>
         <span class="menu-toggle__icon" aria-hidden="true"></span>
@@ -73,7 +81,7 @@ const nav = navigation(locale);
           nav.sections.map((link) => (
             <li>
               <a class="mobile-menu__link" href={link.href}>
-                {link.label}
+                <RollText text={link.label} />
               </a>
             </li>
           ))
@@ -102,6 +110,10 @@ const nav = navigation(locale);
           ))
         }
       </ul>
+
+      <div class="mobile-menu__sound">
+        <SoundToggle labelled />
+      </div>
 
       <div class="mobile-menu__meta">
         <ul>
@@ -178,6 +190,17 @@ const nav = navigation(locale);
     gap: 0.25rem;
   }
 
+  /* On the narrowest phones the sound switch moves into the menu. */
+  @media (max-width: 23.99rem) {
+    .site-header__end :global(.site-header__sound) {
+      display: none !important;
+    }
+  }
+
+  .mobile-menu__sound {
+    margin-top: 1.5rem;
+  }
+
   /* Desktop navigation */
 
   .site-nav {
@@ -234,12 +257,17 @@ const nav = navigation(locale);
     transform: scaleX(1);
   }
 
+  /* Like the page's buttons (Cta.astro): magnetic, with the paper colour
+     pouring in from the pointer and the label rolling. */
   .site-nav__cta {
+    position: relative;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
     min-height: 2.5rem;
     padding: 0 1rem;
+    overflow: hidden;
+    border: 1px solid var(--color-ink);
     border-radius: 999px;
     background: var(--color-ink);
     color: var(--color-paper);
@@ -247,12 +275,38 @@ const nav = navigation(locale);
     font-weight: 500;
     text-decoration: none;
     transition:
-      background-color 0.2s ease,
+      color 0.5s var(--ease-out),
       transform 0.2s var(--ease-out);
   }
 
-  .site-nav__cta:hover {
-    background: var(--color-solid-hover);
+  .site-nav__cta-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .site-nav__cta-pour {
+    position: absolute;
+    z-index: -1;
+    top: var(--pour-y, 50%);
+    left: var(--pour-x, 50%);
+    width: 260%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-paper);
+    translate: -50% -50%;
+    scale: 0;
+    transition: scale 0.7s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .site-nav__cta:hover {
+      color: var(--color-ink);
+    }
+
+    .site-nav__cta:hover .site-nav__cta-pour {
+      scale: 1;
+    }
   }
 
   .site-nav__cta:active,

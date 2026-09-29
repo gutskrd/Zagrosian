@@ -1,7 +1,7 @@
 ---
 /**
- * Quick navigation: one searchable list of every page, section, language and
- * theme, plus a few actions. Opens with Ctrl K or ⌘K, with "/", or from the
+ * Quick navigation: one searchable list of every page, section, language,
+ * theme and sound setting, plus a few actions. Opens with Ctrl K or ⌘K, with "/", or from the
  * search button in the header (src/scripts/command.ts).
  *
  * A native modal <dialog>, so focus stays inside and Escape closes it. The
@@ -18,7 +18,7 @@ const { locale, t, base } = i18n(Astro.url);
 const en = messages('en');
 const nav = navigation(locale);
 
-type Icon = 'page' | 'section' | 'external' | 'copy' | 'light' | 'dark' | 'system' | 'language';
+type Icon = 'page' | 'section' | 'external' | 'copy' | 'light' | 'dark' | 'system' | 'sound-on' | 'sound-off' | 'language';
 
 interface Entry {
   label: string;
@@ -26,7 +26,7 @@ interface Entry {
   keywords: string[];
   icon: Icon;
   href?: string;
-  action?: 'copy' | 'theme';
+  action?: 'copy' | 'theme' | 'sound';
   value?: string;
   /** For language names: written in, and shown in the direction of, that language. */
   lang?: string;
@@ -82,6 +82,17 @@ const groups: { id: string; label: string; entries: Entry[] }[] = [
       icon: preference,
       action: 'theme' as const,
       value: preference,
+    })),
+  },
+  {
+    id: 'sound',
+    label: t.sound.label,
+    entries: (['on', 'off'] as const).map((state) => ({
+      label: t.sound[state],
+      keywords: [en.sound[state], en.sound.label, 'audio music mute volume'],
+      icon: `sound-${state}` as const,
+      action: 'sound' as const,
+      value: state,
     })),
   },
   {
@@ -181,6 +192,8 @@ const searchText = (entry: Entry) =>
                       )}
                       {entry.icon === 'dark' && <path d="M15.75 12.25A6.5 6.5 0 0 1 7.75 4.25a6.5 6.5 0 1 0 8 8z" />}
                       {entry.icon === 'system' && <path d="M3.25 4.5h13.5v9H3.25zM7.5 16.5h5M10 13.5v3" />}
+                      {entry.icon === 'sound-on' && <path d="M3.5 7.75h2.75L10 4.5v11l-3.75-3.25H3.5zM13 7.25a3.5 3.5 0 0 1 0 5.5M15.25 5a6.5 6.5 0 0 1 0 10" />}
+                      {entry.icon === 'sound-off' && <path d="M3.5 7.75h2.75L10 4.5v11l-3.75-3.25H3.5zM13 8l4 4M17 8l-4 4" />}
                     </svg>
                   )}
                 </span>

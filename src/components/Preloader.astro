@@ -1,0 +1,151 @@
+---
+/**
+ * The opening screen, on the first homepage visit of a session: a dark
+ * curtain where the horseman fills in as a counter runs to 100, then slides
+ * away as the hero enters (src/scripts/intro.ts).
+ *
+ * theme-init.js decides before the first paint (`data-intro` on <html>), and
+ * only when motion is welcome. It is decoration, hidden from screen readers,
+ * which read the page underneath. Without JavaScript it never appears, and
+ * should the script not start, it lifts by itself after four seconds.
+ */
+import { i18n } from '../i18n';
+import EmblemMark from '../assets/brand/emblem-mark.svg';
+import Wordmark from './Wordmark.astro';
+
+const { t } = i18n(Astro.url);
+---
+
+<div class="intro-screen" aria-hidden="true" data-intro-screen>
+  <div class="intro-screen__top">
+    <Wordmark />
+    <span class="intro-screen__label">{t.common.loading}</span>
+  </div>
+
+  <div class="intro-screen__mark">
+    <EmblemMark class="intro-screen__rider intro-screen__rider--ghost" focusable="false" />
+    <EmblemMark class="intro-screen__rider intro-screen__rider--ink" focusable="false" data-intro-rider />
+  </div>
+
+  <div class="intro-screen__bottom">
+    <span class="intro-screen__count" data-intro-count>0</span>
+    <span class="intro-screen__bar"><span data-intro-bar></span></span>
+  </div>
+</div>
+
+<style>
+  /* Always near-black, in both themes: a stage curtain. */
+  .intro-screen {
+    --intro-ink: #f2f2f2;
+
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    grid-template-rows: auto 1fr auto;
+    padding: max(1.5rem, env(safe-area-inset-top)) var(--gutter) max(1.5rem, env(safe-area-inset-bottom));
+    background: #0a0a0a;
+    color: var(--intro-ink);
+    user-select: none;
+  }
+
+  :global(:root[data-intro]) .intro-screen {
+    display: grid;
+  }
+
+  /* Should the script never start, the curtain lifts by itself. */
+  :global(:root[data-intro='loading']) .intro-screen {
+    animation: intro-fallback 0.6s ease 4s forwards;
+  }
+
+  @keyframes intro-fallback {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  .intro-screen__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .intro-screen__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  /* The horseman fills in from the tail as the counter runs (intro.ts sets the clip). */
+  .intro-screen__mark {
+    display: grid;
+    place-self: center;
+    width: clamp(7rem, 5rem + 10vw, 12rem);
+  }
+
+  .intro-screen__mark :global(.intro-screen__rider) {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    color: var(--intro-ink);
+  }
+
+  .intro-screen__mark :global(.intro-screen__rider--ghost) {
+    opacity: 0.14;
+  }
+
+  .intro-screen__mark :global(.intro-screen__rider--ink) {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .intro-screen__bottom {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .intro-screen__count {
+    font-size: clamp(5rem, 2rem + 16vw, 15rem);
+    font-weight: 300;
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .intro-screen__bar {
+    display: block;
+    height: 1px;
+    background: rgb(255 255 255 / 0.18);
+  }
+
+  .intro-screen__bar span {
+    display: block;
+    height: 100%;
+    background: var(--intro-ink);
+    transform: scaleX(0);
+    transform-origin: var(--start);
+  }
+
+  /* Leaving: the curtain rises, its contents a little ahead of it. */
+  .intro-screen[data-state='leaving'] {
+    transform: translateY(-100%);
+    transition: transform 1.05s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .intro-screen[data-state='leaving'] > * {
+    opacity: 0;
+    transform: translateY(-3rem);
+    transition:
+      opacity 0.45s ease,
+      transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  @media print {
+    .intro-screen {
+      display: none !important;
+    }
+  }
+</style>

@@ -9,7 +9,7 @@ Ev polîtîka rave dike ka em kîjan daneyên kesane pêvajo dikin dema ku hûn 
 ## Kurte
 
 - Li ser zagrosian.com hesab, form, reklam, analîtîk an şopandin tune ne.
-- Em kukiyan (cookie) bi cih nakin. Dibe ku pêşkêşkarê me yê hostingê kukiyeke ewlekariyê ya bi tevahî pêwîst bi cih bike, dema ku divê ew kontrol bike ka trafîk rewa ye. Heke hûn temayek an zimanek hilbijêrin, geroka we vê bijartinê tenê li ser amûra we bi bîr tîne.
+- Em kukiyan (cookie) bi cih nakin. Dibe ku pêşkêşkarê me yê hostingê kukiyeke ewlekariyê ya bi tevahî pêwîst bi cih bike, dema ku divê ew kontrol bike ka trafîk rewa ye. Heke hûn temayek an zimanek hilbijêrin, an jî dengê vêxin an vemirînin, geroka we vê bijartinê tenê li ser amûra we bi bîr tîne.
 - Ji bo pêşkêşkirina malperê, pêşkêşkarê me yê hostingê daneyên teknîkî yên wekî navnîşana IPya we pêvajo dike.
 - zagrosian.com girêdanan dide profîlên me yên Instagram û TikTokê, lê tiştekî ji wan platforman bar nake. Li ser platforman bi xwe, polîtîkayên wan ên nepeniyê derbasdar in.
 - Heke hûn e-nameyekê ji me re bişînin, em peyama we tenê ji bo bersivdan û şopandinê bi kar tînin. Serlêdanên kar herî dereng çar hefte piştî dawiya pêvajoya serlêdanê tên jêbirin, ji bilî ku hûn razî bibin em wan dirêjtir biparêzin.
@@ -66,7 +66,7 @@ Heke hûn li ser van platforman şîroveyekê li ser şandiyên me binivîsin an
 
 zagrosian.com kukiyên analîtîk, reklamê an şopandinê bi kar nayîne.
 
-Heke hûn temayeke ronî an tarî an zimanek hilbijêrin, an jî pêşniyara xwendina malperê bi zimanê xwe bigirin, geroka we vê bijartinê di embara xwe ya herêmî de (bi navên `theme` û `language-chosen`) tomar dike, da ku malper di serdana we ya bê de wê li ber çav bigire. Ev agahî li ser amûra we dimîne, qet ji me re an ji kesekî din re nayê şandin, û hûn dikarin wê her gav bi paqijkirina daneyên malperê di geroka xwe de jê bibin.
+Heke hûn temayeke ronî an tarî an zimanek hilbijêrin, dengê vêxin an vemirînin, an jî pêşniyara xwendina malperê bi zimanê xwe bigirin, geroka we vê bijartinê di embara xwe ya herêmî de (bi navên `theme`, `language-chosen` û `sound`) tomar dike, da ku malper di serdana we ya bê de wê li ber çav bigire. Heta dawiya serdana we, ew di embara xwe ya danişînê de (bi navê `intro`) jî nîşan dike ku we anîmasyona destpêkê dîtiye, da ku ew dîsa neyê lîstin. Ev agahî li ser amûra we dimîne, qet ji me re an ji kesekî din re nayê şandin, û hûn dikarin wê her gav bi paqijkirina daneyên malperê di geroka xwe de jê bibin.
 
 Dibe ku Cloudflare kukiyeke bi tevahî pêwîst, wekî `__cf_bm` an `cf_clearance`, bi cih bike, dema ku divê ew mirovan ji trafîka otomatîk cuda bike an piştî ku hûn kontroleke ewlekariyê temam dikin. Temenê van kukiyan kurt e, ew tenê ji bo parastina malperê tên bikaranîn û ji bo şopandina we li ser malperên din nayên bikaranîn. Ji ber ku ew ji bo ewlekariyê bi tevahî pêwîst in, ji bo wan razîbûna we ne hewce ye.
 
