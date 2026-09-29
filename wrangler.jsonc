@@ -1,0 +1,18 @@
+// Cloudflare Workers configuration. The site is served as static assets from
+// dist/; there is no Worker script. `npx wrangler deploy` (the deploy command in
+// Workers Builds) builds the site and uploads it.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zagrosian",
+  "compatibility_date": "2026-09-28",
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist",
+    // Pages are built as privacy.html etc. and linked as /privacy.
+    "html_handling": "drop-trailing-slash",
+    // Unknown URLs get dist/404.html with a 404 status.
+    "not_found_handling": "404-page"
+  }
+}

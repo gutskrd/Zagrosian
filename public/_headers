@@ -1,5 +1,6 @@
-# Cloudflare Pages response headers
-# https://developers.cloudflare.com/pages/configuration/headers/
+# Cloudflare response headers for the static assets (Workers and Pages use
+# the same format).
+# https://developers.cloudflare.com/workers/static-assets/headers/
 #
 # Cloudflare joins a header with a comma when more than one matching rule sets
 # it, which would corrupt policies such as the CSP. Each security header is
@@ -41,7 +42,7 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Keep the default *.pages.dev address out of search results, so Google only
-# indexes zagrosian.com. (Preview deployments are noindex by default.)
-https://:project.pages.dev/*
+# Keep Cloudflare's own addresses out of search results, so Google only indexes
+# zagrosian.com: the Worker's *.workers.dev address and its preview URLs.
+https://:worker.:account.workers.dev/*
   X-Robots-Tag: noindex

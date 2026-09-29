@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   site: 'https://zagrosian.com',
-  // Emit /privacy.html instead of /privacy/index.html so URLs stay clean on Cloudflare Pages.
+  // Emit /privacy.html instead of /privacy/index.html; Cloudflare serves it at /privacy.
   trailingSlash: 'never',
   build: {
     format: 'file',

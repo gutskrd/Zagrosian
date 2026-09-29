@@ -15,10 +15,8 @@ Requires Node 22.12 or later.
 | `npm run dev`     | Start the dev server at `http://localhost:4321`  |
 | `npm run check`   | Type-check `.astro` and `.ts` files              |
 | `npm run build`   | Type-check, then build the site into `dist/`     |
-| `npm run preview` | Serve the production build locally               |
-
-`npm run preview` does not apply `public/_headers`. To test with Cloudflare's real headers and routing, run
-`npx wrangler pages dev dist` after building.
+| `npm run preview` | Build, then serve the site at `http://localhost:8787` exactly as Cloudflare does, with the headers from `public/_headers`, clean URLs and the 404 page |
+| `npm run deploy`  | Build and deploy to Cloudflare (after `npx wrangler login`); normally Cloudflare deploys from GitHub instead |
 
 ## Editing content
 
@@ -127,28 +125,44 @@ Rules the code follows:
   Content-Security-Policy and Trusted Types rules in `public/_headers` stay strict.
 - Split headings keep their full text as their accessible name.
 
-## Deploying to Cloudflare Pages
+## Deploying to Cloudflare
 
-Connect the repository in Cloudflare Pages with these settings:
+The site runs on Cloudflare Workers as static assets, with no Worker script. Everything is configured
+in [`wrangler.jsonc`](wrangler.jsonc): the Worker's name (`zagrosian`), the `dist/` folder, clean URLs
+(`/privacy` serves `privacy.html`, and `/privacy.html` redirects to it) and the 404 page. `npx wrangler
+deploy` runs `npm run build` itself, then uploads the site.
 
-| Setting                | Value           |
-| ---------------------- | --------------- |
-| Framework preset       | Astro           |
-| Build command          | `npm run build` |
-| Build output directory | `dist`          |
+Cloudflare deploys it from GitHub with Workers Builds. In the Cloudflare dashboard, under **Workers &
+Pages → zagrosian → Settings → Build**, use:
 
-The Node version is pinned by [`.node-version`](.node-version). Add `zagrosian.com` as a custom domain,
-then redirect `www.zagrosian.com` to `zagrosian.com` with a Cloudflare redirect rule.
+| Setting                            | Value                                                        |
+| ---------------------------------- | ------------------------------------------------------------ |
+| Git repository                     | `gutskrd/Zagrosian`                                          |
+| Branch (production)                | the branch you deploy from, currently `claude/adoring-brown-aa51uh` |
+| Build command                      | leave empty (the deploy command builds the site)             |
+| Deploy command                     | `npx wrangler deploy`                                        |
+| Non-production branch deploy command | `npx wrangler versions upload`                             |
+| Root directory                     | leave empty                                                  |
+
+The Node version is pinned by [`.node-version`](.node-version).
+
+Then, under **Settings → Domains & Routes**, add `zagrosian.com` and `www.zagrosian.com` as custom
+domains, and redirect `www.zagrosian.com` to `zagrosian.com` with a Cloudflare redirect rule (**Rules →
+Redirect Rules**, template *Redirect from WWW to root*). The Worker's own `*.workers.dev` address and
+its preview URLs send `X-Robots-Tag: noindex`, so search engines only index zagrosian.com; you can also
+turn them off on the same settings page.
 
 `security.txt` expires 180 days after each build, so redeploy at least twice a year.
 
 ## Getting indexed by Google
 
-The site is ready for indexing: every page has a canonical URL, there is a sitemap, and the homepage
-carries structured data for the site name and logo. The `*.pages.dev` copy is marked `noindex`, so only
-zagrosian.com is indexed. Google still needs to be told the site exists:
+The site is ready for indexing: every page has a canonical URL, there is a sitemap with the date each
+legal page last changed, and the homepage carries structured data for the company, its logo and its
+social profiles. Only zagrosian.com is indexed (see above). Google still needs to be told the site
+exists:
 
-1. Deploy the site and check that https://zagrosian.com loads.
+1. Check that the latest Cloudflare build is green (the *Workers Builds: zagrosian* check on GitHub)
+   and that https://zagrosian.com loads.
 2. In [Google Search Console](https://search.google.com/search-console), add a **Domain** property for
    `zagrosian.com`. Verify it with the DNS TXT record Google gives you (in Cloudflare: DNS → Records →
    Add record, type `TXT`, name `@`).
