@@ -1,27 +1,24 @@
 ---
-import { site } from '../site';
+import { hevalo, site } from '../site';
 import Cta from './Cta.astro';
 import Griffin from './Griffin.astro';
-import Ridgeline from './Ridgeline.astro';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="container hero__grid">
     <div class="hero__text">
       <h1 id="hero-title" class="hero__title">
-        <span class="hero__line"><span>Software</span></span>
+        <span class="hero__line"><span>We make apps</span></span>
         <span class="hero__line"><span>for Kurdish</span></span>
-        <span class="hero__line"><span>communities.</span></span>
+        <span class="hero__line"><span>speakers.</span></span>
       </h1>
 
       <p class="hero__lead lead intro">
-        {site.name} is an independent technology company based in {site.country}. We build products for Kurdish
-        communities around the world, starting with Hevalo.
+        {site.name} is a software company in {site.country}. Our first app is {hevalo.name}, for learning Kurdish.
       </p>
 
       <div class="hero__actions intro">
-        <Cta href="#hevalo" arrow="down">Explore Hevalo</Cta>
-        <Cta href="#about" variant="text">About the company</Cta>
+        <Cta href="#hevalo" arrow="down">Meet {hevalo.name}</Cta>
       </div>
     </div>
 
@@ -29,13 +26,11 @@ import Ridgeline from './Ridgeline.astro';
       <Griffin alt="The Zagrosian griffin" sizes="(min-width: 64rem) 34vw, min(64vw, 22rem)" loading="eager" />
     </figure>
   </div>
-
-  <Ridgeline class="hero__ridge" />
 </section>
 
 <style>
   .hero {
-    padding-top: clamp(3.5rem, 1.5rem + 8vw, 8rem);
+    padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
   }
 
   .hero__grid {
@@ -43,10 +38,14 @@ import Ridgeline from './Ridgeline.astro';
     gap: clamp(3rem, 2rem + 4vw, 4rem);
   }
 
+  /* The headline is sized to its column: "We make apps" is about 6.1em wide. */
+  .hero__text {
+    container-type: inline-size;
+  }
+
   .hero__title {
-    /* Never wider than the column ("communities." is about 5.6em wide), nor too
-       tall for short landscape screens. */
-    font-size: min(var(--text-display), calc((100vw - 2 * var(--gutter)) / 5.8), 18svh);
+    /* Never wider than the column, nor too tall for short landscape screens. */
+    font-size: min(var(--text-display), 16cqi, 18svh);
     line-height: 0.98;
     letter-spacing: -0.045em;
   }
@@ -87,10 +86,6 @@ import Ridgeline from './Ridgeline.astro';
     width: 100%;
   }
 
-  .hero__ridge {
-    margin-top: clamp(1rem, 0.5rem + 2vw, 2rem);
-  }
-
   @media (min-width: 64rem) {
     .hero__grid {
       grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -100,10 +95,6 @@ import Ridgeline from './Ridgeline.astro';
 
     .hero__text {
       grid-column: 1 / span 7;
-    }
-
-    .hero__title {
-      font-size: min(var(--text-display), 18svh);
     }
 
     .hero__emblem {

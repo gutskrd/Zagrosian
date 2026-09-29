@@ -53,7 +53,6 @@
   --color-surface: #f5f5f4;
   --color-underline: #c4c4c4;
   --color-solid-hover: #2b2b2b;
-  --color-ridge: #cfcfcf;
   /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the About surface,
      above the 3:1 minimum for large text. */
   --color-dim: #878785;
@@ -106,7 +105,6 @@
     --color-surface: #121212;
     --color-underline: #555555;
     --color-solid-hover: #d4d4d4;
-    --color-ridge: #3a3a3a;
     --color-dim: #666666;
     --header-bg: rgb(10 10 10 / 0.8);
 
@@ -333,7 +331,6 @@ svg {
   .site-footer,
   .legal__toc,
   .reading-progress,
-  .ridgeline,
   .cta,
   .menu-toggle {
     display: none !important;

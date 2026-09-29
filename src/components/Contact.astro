@@ -9,9 +9,8 @@ const { contact, press } = site.emails;
 <section id="contact" class="contact section" aria-labelledby="contact-title">
   <div class="container contact__grid">
     <div>
-      <p class="eyebrow" data-reveal>Contact</p>
-      <SplitText id="contact-title" class="heading-2 contact__title" text="Get in touch." />
-      <p class="contact__text lead" data-reveal>For questions, partnerships and anything else.</p>
+      <SplitText id="contact-title" class="heading-2" text="Say hello." />
+      <p class="contact__text lead" data-reveal>Have a question or an idea? Send us an email.</p>
     </div>
 
     <div class="contact__panel" data-reveal>
@@ -41,10 +40,6 @@ const { contact, press } = site.emails;
   .contact__grid {
     display: grid;
     gap: clamp(2.5rem, 2rem + 2vw, 3.5rem);
-  }
-
-  .contact__title {
-    margin-top: 1.25rem;
   }
 
   .contact__text {

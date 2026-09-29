@@ -44,6 +44,9 @@ Requires Node 22.12 or later.
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement after
   the Hevalo section, in [`Motto.astro`](src/components/Motto.astro). *Ji Kurdan, ji bo Kurdan.*
   ("By Kurds, for Kurds") is in the footer.
+- The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
+  [`ProductShowcase.astro`](src/components/ProductShowcase.astro). When the apps are out, replace it
+  with links to the App Store and Google Play, and update `site.description` in `src/site.ts`.
 - [`src/components/`](src/components/): homepage sections.
 - [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
   [`security.md`](src/pages/security.md): legal pages, written in Markdown. When you change one, update
@@ -57,7 +60,7 @@ public/            Favicons, logo, social image, manifest, robots.txt and Cloudf
 src/
   assets/brand/    Griffin emblem (source and sized variants) and the 21-ray sun
   assets/fonts/    Inter subset with the Kurmanji letters Ş and ş
-  components/      Header, Footer, Hero, ProductShowcase, Motto, Principles, About, Contact, …
+  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, …
   layouts/         BaseLayout (document and SEO), LegalLayout (legal pages), NoticeLayout (404)
   pages/           Homepage, legal pages, 404, sitemap.xml and .well-known/security.txt
   scripts/site.ts  Header, mobile menu, section highlighting, scroll reveals, copy button,
@@ -69,12 +72,13 @@ src/
 ## Brand assets
 
 - **Griffin** (`src/assets/brand/griffin-source.png`): the emblem, used in the header, the hero, the
-  Google logo (`public/logo.png`) and the social image (`public/og.png`). The site serves it as
+  Google logo (`public/logo.png`) and the social image (`public/og.png`, which also shows the hero
+  headline; update it if the headline changes). The site serves it as
   16-colour PNGs at 96–960 px wide (`griffin-*.png`), which for black line art are smaller than WebP or
   AVIF. To regenerate a variant:
   `node -e "require('sharp')('src/assets/brand/griffin-source.png').resize({ width: 480 }).png({ palette: true, colours: 16, dither: 0 }).toFile('src/assets/brand/griffin-480.png')"`
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
-  footer mark uses the black version on light backgrounds and the white version in dark mode
+  Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
 
 - **Font:** Inter, self-hosted. The main file covers basic Latin, which already includes ê, î and û;

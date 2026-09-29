@@ -1,8 +1,6 @@
 ---
 import SplitText from './SplitText.astro';
 import { hevalo, site } from '../site';
-
-const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
 ---
 
 <section id="about" class="about section" aria-labelledby="about-title">
@@ -14,23 +12,18 @@ const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
         id="about-title"
         class="about__statement"
         effect="highlight"
-        text="An independent technology company with Kurdish roots."
+        text={"Millions of people speak Kurdish.\nFew of their apps do."}
       />
-      <p class="about__text lead">
-        {site.name} takes its name from the Zagros mountains. We are privately owned, based in {site.country}, and
-        we design, build and operate our products ourselves.
-      </p>
-
-      <dl class="about__facts rule">
-        <div>
-          <dt>Based in</dt>
-          <dd>{basedIn}</dd>
-        </div>
-        <div>
-          <dt>Products</dt>
-          <dd><a href={hevalo.url}>{hevalo.name}</a></dd>
-        </div>
-      </dl>
+      <div class="about__text lead">
+        <p>
+          We build apps in Kurdish, for people who speak it, are learning it or want their children to grow up with
+          it. {hevalo.name} is the first.
+        </p>
+        <p>
+          The name comes from the Zagros, the mountains many Kurds call home.
+          We&rsquo;re based in {site.country} and make everything ourselves.
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -53,42 +46,10 @@ const basedIn = site.country.charAt(0).toUpperCase() + site.country.slice(1);
   }
 
   .about__text {
-    max-width: 36rem;
-    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  }
-
-  .about__facts {
     display: grid;
     gap: 1.25rem;
-    margin: clamp(3rem, 2rem + 3vw, 5rem) 0 0;
-    padding-top: 1.5rem;
-    --rule-color: var(--color-line-strong);
-    font-size: var(--text-sm);
-  }
-
-  .about__facts dt {
-    color: var(--color-muted);
-  }
-
-  .about__facts dd {
-    margin: 0.25rem 0 0;
-    overflow-wrap: anywhere;
-  }
-
-  .about__facts a {
-    text-decoration-color: var(--color-underline);
-    transition: text-decoration-color 0.2s ease;
-  }
-
-  .about__facts a:hover {
-    text-decoration-color: currentColor;
-  }
-
-  @media (min-width: 48rem) {
-    .about__facts {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      column-gap: 2rem;
-    }
+    max-width: 36rem;
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   }
 
   @media (min-width: 64rem) {

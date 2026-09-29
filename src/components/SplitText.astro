@@ -28,11 +28,13 @@ interface Props extends HTMLAttributes<'h2'> {
 // scoped styles still apply to the heading.
 const { text, as: Tag = 'h2', effect = 'rise', id, class: className, ...attributes } = Astro.props;
 
-const words = text.split(' ');
+// A newline in `text` starts a new line, e.g. one sentence per line.
+const lines = text.split('\n').map((line) => line.split(' '));
 // Keep the last two words together, so the heading never ends on a lone word.
-if (words.length > 2) {
-  const last = words.pop();
-  words[words.length - 1] += ` ${last}`;
+const lastLine = lines[lines.length - 1];
+if (lastLine.length > 2) {
+  const last = lastLine.pop();
+  lastLine[lastLine.length - 1] += `\u00a0${last}`;
 }
 
 /** Splits a word so that the odd-indexed parts are an î after an ascender. */
@@ -43,17 +45,22 @@ const kernParts = (word: string) => word.split(/(?<=[bdfhklt])(î)/);
   {...attributes}
   id={id}
   class:list={['split', className]}
-  aria-label={text}
+  aria-label={text.replaceAll('\n', ' ')}
   data-split={effect === 'rise' ? '' : undefined}
   data-highlight={effect === 'highlight' ? '' : undefined}
 >
   {
-    words.map((word, index) => (
+    lines.map((words, line) => (
       <>
-        {index > 0 && ' '}
-        <span class="split__word" aria-hidden="true">
-          <span class="split__inner">{kernParts(word).map((part, i) => (i % 2 ? <span class="split__kern">{part}</span> : part))}</span>
-        </span>
+        {line > 0 && <br />}
+        {words.map((word, index) => (
+          <>
+            {index > 0 && ' '}
+            <span class="split__word" aria-hidden="true">
+              <span class="split__inner">{kernParts(word).map((part, i) => (i % 2 ? <span class="split__kern">{part}</span> : part))}</span>
+            </span>
+          </>
+        ))}
       </>
     ))
   }
