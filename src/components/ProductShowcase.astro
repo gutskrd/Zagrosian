@@ -1,6 +1,7 @@
 ---
 import SplitText from './SplitText.astro';
 import Cta from './Cta.astro';
+import HevaloIcon from './HevaloIcon.astro';
 import type { Product } from '../site';
 
 interface Props {
@@ -18,6 +19,9 @@ const domain = new URL(product.url).hostname;
 
     <div class="showcase__body">
       <div class="showcase__identity">
+        <div class="showcase__icon" data-reveal>
+          <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
+        </div>
         <SplitText id={`${id}-title`} class="showcase__name" text={product.name} />
         <p class="showcase__byline" data-reveal>{product.category}</p>
       </div>
@@ -47,6 +51,18 @@ const domain = new URL(product.url).hostname;
     display: grid;
     gap: clamp(3rem, 2rem + 4vw, 4.5rem);
     margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  /* The app icon, with a soft glow in its own colour. */
+  .showcase__icon {
+    width: clamp(4.5rem, 3.5rem + 2.5vw, 6rem);
+    margin-bottom: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+  }
+
+  .showcase__icon :global(.hevalo-icon) {
+    display: block;
+    width: 100%;
+    filter: drop-shadow(0 0.75rem 2rem rgb(118 104 230 / 0.35));
   }
 
   .showcase__name {

@@ -1,6 +1,7 @@
 ---
 import Arrow from './Arrow.astro';
 import Griffin from './Griffin.astro';
+import ThemeToggle from './ThemeToggle.astro';
 import Wordmark from './Wordmark.astro';
 import { hevalo, legalNav, primaryNav, site } from '../site';
 ---
@@ -12,29 +13,33 @@ import { hevalo, legalNav, primaryNav, site } from '../site';
       <Wordmark />
     </a>
 
-    <nav class="site-nav" aria-label="Primary">
-      <ul class="site-nav__list">
-        {
-          primaryNav.map((link) => (
-            <li>
-              <a class="site-nav__link" href={link.href} data-nav-section={link.href.split('#')[1]}>
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-      <a class="site-nav__cta" href={hevalo.url}>
-        Visit {hevalo.name}
-        <Arrow direction="up-right" />
-      </a>
-    </nav>
+    <div class="site-header__end">
+      <nav class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          {
+            primaryNav.map((link) => (
+              <li>
+                <a class="site-nav__link" href={link.href} data-nav-section={link.href.split('#')[1]}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="site-nav__cta" href={hevalo.url}>
+          Visit {hevalo.name}
+          <Arrow direction="up-right" />
+        </a>
+      </nav>
 
-    <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu">
-      <span class="menu-toggle__label menu-toggle__label--open">Menu</span>
-      <span class="menu-toggle__label menu-toggle__label--close" aria-hidden="true">Close</span>
-      <span class="menu-toggle__icon" aria-hidden="true"></span>
-    </button>
+      <ThemeToggle />
+
+      <button class="menu-toggle" type="button" popovertarget="mobile-menu" aria-controls="mobile-menu">
+        <span class="menu-toggle__label menu-toggle__label--open">Menu</span>
+        <span class="menu-toggle__label menu-toggle__label--close" aria-hidden="true">Close</span>
+        <span class="menu-toggle__icon" aria-hidden="true"></span>
+      </button>
+    </div>
   </div>
 
   <nav id="mobile-menu" class="mobile-menu" popover aria-label="Menu" data-mobile-menu>
@@ -128,6 +133,12 @@ import { hevalo, legalNav, primaryNav, site } from '../site';
     width: auto;
     height: 2.5rem;
     margin-block: -0.25rem;
+  }
+
+  .site-header__end {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
   /* Desktop navigation */
@@ -412,6 +423,10 @@ import { hevalo, legalNav, primaryNav, site } from '../site';
   }
 
   @media (min-width: 48rem) {
+    .site-header__end {
+      gap: 0.75rem;
+    }
+
     .site-nav {
       display: flex;
     }

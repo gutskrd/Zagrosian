@@ -1,0 +1,104 @@
+---
+/**
+ * Header button that switches between light and dark (src/scripts/theme.ts).
+ * The icon is a sun that becomes a crescent moon: the disc grows, a shadow
+ * circle slides over it and the rays fold away. Its state follows the
+ * `data-theme` attribute on <html>, so it is right from the first paint.
+ */
+---
+
+<button class="theme-toggle" type="button" aria-pressed="false" data-theme-toggle>
+  <span class="visually-hidden">Dark theme</span>
+  <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <mask id="theme-toggle-shadow" maskUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#fff"></rect>
+      <circle class="theme-toggle__shadow" cx="24" cy="4" r="7" fill="#000"></circle>
+    </mask>
+    <circle class="theme-toggle__disc" cx="12" cy="12" r="5" fill="currentColor" mask="url(#theme-toggle-shadow)"
+    ></circle>
+    <path
+      class="theme-toggle__rays"
+      d="M12 2.5v2M12 19.5v2M5.28 5.28l1.42 1.42M17.3 17.3l1.42 1.42M2.5 12h2M19.5 12h2M5.28 18.72l1.42-1.42M17.3 6.7l1.42-1.42"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"></path>
+  </svg>
+</button>
+
+<style>
+  /* Shown once theme-init.js has run; without JavaScript it could not work. */
+  .theme-toggle {
+    display: none;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: none;
+    color: var(--color-ink-soft);
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s var(--ease-out);
+  }
+
+  :global(:root[data-theme]) .theme-toggle {
+    display: inline-grid;
+  }
+
+  .theme-toggle:active {
+    transform: scale(0.92);
+  }
+
+  @media (hover: hover) {
+    .theme-toggle:hover {
+      border-color: var(--color-line-strong);
+      color: var(--color-ink);
+    }
+  }
+
+  .theme-toggle__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    overflow: visible;
+  }
+
+  .theme-toggle__disc,
+  .theme-toggle__rays {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .theme-toggle__disc,
+  .theme-toggle__shadow,
+  .theme-toggle__rays {
+    transition:
+      transform 0.6s var(--ease-out),
+      opacity 0.35s ease;
+  }
+
+  /* Dark: the disc grows into a moon, the shadow carves the crescent and the
+     rays turn away. */
+  :global(:root[data-theme='dark']) .theme-toggle__disc {
+    transform: scale(1.55);
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle__shadow {
+    transform: translate(-6.5px, 3px);
+  }
+
+  :global(:root[data-theme='dark']) .theme-toggle__rays {
+    opacity: 0;
+    transform: rotate(-60deg) scale(0.5);
+  }
+
+  @media (min-width: 48rem) {
+    .theme-toggle {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+</style>

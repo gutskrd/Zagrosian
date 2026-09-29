@@ -3,13 +3,14 @@ import { hevalo, home, site } from '../site';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
 import Griffin from './Griffin.astro';
+import HevaloIcon from './HevaloIcon.astro';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
   <div class="container hero__grid">
     <div class="hero__text">
       <a class="hero__notice intro" href="#hevalo">
-        <span class="status-dot" aria-hidden="true"></span>
+        <HevaloIcon class="hero__notice-icon" sizes="20px" loading="eager" />
         <span>{hevalo.name} is coming to {hevalo.availability.comingSoon.join(' and ')}</span>
         <Arrow direction="down" class="hero__notice-arrow" />
       </a>
@@ -68,8 +69,9 @@ import Griffin from './Griffin.astro';
       color 0.2s ease;
   }
 
-  .hero__notice .status-dot {
-    color: var(--color-ink);
+  .hero__notice :global(.hero__notice-icon) {
+    width: 1.25rem;
+    margin-left: -0.25rem;
   }
 
   .hero__notice :global(.hero__notice-arrow) {

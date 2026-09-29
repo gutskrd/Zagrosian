@@ -94,31 +94,34 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 0.9s;
 
-  color-scheme: light dark;
+  color-scheme: light;
   /* Lets elements such as the contents list animate to and from their natural height. */
   interpolate-size: allow-keywords;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-paper: #0a0a0a;
-    --color-ink: #f2f2f2;
-    --color-ink-soft: #bdbdbd;
-    --color-muted: #8f8f8f;
-    --color-line: #242424;
-    --color-line-strong: #333333;
-    --color-surface: #121212;
-    --color-underline: #555555;
-    --color-solid-hover: #d4d4d4;
-    --color-dim: #666666;
-    --header-bg: rgb(10 10 10 / 0.8);
+/* Dark theme. `data-theme` is set before the page is drawn by
+   src/scripts/theme-init.js, from the visitor's choice or, by default, their
+   system setting. Without JavaScript the site stays light. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
 
-    --color-night: #141414;
-    --color-night-line: #2e2e2e;
-    --color-night-edge: #242424;
+  --color-paper: #0a0a0a;
+  --color-ink: #f2f2f2;
+  --color-ink-soft: #bdbdbd;
+  --color-muted: #8f8f8f;
+  --color-line: #242424;
+  --color-line-strong: #333333;
+  --color-surface: #121212;
+  --color-underline: #555555;
+  --color-solid-hover: #d4d4d4;
+  --color-dim: #666666;
+  --header-bg: rgb(10 10 10 / 0.8);
 
-    --art-filter: invert(1);
-  }
+  --color-night: #141414;
+  --color-night-line: #2e2e2e;
+  --color-night-edge: #242424;
+
+  --art-filter: invert(1);
 }
 
 /* ==========================================================================
@@ -359,12 +362,26 @@ svg {
   animation-duration: 0.25s;
 }
 
+/* Switching theme: the new colours spread out in a circle from the control
+   that was used (src/scripts/theme.ts). The usual cross-fade is turned off,
+   and the header joins the page so the whole screen changes together. */
+:root[data-theme-switching]::view-transition-old(root),
+:root[data-theme-switching]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-theme-switching] .site-header {
+  view-transition-name: none;
+}
+
 /* ==========================================================================
    Print
    ========================================================================== */
 
 @media print {
-  :root {
+  :root,
+  :root[data-theme='dark'] {
     color-scheme: light;
     --color-paper: #fff;
     --color-ink: #000;
@@ -496,13 +513,15 @@ svg {
   }
 }
 
-@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
-  :root {
+@media (prefers-contrast: more) {
+  :root[data-theme='dark'] {
     --color-ink-soft: #e6e6e6;
     --color-muted: #cccccc;
     --color-line: #737373;
     --color-line-strong: #999999;
     --color-underline: #999999;
+    --color-dim: var(--color-ink);
+    --color-night-line: #737373;
   }
 }
 

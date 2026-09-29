@@ -1,0 +1,43 @@
+---
+/**
+ * Hevalo's app icon. Served as WebP at three sizes, so each screen downloads
+ * only the resolution it needs.
+ */
+import icon96 from '../assets/brand/hevalo-96.webp';
+import icon192 from '../assets/brand/hevalo-192.webp';
+import icon288 from '../assets/brand/hevalo-288.webp';
+
+interface Props {
+  /** Rendered width, as a `sizes` value, e.g. "20px". */
+  sizes: string;
+  /** Leave empty when the icon sits next to the Hevalo name. */
+  alt?: string;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+}
+
+const { sizes, alt = '', class: className, loading = 'lazy' } = Astro.props;
+
+const srcset = [icon96, icon192, icon288].map((image) => `${image.src} ${image.width}w`).join(', ');
+---
+
+<img
+  class:list={['hevalo-icon', className]}
+  src={icon192.src}
+  srcset={srcset}
+  sizes={sizes}
+  width={icon192.width}
+  height={icon192.height}
+  alt={alt}
+  loading={loading}
+  decoding="async"
+  draggable="false"
+/>
+
+<style>
+  .hevalo-icon {
+    flex: none;
+    height: auto;
+    user-select: none;
+  }
+</style>

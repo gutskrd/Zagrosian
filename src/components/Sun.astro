@@ -1,7 +1,8 @@
 ---
 /**
- * The 21-ray sun, from the original artwork: black on light surfaces, white on
- * dark ones. Decorative, so it has no alternative text.
+ * The 21-ray sun, from the original artwork: black in the light theme, white in
+ * the dark one. Both are tiny, so both are in the page and CSS shows the right
+ * one. Decorative, so it has no alternative text.
  */
 import sunBlack from '../assets/brand/sun-black-64.png';
 import sunWhite from '../assets/brand/sun-white-64.png';
@@ -13,10 +14,10 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<picture class:list={['sun', className]}>
-  <source srcset={sunWhite.src} media="(prefers-color-scheme: dark)" />
-  <img src={sunBlack.src} width={sunBlack.width} height={sunBlack.height} alt="" loading="lazy" decoding="async" />
-</picture>
+<span class:list={['sun', className]}>
+  <img class="sun__light" src={sunBlack.src} width={sunBlack.width} height={sunBlack.height} alt="" loading="lazy" decoding="async" />
+  <img class="sun__dark" src={sunWhite.src} width={sunWhite.width} height={sunWhite.height} alt="" loading="lazy" decoding="async" />
+</span>
 
 <style>
   .sun {
@@ -30,5 +31,14 @@ const { class: className } = Astro.props;
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  .sun__dark,
+  :global(:root[data-theme='dark']) .sun__light {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .sun__dark {
+    display: block;
   }
 </style>

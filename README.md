@@ -59,16 +59,17 @@ Requires Node 22.12 or later.
 ```
 public/            Favicons, logo, social image, manifest, robots.txt and Cloudflare _headers
 src/
-  assets/brand/    Griffin emblem (source and sized variants) and the 21-ray sun
+  assets/brand/    Griffin emblem, the 21-ray sun and the Hevalo app icon (sources and sized variants)
   assets/fonts/    Inter subset with the Kurmanji letters Ş and ş
-  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, …
+  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, ThemeToggle,
+                   ThemeSwitch, …
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
                    NoticeLayout (404)
   lib/             structured-data.ts (JSON-LD) and pages.ts (Markdown versions and llms.txt)
   pages/           Homepage, legal pages, 404, sitemap.xml, llms.txt, llms-full.txt, the Markdown
                    versions ([page].md.ts) and .well-known/security.txt
-  scripts/site.ts  Header, mobile menu, section highlighting, scroll reveals, copy button,
-                   legal table of contents
+  scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
+                   legal table of contents), motion.ts, theme.ts and theme-init.js (light/dark)
   styles/          Font, design tokens and base styles
   site.ts          Site configuration and content
 ```
@@ -84,6 +85,10 @@ src/
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
+- **Hevalo icon** (`src/assets/brand/hevalo-source.png`): Hevalo's app icon, shown above the product
+  name and in the hero's *coming soon* notice. The source's corners are semi-transparent white; the
+  served versions (`hevalo-96/192/288.webp`) have them made fully transparent, so the icon sits cleanly
+  on dark backgrounds.
 
 - **Fonts:** everything is set in Inter, self-hosted, except Kurdish phrases. Those use the `kurdish`
   class in `src/styles/global.css`, the same serif italic as hevalo.app:
@@ -100,8 +105,22 @@ src/
   --unicodes=U+015E,U+015F --layout-features='*' --flavor=woff2
   --output-file=src/assets/fonts/inter-kurmanji-opsz.woff2`.
 
-The site follows the visitor's light or dark system setting. Colours are tokens in
-`src/styles/global.css`; line art is inverted on dark surfaces.
+## Light and dark theme
+
+The site follows the visitor's system setting by default. The sun/moon button in the header switches
+between light and dark, and the control in the footer offers *System*, *Light* and *Dark*. The
+choice is saved in the browser (`localStorage`) and applies to every open tab at once.
+
+- [`src/scripts/theme-init.js`](src/scripts/theme-init.js) is a tiny blocking script in `<head>`
+  that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
+  is an external file because the Content-Security-Policy forbids inline scripts.
+- [`src/scripts/theme.ts`](src/scripts/theme.ts) runs the controls. Where the browser supports view
+  transitions, the new theme spreads out in a circle from the control that was used; with *reduce
+  motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
+  follows system changes while *System* is selected.
+- Colours are tokens in `src/styles/global.css`, with the dark values under
+  `:root[data-theme='dark']`; line art is inverted on dark surfaces. Without JavaScript the site stays
+  light and the controls are hidden.
 
 ## Motion
 

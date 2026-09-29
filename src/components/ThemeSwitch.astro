@@ -1,0 +1,124 @@
+---
+/**
+ * Footer control to follow the system theme or choose light or dark
+ * (src/scripts/theme.ts). Native radio buttons, so arrow keys and screen
+ * readers work as usual; the sliding indicator follows the
+ * `data-theme-preference` attribute on <html>.
+ */
+const options = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+] as const;
+---
+
+<fieldset class="theme-switch" data-theme-switch>
+  <legend class="visually-hidden">Theme</legend>
+  <span class="theme-switch__thumb" aria-hidden="true"></span>
+  {
+    options.map(({ value, label }) => (
+      <label class="theme-switch__option" data-value={value} title={label}>
+        <input class="visually-hidden" type="radio" name="theme" value={value} />
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          {value === 'system' && (
+            <>
+              <rect x="2.75" y="3.75" width="14.5" height="10" rx="1.75" />
+              <path d="M7.5 16.75h5M10 13.75v3" />
+            </>
+          )}
+          {value === 'light' && (
+            <>
+              <circle cx="10" cy="10" r="3.25" />
+              <path d="M10 2.5v1.5M10 16v1.5M4.7 4.7l1.06 1.06M14.24 14.24l1.06 1.06M2.5 10H4M16 10h1.5M4.7 15.3l1.06-1.06M14.24 5.76l1.06-1.06" />
+            </>
+          )}
+          {value === 'dark' && <path d="M16 12.1A6.25 6.25 0 0 1 7.9 4a6.25 6.25 0 1 0 8.1 8.1z" />}
+        </svg>
+        <span class="visually-hidden">{label}</span>
+      </label>
+    ))
+  }
+</fieldset>
+
+<style>
+  /* Shown once theme-init.js has run; without JavaScript it could not work. */
+  .theme-switch {
+    --option: 2rem;
+    --inset: 0.1875rem;
+    position: relative;
+    display: none;
+    grid-template-columns: repeat(3, var(--option));
+    margin: 0;
+    padding: var(--inset);
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    min-inline-size: 0;
+  }
+
+  :global(:root[data-theme]) .theme-switch {
+    display: inline-grid;
+  }
+
+  .theme-switch__thumb {
+    position: absolute;
+    top: var(--inset);
+    left: var(--inset);
+    width: var(--option);
+    height: var(--option);
+    border-radius: 50%;
+    background: var(--color-ink);
+    transition: transform 0.45s var(--ease-out);
+  }
+
+  :global(:root[data-theme-preference='light']) .theme-switch__thumb {
+    transform: translateX(100%);
+  }
+
+  :global(:root[data-theme-preference='dark']) .theme-switch__thumb {
+    transform: translateX(200%);
+  }
+
+  .theme-switch__option {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: var(--option);
+    height: var(--option);
+    border-radius: 50%;
+    color: var(--color-muted);
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+
+  .theme-switch__option:hover {
+    color: var(--color-ink);
+  }
+
+  :global(:root[data-theme-preference='system']) .theme-switch__option[data-value='system'],
+  :global(:root[data-theme-preference='light']) .theme-switch__option[data-value='light'],
+  :global(:root[data-theme-preference='dark']) .theme-switch__option[data-value='dark'] {
+    color: var(--color-paper);
+  }
+
+  .theme-switch__option:has(:focus-visible) {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .theme-switch svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (forced-colors: active) {
+    .theme-switch__thumb {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+  }
+</style>

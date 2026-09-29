@@ -1,5 +1,6 @@
 ---
 import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
+import themeInit from '../scripts/theme-init.js?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { structuredData, toJsonLd } from '../lib/structured-data';
@@ -36,6 +37,7 @@ const jsonLd = noindex
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline src={themeInit}></script>
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
@@ -43,7 +45,6 @@ const jsonLd = noindex
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

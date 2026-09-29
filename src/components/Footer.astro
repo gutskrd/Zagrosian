@@ -1,6 +1,7 @@
 ---
 import Arrow from './Arrow.astro';
 import SocialIcon from './SocialIcon.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
 import { footerNav, home, legalNav, site, socialProfiles } from '../site';
 
 const year = new Date().getFullYear();
@@ -55,7 +56,10 @@ const year = new Date().getFullYear();
     </div>
 
     <div class="site-footer__bottom">
-      <p><small>&copy; {year} {site.legalName}</small></p>
+      <div class="site-footer__meta">
+        <p><small>&copy; {year} {site.legalName}</small></p>
+        <ThemeSwitch />
+      </div>
       <nav aria-label="Legal">
         <ul class="site-footer__legal">
           {
@@ -175,6 +179,13 @@ const year = new Date().getFullYear();
     padding-top: 1rem;
     border-top: 1px solid var(--color-line);
     color: var(--color-muted);
+  }
+
+  .site-footer__meta {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    min-height: 2.75rem;
   }
 
   .site-footer__bottom small {

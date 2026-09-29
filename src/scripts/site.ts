@@ -1,4 +1,5 @@
 import { initMotion } from './motion';
+import { initTheme } from './theme';
 
 /**
  * Adds a hairline under the sticky header once the page has scrolled, and
@@ -166,4 +167,5 @@ initReveal();
 initTableOfContents();
 initSectionNav();
 initCopyButtons();
+initTheme();
 initMotion();
