@@ -1,11 +1,11 @@
 ---
 import Arrow from './Arrow.astro';
-import Griffin from './Griffin.astro';
 import LanguagePicker from './LanguagePicker.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import Wordmark from './Wordmark.astro';
 import { i18n, localizePath, locales, navigation } from '../i18n';
 import { hevalo } from '../site';
+import EmblemMark from '../assets/brand/emblem-mark.svg';
 
 const { locale, t, base, localize } = i18n(Astro.url);
 const nav = navigation(locale);
@@ -14,7 +14,7 @@ const nav = navigation(locale);
 <header class="site-header" data-site-header>
   <div class="container site-header__inner">
     <a class="site-header__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <Griffin class="site-header__griffin" sizes="37px" loading="eager" />
+      <EmblemMark class="site-header__mark" aria-hidden="true" focusable="false" />
       <Wordmark />
     </a>
 
@@ -135,10 +135,6 @@ const nav = navigation(locale);
     view-transition-name: site-header;
   }
 
-  .site-header :global(.griffin) {
-    transition: filter 0.3s ease;
-  }
-
   .site-header[data-scrolled] {
     box-shadow: 0 1px 0 var(--color-line);
   }
@@ -159,10 +155,12 @@ const nav = navigation(locale);
     text-decoration: none;
   }
 
-  .site-header__home :global(.site-header__griffin) {
+  /* The emblem's silhouette, which reads at this size; drawn in the text
+     colour, so it follows the theme. */
+  .site-header__home :global(.site-header__mark) {
+    flex: none;
     width: auto;
-    height: 2.5rem;
-    margin-block: -0.25rem;
+    height: 1.875rem;
   }
 
   .site-header__end {

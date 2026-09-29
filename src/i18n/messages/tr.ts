@@ -47,7 +47,7 @@ export const tr: Messages = {
     lead: 'Zagrosian, Hollanda merkezli bağımsız bir teknoloji şirketidir. Kürtçe öğrenme uygulaması Hevalo’dan başlayarak tüketicilere yönelik ürünler tasarlıyor ve geliştiriyoruz.',
     products: 'Ürünlerimiz',
     about: 'Zagrosian hakkında',
-    griffinAlt: 'Zagrosian’ın grifonu',
+    emblemAlt: 'Zagrosian amblemi: dörtnala koşan bir atın üzerindeki süvari',
   },
   hevalo: {
     eyebrow: 'Ürünler',

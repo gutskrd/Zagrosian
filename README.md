@@ -65,7 +65,8 @@ Requires Node 22.12 or later.
 public/            Favicons, logo, social images (og.png and og/<language>.png), manifest,
                    robots.txt and Cloudflare _headers
 src/
-  assets/brand/    Griffin emblem, the 21-ray sun and the Hevalo app icon (sources and sized variants)
+  assets/brand/    The emblem (source PNG, detailed and simplified SVGs), the 21-ray sun and the Hevalo
+                   app icon
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, CommandMenu,
                    LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
@@ -85,16 +86,26 @@ src/
 
 ## Brand assets
 
-- **Griffin** (`src/assets/brand/griffin-source.png`): the emblem, used in the header, the hero, the
-  Google logo (`public/logo.png`) and the social images (`public/og.png` in English and
-  `public/og/<language>.png`, which also show the hero headline in that language; update them if the
-  headline changes). The site serves it as
-  16-colour PNGs at 96–960 px wide (`griffin-*.png`), which for black line art are smaller than WebP or
-  AVIF. To regenerate a variant:
-  `node -e "require('sharp')('src/assets/brand/griffin-source.png').resize({ width: 480 }).png({ palette: true, colours: 16, dither: 0 }).toFile('src/assets/brand/griffin-480.png')"`
+- **Emblem** (`src/assets/brand/zagros-logo-source.png`): a horseman on a galloping horse, drawn as a
+  woodcut. The source is a 574 × 435 px PNG, too small to stay sharp on large or high-density screens,
+  so the site uses vectors traced from it (with [potrace](https://potrace.sourceforge.net) at 4×, then
+  [SVGO](https://svgo.dev)), which are sharp at any size and a fraction of the weight:
+  - `emblem.svg`, the detailed drawing (ink threshold 85, specks under 3 px² removed), for large
+    sizes: the hero ([`Emblem.astro`](src/components/Emblem.astro)), the Google logo
+    (`public/logo.png`), the app icons and the social images (`public/og.png` in English and
+    `public/og/<language>.png`, which also show the hero headline in that language; update them if
+    the headline changes).
+  - `emblem-mark.svg`, a simplified silhouette (the source blurred by 7 px at 4× before tracing, at
+    threshold 170), which stays legible at 16–48 px: the header and the favicons (`favicon.svg`,
+    `favicon.ico` and `favicon-96.png`).
+
+  Both are black paths filled with `currentColor`. The header inlines the silhouette, so it takes the
+  text colour of the current theme; the hero shows the drawing as an image, turned white in dark mode
+  by `--art-filter`. If the artwork changes, trace it again with the same settings and regenerate the
+  icons and social images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
-  (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
+  (`sun-*-64.png`, cropped to the sun).
 - **Hevalo icon** (`src/assets/brand/hevalo-source.png`): Hevalo's app icon, shown above the product
   name and in the hero's *coming soon* notice. The source's corners are semi-transparent white; the
   served versions (`hevalo-96/192/288.webp`) have them made fully transparent, so the icon sits cleanly
@@ -142,8 +153,8 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Hero:** the headline rises line by line from behind masks on load; the griffin fades in and
-  drifts slightly slower than the page (`data-parallax`).
+- **Hero:** the headline rises line by line from behind masks on load; the horseman rides in,
+  revealed from the tail forwards, and drifts slightly slower than the page (`data-parallax`).
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -152,7 +163,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Motto:** the sun turns slowly as the section scrolls past (`data-spin`), and the Kurdish
   sentence rises word by word.
 - **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
-- **Pointer depth:** with a mouse, the hero griffin leans slightly towards the pointer and the Hevalo
+- **Pointer depth:** with a mouse, the hero horseman leans slightly towards the pointer and the Hevalo
   icon tilts under it with a soft highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 

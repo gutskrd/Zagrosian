@@ -2,7 +2,7 @@
 import { i18n } from '../i18n';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
-import Griffin from './Griffin.astro';
+import Emblem from './Emblem.astro';
 import HevaloIcon from './HevaloIcon.astro';
 
 const { t } = i18n(Astro.url);
@@ -41,7 +41,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     </div>
 
     <figure class="hero__emblem intro" data-parallax="0.08" data-depth>
-      <Griffin alt={t.hero.griffinAlt} sizes="(min-width: 64rem) 34vw, min(64vw, 22rem)" loading="eager" />
+      <Emblem alt={t.hero.emblemAlt} loading="eager" />
     </figure>
   </div>
 </section>
@@ -157,16 +157,16 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
   .hero__emblem {
     justify-self: center;
-    width: min(64vw, 22rem);
+    width: min(80vw, 26rem);
     margin: 0;
   }
 
-  .hero__emblem :global(.griffin) {
+  .hero__emblem :global(.emblem) {
     display: block;
     width: 100%;
   }
 
-  /* Room for the griffin to lean towards the pointer in 3D (motion.ts). */
+  /* Room for the horseman to lean towards the pointer in 3D (motion.ts). */
   .hero__emblem {
     perspective: 80rem;
   }
@@ -184,9 +184,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
     .hero__emblem {
       grid-column: 8 / span 5;
+      align-self: center;
       justify-self: end;
       width: 100%;
-      max-width: 32rem;
+      max-width: 34rem;
     }
   }
 
@@ -216,7 +217,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
 
     .hero__emblem {
-      animation: emblem 1.8s var(--ease-out) 0.35s both;
+      animation: emblem 1.6s var(--ease-out) 0.3s both;
     }
   }
 
@@ -233,10 +234,23 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
+  /* The horseman rides in: revealed from the tail forwards as he moves into
+     place. The drawing faces right in every language, so this is not mirrored.
+     The negative insets leave room for the pointer tilt, so nothing is clipped
+     once he has arrived. */
   @keyframes emblem {
     from {
       opacity: 0;
-      transform: translateY(1.5rem) scale(0.97);
+      transform: translateX(-3rem);
+      clip-path: inset(-20% 100% -20% -20%);
+    }
+
+    40% {
+      opacity: 1;
+    }
+
+    to {
+      clip-path: inset(-20% -20% -20% -20%);
     }
   }
 </style>

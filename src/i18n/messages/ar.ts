@@ -48,7 +48,7 @@ export const ar: Messages = {
     lead: 'Zagrosian شركة تقنية مستقلة مقرّها هولندا. نصمّم ونطوّر منتجات رقمية للأفراد، أولها Hevalo، تطبيق لتعلّم اللغة الكردية.',
     products: 'منتجاتنا',
     about: 'عن Zagrosian',
-    griffinAlt: 'شعار الغريفين لشركة Zagrosian',
+    emblemAlt: 'شعار Zagrosian: فارس على حصان يعدو',
   },
   hevalo: {
     eyebrow: 'المنتجات',

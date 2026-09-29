@@ -55,7 +55,7 @@ export const en = {
     lead: 'Zagrosian is an independent technology company based in the Netherlands. We design and build consumer products, starting with Hevalo, an app for learning Kurdish.',
     products: 'Our products',
     about: 'About Zagrosian',
-    griffinAlt: 'The Zagrosian griffin',
+    emblemAlt: 'The Zagrosian emblem: a horseman on a galloping horse',
   },
   hevalo: {
     eyebrow: 'Products',

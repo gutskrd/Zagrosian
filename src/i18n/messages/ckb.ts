@@ -50,7 +50,7 @@ export const ckb: Messages = {
     lead: 'Zagrosian کۆمپانیایەکی سەربەخۆی تەکنەلۆژییە و بارەگاکەی لە هۆڵەندایە. ئێمە بەرهەمی دیجیتاڵی بۆ بەکارهێنەران دیزاین و دروست دەکەین، کە یەکەمیان Hevalo، ئەپێکی فێربوونی زمانی کوردییە.',
     products: 'بەرهەمەکانمان',
     about: 'دەربارەی Zagrosian',
-    griffinAlt: 'گریفۆنی Zagrosian',
+    emblemAlt: 'هێمای Zagrosian: سوارێک لەسەر ئەسپێک کە ڕادەکات',
   },
   hevalo: {
     eyebrow: 'بەرهەمەکان',

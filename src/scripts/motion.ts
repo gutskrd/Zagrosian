@@ -227,14 +227,14 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 }
 
 /* -------------------------------------------------------------------------- */
-/* Pointer depth: with a mouse, the hero griffin leans slightly towards the    */
+/* Pointer depth: with a mouse, the hero horseman leans slightly towards the  */
 /* pointer, and the Hevalo icon tilts under it with a soft highlight.          */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  // The griffin follows the pointer across the whole window, eased towards it
+  // The horseman follows the pointer across the whole window, eased towards it
   // frame by frame. It uses the individual `rotate` and `translate` properties,
   // so it combines with the scroll parallax on `transform`.
   const emblem = document.querySelector<HTMLElement>('[data-depth]');
