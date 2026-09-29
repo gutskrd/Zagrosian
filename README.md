@@ -43,7 +43,8 @@ Requires Node 22.12 or later.
 - Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement after
   the Hevalo section, in [`Motto.astro`](src/components/Motto.astro). *Ji Kurdan, ji bo Kurdan.*
-  ("By Kurds, for Kurds") is in the footer.
+  ("By Kurds, for Kurds") is in the footer. Both use the `kurdish` class, which sets them in the same
+  serif italic as hevalo.app (see **Fonts** below).
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro). When the apps are out, replace it
   with links to the App Store and Google Play.
@@ -81,9 +82,16 @@ src/
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun). The favicon and app icons show the white sun on a black tile.
 
-- **Font:** Inter, self-hosted. The main file covers basic Latin, which already includes ê, î and û;
+- **Fonts:** everything is set in Inter, self-hosted, except Kurdish phrases. Those use the `kurdish`
+  class in `src/styles/global.css`, the same serif italic as hevalo.app:
+  `'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif`. These are
+  fonts already on the visitor's device (Iowan Old Style on Apple devices, Palatino Linotype on
+  Windows), so nothing is downloaded. Widths differ between them, so the motto's size leaves room for
+  the widest.
+
+  Inter's main file covers basic Latin, which already includes ê, î and û;
   `src/assets/fonts/inter-kurmanji-opsz.woff2` adds Ş and ş, the only Kurmanji letters missing from
-  it, and loads only on pages that use them. It was cut from Fontsource's Inter Latin Extended file
+  it, for Kurdish words in Inter text, and loads only on pages that use them. It was cut from Fontsource's Inter Latin Extended file
   (OFL, licence alongside it) with fontTools:
   `pyftsubset node_modules/@fontsource-variable/inter/files/inter-latin-ext-opsz-normal.woff2
   --unicodes=U+015E,U+015F --layout-features='*' --flavor=woff2
