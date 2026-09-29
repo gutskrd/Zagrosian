@@ -1,0 +1,128 @@
+---
+/**
+ * The menu button: a round disc with two dots, and its label beside it.
+ *
+ * The header's button opens the menu (SiteMenu.astro); the menu has its own,
+ * in the same place, that closes it and takes focus when the menu opens. When the menu opens the dots flip upright
+ * on a spring, and when it closes they flip back. On hover the dots move apart
+ * and the label rolls. It uses the Popover API, so it works without
+ * JavaScript. On narrow phones only the disc shows; the label stays as the
+ * button's name.
+ */
+import { i18n } from '../i18n';
+import RollText from './RollText.astro';
+
+interface Props {
+  /** `open` in the header; `close` inside the menu. */
+  action?: 'open' | 'close';
+}
+
+const { action = 'open' } = Astro.props;
+const { t } = i18n(Astro.url);
+---
+
+<button
+  class:list={['menu-button', `menu-button--${action}`]}
+  type="button"
+  popovertarget="site-menu"
+  popovertargetaction={action === 'close' ? 'hide' : 'show'}
+  aria-controls="site-menu"
+  autofocus={action === 'close'}
+  data-magnetic
+>
+  <span class="menu-button__label"><RollText text={action === 'close' ? t.common.close : t.common.menu} /></span>
+  <span class="menu-button__disc" aria-hidden="true">
+    <span class="menu-button__dots"><span></span><span></span></span>
+  </span>
+</button>
+
+<style>
+  .menu-button {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .menu-button__disc {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    transition: scale 0.5s var(--ease-spring);
+  }
+
+  .menu-button:active .menu-button__disc {
+    scale: 0.92;
+  }
+
+  .menu-button__dots {
+    display: flex;
+    gap: 5px;
+    transition:
+      rotate 0.8s var(--ease-spring) 0.3s,
+      gap 0.4s var(--ease-out);
+  }
+
+  .menu-button__dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  @media (hover: hover) {
+    .menu-button:hover .menu-button__dots {
+      gap: 9px;
+    }
+
+    .menu-button:hover .menu-button__disc {
+      scale: 1.08;
+    }
+  }
+
+  /* Upright while the menu is open: the menu's own button, and the header's
+     underneath it, which flips back as the menu lifts. */
+  .menu-button--close .menu-button__dots,
+  :global(.site-header:has(.site-menu:popover-open)) .menu-button--open .menu-button__dots {
+    rotate: 90deg;
+  }
+
+  /* The menu's button arrives with the dots lying down, then flips them. */
+  @starting-style {
+    .menu-button--close .menu-button__dots {
+      rotate: 0deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-button__dots,
+    .menu-button__disc {
+      transition: none;
+    }
+  }
+
+  /* On narrow phones, the disc alone. */
+  @media (max-width: 29.99rem) {
+    .menu-button__label :global(.roll__track) {
+      display: none;
+    }
+
+    .menu-button {
+      gap: 0;
+    }
+  }
+</style>

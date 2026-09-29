@@ -33,9 +33,13 @@ function initHeader() {
   );
 }
 
-/** The popover handles open, close, Escape and focus; links just need to close it. */
-function initMobileMenu() {
-  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+/**
+ * The full-screen menu (SiteMenu.astro). The popover handles open, close,
+ * Escape and focus; a link just needs to close it, so a link to a section of
+ * this page scrolls there as the menu lifts.
+ */
+function initMenu() {
+  const menu = document.querySelector<HTMLElement>('[data-site-menu]');
   if (!menu) return;
 
   menu.addEventListener('click', (event) => {
@@ -164,29 +168,30 @@ function initCopyButtons() {
  * formatted for the page's language and updates on the minute.
  */
 function initLocalTime() {
-  const slot = document.querySelector<HTMLElement>('[data-local-time]');
-  const { timeZone, template = '{time}' } = slot?.dataset ?? {};
-  if (!slot || !timeZone) return;
+  for (const slot of document.querySelectorAll<HTMLElement>('[data-local-time]')) {
+    const { timeZone, template = '{time}' } = slot.dataset;
+    if (!timeZone) continue;
 
-  let formatter: Intl.DateTimeFormat;
-  try {
-    formatter = new Intl.DateTimeFormat(document.documentElement.lang, { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-  } catch {
-    return;
+    let formatter: Intl.DateTimeFormat;
+    try {
+      formatter = new Intl.DateTimeFormat(document.documentElement.lang, { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    } catch {
+      continue;
+    }
+
+    const time = document.createElement('time');
+    const [before = '', after = ''] = template.split('{time}');
+    slot.append(before, time, after);
+    slot.hidden = false;
+
+    const tick = () => {
+      const now = new Date();
+      time.dateTime = now.toISOString();
+      time.textContent = formatter.format(now);
+      window.setTimeout(tick, 60_000 - (now.getSeconds() * 1000 + now.getMilliseconds()) + 50);
+    };
+    tick();
   }
-
-  const time = document.createElement('time');
-  const [before = '', after = ''] = template.split('{time}');
-  slot.append(before, time, after);
-  slot.hidden = false;
-
-  const tick = () => {
-    const now = new Date();
-    time.dateTime = now.toISOString();
-    time.textContent = formatter.format(now);
-    window.setTimeout(tick, 60_000 - (now.getSeconds() * 1000 + now.getMilliseconds()) + 50);
-  };
-  tick();
 }
 
 /**
@@ -244,7 +249,7 @@ function initLegalTools() {
 // First, so the opening screen's counter starts at once.
 initIntro();
 initHeader();
-initMobileMenu();
+initMenu();
 initReveal();
 initTableOfContents();
 initSectionNav();

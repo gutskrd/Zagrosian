@@ -34,7 +34,7 @@ function remember() {
 export function initLanguageMenu() {
   if (document.documentElement.dir === 'rtl' || !document.fonts) return;
   const warm = () => void document.fonts.load('1em "Vazirmatn Variable"', 'ع').catch(() => {});
-  for (const button of document.querySelectorAll('.language__button, .menu-toggle')) {
+  for (const button of document.querySelectorAll('.language__button, .menu-button')) {
     for (const type of ['pointerenter', 'focus', 'touchstart']) {
       button.addEventListener(type, warm, { once: true, passive: true });
     }

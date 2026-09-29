@@ -17,9 +17,12 @@ const { text, class: className } = Astro.props;
 
 const joined = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(text);
 const pieces = joined ? [text] : [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((s) => s.segment);
+// Split letters are separate boxes, which a right-to-left page would lay out
+// from right to left ("Hevalo" as "olaveH"); split labels keep left to right.
+const dir = joined ? undefined : 'ltr';
 ---
 
-<span class:list={['roll', className]}
+<span class:list={['roll', className]} dir={dir}
   ><span class="visually-hidden">{text}</span><span class="roll__track" aria-hidden="true"
     >{pieces.map((piece) => <span class:list={['roll__piece', piece === ' ' && 'roll__space']}>{piece}</span>)}</span
   ></span

@@ -648,10 +648,8 @@ svg {
    mouse or trackpad, and not when reduced motion or forced colours are on.
    ========================================================================== */
 
-/* Dialogs and menus open in the browser's top layer, above the custom
-   cursor, so while one is open the system cursor comes back. */
-:root.has-cursor:not(:has(dialog[open], :popover-open)),
-:root.has-cursor:not(:has(dialog[open], :popover-open)) * {
+:root.has-cursor,
+:root.has-cursor * {
   cursor: none !important;
 }
 
@@ -659,15 +657,19 @@ svg {
   cursor: text !important;
 }
 
-:root:has(dialog[open], :popover-open) .cursor {
-  visibility: hidden;
-}
-
+/* The cursor is a manual popover, so it can sit in the top layer above
+   dialogs and the menu; these undo the browser's popover styles. */
 .cursor {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0 auto auto 0;
   z-index: 300;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
   pointer-events: none;
   mix-blend-mode: difference;
   opacity: 0;
@@ -843,7 +845,9 @@ html.lenis {
   .legal__toc,
   .reading-progress,
   .cta,
-  .menu-toggle {
+  .menu-button,
+  .cursor,
+  .sound-prompt {
     display: none !important;
   }
 
@@ -1015,8 +1019,7 @@ html.lenis {
   .rule::before,
   .status-dot,
   .reading-progress span,
-  .menu-toggle__icon::before,
-  .menu-toggle__icon::after {
+  .menu-button__dots span {
     forced-color-adjust: none;
     background: CanvasText;
   }
@@ -1026,8 +1029,8 @@ html.lenis {
   }
 
   .cta,
-  .site-nav__cta,
-  .mobile-menu__cta,
+  .site-header__cta,
+  .menu-button__disc,
   .skip-link {
     border: 1px solid;
   }

@@ -1,0 +1,86 @@
+---
+/**
+ * A small world icon. Its meridians turn like a spinning globe while the
+ * control it belongs to is hovered, focused or open (or inside `.globe-spin`),
+ * and stay still for visitors who prefer less motion.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg class:list={['globe', className]} viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+  <circle cx="10" cy="10" r="7.25"></circle>
+  <path d="M2.75 10h14.5"></path>
+  <ellipse class="globe__meridian" cx="10" cy="10" rx="7.25" ry="7.25"></ellipse>
+  <ellipse class="globe__meridian globe__meridian--2" cx="10" cy="10" rx="7.25" ry="7.25"></ellipse>
+  <ellipse class="globe__meridian globe__meridian--3" cx="10" cy="10" rx="7.25" ry="7.25"></ellipse>
+</svg>
+
+<style>
+  .globe {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+
+  /* At rest, one meridian: a circle squeezed into a slim ellipse. */
+  .globe__meridian {
+    transform-box: fill-box;
+    transform-origin: center;
+    scale: 0.4 1;
+  }
+
+  .globe__meridian--2,
+  .globe__meridian--3 {
+    opacity: 0;
+  }
+
+  /* Turning: each meridian sweeps from the edge to the centre line and back,
+     a third of a turn apart, which reads as the globe spinning. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:is(a:hover, a:focus-visible, button:hover, button:focus-visible, .language:has(:popover-open), .globe-spin))
+      .globe__meridian {
+      opacity: 1;
+      animation: globe-turn 2.4s linear infinite;
+    }
+
+    :global(:is(a:hover, a:focus-visible, button:hover, button:focus-visible, .language:has(:popover-open), .globe-spin))
+      .globe__meridian--2 {
+      animation-delay: -0.8s;
+    }
+
+    :global(:is(a:hover, a:focus-visible, button:hover, button:focus-visible, .language:has(:popover-open), .globe-spin))
+      .globe__meridian--3 {
+      animation-delay: -1.6s;
+    }
+  }
+
+  @keyframes globe-turn {
+    0% {
+      scale: 1 1;
+      opacity: 0;
+    }
+
+    8% {
+      opacity: 1;
+    }
+
+    50% {
+      scale: 0.02 1;
+    }
+
+    92% {
+      opacity: 1;
+    }
+
+    100% {
+      scale: 1 1;
+      opacity: 0;
+    }
+  }
+</style>

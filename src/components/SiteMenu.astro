@@ -1,0 +1,585 @@
+---
+/**
+ * The site menu: a full-screen panel, like a studio's.
+ *
+ * It drops in from the top like a curtain; the links, set very large, rise one
+ * after another from behind their masks, and the rest follows. Hovering a
+ * link dims the others. Besides the pages it holds contact, social media,
+ * every language (with the world icon), sound, and the time at headquarters.
+ *
+ * It is a popover (`#site-menu`), so it opens, closes on Escape and returns
+ * focus by itself, without JavaScript. Its top bar mirrors the header, with
+ * its own menu button in the same place to close it. It is always dark, in
+ * both themes: the colour tokens are redefined inside it.
+ */
+import { i18n, localizePath, locales, navigation } from '../i18n';
+import { hevalo, site, socialProfiles } from '../site';
+import EmblemMark from '../assets/brand/emblem-mark.svg';
+import Arrow from './Arrow.astro';
+import Cta from './Cta.astro';
+import Globe from './Globe.astro';
+import MenuButton from './MenuButton.astro';
+import RollText from './RollText.astro';
+import SocialIcon from './SocialIcon.astro';
+import SoundToggle from './SoundToggle.astro';
+import Wordmark from './Wordmark.astro';
+
+const { locale, t, base, localize } = i18n(Astro.url);
+const nav = navigation(locale);
+const links = [{ label: nav.home.label, href: nav.home.href, section: undefined }, ...nav.sections.map((link) => ({ ...link, section: link.href.split('#')[1] }))];
+const year = new Date().getFullYear();
+---
+
+<nav id="site-menu" class="site-menu" popover aria-label={t.common.menu} data-site-menu data-lenis-prevent>
+  <div class="container site-menu__bar">
+    <a class="site-menu__home" href={localize('/')} aria-label={t.common.homeLink}>
+      <EmblemMark class="site-menu__mark" aria-hidden="true" focusable="false" />
+      <Wordmark />
+    </a>
+    <MenuButton action="close" />
+  </div>
+
+  <div class="container site-menu__body">
+    <ul class="site-menu__links">
+      {
+        links.map((link) => (
+          <li>
+            <a class="site-menu__link" href={link.href} data-nav-section={link.section}>
+              <span class="site-menu__mask">
+                <span class="site-menu__text">
+                  <RollText text={link.label} />
+                </span>
+              </span>
+              <Arrow class="site-menu__arrow" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="site-menu__aside">
+      <div class="site-menu__group site-menu__group--cta">
+        <Cta href={hevalo.url} arrow="up-right" label={t.nav.visitHevalo} />
+      </div>
+
+      <div class="site-menu__group">
+        <p class="site-menu__label">{t.contact.eyebrow}</p>
+        <a class="site-menu__small-link" href={`mailto:${site.emails.contact}`} dir="ltr">{site.emails.contact}</a>
+      </div>
+
+      <div class="site-menu__group">
+        <p class="site-menu__label">{t.common.socialNav}</p>
+        <ul class="site-menu__social">
+          {
+            socialProfiles.map((profile) => (
+              <li>
+                <a class="site-menu__small-link" href={profile.url} rel="me">
+                  <SocialIcon name={profile.icon} class="site-menu__social-icon" />
+                  {profile.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="site-menu__group site-menu__group--languages">
+        <p class="site-menu__label site-menu__label--world globe-spin"><Globe />{t.language.label}</p>
+        <ul class="site-menu__languages">
+          {
+            locales.map(({ code, name, dir }) => (
+              <li>
+                <a
+                  class="language__link site-menu__language"
+                  href={localizePath(code, base)}
+                  hreflang={code}
+                  lang={code}
+                  aria-current={code === locale ? 'true' : undefined}
+                >
+                  <span dir={dir}>{name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="site-menu__group">
+        <p class="site-menu__label">{t.sound.label}</p>
+        <SoundToggle labelled />
+      </div>
+    </div>
+  </div>
+
+  <div class="container site-menu__foot">
+    <p class="site-menu__copyright">&copy; {year} {site.legalName}</p>
+    <ul class="site-menu__legal">
+      {
+        nav.legal.map((link) => (
+          <li>
+            <a class="site-menu__small-link" href={link.href}>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="site-menu__time">
+      {t.about.headquarters}
+      <span data-local-time data-time-zone={site.timeZone} data-template={t.about.localTime} hidden></span>
+    </p>
+  </div>
+</nav>
+
+<style>
+  /* ------------------------------------------------------------------------ */
+  /* The panel                                                                */
+  /* ------------------------------------------------------------------------ */
+
+  .site-menu {
+    /* Always dark: the page's colour tokens, as in the dark theme. */
+    --color-paper: #0a0a0a;
+    --color-ink: #f2f2f2;
+    --color-ink-soft: #bdbdbd;
+    --color-muted: #8f8f8f;
+    --color-line: #262626;
+    --color-line-strong: #3a3a3a;
+    --color-surface: #141414;
+    --color-solid-hover: #d4d4d4;
+    --focus-ring: #f2f2f2;
+    color-scheme: dark;
+
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex-direction: column;
+  }
+
+  .site-menu:popover-open {
+    display: flex;
+  }
+
+  .site-menu::backdrop {
+    background: transparent;
+  }
+
+  /* The page cannot scroll behind it. */
+  :global(html:has(.site-menu:popover-open)) {
+    overflow: hidden;
+  }
+
+  /* ------------------------------------------------------------------------ */
+  /* Top bar: the header's layout, so the close button sits where the menu    */
+  /* button was.                                                               */
+  /* ------------------------------------------------------------------------ */
+
+  .site-menu__bar {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: var(--header-height);
+  }
+
+  .site-menu__home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    text-decoration: none;
+  }
+
+  .site-menu__home :global(.site-menu__mark) {
+    flex: none;
+    width: auto;
+    height: 1.875rem;
+  }
+
+  /* ------------------------------------------------------------------------ */
+  /* Body: the links, and beside or below them the rest                       */
+  /* ------------------------------------------------------------------------ */
+
+  .site-menu__body {
+    display: grid;
+    flex: 1;
+    align-content: space-between;
+    gap: clamp(2.5rem, 1.5rem + 4vw, 4rem);
+    padding-block: clamp(1.5rem, 1rem + 3vw, 3rem);
+  }
+
+  .site-menu__links {
+    display: grid;
+  }
+
+  .site-menu__link {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    font-size: clamp(2.75rem, 1.25rem + 7vw, 7.25rem);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    text-decoration: none;
+    transition:
+      opacity 0.4s ease,
+      color 0.4s ease;
+  }
+
+  :root:is([lang='ar'], [lang='ckb'], [lang='fa']) .site-menu__link {
+    line-height: 1.35;
+  }
+
+  /* Each link rises from behind its own mask. */
+  .site-menu__mask {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.06em 0.1em;
+    margin: 0 -0.06em -0.1em;
+  }
+
+  .site-menu__text {
+    display: block;
+  }
+
+  /* An arrow slides in beside the link under the pointer. */
+  .site-menu__link :global(.site-menu__arrow) {
+    width: 0.4em;
+    height: 0.4em;
+    opacity: 0;
+    translate: calc(var(--direction) * -0.3em) 0;
+    transition:
+      opacity 0.35s ease,
+      translate 0.5s var(--ease-out);
+  }
+
+  /* The current section is marked with a dot. */
+  .site-menu__link[aria-current]::after {
+    content: '';
+    order: -1;
+    width: 0.14em;
+    height: 0.14em;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  @media (hover: hover) {
+    .site-menu__links:has(.site-menu__link:hover) .site-menu__link:not(:hover) {
+      opacity: 0.3;
+    }
+
+    .site-menu__link:hover :global(.site-menu__arrow) {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  .site-menu__link:focus-visible :global(.site-menu__arrow) {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .site-menu__aside {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 2rem 1.5rem;
+    align-content: end;
+  }
+
+  .site-menu__group {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.75rem;
+  }
+
+  .site-menu__group--cta,
+  .site-menu__group--languages {
+    grid-column: 1 / -1;
+  }
+
+  .site-menu__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  :root:is([lang='ar'], [lang='ckb'], [lang='fa']) .site-menu__label {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+  }
+
+  .site-menu__label--world :global(.globe) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .site-menu__small-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    color: var(--color-ink);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    background: linear-gradient(currentColor, currentColor) 0 calc(100% - 0.4rem) / 0 1px no-repeat;
+    transition: background-size 0.45s var(--ease-out);
+  }
+
+  :global([dir='rtl']) .site-menu__small-link {
+    background-position-x: 100%;
+  }
+
+  .site-menu__small-link:hover {
+    background-size: 100% 1px;
+  }
+
+  .site-menu__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  .site-menu__social :global(.site-menu__social-icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .site-menu__languages {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: 0 1rem;
+    width: 100%;
+  }
+
+  .site-menu__language {
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.25s ease;
+  }
+
+  .site-menu__language:hover,
+  .site-menu__language[aria-current] {
+    color: var(--color-ink);
+  }
+
+  .site-menu__language[aria-current]::before {
+    content: '';
+    flex: none;
+    width: 0.375rem;
+    height: 0.375rem;
+    margin-inline-end: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* ------------------------------------------------------------------------ */
+  /* Foot                                                                     */
+  /* ------------------------------------------------------------------------ */
+
+  .site-menu__foot {
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-line);
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  .site-menu__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+  }
+
+  .site-menu__legal .site-menu__small-link {
+    font-size: var(--text-xs);
+    color: var(--color-muted);
+  }
+
+  .site-menu__time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .site-menu__time [data-local-time]:not([hidden])::before {
+    content: '·';
+    margin-inline: 0.375rem;
+  }
+
+  @media (min-width: 64rem) {
+    .site-menu__body {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: end;
+    }
+
+    .site-menu__links {
+      grid-column: 1 / span 7;
+    }
+
+    .site-menu__aside {
+      grid-column: 8 / -1;
+      padding-bottom: 0.75rem;
+    }
+  }
+
+  /* ------------------------------------------------------------------------ */
+  /* Opening and closing                                                      */
+  /* ------------------------------------------------------------------------ */
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* The curtain drops in from the top, and lifts away again. */
+    .site-menu {
+      clip-path: inset(0 0 100% 0);
+      transition:
+        clip-path 0.75s var(--ease-in-out),
+        overlay 0.75s allow-discrete,
+        display 0.75s allow-discrete;
+    }
+
+    .site-menu:popover-open {
+      clip-path: inset(0);
+    }
+
+    @starting-style {
+      .site-menu:popover-open {
+        clip-path: inset(0 0 100% 0);
+      }
+    }
+
+    /* The links rise one after another as it lands; they drop away quickly
+       when it closes. */
+    .site-menu__text {
+      translate: 0 110%;
+      transition: translate 0.35s var(--ease-in-out);
+    }
+
+    .site-menu:popover-open .site-menu__text {
+      translate: 0 0;
+      transition: translate 1s var(--ease-out) calc(0.3s + var(--i, 0) * 0.07s);
+    }
+
+    @starting-style {
+      .site-menu:popover-open .site-menu__text {
+        translate: 0 110%;
+      }
+    }
+
+    .site-menu__links li:nth-child(2) {
+      --i: 1;
+    }
+
+    .site-menu__links li:nth-child(3) {
+      --i: 2;
+    }
+
+    .site-menu__links li:nth-child(4) {
+      --i: 3;
+    }
+
+    .site-menu__links li:nth-child(5) {
+      --i: 4;
+    }
+
+    /* The rest fades up after the links. */
+    .site-menu__group,
+    .site-menu__foot,
+    .site-menu__bar > * {
+      opacity: 0;
+      translate: 0 1rem;
+      transition:
+        opacity 0.25s ease,
+        translate 0.35s var(--ease-in-out);
+    }
+
+    .site-menu:popover-open :is(.site-menu__group, .site-menu__foot, .site-menu__bar > *) {
+      opacity: 1;
+      translate: 0 0;
+      transition:
+        opacity 0.8s ease calc(0.5s + var(--j, 0) * 0.06s),
+        translate 1s var(--ease-out) calc(0.5s + var(--j, 0) * 0.06s);
+    }
+
+    @starting-style {
+      .site-menu:popover-open :is(.site-menu__group, .site-menu__foot, .site-menu__bar > *) {
+        opacity: 0;
+        translate: 0 1rem;
+      }
+    }
+
+    /* The top bar is there almost at once. */
+    .site-menu__bar > * {
+      --j: -6;
+    }
+
+    .site-menu__group:nth-child(2) {
+      --j: 1;
+    }
+
+    .site-menu__group:nth-child(3) {
+      --j: 2;
+    }
+
+    .site-menu__group:nth-child(4) {
+      --j: 3;
+    }
+
+    .site-menu__group:nth-child(5) {
+      --j: 4;
+    }
+
+    .site-menu__foot {
+      --j: 5;
+    }
+  }
+
+  /* With reduced motion it simply appears and disappears. */
+  @media (prefers-reduced-motion: reduce) {
+    .site-menu {
+      opacity: 0;
+      transition:
+        opacity 0.2s ease,
+        overlay 0.2s allow-discrete,
+        display 0.2s allow-discrete;
+    }
+
+    .site-menu:popover-open {
+      opacity: 1;
+    }
+
+    @starting-style {
+      .site-menu:popover-open {
+        opacity: 0;
+      }
+    }
+  }
+
+  @media print {
+    .site-menu {
+      display: none !important;
+    }
+  }
+</style>

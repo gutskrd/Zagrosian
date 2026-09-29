@@ -11,8 +11,8 @@
  * - the ink horseman: a wide, light ring.
  * Pressing tightens the ring.
  *
- * Touch screens, reduced motion and forced colours keep the system cursor,
- * and it returns while a dialog or menu is open (they sit above the page).
+ * Touch screens, reduced motion and forced colours keep the system cursor.
+ * It stays visible above dialogs and the menu (see the top layer below).
  * The elements are created with the DOM API; nothing is written as HTML.
  */
 
@@ -38,7 +38,9 @@ export function initCursor() {
   if (
     !window.matchMedia('(hover: hover) and (pointer: fine)').matches ||
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-    window.matchMedia('(forced-colors: active)').matches
+    window.matchMedia('(forced-colors: active)').matches ||
+    // It needs the Popover API to stay above dialogs and the menu.
+    !('showPopover' in HTMLElement.prototype)
   ) {
     return;
   }
@@ -70,6 +72,31 @@ export function initCursor() {
 
   cursor.append(ring, dot);
   document.body.append(cursor);
+
+  // Dialogs and the menu open in the browser's top layer, above the page. The
+  // cursor lives in the top layer too (a manual popover), and moves back on
+  // top whenever one of them opens, so it is never hidden beneath them.
+  cursor.popover = 'manual';
+  cursor.showPopover();
+  const raise = () => {
+    try {
+      cursor.hidePopover();
+      cursor.showPopover();
+    } catch {
+      // Already on top, or the page is changing.
+    }
+  };
+  document.addEventListener(
+    'toggle',
+    (event) => {
+      if (event.target !== cursor && (event as ToggleEvent).newState === 'open') raise();
+    },
+    true,
+  );
+  for (const dialog of document.querySelectorAll('dialog')) {
+    new MutationObserver(() => dialog.open && raise()).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+  }
+
   root.classList.add('has-cursor');
 
   let x = -100;

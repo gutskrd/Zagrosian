@@ -39,12 +39,21 @@ export function initSmoothScroll() {
     });
   }
 
-  // Hold the page still while the opening screen or a modal dialog is up.
+  // Hold the page still while the opening screen, a modal dialog or the menu
+  // is up. The menu lets go as it starts to close (`beforetoggle`), so a link
+  // in it to a section of this page can glide there as it lifts.
+  const menu = document.querySelector('[data-site-menu]');
+  let menuOpen = false;
   const sync = () => {
-    const held = document.documentElement.dataset.intro === 'running' || document.querySelector('dialog[open]') !== null;
+    const held =
+      document.documentElement.dataset.intro === 'running' || document.querySelector('dialog[open]') !== null || menuOpen;
     if (held) lenis?.stop();
     else lenis?.start();
   };
+  menu?.addEventListener('beforetoggle', (event) => {
+    menuOpen = (event as ToggleEvent).newState === 'open';
+    sync();
+  });
   sync();
   document.addEventListener('intro:end', sync);
   new MutationObserver(sync).observe(document.documentElement, {

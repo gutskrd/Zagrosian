@@ -77,7 +77,7 @@ src/
   lib/             structured-data.ts (JSON-LD) and pages.ts (Markdown versions and llms.txt)
   pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
-  scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
+  scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    ink.ts (the hero horseman in WebGL), intro.ts (opening screen), sound.ts,
                    cursor.ts, magnetic.ts, smooth.ts, text.ts, language.ts, theme.ts and
@@ -224,7 +224,7 @@ back for visitors who prefer reduced motion, and the site works fully without it
   readers, never shown without JavaScript or with *reduce motion*, and lifts by itself after four
   seconds should the script not start.
 - **Sound** ([`sound.ts`](src/scripts/sound.ts)): off until the visitor turns it on, from the header
-  (the level meter), the mobile menu, quick navigation, or a small card offered once. Everything is
+  (the level meter), the site menu, quick navigation, or a small card offered once. Everything is
   synthesised with the Web Audio API, so nothing is downloaded and the Content-Security-Policy needs
   no media sources:
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
@@ -239,12 +239,23 @@ back for visitors who prefer reduced motion, and the site works fully without it
 - **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a dot and a trailing ring that
   invert what is under them. Over a link or a plain button the ring becomes a lens; over an external
   link it adds an arrow; over a magnetic button it steps aside while the button answers; over the ink
-  horseman it widens like a breath of wind. Over text fields, and while a dialog or menu is open, the
-  system cursor returns.
+  horseman it widens like a breath of wind. Over text fields the system cursor returns. The cursor is a
+  manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
+- **Header and menu** ([`Header.astro`](src/components/Header.astro),
+  [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
+  the header is the same at every size: the emblem, then Visit Hevalo (from 768px), quick navigation
+  (from 1024px), the world icon for languages ([`Globe.astro`](src/components/Globe.astro), whose
+  meridians spin on hover), sound, theme, and the menu button: a disc with two dots that spread on
+  hover and flip upright when the menu opens. The menu is a full-screen, always-dark panel that drops
+  in like a curtain; its links, set very large, rise one after another from behind masks (the others
+  dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
+  contact, social media, every language, sound, the legal pages and the time at headquarters. It is a
+  native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
+  does not scroll while it is open.
 - **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`magnetic.ts`](src/scripts/magnetic.ts),
   [`RollText.astro`](src/components/RollText.astro)): magnetic (they lean towards the pointer on a
   spring), their colour pours in from where the pointer entered, labels roll letter by letter (Arabic
-  script, whose letters join, rolls as one piece) and arrows slide out as a copy slides in. Header
+  script, whose letters join, rolls as one piece) and arrows slide out as a copy slides in. The menu's
   links roll too.
 - **Text** ([`text.ts`](src/scripts/text.ts)): paragraphs marked `data-lines` rise line by line from
   behind masks, then are put back as they were; section labels are small monospace capitals that decode
@@ -303,9 +314,9 @@ pages are fully static and every language can be indexed.
   language file has the same shape, so a missing or extra string is a type error at build time.
   The Kurdish and Arabic translations use the same words as Hevalo's own interface where they overlap.
   Brand and product names stay in Latin script.
-- **Choosing a language:** the globe button in the header opens a menu with every language, each
+- **Choosing a language:** the world icon in the header opens a menu with every language, each
   written in that language (a native popover, so it works with keyboard and screen readers and needs
-  no script to open). On phones the list is in the menu. Visitors whose browser prefers another
+  no script to open). Every language is also listed in the site menu. Visitors whose browser prefers another
   available language see a small suggestion to switch, written in that language; it never redirects.
   Once they choose or dismiss it, it does not appear again (`language-chosen` in `localStorage`, which
   the privacy policy mentions).
