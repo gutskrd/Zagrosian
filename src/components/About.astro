@@ -1,6 +1,8 @@
 ---
 import SplitText from './SplitText.astro';
 import { hevalo, site } from '../site';
+
+const headquarters = site.country.replace(/^the /, '');
 ---
 
 <section id="about" class="about section" aria-labelledby="about-title">
@@ -12,18 +14,23 @@ import { hevalo, site } from '../site';
         id="about-title"
         class="about__statement"
         effect="highlight"
-        text={"Millions of people speak Kurdish.\nFew of their apps do."}
+        text="Our mission is to support the Kurdish language and its speakers through technology."
       />
-      <div class="about__text lead">
-        <p>
-          We build apps in Kurdish, for people who speak it, are learning it or want their children to grow up with
-          it. {hevalo.name} is the first.
-        </p>
-        <p>
-          The name comes from the Zagros, the mountains many Kurds call home.
-          We&rsquo;re based in {site.country} and make everything ourselves.
-        </p>
-      </div>
+      <p class="about__text lead">
+        {site.name} is privately owned. We design and build our products in-house, with a strong focus on quality and
+        privacy.
+      </p>
+
+      <dl class="about__facts rule">
+        <div>
+          <dt>Headquarters</dt>
+          <dd>{headquarters}</dd>
+        </div>
+        <div>
+          <dt>Products</dt>
+          <dd><a href={hevalo.url}>{hevalo.name}</a></dd>
+        </div>
+      </dl>
     </div>
   </div>
 </section>
@@ -39,17 +46,48 @@ import { hevalo, site } from '../site';
   }
 
   .about__statement {
-    max-width: 17ch;
+    max-width: 20ch;
     font-size: var(--text-h2);
     line-height: 1.04;
     letter-spacing: -0.035em;
   }
 
   .about__text {
-    display: grid;
-    gap: 1.25rem;
     max-width: 36rem;
     margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .about__facts {
+    display: grid;
+    gap: 1.25rem;
+    margin: clamp(3rem, 2rem + 3vw, 5rem) 0 0;
+    padding-top: 1.5rem;
+    --rule-color: var(--color-line-strong);
+    font-size: var(--text-sm);
+  }
+
+  .about__facts dt {
+    color: var(--color-muted);
+  }
+
+  .about__facts dd {
+    margin: 0.25rem 0 0;
+  }
+
+  .about__facts a {
+    text-decoration-color: var(--color-underline);
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .about__facts a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  @media (min-width: 48rem) {
+    .about__facts {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 2rem;
+    }
   }
 
   @media (min-width: 64rem) {

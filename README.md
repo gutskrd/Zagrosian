@@ -46,7 +46,7 @@ Requires Node 22.12 or later.
   ("By Kurds, for Kurds") is in the footer.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro). When the apps are out, replace it
-  with links to the App Store and Google Play, and update `site.description` in `src/site.ts`.
+  with links to the App Store and Google Play.
 - [`src/components/`](src/components/): homepage sections.
 - [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
   [`security.md`](src/pages/security.md): legal pages, written in Markdown. When you change one, update

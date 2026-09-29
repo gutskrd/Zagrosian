@@ -8,17 +8,19 @@ import Griffin from './Griffin.astro';
   <div class="container hero__grid">
     <div class="hero__text">
       <h1 id="hero-title" class="hero__title">
-        <span class="hero__line"><span>We make apps</span></span>
+        <span class="hero__line"><span>Technology</span></span>
         <span class="hero__line"><span>for Kurdish</span></span>
-        <span class="hero__line"><span>speakers.</span></span>
+        <span class="hero__line"><span>communities.</span></span>
       </h1>
 
       <p class="hero__lead lead intro">
-        {site.name} is a software company in {site.country}. Our first app is {hevalo.name}, for learning Kurdish.
+        {site.name} is an independent technology company. We build consumer products for Kurdish speakers worldwide,
+        including the language-learning app {hevalo.name}.
       </p>
 
       <div class="hero__actions intro">
-        <Cta href="#hevalo" arrow="down">Meet {hevalo.name}</Cta>
+        <Cta href="#hevalo" arrow="down">Our products</Cta>
+        <Cta href="#about" variant="text">About {site.name}</Cta>
       </div>
     </div>
 
@@ -38,7 +40,7 @@ import Griffin from './Griffin.astro';
     gap: clamp(3rem, 2rem + 4vw, 4rem);
   }
 
-  /* The headline is sized to its column: "We make apps" is about 6.1em wide. */
+  /* The headline is sized to its column: "communities." is about 5.6em wide. */
   .hero__text {
     container-type: inline-size;
   }

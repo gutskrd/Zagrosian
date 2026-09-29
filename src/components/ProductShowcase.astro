@@ -1,7 +1,7 @@
 ---
 import SplitText from './SplitText.astro';
 import Cta from './Cta.astro';
-import { site, type Product } from '../site';
+import type { Product } from '../site';
 
 interface Props {
   product: Product;
@@ -14,15 +14,17 @@ const domain = new URL(product.url).hostname;
 
 <section id={id} class="showcase inverse" aria-labelledby={`${id}-title`}>
   <div class="container">
+    <p class="eyebrow" data-reveal>Products</p>
+
     <div class="showcase__body">
       <div class="showcase__identity">
         <SplitText id={`${id}-title`} class="showcase__name" text={product.name} />
-        <p class="showcase__byline" data-reveal>A product by {site.name}</p>
+        <p class="showcase__byline" data-reveal>{product.category}</p>
       </div>
 
       <div class="showcase__details" data-reveal>
         <p class="showcase__description">{product.description}</p>
-        <Cta href={product.url} variant="inverse">Visit {product.name}</Cta>
+        <Cta href={product.url} variant="inverse">Visit {domain}</Cta>
       </div>
     </div>
 
@@ -32,8 +34,7 @@ const domain = new URL(product.url).hostname;
         <h3 class="showcase__soon-title">{product.name} for iOS and Android.</h3>
       </div>
       <p class="showcase__soon-text">
-        The apps are in the works. Until then, you&rsquo;ll find it on the web at{' '}
-        <a href={product.url}>{domain}</a>.
+        The native apps are in development and will be available on the App Store and Google Play.
       </p>
     </div>
   </div>
@@ -47,6 +48,7 @@ const domain = new URL(product.url).hostname;
   .showcase__body {
     display: grid;
     gap: clamp(3rem, 2rem + 4vw, 4.5rem);
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
   .showcase__name {
@@ -143,17 +145,6 @@ const domain = new URL(product.url).hostname;
   .showcase__soon-text {
     max-width: 28rem;
     color: var(--color-night-muted);
-  }
-
-  .showcase__soon-text a {
-    color: var(--color-night-ink);
-    text-decoration-color: var(--color-night-line);
-    text-underline-offset: 0.2em;
-    transition: text-decoration-color 0.2s ease;
-  }
-
-  .showcase__soon-text a:hover {
-    text-decoration-color: currentColor;
   }
 
   @media (min-width: 64rem) {

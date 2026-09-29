@@ -1,6 +1,7 @@
 export interface Product {
   name: string;
   url: string;
+  category: string;
   description: string;
 }
 
@@ -41,8 +42,9 @@ export interface SiteConfig {
 export const hevalo: Product = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
+  category: 'Kurdish language learning',
   description:
-    'Learn Kurdish through short lessons and games you play with friends. Kurmanji comes first, with more dialects to follow.',
+    'An app for learning Kurdish through short lessons and games played with friends. Available first in Kurmanji, with more dialects planned.',
 };
 
 export const site: SiteConfig = {
@@ -50,10 +52,10 @@ export const site: SiteConfig = {
   legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
   country: 'the Netherlands',
-  tagline: 'We make apps for Kurdish speakers.',
-  title: 'Zagrosian — Apps for Kurdish speakers',
+  tagline: 'Technology for Kurdish communities.',
+  title: 'Zagrosian — Technology for Kurdish communities',
   description:
-    'Zagrosian makes apps for Kurdish speakers. Our first is Hevalo, for learning Kurdish, with iOS and Android apps coming soon.',
+    'Zagrosian is an independent technology company building consumer products for Kurdish speakers worldwide, including the language-learning app Hevalo.',
   emails: {
     contact: 'contact@zagrosian.com',
     press: 'press@zagrosian.com',
