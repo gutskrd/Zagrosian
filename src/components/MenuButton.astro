@@ -1,13 +1,15 @@
 ---
 /**
- * The menu button: a round disc with two dots, and its label beside it.
+ * The menu button: two dots beside a label, nothing around them.
  *
- * The header's button opens the menu (SiteMenu.astro); the menu has its own,
- * in the same place, that closes it and takes focus when the menu opens. When the menu opens the dots flip upright
- * on a spring, and when it closes they flip back. On hover the dots move apart
- * and the label rolls. It uses the Popover API, so it works without
- * JavaScript. On narrow phones only the disc shows; the label stays as the
- * button's name.
+ * - Hover: the dots flip across to each other's side, and the label rolls
+ *   with them.
+ * - Open: the dots stretch into an X; the menu (SiteMenu.astro) has its own
+ *   button, in the same place, that shows the X and closes it, and it takes
+ *   focus when the menu opens. Closing turns the X back into the dots.
+ *
+ * It uses the Popover API, so it works without JavaScript. On narrow phones
+ * only the dots show; the label stays as the button's name.
  */
 import { i18n } from '../i18n';
 import RollText from './RollText.astro';
@@ -31,8 +33,9 @@ const { t } = i18n(Astro.url);
   data-magnetic
 >
   <span class="menu-button__label"><RollText text={action === 'close' ? t.common.close : t.common.menu} /></span>
-  <span class="menu-button__disc" aria-hidden="true">
-    <span class="menu-button__dots"><span></span><span></span></span>
+  <span class="menu-button__icon" aria-hidden="true">
+    <span class="menu-button__dot"></span>
+    <span class="menu-button__dot"></span>
   </span>
 </button>
 
@@ -41,7 +44,9 @@ const { t } = i18n(Astro.url);
     display: inline-flex;
     flex: none;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    gap: 0.625rem;
+    min-width: 2.75rem;
     min-height: 2.75rem;
     padding: 0;
     border: 0;
@@ -54,68 +59,111 @@ const { t } = i18n(Astro.url);
     cursor: pointer;
   }
 
-  .menu-button__disc {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    border-radius: 50%;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    transition: scale 0.5s var(--ease-spring);
+  /* The two dots, side by side, in a small square they turn within. */
+  .menu-button__icon {
+    position: relative;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    transition: rotate 0.7s var(--ease-spring);
   }
 
-  .menu-button:active .menu-button__disc {
-    scale: 0.92;
-  }
-
-  .menu-button__dots {
-    display: flex;
-    gap: 5px;
-    transition:
-      rotate 0.8s var(--ease-spring) 0.3s,
-      gap 0.4s var(--ease-out);
-  }
-
-  .menu-button__dots span {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
+  .menu-button__dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
     background: currentColor;
+    translate: calc(-50% - 5px) -50%;
+    transition:
+      width 0.45s var(--ease-out),
+      height 0.45s var(--ease-out),
+      translate 0.45s var(--ease-out),
+      rotate 0.6s var(--ease-spring);
   }
 
+  .menu-button__dot + .menu-button__dot {
+    translate: calc(-50% + 5px) -50%;
+  }
+
+  /* Hover: the pair turns half a circle, so each dot flips to the other side. */
   @media (hover: hover) {
-    .menu-button:hover .menu-button__dots {
-      gap: 9px;
-    }
-
-    .menu-button:hover .menu-button__disc {
-      scale: 1.08;
+    .menu-button:hover .menu-button__icon {
+      rotate: 180deg;
     }
   }
 
-  /* Upright while the menu is open: the menu's own button, and the header's
-     underneath it, which flips back as the menu lifts. */
-  .menu-button--close .menu-button__dots,
-  :global(.site-header:has(.site-menu:popover-open)) .menu-button--open .menu-button__dots {
+  .menu-button:focus-visible .menu-button__icon {
+    rotate: 180deg;
+  }
+
+  /* Open: the dots meet in the middle and stretch into an X. This is the
+     menu's own button, and the header's underneath it, which turns back
+     into dots as the menu lifts. */
+  .menu-button--close .menu-button__dot,
+  :global(.site-header:has(.site-menu:popover-open)) .menu-button--open .menu-button__dot {
+    width: 20px;
+    height: 2px;
+    border-radius: 1px;
+    translate: -50% -50%;
+    rotate: 45deg;
+  }
+
+  .menu-button--close .menu-button__dot + .menu-button__dot,
+  :global(.site-header:has(.site-menu:popover-open)) .menu-button--open .menu-button__dot + .menu-button__dot {
+    rotate: -45deg;
+  }
+
+  /* The X turns a quarter under the pointer. */
+  @media (hover: hover) {
+    .menu-button--close:hover .menu-button__icon {
+      rotate: 90deg;
+    }
+  }
+
+  .menu-button--close:focus-visible .menu-button__icon {
     rotate: 90deg;
   }
 
-  /* The menu's button arrives with the dots lying down, then flips them. */
+  /* The menu's button arrives as two dots, then becomes the X, a moment
+     after the menu starts to drop. */
+  .menu-button--close .menu-button__dot {
+    transition-delay: 0.2s;
+  }
+
   @starting-style {
-    .menu-button--close .menu-button__dots {
+    .menu-button--close .menu-button__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      translate: calc(-50% - 5px) -50%;
       rotate: 0deg;
+    }
+
+    .menu-button--close .menu-button__dot + .menu-button__dot {
+      translate: calc(-50% + 5px) -50%;
     }
   }
 
+  /* The header's button turns back into dots as the menu lifts away. */
+  .menu-button--open .menu-button__dot {
+    transition-delay: 0.25s;
+  }
+
+  .menu-button:active .menu-button__icon {
+    scale: 0.85;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .menu-button__dots,
-    .menu-button__disc {
+    .menu-button__icon,
+    .menu-button__dot {
       transition: none;
     }
   }
 
-  /* On narrow phones, the disc alone. */
+  /* On narrow phones, the dots alone. */
   @media (max-width: 29.99rem) {
     .menu-button__label :global(.roll__track) {
       display: none;

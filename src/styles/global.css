@@ -1019,7 +1019,7 @@ html.lenis {
   .rule::before,
   .status-dot,
   .reading-progress span,
-  .menu-button__dots span {
+  .menu-button__dot {
     forced-color-adjust: none;
     background: CanvasText;
   }
@@ -1030,7 +1030,6 @@ html.lenis {
 
   .cta,
   .site-header__cta,
-  .menu-button__disc,
   .skip-link {
     border: 1px solid;
   }

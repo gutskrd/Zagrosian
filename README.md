@@ -236,8 +236,8 @@ back for visitors who prefer reduced motion, and the site works fully without it
   The choice is remembered. Browsers only allow audio after an interaction, so on a new page the score
   resumes at once where the browser allows it (Chrome, within the site) or with the first click or key
   press. It pauses while the tab is hidden.
-- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a dot and a trailing ring that
-  invert what is under them. Over a link or a plain button the ring becomes a lens; over an external
+- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a dot inside a ring, both exactly
+  where the pointer is (no lag), that invert what is under them. Over a link or a plain button the ring becomes a lens; over an external
   link it adds an arrow; over a magnetic button it steps aside while the button answers; over the ink
   horseman it widens like a breath of wind. Over text fields the system cursor returns. The cursor is a
   manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
@@ -245,8 +245,8 @@ back for visitors who prefer reduced motion, and the site works fully without it
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
   the header is the same at every size: the emblem, then Visit Hevalo (from 768px), quick navigation
   (from 1024px), the world icon for languages ([`Globe.astro`](src/components/Globe.astro), whose
-  meridians spin on hover), sound, theme, and the menu button: a disc with two dots that spread on
-  hover and flip upright when the menu opens. The menu is a full-screen, always-dark panel that drops
+  meridians spin on hover), sound, theme, and the menu button: two dots on their own, which flip across
+  to each other's side on hover (the label rolls with them) and stretch into an X when the menu opens. The menu is a full-screen, always-dark panel that drops
   in like a curtain; its links, set very large, rise one after another from behind masks (the others
   dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
   contact, social media, every language, sound, the legal pages and the time at headquarters. It is a

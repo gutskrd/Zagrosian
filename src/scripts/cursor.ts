@@ -1,7 +1,7 @@
 /**
  * A custom cursor, for a mouse or trackpad (styles in global.css, `.cursor`).
  *
- * A dot follows the pointer exactly; a ring trails it with a little weight.
+ * A dot inside a ring, both exactly where the pointer is, with no lag.
  * What is under the pointer changes it:
  * - a link or a plain button: the ring fills and inverts the text beneath,
  *   like a lens; an external link adds an arrow pointing out;
@@ -101,25 +101,7 @@ export function initCursor() {
 
   let x = -100;
   let y = -100;
-  let ringX = x;
-  let ringY = y;
-  let frame = 0;
-  let last = 0;
   let state: State = '';
-
-  const follow = (now: number) => {
-    const seconds = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
-    last = now;
-    const k = 1 - Math.exp(-seconds * 16);
-    ringX += (x - ringX) * k;
-    ringY += (y - ringY) * k;
-    ring.style.transform = `translate3d(${ringX.toFixed(2)}px, ${ringY.toFixed(2)}px, 0)`;
-    if (Math.abs(x - ringX) + Math.abs(y - ringY) > 0.1) frame = requestAnimationFrame(follow);
-    else {
-      frame = 0;
-      last = 0;
-    }
-  };
 
   const setState = (next: State) => {
     if (next === state) return;
@@ -134,14 +116,11 @@ export function initCursor() {
       if (event.pointerType !== 'mouse') return;
       x = event.clientX;
       y = event.clientY;
-      // The dot moves at once, in the same frame as the pointer.
-      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      if (!cursor.hasAttribute('data-visible')) {
-        ringX = x;
-        ringY = y;
-        cursor.toggleAttribute('data-visible', true);
-      }
-      if (!frame) frame = requestAnimationFrame(follow);
+      // Both move at once, in the same frame as the pointer: no lag.
+      const at = `translate3d(${x}px, ${y}px, 0)`;
+      dot.style.transform = at;
+      ring.style.transform = at;
+      if (!cursor.hasAttribute('data-visible')) cursor.toggleAttribute('data-visible', true);
     },
     { passive: true },
   );
