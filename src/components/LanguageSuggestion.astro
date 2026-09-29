@@ -39,16 +39,20 @@ const others = locales.filter(({ code }) => code !== locale);
     inset-inline-end: var(--gutter);
     z-index: 60;
     width: min(22rem, calc(100vw - 2 * var(--gutter)));
-    opacity: 0;
-    transform: translateY(1rem);
-    transition:
-      opacity 0.4s ease,
-      transform 0.6s var(--ease-out);
+    /* It slides up from below the edge of the screen rather than fading in,
+       so its text is never shown at reduced contrast. */
+    transform: translateY(calc(100% + 2 * var(--gutter)));
+    transition: transform 0.7s var(--ease-out);
   }
 
   .suggest[data-visible] {
-    opacity: 1;
     transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .suggest {
+      transition: none;
+    }
   }
 
   .suggest__card {

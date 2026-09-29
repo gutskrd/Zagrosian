@@ -422,7 +422,7 @@ function initPrompt() {
     if (!visible) return;
     visible = false;
     prompt.toggleAttribute('data-visible', false);
-    window.setTimeout(() => (prompt.hidden = true), 400);
+    window.setTimeout(() => (prompt.hidden = true), 700);
   };
 
   const show = () => {

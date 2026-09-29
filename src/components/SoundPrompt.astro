@@ -41,16 +41,20 @@ const { t } = i18n(Astro.url);
     box-shadow:
       0 1px 2px rgb(0 0 0 / 0.06),
       0 16px 40px rgb(0 0 0 / 0.14);
-    opacity: 0;
-    transform: translateY(1rem);
-    transition:
-      opacity 0.4s ease,
-      transform 0.6s var(--ease-out);
+    /* It slides up from below the edge of the screen rather than fading in,
+       so its text is never shown at reduced contrast. */
+    transform: translateY(calc(100% + 2 * var(--gutter)));
+    transition: transform 0.7s var(--ease-out);
   }
 
   .sound-prompt[data-visible] {
-    opacity: 1;
     transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sound-prompt {
+      transition: none;
+    }
   }
 
   :global([data-theme='dark']) .sound-prompt {

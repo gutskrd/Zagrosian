@@ -76,6 +76,6 @@ export function initLanguageSuggestion() {
   card.querySelector('[data-language-suggestion-dismiss]')?.addEventListener('click', () => {
     remember();
     box.toggleAttribute('data-visible', false);
-    window.setTimeout(() => (box.hidden = true), 400);
+    window.setTimeout(() => (box.hidden = true), 700);
   });
 }
