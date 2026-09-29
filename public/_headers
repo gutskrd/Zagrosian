@@ -21,6 +21,7 @@
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Resource-Policy: same-origin
   X-Permitted-Cross-Domain-Policies: none
+  Speculation-Rules: "/speculation-rules.json"
   ! Access-Control-Allow-Origin
 
 # Plain-text and XML files: browsers display these with built-in viewers that
@@ -37,6 +38,30 @@
 /.well-known/security.txt
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+
+# Plain-text versions for machines: each page as Markdown and the llms.txt
+# summary. Search results should show the HTML pages, so these are noindex;
+# AI assistants and other tools can still read them.
+/*.md
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+  X-Robots-Tag: noindex
+
+/llms.txt
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+  X-Robots-Tag: noindex
+
+/llms-full.txt
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+  X-Robots-Tag: noindex
+
+# Prerender same-site pages when a visitor hovers or taps a link, so they open
+# instantly (Chrome and Edge). Sent as a header so no inline script is needed.
+/speculation-rules.json
+  ! Content-Type
+  Content-Type: application/speculationrules+json
 
 # Fingerprinted build assets never change.
 /_astro/*

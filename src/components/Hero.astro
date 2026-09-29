@@ -1,5 +1,6 @@
 ---
-import { hevalo, site } from '../site';
+import { hevalo, home, site } from '../site';
+import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
 import Griffin from './Griffin.astro';
 ---
@@ -7,16 +8,23 @@ import Griffin from './Griffin.astro';
 <section class="hero" aria-labelledby="hero-title">
   <div class="container hero__grid">
     <div class="hero__text">
+      <a class="hero__notice intro" href="#hevalo">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>{hevalo.name} is coming to {hevalo.availability.comingSoon.join(' and ')}</span>
+        <Arrow direction="down" class="hero__notice-arrow" />
+      </a>
+
       <h1 id="hero-title" class="hero__title">
-        <span class="hero__line"><span>Technology</span></span>
-        <span class="hero__line"><span>for Kurdish</span></span>
-        <span class="hero__line"><span>communities.</span></span>
+        {
+          home.headline.map((line) => (
+            <span class="hero__line">
+              <span>{line}</span>
+            </span>
+          ))
+        }
       </h1>
 
-      <p class="hero__lead lead intro">
-        {site.name} is an independent technology company. We build consumer products for Kurdish speakers worldwide,
-        including the language-learning app {hevalo.name}.
-      </p>
+      <p class="hero__lead lead intro">{home.lead}</p>
 
       <div class="hero__actions intro">
         <Cta href="#hevalo" arrow="down">Our products</Cta>
@@ -38,6 +46,55 @@ import Griffin from './Griffin.astro';
   .hero__grid {
     display: grid;
     gap: clamp(3rem, 2rem + 4vw, 4rem);
+  }
+
+  /* Announcement above the headline, linking to the Hevalo section. */
+  .hero__notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.25rem;
+    margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    padding: 0.25rem 0.875rem 0.25rem 0.75rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 999px;
+    font-size: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
+    font-weight: 450;
+    color: var(--color-ink-soft);
+    text-decoration: none;
+    text-wrap: balance;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .hero__notice .status-dot {
+    color: var(--color-ink);
+  }
+
+  .hero__notice :global(.hero__notice-arrow) {
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--color-muted);
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  /* On the narrowest phones the arrow gives way, so the text stays on one line. */
+  @media (max-width: 22.49rem) {
+    .hero__notice :global(.hero__notice-arrow) {
+      display: none;
+    }
+  }
+
+  @media (hover: hover) {
+    .hero__notice:hover {
+      border-color: var(--color-ink);
+      color: var(--color-ink);
+    }
+
+    .hero__notice:hover :global(.hero__notice-arrow) {
+      transform: translateY(2px);
+    }
   }
 
   /* The headline is sized to its column: "communities." is about 5.6em wide. */

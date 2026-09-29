@@ -1,7 +1,7 @@
 ---
 import Arrow from './Arrow.astro';
 import SplitText from './SplitText.astro';
-import { site } from '../site';
+import { home, site } from '../site';
 
 const { contact, press } = site.emails;
 ---
@@ -11,10 +11,10 @@ const { contact, press } = site.emails;
     <div>
       <p class="eyebrow" data-reveal>Contact</p>
       <SplitText id="contact-title" class="heading-2 contact__title" text="Get in touch." />
-      <p class="contact__text lead" data-reveal>For general enquiries and partnerships, please contact us by email.</p>
+      <p class="contact__text lead" data-reveal>{home.contact}</p>
     </div>
 
-    <div class="contact__panel" data-reveal>
+    <address class="contact__panel" data-reveal>
       <a class="contact__email" href={`mailto:${contact}`}>
         <span>{contact}</span>
         <Arrow class="contact__arrow" />
@@ -33,7 +33,7 @@ const { contact, press } = site.emails;
         Press enquiries: <a href={`mailto:${press}`}>{press}</a><br />
         To report a security issue, please see our <a href="/security">security policy</a>.
       </p>
-    </div>
+    </address>
   </div>
 </section>
 
@@ -53,6 +53,7 @@ const { contact, press } = site.emails;
 
   .contact__panel {
     display: grid;
+    font-style: normal;
     align-content: end;
     justify-items: start;
     gap: 1.25rem;

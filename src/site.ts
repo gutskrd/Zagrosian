@@ -1,8 +1,12 @@
 export interface Product {
   name: string;
   url: string;
+  /** The product's own logo, for structured data. */
+  logo: string;
   category: string;
   description: string;
+  /** Where the product is available now, and what is coming. */
+  availability: { web: string; comingSoon: string[]; comingSoonNote: string };
 }
 
 export interface SocialProfile {
@@ -42,9 +46,15 @@ export interface SiteConfig {
 export const hevalo: Product = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
+  logo: 'https://hevalo.app/logo.png',
   category: 'Kurdish language learning',
   description:
     'An app for learning Kurdish through short lessons and games played with friends. Available first in Kurmanji, with more dialects planned.',
+  availability: {
+    web: 'hevalo.app',
+    comingSoon: ['iOS', 'Android'],
+    comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
+  },
 };
 
 export const site: SiteConfig = {
@@ -61,6 +71,23 @@ export const site: SiteConfig = {
     press: 'press@zagrosian.com',
   },
   products: [hevalo],
+};
+
+/** Where the company is based, as a standalone name ("Netherlands"). */
+export const headquarters = site.country.replace(/^the /, '');
+
+/**
+ * Homepage copy. The page, its Markdown version (/index.md) and /llms.txt are all
+ * built from this, so they always say the same thing.
+ */
+export const home = {
+  headline: ['Technology', 'for Kurdish', 'communities.'],
+  lead: `${site.name} is an independent technology company. We build consumer products for Kurdish speakers worldwide, including the language-learning app ${hevalo.name}.`,
+  motto: { ku: 'Jiyan bi kurdî xweştire.', en: 'Life is sweeter in Kurdish.' },
+  mission: 'Our mission is to support the Kurdish language and its speakers through technology.',
+  approach: `${site.name} is privately owned. We design and build our products in-house, with a strong focus on quality and privacy.`,
+  contact: 'For general enquiries and partnerships, please contact us by email.',
+  footerMotto: { ku: 'Ji Kurdan, ji bo Kurdan.', en: 'By Kurds, for Kurds.' },
 };
 
 export const socialProfiles: SocialProfile[] = [

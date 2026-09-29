@@ -1,8 +1,6 @@
 ---
 import SplitText from './SplitText.astro';
-import { hevalo, site } from '../site';
-
-const headquarters = site.country.replace(/^the /, '');
+import { headquarters, hevalo, home } from '../site';
 ---
 
 <section id="about" class="about section" aria-labelledby="about-title">
@@ -14,12 +12,9 @@ const headquarters = site.country.replace(/^the /, '');
         id="about-title"
         class="about__statement"
         effect="highlight"
-        text="Our mission is to support the Kurdish language and its speakers through technology."
+        text={home.mission}
       />
-      <p class="about__text lead">
-        {site.name} is privately owned. We design and build our products in-house, with a strong focus on quality and
-        privacy.
-      </p>
+      <p class="about__text lead">{home.approach}</p>
 
       <dl class="about__facts rule">
         <div>

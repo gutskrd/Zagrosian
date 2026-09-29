@@ -26,7 +26,12 @@ const updatedLabel = updated.toLocaleDateString('en-GB', {
 const sections = headings.filter((heading) => heading.depth === 2);
 ---
 
-<BaseLayout title={`${title} — ${site.name}`} description={description}>
+<BaseLayout
+  title={`${title} — ${site.name}`}
+  description={description}
+  breadcrumb={title}
+  dateModified={updated.toISOString().slice(0, 10)}
+>
   <div class="reading-progress" aria-hidden="true" data-reading-progress><span></span></div>
 
   <article class="legal" aria-labelledby="legal-title">
@@ -139,6 +144,21 @@ const sections = headings.filter((heading) => heading.depth === 2);
 
   .legal__toc-details[open] .legal__toc-title::after {
     background: linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat;
+  }
+
+  /* On small screens, where the list is collapsible, it opens and closes smoothly. */
+  @media (max-width: 63.99rem) and (prefers-reduced-motion: no-preference) {
+    .legal__toc-details::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size 0.4s var(--ease-out),
+        content-visibility 0.4s allow-discrete;
+    }
+
+    .legal__toc-details[open]::details-content {
+      block-size: auto;
+    }
   }
 
   .legal__toc ol {

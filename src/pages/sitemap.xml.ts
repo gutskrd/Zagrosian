@@ -1,24 +1,10 @@
-import type { APIRoute, MarkdownInstance } from 'astro';
-import { site } from '../site';
+import type { APIRoute } from 'astro';
+import { textPages } from '../lib/pages';
 
-/** The legal pages, whose `updated` date becomes their <lastmod>. */
-const legalPages = import.meta.glob<MarkdownInstance<{ updated: string | Date }>>('./*.md', { eager: true });
-
-/** Every indexable page. The 404 page is `noindex` and left out. */
-const pages: { path: string; lastmod?: string }[] = [
-  { path: '/' },
-  ...Object.entries(legalPages).map(([file, page]) => ({
-    path: `/${file.slice(2, -'.md'.length)}`,
-    lastmod: new Date(page.frontmatter.updated).toISOString().slice(0, 10),
-  })),
-];
-
+/** Every indexable page, with the date legal pages last changed. The 404 page is `noindex` and left out. */
 export const GET: APIRoute = () => {
-  const urls = pages
-    .map(({ path, lastmod }) => {
-      const loc = `<loc>${new URL(path, site.url).href}</loc>`;
-      return `  <url>${loc}${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
-    })
+  const urls = textPages
+    .map(({ url, updated }) => `  <url><loc>${url}</loc>${updated ? `<lastmod>${updated}</lastmod>` : ''}</url>`)
     .join('\n');
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>

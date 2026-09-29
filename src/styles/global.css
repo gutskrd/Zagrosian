@@ -95,6 +95,8 @@
   --duration: 0.9s;
 
   color-scheme: light dark;
+  /* Lets elements such as the contents list animate to and from their natural height. */
+  interpolate-size: allow-keywords;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -256,6 +258,44 @@ svg {
   font-family: var(--font-kurdish);
   font-style: italic;
   font-weight: 400;
+}
+
+/* A small dot with a slow ring around it, like a status light. Uses the current
+   text colour, so it works on light and dark surfaces. */
+.status-dot {
+  position: relative;
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .status-dot::after {
+    animation: status-pulse 2.4s var(--ease-out) infinite;
+  }
+}
+
+@keyframes status-pulse {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(3);
+  }
 }
 
 .heading-2 {
@@ -434,5 +474,59 @@ svg {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Accessibility preferences
+   ========================================================================== */
+
+/* "Increase contrast" (macOS, iOS, Windows): darker secondary text and lines,
+   and scroll-highlighted headings start fully visible. */
+@media (prefers-contrast: more) {
+  :root {
+    --color-ink-soft: #1f1f1f;
+    --color-muted: #3d3d3d;
+    --color-line: #8f8f8f;
+    --color-line-strong: #5c5c5c;
+    --color-underline: #5c5c5c;
+    --color-dim: var(--color-ink);
+    --color-night-muted: #d9d9d9;
+    --color-night-line: #737373;
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root {
+    --color-ink-soft: #e6e6e6;
+    --color-muted: #cccccc;
+    --color-line: #737373;
+    --color-line-strong: #999999;
+    --color-underline: #999999;
+  }
+}
+
+/* Forced colours (Windows High Contrast): the system replaces backgrounds, so
+   marks drawn with a background colour are redrawn in the system text colour,
+   and filled buttons get a visible outline. */
+@media (forced-colors: active) {
+  .rule::before,
+  .status-dot,
+  .reading-progress span,
+  .menu-toggle__icon::before,
+  .menu-toggle__icon::after {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .status-dot::after {
+    border-color: CanvasText;
+  }
+
+  .cta,
+  .site-nav__cta,
+  .mobile-menu__cta,
+  .skip-link {
+    border: 1px solid;
   }
 }

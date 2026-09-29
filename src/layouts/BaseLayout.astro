@@ -2,6 +2,7 @@
 import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import { structuredData, toJsonLd } from '../lib/structured-data';
 import { site } from '../site';
 import '../styles/global.css';
 
@@ -11,14 +12,23 @@ interface Props {
   description?: string;
   /** Keep error pages out of search results. */
   noindex?: boolean;
+  /** The page's name in breadcrumbs, for pages below the homepage. */
+  breadcrumb?: string;
+  /** Date of the last material change (YYYY-MM-DD). */
+  dateModified?: string;
 }
 
-const { title = site.title, description = site.description, noindex = false } = Astro.props;
+const { title = site.title, description = site.description, noindex = false, breadcrumb, dateModified } = Astro.props;
 
 // Pages build to /name.html, but are served (and should be linked) as /name.
 const path = Astro.url.pathname.replace(/(index)?\.html$/, '');
 const canonical = new URL(path, site.url).href;
 const ogImage = new URL('/og.png', site.url).href;
+// Every indexable page also has a Markdown version (src/pages/[page].md.ts).
+const markdown = path === '/' ? '/index.md' : `${path}.md`;
+const jsonLd = noindex
+  ? undefined
+  : toJsonLd(structuredData({ url: canonical, title, description, breadcrumb, dateModified }));
 ---
 
 <!doctype html>
@@ -29,6 +39,7 @@ const ogImage = new URL('/og.png', site.url).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {!noindex && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown" />}
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
@@ -52,6 +63,7 @@ const ogImage = new URL('/og.png', site.url).href;
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
     <slot name="head" />
   </head>
   <body>

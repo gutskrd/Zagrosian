@@ -15,13 +15,15 @@ Requires Node 22.12 or later.
 | `npm run dev`     | Start the dev server at `http://localhost:4321`  |
 | `npm run check`   | Type-check `.astro` and `.ts` files              |
 | `npm run build`   | Type-check, then build the site into `dist/`     |
-| `npm run preview` | Build, then serve the site at `http://localhost:8787` exactly as Cloudflare does, with the headers from `public/_headers`, clean URLs and the 404 page |
+| `npm run preview` | Build, then serve the site at `http://localhost:8787` exactly as Cloudflare does, with the headers from `public/_headers`, clean URLs and the 404 page. Rebuilds when files in `src/` change |
 | `npm run deploy`  | Build and deploy to Cloudflare (after `npx wrangler login`); normally Cloudflare deploys from GitHub instead |
 
 ## Editing content
 
-- [`src/site.ts`](src/site.ts): company name, country, title, description, products, the email
-  addresses shown on the homepage. Each address appears only where it is needed:
+- [`src/site.ts`](src/site.ts): company name, country, title, description, products, and all
+  homepage copy (`home`). The homepage, its Markdown version and `llms.txt` are built from this one
+  file, so change text here rather than in the components. It also holds the email addresses shown on
+  the homepage. Each address appears only where it is needed:
 
   | Address                 | Where it appears                                       |
   | ----------------------- | ------------------------------------------------------ |
@@ -60,8 +62,11 @@ src/
   assets/brand/    Griffin emblem (source and sized variants) and the 21-ray sun
   assets/fonts/    Inter subset with the Kurmanji letters Ş and ş
   components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, …
-  layouts/         BaseLayout (document and SEO), LegalLayout (legal pages), NoticeLayout (404)
-  pages/           Homepage, legal pages, 404, sitemap.xml and .well-known/security.txt
+  layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
+                   NoticeLayout (404)
+  lib/             structured-data.ts (JSON-LD) and pages.ts (Markdown versions and llms.txt)
+  pages/           Homepage, legal pages, 404, sitemap.xml, llms.txt, llms-full.txt, the Markdown
+                   versions ([page].md.ts) and .well-known/security.txt
   scripts/site.ts  Header, mobile menu, section highlighting, scroll reveals, copy button,
                    legal table of contents
   styles/          Font, design tokens and base styles
@@ -125,6 +130,36 @@ Rules the code follows:
   Content-Security-Policy and Trusted Types rules in `public/_headers` stay strict.
 - Split headings keep their full text as their accessible name.
 
+## Readable by machines
+
+Besides the pages themselves, the site describes itself in formats that search engines, AI assistants
+and other tools read directly:
+
+- **Structured data:** every page carries a schema.org JSON-LD graph
+  ([`src/lib/structured-data.ts`](src/lib/structured-data.ts)): the WebSite, the Organization (logo,
+  contact points, social profiles, the Hevalo brand) and the page itself, with breadcrumbs and a
+  last-modified date on the legal pages. Nodes refer to each other by `@id`, so they form one
+  description of the company.
+- **Markdown versions:** every page is also published as Markdown (`/index.md`, `/privacy.md`,
+  `/terms.md`, `/security.md`) and linked from the page with `<link rel="alternate" type="text/markdown">`.
+- **llms.txt:** [`/llms.txt`](https://zagrosian.com/llms.txt) is a short overview for language models
+  in the [llms.txt](https://llmstxt.org) format, and `/llms-full.txt` has the text of every page in one
+  file. Both are built from the same content as the pages ([`src/lib/pages.ts`](src/lib/pages.ts)).
+- **Sitemap, robots.txt, web app manifest and security.txt** complete the picture.
+
+The Markdown and text files are marked `noindex`, so search results always show the real pages.
+
+## Browser features
+
+- **Instant navigation:** a `Speculation-Rules` header points Chrome and Edge to
+  [`public/speculation-rules.json`](public/speculation-rules.json), which prerenders a page on this site
+  when a visitor hovers or starts to tap a link to it. Other browsers ignore it.
+- **Page transitions:** browsers that support cross-document view transitions cross-fade between
+  pages, with the header staying in place.
+- **Accessibility preferences:** besides light and dark mode and *reduce motion*, the site responds to
+  *increase contrast* (darker secondary text and lines) and to Windows' forced colours (high contrast),
+  where buttons get outlines and drawn marks use the system text colour.
+
 ## Deploying to Cloudflare
 
 The site runs on Cloudflare Workers as static assets, with no Worker script. Everything is configured
@@ -157,8 +192,8 @@ turn them off on the same settings page.
 ## Getting indexed by Google
 
 The site is ready for indexing: every page has a canonical URL, there is a sitemap with the date each
-legal page last changed, and the homepage carries structured data for the company, its logo and its
-social profiles. Only zagrosian.com is indexed (see above). Google still needs to be told the site
+legal page last changed, and every page carries structured data (see **Readable by machines**). Only
+zagrosian.com is indexed (see above). Google still needs to be told the site
 exists:
 
 1. Check that the latest Cloudflare build is green (the *Workers Builds: zagrosian* check on GitHub)

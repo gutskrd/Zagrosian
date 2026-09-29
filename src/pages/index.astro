@@ -5,54 +5,10 @@ import Hero from '../components/Hero.astro';
 import Motto from '../components/Motto.astro';
 import ProductShowcase from '../components/ProductShowcase.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { hevalo, site, socialProfiles } from '../site';
-
-const home = `${site.url}/`;
-
-// WebSite gives Google the site name; Organization gives it the logo and company details.
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebSite',
-      '@id': `${home}#website`,
-      name: site.name,
-      url: home,
-      publisher: { '@id': `${home}#organization` },
-      inLanguage: 'en',
-    },
-    {
-      '@type': 'Organization',
-      '@id': `${home}#organization`,
-      name: site.name,
-      url: home,
-      logo: {
-        '@type': 'ImageObject',
-        url: `${site.url}/logo.png`,
-        width: 512,
-        height: 512,
-      },
-      description: site.description,
-      email: site.emails.contact,
-      address: { '@type': 'PostalAddress', addressCountry: 'NL' },
-      contactPoint: [
-        { '@type': 'ContactPoint', contactType: 'general inquiries', email: site.emails.contact },
-        { '@type': 'ContactPoint', contactType: 'press', email: site.emails.press },
-      ],
-      sameAs: socialProfiles.map((profile) => profile.url),
-      brand: site.products.map((product) => ({
-        '@type': 'Brand',
-        name: product.name,
-        url: product.url,
-      })),
-    },
-  ],
-};
+import { hevalo } from '../site';
 ---
 
 <BaseLayout>
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(structuredData)} />
-
   <Hero />
   <ProductShowcase product={hevalo} />
   <Motto />

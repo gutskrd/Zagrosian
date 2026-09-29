@@ -30,12 +30,10 @@ const domain = new URL(product.url).hostname;
 
     <div class="showcase__soon rule" data-reveal>
       <div class="showcase__soon-heading">
-        <p class="showcase__status"><span class="showcase__pulse" aria-hidden="true"></span>Coming soon</p>
-        <h3 class="showcase__soon-title">{product.name} for iOS and Android.</h3>
+        <p class="showcase__status"><span class="status-dot" aria-hidden="true"></span>Coming soon</p>
+        <h3 class="showcase__soon-title">{product.name} for {product.availability.comingSoon.join(' and ')}.</h3>
       </div>
-      <p class="showcase__soon-text">
-        The native apps are in development and will be available on the App Store and Google Play.
-      </p>
+      <p class="showcase__soon-text">{product.availability.comingSoonNote}</p>
     </div>
   </div>
 </section>
@@ -95,42 +93,6 @@ const domain = new URL(product.url).hostname;
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-night-muted);
-  }
-
-  /* A small dot with a slow ring around it, like a status light. */
-  .showcase__pulse {
-    position: relative;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: var(--color-night-ink);
-  }
-
-  .showcase__pulse::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 1px solid var(--color-night-ink);
-    opacity: 0;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .showcase__pulse::after {
-      animation: pulse 2.4s var(--ease-out) infinite;
-    }
-  }
-
-  @keyframes pulse {
-    from {
-      opacity: 0.7;
-      transform: scale(1);
-    }
-
-    to {
-      opacity: 0;
-      transform: scale(3);
-    }
   }
 
   .showcase__soon-title {
