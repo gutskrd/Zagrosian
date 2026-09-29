@@ -1,5 +1,5 @@
 /**
- * The site's languages: the same nine as Hevalo, in the same order. English is
+ * The site's languages: Hevalo's nine, in the same order, and Persian. English is
  * the default and lives at the root (/, /privacy); every other language has
  * its own prefix (/de, /de/privacy). `intl` is the locale used to format
  * dates and numbers: the site's English is British ("29 September 2026").
@@ -14,6 +14,7 @@ export const locales = [
   { code: 'fr', name: 'Français', englishName: 'French', dir: 'ltr', ogLocale: 'fr_FR', intl: 'fr' },
   { code: 'tr', name: 'Türkçe', englishName: 'Turkish', dir: 'ltr', ogLocale: 'tr_TR', intl: 'tr' },
   { code: 'ar', name: 'العربية', englishName: 'Arabic', dir: 'rtl', ogLocale: 'ar_AR', intl: 'ar' },
+  { code: 'fa', name: 'فارسی', englishName: 'Persian (Farsi)', dir: 'rtl', ogLocale: 'fa_IR', intl: 'fa' },
 ] as const;
 
 export type Locale = (typeof locales)[number]['code'];

@@ -8,6 +8,7 @@ import { ckb } from './messages/ckb';
 import { de } from './messages/de';
 import { en, type Messages } from './messages/en';
 import { es } from './messages/es';
+import { fa } from './messages/fa';
 import { fr } from './messages/fr';
 import { ku } from './messages/ku';
 import { nl } from './messages/nl';
@@ -20,7 +21,7 @@ export type { Messages };
 export const legalSlugs = ['privacy', 'terms', 'security'] as const;
 export type LegalSlug = (typeof legalSlugs)[number];
 
-const catalogues: Record<Locale, Messages> = { en, ku, ckb, nl, de, es, fr, tr, ar };
+const catalogues: Record<Locale, Messages> = { en, ku, ckb, nl, de, es, fr, tr, ar, fa };
 
 export const messages = (locale: Locale): Messages => catalogues[locale];
 

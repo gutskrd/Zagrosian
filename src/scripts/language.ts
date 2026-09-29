@@ -7,11 +7,13 @@
 
 const STORAGE_KEY = 'language-chosen';
 
-/** Maps a browser language tag to a site language code: de-AT → de, ckb-IQ → ckb, ku-Arab → ckb. */
+/** Maps a browser language tag to a site language code: de-AT → de, ckb-IQ → ckb, ku-Arab → ckb, prs → fa. */
 function siteLanguage(tag: string, supported: string[]): string | undefined {
   const lower = tag.toLowerCase();
   if (lower === 'ku-arab' || lower.startsWith('ku-arab-') || lower.startsWith('ckb')) return 'ckb';
   if (lower.startsWith('kmr')) return 'ku';
+  // Dari, the Persian of Afghanistan.
+  if (lower.startsWith('prs')) return 'fa';
   const base = lower.split('-')[0];
   return supported.find((code) => code === base);
 }

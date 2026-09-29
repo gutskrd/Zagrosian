@@ -14,12 +14,16 @@ const { entry, headings } = Astro.props;
 const { title, description, eyebrow, updated } = entry.data;
 const { locale, info, t, base } = i18n(Astro.url);
 
-const updatedLabel = new Intl.DateTimeFormat(info.intl, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'UTC',
-}).format(updated);
+const dateOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } as const;
+const localDate = new Intl.DateTimeFormat(info.intl, dateOptions);
+// Where the language's calendar is not the Gregorian one (Persian uses the
+// Solar Hijri calendar), the Gregorian date of the English original follows in
+// brackets: "۷ مهر ۱۴۰۵ (۲۹ سپتامبر ۲۰۲۶)".
+const gregorian =
+  localDate.resolvedOptions().calendar === 'gregory'
+    ? ''
+    : ` (${new Intl.DateTimeFormat(`${info.intl}-u-ca-gregory`, dateOptions).format(updated)})`;
+const updatedLabel = localDate.format(updated) + gregorian;
 
 const sections = headings.filter((heading) => heading.depth === 2);
 
@@ -59,7 +63,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
           <span class="legal__separator" aria-hidden="true">·</span>
           <span class="legal__reading">{readingTime}</span>
         </p>
-        <button class="legal__print" type="button" data-print hidden>
+        <button class="legal__print" type="button" data-print>
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
             <path d="M5.5 7.5V3.25h9V7.5M5.5 14H3.25V7.5h13.5V14H14.5M5.5 11.5h9v5.25h-9z" />
           </svg>
@@ -183,8 +187,10 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     margin-inline: 0.5rem;
   }
 
+  /* Shown only where the script can run, and from the first paint, so it
+     never shifts the page. */
   .legal__print {
-    display: inline-flex;
+    display: none;
     align-items: center;
     gap: 0.5rem;
     min-height: 2.25rem;
@@ -201,8 +207,8 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
       border-color 0.2s ease;
   }
 
-  .legal__print[hidden] {
-    display: none;
+  :global(:root[data-theme]) .legal__print {
+    display: inline-flex;
   }
 
   @media (hover: hover) {
@@ -221,19 +227,29 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     stroke-linejoin: round;
   }
 
-  /* Copy-link buttons beside section headings (added by src/scripts/site.ts). */
+  /* Copy-link buttons beside section headings (added by src/scripts/site.ts).
+     When the script can run (the theme script has set data-theme), headings
+     keep room for the button at their end from the first paint, so adding it
+     never moves the text. */
+  :global(:root[data-theme]) .legal__content :global(h2) {
+    position: relative;
+    padding-inline-end: 2.5rem;
+  }
+
   .legal__content :global(.heading-link) {
-    display: inline-grid;
+    position: absolute;
+    /* The heading's top padding, then centred on its first line. */
+    inset-block-start: calc(2rem + 0.25em);
+    inset-inline-end: 0;
+    display: grid;
     place-items: center;
     width: 1.75rem;
     height: 1.75rem;
-    margin-inline-start: 0.5rem;
     padding: 0;
     border: 0;
     border-radius: 0.5rem;
     background: none;
     color: var(--color-muted);
-    vertical-align: 0.1em;
     cursor: pointer;
     opacity: 0;
     transition:

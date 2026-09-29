@@ -125,6 +125,14 @@
   ! Content-Language
   Content-Language: ar
 
+/fa
+  ! Content-Language
+  Content-Language: fa
+
+/fa/*
+  ! Content-Language
+  Content-Language: fa
+
 # Prerender same-site pages when a visitor hovers or taps a link, so they open
 # instantly (Chrome and Edge). Sent as a header so no inline script is needed.
 /speculation-rules.json

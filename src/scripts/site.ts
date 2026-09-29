@@ -193,10 +193,7 @@ function initLegalTools() {
   const status = article.querySelector<HTMLElement>('[data-legal-status]');
 
   const print = article.querySelector<HTMLButtonElement>('[data-print]');
-  if (print) {
-    print.hidden = false;
-    print.addEventListener('click', () => window.print());
-  }
+  print?.addEventListener('click', () => window.print());
 
   if (!navigator.clipboard?.writeText) return;
   const label = article.dataset.copyLink ?? '';

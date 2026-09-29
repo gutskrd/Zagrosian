@@ -3,8 +3,8 @@
 The website of Zagrosian, the technology company behind [Hevalo](https://hevalo.app).
 
 Built with [Astro](https://astro.build) as a fully static site: no server, no database, no forms, no
-cookies and no third-party requests. Available in the nine languages of Hevalo: Kurdish (Kurmanji and
-Sorani), English, Dutch, German, Spanish, French, Turkish and Arabic.
+cookies and no third-party requests. Available in ten languages: the nine of Hevalo (Kurdish in
+Kurmanji and Sorani, English, Dutch, German, Spanish, French, Turkish and Arabic) and Persian.
 
 ## Commands
 
@@ -111,12 +111,12 @@ src/
   served versions (`hevalo-96/192/288.webp`) have them made fully transparent, so the icon sits cleanly
   on dark backgrounds.
 
-- **Fonts:** Latin text is set in Inter and Arabic script (Arabic and Sorani) in
+- **Fonts:** Latin text is set in Inter and Arabic script (Arabic, Sorani and Persian) in
   [Vazirmatn](https://github.com/rastikerdar/vazirmatn), both self-hosted variable fonts under the OFL.
-  Vazirmatn is designed to match Latin sans-serifs like Inter and covers the Sorani letters (ڕ ڵ ۆ ێ
-  ە). The browser downloads it only when Arabic script is on screen: on Arabic and Sorani pages, and
-  elsewhere when the visitor reaches for the language menu, which lists those two languages in their
-  own script. Kurdish phrases use the `kurdish`
+  Vazirmatn was designed for Persian, matches Latin sans-serifs like Inter and also covers Arabic and
+  the Sorani letters (ڕ ڵ ۆ ێ ە). The browser downloads it only when Arabic script is on screen: on
+  Arabic, Sorani and Persian pages, and elsewhere when the visitor reaches for the language menu,
+  which lists those three languages in their own script. Kurdish phrases use the `kurdish`
   class in `src/styles/global.css`, the same serif italic as hevalo.app:
   `'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif`. These are
   fonts already on the visitor's device (Iowan Old Style on Apple devices, Palatino Linotype on
@@ -199,7 +199,7 @@ The Markdown and text files are marked `noindex`, so search results always show 
 
 ## Languages
 
-The site is in the same nine languages as Hevalo, listed in
+The site is in the nine languages of Hevalo and Persian, listed in
 [`src/i18n/locales.ts`](src/i18n/locales.ts):
 
 | Language            | Code  | Address         | Direction     |
@@ -213,6 +213,7 @@ The site is in the same nine languages as Hevalo, listed in
 | French              | `fr`  | `/fr`           | left to right |
 | Turkish             | `tr`  | `/tr`           | left to right |
 | Arabic              | `ar`  | `/ar`           | right to left |
+| Persian (Farsi)     | `fa`  | `/fa`           | right to left |
 
 Every page exists in every language at the same path under the language's prefix (`/privacy`,
 `/de/privacy`, `/ar/privacy`), each with its own 404 page. The language is read from the address, so
@@ -228,10 +229,14 @@ pages are fully static and every language can be indexed.
   available language see a small suggestion to switch, written in that language; it never redirects.
   Once they choose or dismiss it, it does not appear again (`language-chosen` in `localStorage`, which
   the privacy policy mentions).
-- **Right to left:** Arabic and Sorani pages set `dir="rtl"`. Layout uses logical CSS properties, so
+- **Right to left:** Arabic, Sorani and Persian pages set `dir="rtl"`. Layout uses logical CSS properties, so
   it mirrors by itself; arrows flip, and Arabic script gets no letter-spacing and taller lines. Latin
   text inside them (brand names, email addresses, the Kurmanji motto) keeps its own direction and
   spacing.
+- **Persian:** written in formal Persian with Persian letters (ی، ک), zero-width non-joiners where
+  Persian needs them (می‌کنیم، داده‌ها) and Persian digits. Dates use the Solar Hijri calendar, with the
+  Gregorian date of the English original in brackets on legal pages. Browsers set to Dari (`prs`) are
+  offered the Persian pages.
 - **Long words:** German and Dutch headings are hyphenated where the browser supports it; legal titles
   with long compounds (such as *Datenschutzerklärung*) are sized so the word fits a phone screen, and
   as a last resort a word breaks rather than overflowing.

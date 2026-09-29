@@ -1,5 +1,6 @@
 ---
 import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
+import vazirmatnArabic from '@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2?url';
 import themeInit from '../scripts/theme-init.js?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -93,6 +94,11 @@ const jsonLd = noindex
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    {
+      // Arabic-script pages (Arabic, Sorani, Persian) need Vazirmatn from the
+      // first paint; loading it late would reflow headings as the font swaps in.
+      info.dir === 'rtl' && <link rel="preload" href={vazirmatnArabic} as="font" type="font/woff2" crossorigin />
+    }
     {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
     <slot name="head" />
   </head>

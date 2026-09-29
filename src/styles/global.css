@@ -4,7 +4,8 @@
    at display sizes. Its Latin file covers English, Dutch, German, Spanish,
    French and most of Kurmanji and Turkish; a 5 KB subset adds the rest
    (Ğ ğ İ Ş ş; src/assets/fonts, cut with fontTools from the Latin Extended
-   file). Arabic and Sorani use Vazirmatn, which Inter does not cover.
+   file). Arabic, Sorani and Persian use Vazirmatn, a typeface designed for
+   Persian that also covers Arabic and Sorani, which Inter does not.
    Browsers only download a face when the page uses one of its characters, so
    English pages never load the Arabic font.
    ========================================================================== */
@@ -514,7 +515,7 @@ svg {
 }
 
 /* ==========================================================================
-   Right-to-left languages (Arabic, Sorani Kurdish)
+   Right-to-left languages (Arabic, Sorani Kurdish, Persian)
    Layout uses logical properties (margin-inline-start and so on), so it
    mirrors by itself. What remains: the side animations start from, and
    Arabic script, whose letters join, so it gets no letter-spacing, and whose
@@ -539,11 +540,11 @@ svg {
 
 /* Latin text on these pages (the wordmark, "Hevalo", the Kurmanji motto,
    email addresses) is marked lang="en" or dir="ltr" and keeps its spacing. */
-:root:is([lang='ar'], [lang='ckb']) :not(:lang(en), [dir='ltr'], [dir='ltr'] *) {
+:root:is([lang='ar'], [lang='ckb'], [lang='fa']) :not(:lang(en), [dir='ltr'], [dir='ltr'] *) {
   letter-spacing: 0 !important;
 }
 
-:root:is([lang='ar'], [lang='ckb'])
+:root:is([lang='ar'], [lang='ckb'], [lang='fa'])
   :is(h1, h2, h3, .hero__title, .heading-2, .about__statement, .legal__title, .notice__title, .showcase__soon-title) {
   line-height: 1.3 !important;
 }
