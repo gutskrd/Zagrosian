@@ -1,5 +1,11 @@
-# Search engines and AI assistants are welcome to read this site.
-# A plain-text overview for language models: https://zagrosian.com/llms.txt
+# Search engines and AI assistants are welcome to read this site, and to use it
+# for search results and for answers.
+#
+# Easiest to read, for language models and other tools:
+# - https://zagrosian.com/llms.txt       an overview, with links to every page
+# - https://zagrosian.com/llms-full.txt  the full text of every page
+# - Every page also comes as Markdown: add .md to its address
+#   (https://zagrosian.com/index.md, https://zagrosian.com/de/privacy.md).
 
 User-agent: *
 Allow: /

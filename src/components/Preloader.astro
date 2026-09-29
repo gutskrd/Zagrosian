@@ -7,19 +7,21 @@
  * theme-init.js decides before the first paint (`data-intro` on <html>), and
  * only when motion is welcome. It is decoration, hidden from screen readers,
  * which read the page underneath. Without JavaScript it never appears, and
- * should the script not start, it lifts by itself after four seconds.
+ * should the script not start, it lifts by itself after four seconds. Its
+ * words are drawn by CSS from attributes, so the page's text (what search
+ * engines and AI crawlers read) starts with the real headline; the script
+ * removes it from the page once it has lifted.
  */
 import { i18n } from '../i18n';
 import EmblemMark from '../assets/brand/emblem-mark.svg';
-import Wordmark from './Wordmark.astro';
 
 const { t } = i18n(Astro.url);
 ---
 
 <div class="intro-screen" aria-hidden="true" data-intro-screen>
   <div class="intro-screen__top">
-    <Wordmark />
-    <span class="intro-screen__label">{t.common.loading}</span>
+    <span class="wordmark intro-screen__wordmark" data-label="Zagrosian"></span>
+    <span class="intro-screen__label" data-label={t.common.loading}></span>
   </div>
 
   <div class="intro-screen__mark">
@@ -28,7 +30,7 @@ const { t } = i18n(Astro.url);
   </div>
 
   <div class="intro-screen__bottom">
-    <span class="intro-screen__count" data-intro-count>0</span>
+    <span class="intro-screen__count" data-intro-count></span>
     <span class="intro-screen__bar"><span data-intro-bar></span></span>
   </div>
 </div>
@@ -70,6 +72,25 @@ const { t } = i18n(Astro.url);
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+  }
+
+  .intro-screen__wordmark::before,
+  .intro-screen__label::before {
+    content: attr(data-label);
+  }
+
+  /* The wordmark, as in the header (Wordmark.astro). */
+  .intro-screen__wordmark {
+    font-size: 1.1875rem;
+    font-weight: 620;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* Holds the counter's height before the first number is written. */
+  .intro-screen__count:empty::before {
+    content: '\00a0';
   }
 
   .intro-screen__label {

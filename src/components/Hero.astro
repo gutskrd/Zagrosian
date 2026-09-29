@@ -24,10 +24,15 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
       <h1 id="hero-title" class:list={['hero__title', fit && `hero__title--${fit}`]}>
         {
-          t.hero.headline.map((line) => (
-            <span class="hero__line">
-              <span>{line}</span>
-            </span>
+          t.hero.headline.map((line, index) => (
+            <>
+              {/* A real space between the lines, for anything that reads the
+                  text without the styles (search engines, AI crawlers). */}
+              {index > 0 && ' '}
+              <span class="hero__line">
+                <span>{line}</span>
+              </span>
+            </>
           ))
         }
       </h1>

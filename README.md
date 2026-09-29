@@ -219,14 +219,16 @@ back for visitors who prefer reduced motion, and the site works fully without it
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
   [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
   the horseman fills in as a counter runs to 100 (in the page's own digits, so Persian and Arabic
-  count in theirs). It follows the page's real loading and takes at least 1.4 seconds; then the
-  curtain rises and the hero's entrance plays from the start. It is decoration, hidden from screen
-  readers, never shown without JavaScript or with *reduce motion*, and lifts by itself after four
-  seconds should the script not start.
-- **Sound** ([`sound.ts`](src/scripts/sound.ts)): off until the visitor turns it on, from the header
-  (the level meter), the site menu, quick navigation, or a small card offered once. Everything is
-  synthesised with the Web Audio API, so nothing is downloaded and the Content-Security-Policy needs
-  no media sources:
+  count in theirs). It follows the page's real loading and takes one to three seconds; then the
+  curtain rises and the hero's entrance plays from the start, and the screen is removed from the
+  page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
+  motion*, and lifts by itself after four seconds should the script not start. Its words are drawn by
+  CSS, so the page's text (what search engines and AI crawlers read) starts with the headline.
+- **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
+  off until the visitor turns it on, from the header (the level meter), the site menu, quick
+  navigation, or a small card offered once. Everything is synthesised with the Web Audio API, so no
+  audio files are downloaded and the Content-Security-Policy needs no media sources; the synthesiser
+  itself (5 KB) is downloaded only once sound is on:
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
     soft wind, and now and then a bell, in a generated reverb;
   - interface sounds: a tick when the pointer or keyboard reaches a control, a tap on a click, air
@@ -236,11 +238,16 @@ back for visitors who prefer reduced motion, and the site works fully without it
   The choice is remembered. Browsers only allow audio after an interaction, so on a new page the score
   resumes at once where the browser allows it (Chrome, within the site) or with the first click or key
   press. It pauses while the tab is hidden.
-- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a dot inside a ring, both exactly
-  where the pointer is (no lag), that invert what is under them. Over a link or a plain button the ring becomes a lens; over an external
-  link it adds an arrow; over a magnetic button it steps aside while the button answers; over the ink
-  horseman it widens like a breath of wind. Over text fields the system cursor returns. The cursor is a
+- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a ring exactly where the pointer
+  is (no lag) that inverts what is under it. Over a link or a plain button it becomes a lens; over an
+  external link it adds an arrow; over a magnetic button it steps aside while the button answers; over
+  the ink horseman it widens like a breath of wind. Over text fields the system cursor returns. It
+  never lingers: it disappears when the pointer leaves the window, the window loses focus or the page
+  is left (so it is not frozen into the page transition), and returns with the next move. It is a
   manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
+- **Only what the device uses:** smooth scrolling, the cursor and the magnetic buttons
+  ([`desktop.ts`](src/scripts/desktop.ts)) are loaded separately and only with a mouse or trackpad,
+  so phones and tablets never download them (every page's main script is about 8 KB compressed).
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
   the header is the same at every size: the emblem, then Visit Hevalo (from 768px), quick navigation
@@ -284,9 +291,21 @@ and other tools read directly:
   in the [llms.txt](https://llmstxt.org) format, with links to every language, and `/llms-full.txt` has
   the text of every English page in one file. Both are built from the same content as the pages
   ([`src/lib/pages.ts`](src/lib/pages.ts)).
-- **Sitemap, robots.txt, web app manifest and security.txt** complete the picture.
+- **Sitemap, robots.txt, web app manifest and security.txt** complete the picture. `robots.txt`
+  welcomes every crawler, AI assistants included, and points them to `llms.txt`, `llms-full.txt` and
+  the Markdown versions.
+- **Clean text in the HTML:** crawlers that read the raw HTML (most AI crawlers do) get every piece of
+  text once and in order. Rolling button labels draw their letters with CSS from `data-char`
+  attributes instead of repeating the label, the opening screen's words are drawn by CSS, and the
+  headline's lines are separated by a real space.
 
 The Markdown and text files are marked `noindex`, so search results always show the real pages.
+
+**AI crawlers and Cloudflare:** Cloudflare can block AI crawlers, or rewrite `robots.txt` to forbid
+them, from its dashboard, and may do so by default on new domains. For the site to be read
+by AI assistants, check in the Cloudflare dashboard for zagrosian.com, under **AI Crawl Control** (or
+**Security → Bots**), that AI crawlers are allowed and that **managed robots.txt** is off, so the file
+above is served as written.
 
 ## Languages
 
@@ -417,6 +436,10 @@ exists:
    Console, and enable **Crawler Hints** in Cloudflare so Bing and others learn about changes quickly.
 
 New sites usually appear for searches on their own name within days to a few weeks.
+
+**Cost:** the site is served entirely as static files by Cloudflare, with no Worker script, so
+requests do not count against Workers usage, and hashed assets (`/_astro/*`) are cached by browsers
+for a year.
 
 ## Security
 

@@ -1,8 +1,5 @@
 import { initCommandMenu } from './command';
-import { initCursor } from './cursor';
 import { initIntro } from './intro';
-import { initMagnetic } from './magnetic';
-import { initSmoothScroll } from './smooth';
 import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
@@ -263,9 +260,12 @@ initLanguageSuggestion();
 initMotion();
 initText();
 initSound();
-initCursor();
-initMagnetic();
-initSmoothScroll();
+
+// Smooth scrolling, the custom cursor and magnetic buttons are for a mouse or
+// trackpad: loaded separately, so phones and tablets never download them.
+if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  void import('./desktop').then(({ initDesktop }) => initDesktop());
+}
 
 // The hero horseman in ink particles, loaded separately and only when
 // theme-init.js has found it welcome and the page has a hero.

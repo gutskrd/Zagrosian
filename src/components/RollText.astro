@@ -3,10 +3,11 @@
  * A label that rolls on hover: each letter slides up and out as its copy
  * rises from below, one after another (styles in global.css, `.roll`).
  *
- * The letters are split at build time. Screen readers, search and copying get
- * the whole label from a visually hidden copy; the split letters are hidden
- * from them. Arabic script is joined, and splitting it would break the joins,
- * so Arabic, Persian and Sorani labels roll as one piece.
+ * The label is in the page once, as real text (visually hidden), so screen
+ * readers, search engines, AI crawlers and copying all get it exactly once.
+ * The letters you see are drawn by CSS from `data-char` attributes, and are
+ * hidden from assistive technology. Arabic script is joined, and splitting it
+ * would break the joins, so Arabic, Persian and Sorani labels roll as one piece.
  */
 interface Props {
   text: string;
@@ -24,6 +25,6 @@ const dir = joined ? undefined : 'ltr';
 
 <span class:list={['roll', className]} dir={dir}
   ><span class="visually-hidden">{text}</span><span class="roll__track" aria-hidden="true"
-    >{pieces.map((piece) => <span class:list={['roll__piece', piece === ' ' && 'roll__space']}>{piece}</span>)}</span
+    >{pieces.map((piece) => <span class:list={['roll__piece', piece === ' ' && 'roll__space']} data-char={piece} />)}</span
   ></span
 >

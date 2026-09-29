@@ -2,26 +2,26 @@
  * The opening screen (src/components/Preloader.astro).
  *
  * The counter follows the page's real loading (the window's load event), and
- * takes at least 1.4 seconds so it can be read. The horseman fills in and the
- * line draws across with it. Then the curtain rises, and the hero's entrance
- * plays from the start as it is uncovered: the headline, the ink
- * (`intro:end`) and the rest.
+ * takes at least a second so it can be read, three at most. The horseman
+ * fills in and the line draws across with it. Then the curtain rises, and the
+ * hero's entrance plays from the start as it is uncovered: the headline, the
+ * ink (`intro:end`) and the rest. Afterwards the screen is removed from the
+ * page.
  *
  * Numbers are written in the page's own digits (Persian and Arabic use
  * their own), through Intl.NumberFormat.
  */
 
-const MINIMUM = 1400;
-const MAXIMUM = 4000;
+const MINIMUM = 1000;
+const MAXIMUM = 3000;
 
 const root = document.documentElement;
 
-export const introRunning = () => root.dataset.intro !== undefined;
-
 export function initIntro() {
   const screen = document.querySelector<HTMLElement>('[data-intro-screen]');
-  if (!root.dataset.intro) return;
-  if (!screen) {
+  if (!root.dataset.intro || !screen) {
+    // Not this visit: it is not needed in the page at all.
+    screen?.remove();
     delete root.dataset.intro;
     return;
   }
@@ -58,7 +58,7 @@ export function initIntro() {
       replayHero();
       document.dispatchEvent(new CustomEvent('intro:end'));
     }, 320);
-    window.setTimeout(() => (screen.hidden = true), 1150);
+    window.setTimeout(() => screen.remove(), 1150);
   };
 
   const tick = (now: number) => {

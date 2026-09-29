@@ -1,15 +1,19 @@
 /**
  * A custom cursor, for a mouse or trackpad (styles in global.css, `.cursor`).
  *
- * A dot inside a ring, both exactly where the pointer is, with no lag.
- * What is under the pointer changes it:
- * - a link or a plain button: the ring fills and inverts the text beneath,
- *   like a lens; an external link adds an arrow pointing out;
- * - a magnetic button: the cursor steps aside, and the button leans towards
- *   the pointer instead (magnetic.ts);
+ * A ring, exactly where the pointer is, with no lag. What is under the pointer
+ * changes it:
+ * - a link or a plain button: it fills and inverts the text beneath, like a
+ *   lens; an external link adds an arrow pointing out;
+ * - a magnetic button: it steps aside, and the button leans towards the
+ *   pointer instead (magnetic.ts);
  * - a text field: the system's text cursor returns;
  * - the ink horseman: a wide, light ring.
- * Pressing tightens the ring.
+ * Pressing tightens it.
+ *
+ * It never lingers where the pointer no longer is: it disappears when the
+ * pointer leaves the window, the window loses focus or the page is left (so
+ * it is not frozen into the page transition), and returns with the next move.
  *
  * Touch screens, reduced motion and forced colours keep the system cursor.
  * It stays visible above dialogs and the menu (see the top layer below).
@@ -45,14 +49,13 @@ export function initCursor() {
     return;
   }
 
-  const make = (className: string, tag = 'div') => {
-    const element = document.createElement(tag);
+  const make = (className: string) => {
+    const element = document.createElement('div');
     element.className = className;
     return element;
   };
   const cursor = make('cursor');
   cursor.setAttribute('aria-hidden', 'true');
-  const dot = make('cursor__dot');
   const ring = make('cursor__ring');
   ring.append(make('cursor__shape'));
 
@@ -70,31 +73,31 @@ export function initCursor() {
   svg.append(path);
   ring.append(svg);
 
-  cursor.append(ring, dot);
+  cursor.append(ring);
   document.body.append(cursor);
 
   // Dialogs and the menu open in the browser's top layer, above the page. The
   // cursor lives in the top layer too (a manual popover), and moves back on
   // top whenever one of them opens, so it is never hidden beneath them.
   cursor.popover = 'manual';
-  cursor.showPopover();
-  const raise = () => {
+  const show = () => {
     try {
-      cursor.hidePopover();
+      if (cursor.matches(':popover-open')) cursor.hidePopover();
       cursor.showPopover();
     } catch {
-      // Already on top, or the page is changing.
+      // The page is changing.
     }
   };
+  show();
   document.addEventListener(
     'toggle',
     (event) => {
-      if (event.target !== cursor && (event as ToggleEvent).newState === 'open') raise();
+      if (event.target !== cursor && (event as ToggleEvent).newState === 'open') show();
     },
     true,
   );
   for (const dialog of document.querySelectorAll('dialog')) {
-    new MutationObserver(() => dialog.open && raise()).observe(dialog, { attributes: true, attributeFilter: ['open'] });
+    new MutationObserver(() => dialog.open && show()).observe(dialog, { attributes: true, attributeFilter: ['open'] });
   }
 
   root.classList.add('has-cursor');
@@ -110,33 +113,48 @@ export function initCursor() {
     else delete cursor.dataset.state;
   };
 
+  const fade = () => cursor.toggleAttribute('data-visible', false);
+  // Gone at once, not faded: used when leaving the page, before the browser
+  // takes its picture of it for the transition.
+  const vanish = () => {
+    fade();
+    try {
+      cursor.hidePopover();
+    } catch {
+      // Already hidden.
+    }
+  };
+
   window.addEventListener(
     'pointermove',
     (event) => {
-      if (event.pointerType !== 'mouse') return;
+      if (event.pointerType === 'touch') return;
       x = event.clientX;
       y = event.clientY;
-      // Both move at once, in the same frame as the pointer: no lag.
-      const at = `translate3d(${x}px, ${y}px, 0)`;
-      dot.style.transform = at;
-      ring.style.transform = at;
+      ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      if (!cursor.matches(':popover-open')) show();
       if (!cursor.hasAttribute('data-visible')) cursor.toggleAttribute('data-visible', true);
     },
     { passive: true },
   );
 
   document.addEventListener('pointerover', (event) => {
-    if (event.pointerType === 'mouse') setState(stateOf(event.target as Element | null));
+    if (event.pointerType !== 'touch') setState(stateOf(event.target as Element | null));
   });
 
-  // Leaving the window, and coming back.
+  // Leaving the window, switching to another app or tab, leaving the page.
   document.addEventListener('pointerout', (event) => {
-    if (!event.relatedTarget) cursor.toggleAttribute('data-visible', false);
+    if (!event.relatedTarget) fade();
   });
+  document.documentElement.addEventListener('pointerleave', fade);
+  window.addEventListener('blur', fade);
+  document.addEventListener('visibilitychange', () => document.hidden && fade());
+  window.addEventListener('pageswap', vanish);
+  window.addEventListener('pagehide', vanish);
 
   window.addEventListener('pointerdown', () => cursor.toggleAttribute('data-pressed', true), { passive: true });
   window.addEventListener('pointerup', () => cursor.toggleAttribute('data-pressed', false), { passive: true });
 
-  // A page change or a dialog can move content under a still pointer.
+  // Scrolling moves content under a still pointer.
   document.addEventListener('scroll', () => setState(stateOf(document.elementFromPoint(x, y))), { passive: true });
 }
