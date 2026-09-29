@@ -7,7 +7,7 @@ updated: 2026-09-28
 
 Nous prenons au sérieux la sécurité de nos sites et de nos produits. Si vous pensez avoir découvert une vulnérabilité dans zagrosian.com, Hevalo ou tout autre service de Zagrosian, nous voulons en être informés et nous travaillerons avec vous pour la corriger.
 
-## Comment nous la signaler
+## Comment signaler une vulnérabilité
 
 Écrivez à [contact@zagrosian.com](mailto:contact@zagrosian.com) en indiquant « Security » dans l’objet. Merci de préciser :
 

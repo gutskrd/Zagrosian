@@ -51,9 +51,9 @@ export const es: Messages = {
   },
   hevalo: {
     eyebrow: 'Productos',
-    category: 'Aprendizaje del kurdo',
+    category: 'Aprender kurdo',
     description:
-      'Una aplicación para aprender kurdo con lecciones breves y juegos para jugar con amigos. Disponible primero en kurmanji, con más dialectos previstos.',
+      'Una aplicación para aprender kurdo con lecciones breves y juegos para compartir con amigos. Disponible primero en kurmanji; pronto llegarán más dialectos.',
     visit: 'Visitar hevalo.app',
     website: 'Sitio web',
     comingSoon: 'Próximamente',
@@ -65,10 +65,11 @@ export const es: Messages = {
     eyebrow: 'Nosotros',
     mission:
       'Nuestra misión es crear software que la gente disfrute usando cada día: rápido, respetuoso con la privacidad y bien diseñado.',
-    approach: 'Zagrosian es una empresa de propiedad privada. Diseñamos y desarrollamos nuestros productos internamente.',
+    approach: 'Zagrosian es una empresa de propiedad privada. Diseñamos y desarrollamos nuestros productos con un equipo propio.',
     headquartersLabel: 'Sede',
     headquarters: 'Países Bajos',
     productsLabel: 'Productos',
+    localTime: '{time}, hora local',
   },
   contact: {
     eyebrow: 'Contacto',
@@ -96,6 +97,24 @@ export const es: Messages = {
     translationNotice:
       'Esta es una traducción. Si difiere de la versión en inglés, prevalece la versión en inglés.',
     readEnglish: 'Leer la versión en inglés',
+    readingTime: '{duration} de lectura',
+    readingTimeUnit: 'short',
+    print: 'Imprimir',
+    copyLink: 'Copiar enlace a esta sección',
+    linkCopied: 'Enlace copiado al portapapeles.',
+  },
+  command: {
+    open: 'Buscar',
+    title: 'Navegación rápida',
+    placeholder: 'Busca páginas, secciones y ajustes…',
+    pages: 'Páginas',
+    sections: 'Secciones',
+    actions: 'Acciones',
+    copyEmail: 'Copiar dirección de correo',
+    empty: 'No se han encontrado resultados.',
+    hintMove: 'para moverte',
+    hintOpen: 'para abrir',
+    hintClose: 'para cerrar',
   },
   notFound: {
     title: 'Página no encontrada',

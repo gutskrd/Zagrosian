@@ -8,7 +8,7 @@ Diese Bedingungen gelten für Ihre Nutzung von zagrosian.com (die „Website“)
 
 ## Unsere Produkte
 
-Die Website informiert über Zagrosian und seine Produkte. Für Hevalo und unsere anderen Produkte gelten eigene Bedingungen, die bei deren Nutzung Anwendung finden. Diese Bedingungen erstrecken sich nicht auf sie.
+Die Website informiert über Zagrosian und die Produkte des Unternehmens. Für Hevalo und unsere anderen Produkte gelten eigene Bedingungen, die bei deren Nutzung Anwendung finden. Diese Bedingungen erstrecken sich nicht auf sie.
 
 ## Nutzung der Website
 

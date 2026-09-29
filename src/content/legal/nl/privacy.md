@@ -4,12 +4,12 @@ description: Hoe Zagrosian omgaat met persoonsgegevens wanneer u zagrosian.com b
 updated: 2026-09-29
 ---
 
-Deze verklaring legt uit welke persoonsgegevens wij verwerken wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt, waarom wij dat doen en welke rechten u heeft. Wij verzamelen heel weinig, dus de verklaring is kort.
+Deze verklaring legt uit welke persoonsgegevens wij verwerken wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt, waarom wij dat doen en welke rechten u heeft. Omdat wij heel weinig gegevens verzamelen, is deze verklaring kort.
 
 ## Samenvatting
 
 - zagrosian.com heeft geen accounts, formulieren, advertenties, analysediensten of tracking.
-- Wij plaatsen geen cookies. Onze hostingprovider kan een strikt noodzakelijke beveiligingscookie plaatsen als hij moet controleren of verkeer legitiem is. Als u een weergave of een taal kiest, onthoudt uw browser die keuze alleen op uw eigen apparaat.
+- Wij plaatsen geen cookies. Onze hostingprovider kan een strikt noodzakelijke beveiligingscookie plaatsen als hij moet controleren of verkeer legitiem is. Als u een thema of een taal kiest, onthoudt uw browser die keuze alleen op uw eigen apparaat.
 - Om de website te kunnen leveren, verwerkt onze hostingprovider technische gegevens zoals uw IP-adres.
 - zagrosian.com linkt naar onze profielen op Instagram en TikTok, maar laadt niets van die platforms. Op de platforms zelf gelden hun eigen privacybeleidsregels.
 - Als u ons e-mailt, gebruiken wij uw bericht alleen om te antwoorden en om de zaak af te handelen. Sollicitaties verwijderen wij binnen vier weken na afloop van de sollicitatieprocedure, tenzij u ermee instemt dat wij ze langer bewaren.
@@ -56,7 +56,7 @@ Als u onze profielen bezoekt, volgt of er interactie mee heeft, verwerkt het pla
 - **Instagram** wordt in de Europese Unie aangeboden door Meta Platforms Ireland Limited. Zie het [privacybeleid van Instagram](https://privacycenter.instagram.com/policy).
 - **TikTok** wordt in de Europese Economische Ruimte aangeboden door TikTok Technology Limited, Ierland. Zie het [privacybeleid van TikTok](https://www.tiktok.com/legal/page/eea/privacy-policy/en).
 
-Beide platforms tonen ons geaggregeerde statistieken over onze profielen en berichten, zoals het aantal weergaven en volgers en de landen waar zij vandaan komen. Met deze statistieken bent u niet te identificeren, en wij hebben geen invloed op hoe de platforms ze samenstellen. Voor Instagram zijn wij en Meta gezamenlijk verantwoordelijk voor deze statistieken, op grond van het [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum) van Meta. Meta heeft daarvoor de primaire verantwoordelijkheid op zich genomen, ook voor het afhandelen van verzoeken over uw rechten, maar u kunt ook contact met ons opnemen.
+Beide platforms tonen ons geaggregeerde statistieken over onze profielen en berichten, zoals het aantal weergaven en volgers en de landen waar zij vandaan komen. Met deze statistieken bent u niet te identificeren, en wij hebben geen invloed op hoe de platforms ze samenstellen. Voor Instagram zijn Meta en wij gezamenlijk verantwoordelijk voor deze statistieken; dat is vastgelegd in het [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum) van Meta. Meta heeft daarvoor de primaire verantwoordelijkheid op zich genomen, ook voor het afhandelen van verzoeken over uw rechten, maar u kunt ook contact met ons opnemen.
 
 Als u op deze platforms reageert op onze berichten of ons een bericht stuurt, zien wij uw gebruikersnaam, uw openbare profiel en uw bericht, en gebruiken wij die alleen om te antwoorden. Wij gaan met zulke berichten op dezelfde manier om als met e-mail.
 
@@ -66,7 +66,7 @@ Als u op deze platforms reageert op onze berichten of ons een bericht stuurt, zi
 
 zagrosian.com gebruikt geen analytische, advertentie- of trackingcookies.
 
-Als u een lichte of donkere weergave of een taal kiest, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme` en `language-chosen`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
+Als u een licht of donker thema of een taal kiest, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme` en `language-chosen`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
 
 Cloudflare kan een strikt noodzakelijke cookie plaatsen, zoals `__cf_bm` of `cf_clearance`, als het mensen moet onderscheiden van geautomatiseerd verkeer of nadat u een beveiligingscontrole heeft doorlopen. Deze cookies zijn kortlevend, worden alleen gebruikt om de website te beschermen en worden niet gebruikt om u over andere websites te volgen. Omdat ze strikt noodzakelijk zijn voor de beveiliging, is er geen toestemming voor nodig.
 

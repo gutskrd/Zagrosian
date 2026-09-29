@@ -67,8 +67,8 @@ public/            Favicons, logo, social images (og.png and og/<language>.png),
 src/
   assets/brand/    Griffin emblem, the 21-ray sun and the Hevalo app icon (sources and sized variants)
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
-  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, LanguagePicker,
-                   LanguageSuggestion, ThemeToggle, ThemeSwitch, …
+  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, CommandMenu,
+                   LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
   content/legal/   Legal pages in Markdown, one folder per language
   i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
@@ -77,7 +77,8 @@ src/
   pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
-                   legal table of contents), motion.ts, language.ts, theme.ts and theme-init.js
+                   local time, legal page tools), command.ts (quick navigation), motion.ts,
+                   language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -151,6 +152,8 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Motto:** the sun turns slowly as the section scrolls past (`data-spin`), and the Kurdish
   sentence rises word by word.
 - **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
+- **Pointer depth:** with a mouse, the hero griffin leans slightly towards the pointer and the Hevalo
+  icon tilts under it with a soft highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 
 Rules the code follows:
@@ -229,13 +232,26 @@ pages are fully static and every language can be indexed.
   version applies if they differ. Have translations reviewed by a native speaker, and a lawyer where it
   matters, before relying on them.
 
-To add a language: add it to `locales` in `src/i18n/locales.ts`, add a message file in
+To add a language: add it to `locales` in `src/i18n/locales.ts` (with the locale used to format its
+dates and numbers), add a message file in
 `src/i18n/messages/` and import it in `src/i18n/index.ts`, add its legal pages under
 `src/content/legal/<code>/`, add its two `Content-Language` rules to `public/_headers`, and make its
 social image `public/og/<code>.png`. The build fails if the message file or any of the legal pages
 is missing.
 
 ## Browser features
+
+- **Quick navigation:** Ctrl K (⌘K on Apple devices), the `/` key or the search button in the header
+  opens a searchable list of every page, section, language and theme, with a few actions (visit
+  Hevalo, copy the email address). It is keyboard-first (arrow keys, Enter, Escape), follows the ARIA
+  combobox pattern for screen readers, and finds entries by their English name too, so *privacy*
+  also finds *Datenschutz*. The entries are written at build time in
+  [`CommandMenu.astro`](src/components/CommandMenu.astro); [`command.ts`](src/scripts/command.ts)
+  only filters and highlights them.
+- **Legal pages:** each shows its reading time, a print button (which also saves as PDF, with a
+  print layout) and, beside every section heading, a button that copies a link to that section.
+- **Local time:** the About section shows the current time at the headquarters, formatted for the
+  page's language (`timeZone` in `src/site.ts`).
 
 - **Instant navigation:** a `Speculation-Rules` header points Chrome and Edge to
   [`public/speculation-rules.json`](public/speculation-rules.json), which prerenders a page on this site

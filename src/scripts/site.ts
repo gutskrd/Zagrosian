@@ -1,3 +1,4 @@
+import { initCommandMenu } from './command';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { initMotion } from './motion';
 import { initTheme } from './theme';
@@ -152,12 +153,100 @@ function initCopyButtons() {
   }
 }
 
+/**
+ * The current time at the headquarters, next to the country in About. It is
+ * formatted for the page's language and updates on the minute.
+ */
+function initLocalTime() {
+  const slot = document.querySelector<HTMLElement>('[data-local-time]');
+  const { timeZone, template = '{time}' } = slot?.dataset ?? {};
+  if (!slot || !timeZone) return;
+
+  let formatter: Intl.DateTimeFormat;
+  try {
+    formatter = new Intl.DateTimeFormat(document.documentElement.lang, { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  } catch {
+    return;
+  }
+
+  const time = document.createElement('time');
+  const [before = '', after = ''] = template.split('{time}');
+  slot.append(before, time, after);
+  slot.hidden = false;
+
+  const tick = () => {
+    const now = new Date();
+    time.dateTime = now.toISOString();
+    time.textContent = formatter.format(now);
+    window.setTimeout(tick, 60_000 - (now.getSeconds() * 1000 + now.getMilliseconds()) + 50);
+  };
+  tick();
+}
+
+/**
+ * Legal pages: a print button, and a button beside each section heading that
+ * copies a link to that section. Both need JavaScript, so they are added here.
+ */
+function initLegalTools() {
+  const article = document.querySelector<HTMLElement>('[data-legal]');
+  if (!article) return;
+  const status = article.querySelector<HTMLElement>('[data-legal-status]');
+
+  const print = article.querySelector<HTMLButtonElement>('[data-print]');
+  if (print) {
+    print.hidden = false;
+    print.addEventListener('click', () => window.print());
+  }
+
+  if (!navigator.clipboard?.writeText) return;
+  const label = article.dataset.copyLink ?? '';
+  const copied = article.dataset.linkCopied ?? '';
+  const svg = 'http://www.w3.org/2000/svg';
+
+  for (const heading of article.querySelectorAll<HTMLHeadingElement>('[data-legal-content] h2[id]')) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'heading-link';
+    button.setAttribute('aria-label', `${label}: ${heading.textContent?.trim() ?? ''}`);
+
+    const icon = document.createElementNS(svg, 'svg');
+    icon.setAttribute('viewBox', '0 0 20 20');
+    icon.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(svg, 'path');
+    path.setAttribute('d', 'M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1');
+    icon.append(path);
+    button.append(icon);
+
+    button.addEventListener('click', async () => {
+      const url = new URL(window.location.href);
+      url.hash = heading.id;
+      try {
+        await navigator.clipboard.writeText(url.href);
+        history.replaceState(null, '', url.hash);
+        button.toggleAttribute('data-copied', true);
+        if (status) status.textContent = copied;
+        window.setTimeout(() => {
+          button.removeAttribute('data-copied');
+          if (status) status.textContent = '';
+        }, 2000);
+      } catch {
+        // Copying was refused; the heading's address is still in the contents.
+      }
+    });
+
+    heading.append(button);
+  }
+}
+
 initHeader();
 initMobileMenu();
 initReveal();
 initTableOfContents();
 initSectionNav();
 initCopyButtons();
+initLocalTime();
+initLegalTools();
+initCommandMenu();
 initTheme();
 initLanguageMenu();
 initLanguageSuggestion();

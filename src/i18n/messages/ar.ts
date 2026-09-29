@@ -6,7 +6,7 @@ export const ar: Messages = {
     title: 'Zagrosian — تقنية للحياة اليومية',
     tagline: 'تقنية للحياة اليومية.',
     description:
-      'Zagrosian شركة تقنية مستقلة مقرّها هولندا. نصمّم ونطوّر منتجات استهلاكية، بدءًا من Hevalo، تطبيق لتعلّم اللغة الكردية.',
+      'Zagrosian شركة تقنية مستقلة مقرّها هولندا. نصمّم ونطوّر منتجات رقمية للأفراد، أولها Hevalo، تطبيق لتعلّم اللغة الكردية.',
   },
   common: {
     skipToContent: 'تخطَّ إلى المحتوى',
@@ -39,16 +39,16 @@ export const ar: Messages = {
   language: {
     label: 'اللغة',
     suggestion: 'هذه الصفحة متاحة أيضًا باللغة العربية.',
-    switchTo: 'اقرأ بالعربية',
+    switchTo: 'تصفّح بالعربية',
     dismiss: 'إغلاق',
   },
   hero: {
-    notice: 'Hevalo قادم إلى iOS وأندرويد',
+    notice: 'Hevalo قريبًا على iOS وأندرويد',
     headline: ['تقنية', 'للحياة اليومية.'],
-    lead: 'Zagrosian شركة تقنية مستقلة مقرّها هولندا. نصمّم ونطوّر منتجات استهلاكية، بدءًا من Hevalo، تطبيق لتعلّم اللغة الكردية.',
+    lead: 'Zagrosian شركة تقنية مستقلة مقرّها هولندا. نصمّم ونطوّر منتجات رقمية للأفراد، أولها Hevalo، تطبيق لتعلّم اللغة الكردية.',
     products: 'منتجاتنا',
     about: 'عن Zagrosian',
-    griffinAlt: 'شعار الغريفين الخاص بـ Zagrosian',
+    griffinAlt: 'شعار الغريفين لشركة Zagrosian',
   },
   hevalo: {
     eyebrow: 'المنتجات',
@@ -69,6 +69,7 @@ export const ar: Messages = {
     headquartersLabel: 'المقر الرئيسي',
     headquarters: 'هولندا',
     productsLabel: 'المنتجات',
+    localTime: 'الساعة {time} بالتوقيت المحلي',
   },
   contact: {
     eyebrow: 'تواصل معنا',
@@ -95,6 +96,24 @@ export const ar: Messages = {
     contents: 'في هذه الصفحة',
     translationNotice: 'هذه ترجمة. في حال وجود أي اختلاف بينها وبين النسخة الإنجليزية، تُعتمد النسخة الإنجليزية.',
     readEnglish: 'اقرأ النسخة الإنجليزية',
+    readingTime: 'مدة القراءة: {duration}',
+    readingTimeUnit: 'long',
+    print: 'طباعة',
+    copyLink: 'نسخ رابط هذا القسم',
+    linkCopied: 'تم نسخ الرابط إلى الحافظة.',
+  },
+  command: {
+    open: 'بحث',
+    title: 'التنقل السريع',
+    placeholder: 'ابحث في الصفحات والأقسام والإعدادات…',
+    pages: 'الصفحات',
+    sections: 'الأقسام',
+    actions: 'الإجراءات',
+    copyEmail: 'نسخ عنوان البريد الإلكتروني',
+    empty: 'لا توجد نتائج.',
+    hintMove: 'للتنقل',
+    hintOpen: 'للفتح',
+    hintClose: 'للإغلاق',
   },
   notFound: {
     title: 'الصفحة غير موجودة',

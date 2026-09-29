@@ -68,7 +68,7 @@ zagrosian.com analiz, reklam veya izleme çerezleri kullanmaz.
 
 Açık veya koyu bir tema ya da bir dil seçerseniz veya siteyi kendi dilinizde okuma önerisini kapatırsanız tarayıcınız bu tercihi, web sitesinin bir sonraki ziyaretinizde dikkate alabilmesi için yerel depolamasına (`theme` ve `language-chosen` adlarıyla) kaydeder. Bu bilgi cihazınızda kalır, hiçbir zaman bize veya başka birine gönderilmez ve tarayıcınızdaki site verilerini temizleyerek istediğiniz zaman silebilirsiniz.
 
-Cloudflare, insanları otomatik trafikten ayırt etmesi gerektiğinde veya bir güvenlik kontrolünü tamamladıktan sonra `__cf_bm` ya da `cf_clearance` gibi kesinlikle gerekli bir çerez yerleştirebilir. Bu çerezler kısa ömürlüdür, yalnızca web sitesini korumak için kullanılır ve sizi başka web sitelerinde izlemek için kullanılmaz. Güvenlik için kesinlikle gerekli oldukları için onayınızı gerektirmezler.
+Cloudflare, insanları otomatik trafikten ayırt etmesi gerektiğinde veya bir güvenlik kontrolünü tamamladıktan sonra `__cf_bm` ya da `cf_clearance` gibi kesinlikle gerekli bir çerez yerleştirebilir. Bu çerezler kısa ömürlüdür, yalnızca web sitesini korumak için kullanılır ve sizi başka web sitelerinde izlemek için kullanılmaz. Güvenlik açısından kesinlikle gerekli olduklarından onayınızı gerektirmezler.
 
 ## Verileri kimlerle paylaşıyoruz
 
@@ -88,7 +88,7 @@ AEA dışına yapılan her aktarım için eşdeğer güvenceler sunan e-posta sa
 ## Verileri ne kadar süre saklıyoruz
 
 - **Teknik veriler:** bunları saklamayız. Cloudflare, gizlilik politikasında açıklandığı şekilde istek verilerini güvenlik ve operasyonel amaçlarla sınırlı bir süre saklar.
-- **E-postalar ve sosyal medya mesajları:** yazışmaları mesajınızı ve olası takibini yürütmek için gerektiği sürece saklar ve son iletişimimizden en geç iki yıl sonra sileriz; ancak yasal bir yükümlülüğü yerine getirmek veya bir uyuşmazlığı çözmek için daha uzun süre saklamamız gerekiyorsa bu durum saklıdır.
+- **E-postalar ve sosyal medya mesajları:** yazışmaları mesajınızı ve olası takibini yürütmek için gerektiği sürece saklar ve son iletişimimizden en geç iki yıl sonra sileriz. Yasal bir yükümlülüğü yerine getirmek veya bir uyuşmazlığı çözmek için daha uzun süre saklamamız gereken durumlar bunun dışındadır.
 - **İş başvuruları:** başvuru süreci sona erdikten en geç dört hafta sonra sileriz. İzin vermeniz hâlinde, uygun başka bir pozisyon açılma ihtimaline karşı başvurunuzu bir yıla kadar saklayabiliriz. Bu izni istediğiniz zaman geri çekebilirsiniz.
 
 ## Haklarınız

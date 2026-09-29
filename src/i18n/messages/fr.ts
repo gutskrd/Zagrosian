@@ -71,6 +71,7 @@ export const fr: Messages = {
     headquartersLabel: 'Siège',
     headquarters: 'Pays-Bas',
     productsLabel: 'Produits',
+    localTime: '{time}, heure locale',
   },
   contact: {
     eyebrow: 'Contact',
@@ -98,6 +99,24 @@ export const fr: Messages = {
     translationNotice:
       'Ceci est une traduction. En cas de divergence avec la version anglaise, la version anglaise prévaut.',
     readEnglish: 'Lire la version anglaise',
+    readingTime: '{duration} de lecture',
+    readingTimeUnit: 'short',
+    print: 'Imprimer',
+    copyLink: 'Copier le lien vers cette section',
+    linkCopied: 'Lien copié dans le presse-papiers.',
+  },
+  command: {
+    open: 'Rechercher',
+    title: 'Navigation rapide',
+    placeholder: 'Rechercher des pages, des sections ou des réglages…',
+    pages: 'Pages',
+    sections: 'Sections',
+    actions: 'Actions',
+    copyEmail: 'Copier l’adresse e-mail',
+    empty: 'Aucun résultat.',
+    hintMove: 'pour naviguer',
+    hintOpen: 'pour ouvrir',
+    hintClose: 'pour fermer',
   },
   notFound: {
     title: 'Page introuvable',

@@ -227,6 +227,83 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 }
 
 /* -------------------------------------------------------------------------- */
+/* Pointer depth: with a mouse, the hero griffin leans slightly towards the    */
+/* pointer, and the Hevalo icon tilts under it with a soft highlight.          */
+/* -------------------------------------------------------------------------- */
+
+function initPointerDepth() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  // The griffin follows the pointer across the whole window, eased towards it
+  // frame by frame. It uses the individual `rotate` and `translate` properties,
+  // so it combines with the scroll parallax on `transform`.
+  const emblem = document.querySelector<HTMLElement>('[data-depth]');
+  const layer = emblem?.firstElementChild;
+  if (emblem && layer instanceof HTMLElement) {
+    let targetX = 0;
+    let targetY = 0;
+    let x = 0;
+    let y = 0;
+    let running = false;
+    let inView = true;
+
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+    }).observe(emblem);
+
+    const step = () => {
+      x += (targetX - x) * 0.07;
+      y += (targetY - y) * 0.07;
+      const angle = Math.hypot(x, y) * 7;
+      layer.style.rotate = angle > 0.01 ? `${(-y).toFixed(3)} ${x.toFixed(3)} 0 ${angle.toFixed(2)}deg` : '';
+      layer.style.translate = `${(x * 12).toFixed(2)}px ${(y * 8).toFixed(2)}px`;
+      if (Math.abs(targetX - x) + Math.abs(targetY - y) > 0.002) requestAnimationFrame(step);
+      else running = false;
+    };
+    const start = () => {
+      if (!running) {
+        running = true;
+        requestAnimationFrame(step);
+      }
+    };
+
+    window.addEventListener(
+      'pointermove',
+      (event) => {
+        if (!inView || event.pointerType !== 'mouse') return;
+        targetX = clamp((event.clientX / window.innerWidth) * 2 - 1, -1, 1);
+        targetY = clamp((event.clientY / window.innerHeight) * 2 - 1, -1, 1);
+        start();
+      },
+      { passive: true },
+    );
+    document.documentElement.addEventListener('pointerleave', () => {
+      targetX = 0;
+      targetY = 0;
+      start();
+    });
+  }
+
+  for (const tilt of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
+    tilt.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      const rect = tilt.getBoundingClientRect();
+      const px = clamp((event.clientX - rect.left) / rect.width);
+      const py = clamp((event.clientY - rect.top) / rect.height);
+      tilt.style.setProperty('--tilt-x', `${((0.5 - py) * 18).toFixed(2)}deg`);
+      tilt.style.setProperty('--tilt-y', `${((px - 0.5) * 18).toFixed(2)}deg`);
+      tilt.style.setProperty('--glare-x', `${(px * 100).toFixed(1)}%`);
+      tilt.style.setProperty('--glare-y', `${(py * 100).toFixed(1)}%`);
+      tilt.toggleAttribute('data-tilting', true);
+    });
+    tilt.addEventListener('pointerleave', () => {
+      for (const name of ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y']) tilt.style.removeProperty(name);
+      tilt.removeAttribute('data-tilting');
+    });
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 
 export function initMotion() {
   const effects: ScrollEffect[] = [];
@@ -260,6 +337,8 @@ export function initMotion() {
     for (const heading of document.querySelectorAll<HTMLElement>('[data-highlight]')) {
       effects.push(highlight(heading));
     }
+
+    initPointerDepth();
   }
 
   if ('IntersectionObserver' in window) runScrollEffects(effects);

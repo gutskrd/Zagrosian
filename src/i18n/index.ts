@@ -83,3 +83,14 @@ export function navigation(locale: Locale) {
 /** Fills `{name}` placeholders: format('{email} copied', { email: 'a@b' }). */
 export const format = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? `{${key}}`);
+
+/** Unit wording that the Unicode locale data (CLDR) does not have yet. */
+const minuteFallback: Partial<Record<Locale, string>> = { ckb: '{n} خولەک' };
+
+/** A number of minutes in a language: "6 min", "6 Min.", "6 دقائق", "٦ خولەک". */
+export function formatMinutes(locale: Locale, minutes: number, unitDisplay: 'short' | 'long'): string {
+  const fallback = minuteFallback[locale];
+  const { intl } = localeInfo(locale);
+  if (fallback) return format(fallback, { n: new Intl.NumberFormat(intl).format(minutes) });
+  return new Intl.NumberFormat(intl, { style: 'unit', unit: 'minute', unitDisplay }).format(minutes);
+}

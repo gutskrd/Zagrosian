@@ -77,6 +77,8 @@ export const en = {
     headquartersLabel: 'Headquarters',
     headquarters: 'Netherlands',
     productsLabel: 'Products',
+    /** Shown with the headquarters: the current time there. */
+    localTime: '{time} local time',
   },
   contact: {
     eyebrow: 'Contact',
@@ -101,6 +103,26 @@ export const en = {
     /** Shown on translated legal pages only. */
     translationNotice: 'This is a translation. If it differs from the English version, the English version applies.',
     readEnglish: 'Read the English version',
+    /** {duration} is a number of minutes, written with the unit style below. */
+    readingTime: '{duration} read',
+    readingTimeUnit: 'short' as 'short' | 'long',
+    print: 'Print',
+    copyLink: 'Copy link to this section',
+    linkCopied: 'Link copied to the clipboard.',
+  },
+  /** The quick navigation menu (Ctrl K or ⌘K). */
+  command: {
+    open: 'Search',
+    title: 'Quick navigation',
+    placeholder: 'Search pages, sections and settings…',
+    pages: 'Pages',
+    sections: 'Sections',
+    actions: 'Actions',
+    copyEmail: 'Copy email address',
+    empty: 'No results found.',
+    hintMove: 'to move',
+    hintOpen: 'to open',
+    hintClose: 'to close',
   },
   notFound: {
     title: 'Page not found',

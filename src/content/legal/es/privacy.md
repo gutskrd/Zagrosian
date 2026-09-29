@@ -4,20 +4,20 @@ description: Cómo trata Zagrosian los datos personales cuando visitas zagrosian
 updated: 2026-09-29
 ---
 
-Esta política explica qué datos personales tratamos cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales, por qué los tratamos y qué derechos tienes. Recogemos muy pocos datos, así que es breve.
+Esta política explica qué datos personales tratamos cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales, por qué los tratamos y qué derechos tienes. Como recogemos muy pocos datos, es breve.
 
 ## Resumen
 
 - zagrosian.com no tiene cuentas de usuario, formularios, publicidad, analítica ni seguimiento.
 - No instalamos cookies. Nuestro proveedor de alojamiento puede instalar una cookie de seguridad estrictamente necesaria cuando tiene que comprobar que el tráfico es legítimo. Si eliges un tema o un idioma, tu navegador recuerda esa elección solo en tu dispositivo.
-- Para servir el sitio web, nuestro proveedor de alojamiento trata datos técnicos como tu dirección IP.
+- Para que el sitio web funcione, nuestro proveedor de alojamiento trata datos técnicos como tu dirección IP.
 - zagrosian.com enlaza a nuestros perfiles de Instagram y TikTok, pero no carga nada de esas plataformas. En las propias plataformas se aplican sus políticas de privacidad.
 - Si nos escribes por correo electrónico, usamos tu mensaje solo para responderte y hacer el seguimiento. Las candidaturas se eliminan en un plazo de cuatro semanas desde el final del proceso de selección, salvo que aceptes que las conservemos más tiempo.
 - No vendemos datos personales ni los usamos para publicidad o elaboración de perfiles.
 
 ## Quiénes somos
 
-Zagrosian, con sede en los Países Bajos, es el responsable del tratamiento de los datos personales descrito en esta política (el «responsable del tratamiento» según el Reglamento General de Protección de Datos, o RGPD).
+Zagrosian, con sede en los Países Bajos, decide cómo y para qué se tratan los datos personales descritos en esta política; es decir, es el «responsable del tratamiento» según el Reglamento General de Protección de Datos (RGPD).
 
 Para cualquier cuestión relacionada con esta política, incluidas las solicitudes sobre tus datos personales, escribe a [privacy@zagrosian.com](mailto:privacy@zagrosian.com). No estamos obligados a designar un delegado de protección de datos y no lo hemos hecho.
 
@@ -29,7 +29,7 @@ Esta política se aplica únicamente a zagrosian.com. Hevalo y nuestros demás p
 
 Cuando abres una página, tu navegador envía automáticamente la información técnica necesaria para mostrarla: tu dirección IP, la fecha y hora de la solicitud, la página solicitada, tu navegador y sistema operativo y, en su caso, la página desde la que llegaste.
 
-Nuestro proveedor de alojamiento, Cloudflare, utiliza esta información para servir el sitio web, mantenerlo disponible y protegerlo frente a ataques y abusos, por ejemplo filtrando el tráfico malicioso. Nosotros no guardamos registros del servidor. En nuestra cuenta de Cloudflare podemos ver estadísticas agregadas, como el número de solicitudes y los países de los que proceden, que no permiten identificarte.
+Nuestro proveedor de alojamiento, Cloudflare, utiliza esta información para ofrecer el sitio web, mantenerlo disponible y protegerlo frente a ataques y abusos, por ejemplo filtrando el tráfico malicioso. Nosotros no guardamos registros del servidor. En nuestra cuenta de Cloudflare podemos ver estadísticas agregadas, como el número de solicitudes y los países de los que proceden, que no permiten identificarte.
 
 **Base jurídica:** nuestro interés legítimo en mantener un sitio web seguro y fiable (artículo 6.1.f) del RGPD).
 
@@ -53,8 +53,8 @@ Tenemos perfiles en [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosi
 
 Cuando visitas, sigues o interactúas con nuestros perfiles, la plataforma trata tus datos personales conforme a su propia política de privacidad y es responsable de ese tratamiento:
 
-- **Instagram** lo presta en la Unión Europea Meta Platforms Ireland Limited. Consulta la [Política de privacidad de Instagram](https://privacycenter.instagram.com/policy).
-- **TikTok** lo presta en el Espacio Económico Europeo TikTok Technology Limited, Irlanda. Consulta la [Política de privacidad de TikTok](https://www.tiktok.com/legal/page/eea/privacy-policy/en).
+- **Instagram** es un servicio de Meta Platforms Ireland Limited en la Unión Europea. Consulta la [Política de privacidad de Instagram](https://privacycenter.instagram.com/policy).
+- **TikTok** es un servicio de TikTok Technology Limited (Irlanda) en el Espacio Económico Europeo. Consulta la [Política de privacidad de TikTok](https://www.tiktok.com/legal/page/eea/privacy-policy/en).
 
 Ambas plataformas nos muestran estadísticas agregadas sobre nuestros perfiles y publicaciones, como el número de visualizaciones y seguidores y los países de los que proceden. Estas estadísticas no permiten identificarte, y no podemos influir en cómo las elaboran las plataformas. En el caso de Instagram, Meta y nosotros somos corresponsables de estas estadísticas conforme al [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum) de Meta. Meta ha asumido la responsabilidad principal sobre ellas, incluida la gestión de las solicitudes relativas a tus derechos, pero también puedes ponerte en contacto con nosotros.
 
@@ -108,7 +108,7 @@ También tienes derecho a presentar una reclamación ante una autoridad de prote
 
 ## Seguridad
 
-El sitio web se sirve únicamente a través de conexiones cifradas y utiliza una estricta política de seguridad de contenidos (Content Security Policy) que bloquea los scripts de terceros. No tiene cuentas de usuario y no almacena datos personales. Si encuentras un problema de seguridad, consulta nuestra [política de seguridad](/es/security).
+El sitio web solo se ofrece a través de conexiones cifradas y utiliza una estricta política de seguridad de contenidos (Content Security Policy) que bloquea los scripts de terceros. No tiene cuentas de usuario y no almacena datos personales. Si encuentras un problema de seguridad, consulta nuestra [política de seguridad](/es/security).
 
 ## Menores
 

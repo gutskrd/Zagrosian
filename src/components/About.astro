@@ -1,6 +1,6 @@
 ---
 import { i18n } from '../i18n';
-import { hevalo } from '../site';
+import { hevalo, site } from '../site';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
@@ -17,7 +17,15 @@ const { t } = i18n(Astro.url);
       <dl class="about__facts rule">
         <div>
           <dt>{t.about.headquartersLabel}</dt>
-          <dd>{t.about.headquarters}</dd>
+          <dd>
+            {t.about.headquarters}
+            <span
+              class="about__time"
+              data-local-time
+              data-time-zone={site.timeZone}
+              data-template={t.about.localTime}
+              hidden></span>
+          </dd>
         </div>
         <div>
           <dt>{t.about.productsLabel}</dt>
@@ -65,6 +73,30 @@ const { t } = i18n(Astro.url);
 
   .about__facts dd {
     margin: 0.25rem 0 0;
+  }
+
+  /* The live local time, under the country. */
+  .about__time {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .about__time::before {
+    content: '';
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
+    margin-inline-end: 0.5rem;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.6;
+    vertical-align: 0.1em;
+  }
+
+  .about__time[hidden] {
+    display: none;
   }
 
   .about__facts a {

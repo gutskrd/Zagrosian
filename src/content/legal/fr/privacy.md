@@ -4,7 +4,7 @@ description: Comment Zagrosian traite les données personnelles lorsque vous vis
 updated: 2026-09-29
 ---
 
-Cette politique explique quelles données personnelles nous traitons lorsque vous visitez zagrosian.com, nous contactez ou consultez nos profils sur les réseaux sociaux, pourquoi nous les traitons et quels sont vos droits. Nous collectons très peu de données, elle est donc courte.
+Cette politique explique quelles données personnelles nous traitons lorsque vous visitez zagrosian.com, nous contactez ou consultez nos profils sur les réseaux sociaux, pourquoi nous les traitons et quels sont vos droits. Comme nous collectons très peu de données, elle est courte.
 
 ## En bref
 
@@ -17,7 +17,7 @@ Cette politique explique quelles données personnelles nous traitons lorsque vou
 
 ## Qui sommes-nous
 
-Zagrosian, établie aux Pays-Bas, est responsable du traitement des données personnelles décrit dans cette politique (le « responsable du traitement » au sens du Règlement général sur la protection des données, ou RGPD).
+Zagrosian, établie aux Pays-Bas, détermine les finalités et les moyens des traitements décrits dans cette politique : elle en est le « responsable du traitement » au sens du Règlement général sur la protection des données (RGPD).
 
 Pour toute question relative à cette politique, y compris les demandes concernant vos données personnelles, écrivez à [privacy@zagrosian.com](mailto:privacy@zagrosian.com). Nous ne sommes pas tenus de désigner un délégué à la protection des données et ne l’avons pas fait.
 

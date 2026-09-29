@@ -12,7 +12,7 @@ Ev polîtîka rave dike ka em kîjan daneyên kesane pêvajo dikin dema ku hûn 
 - Em kukiyan (cookie) bi cih nakin. Dibe ku pêşkêşkarê me yê hostingê kukiyeke ewlekariyê ya bi tevahî pêwîst bi cih bike, dema ku divê ew kontrol bike ka trafîk rewa ye. Heke hûn temayek an zimanek hilbijêrin, geroka we vê bijartinê tenê li ser amûra we bi bîr tîne.
 - Ji bo pêşkêşkirina malperê, pêşkêşkarê me yê hostingê daneyên teknîkî yên wekî navnîşana IPya we pêvajo dike.
 - zagrosian.com girêdanan dide profîlên me yên Instagram û TikTokê, lê tiştekî ji wan platforman bar nake. Li ser platforman bi xwe, polîtîkayên wan ên nepeniyê derbasdar in.
-- Heke hûn e-nameyekê ji me re bişînin, em peyama we tenê ji bo bersivdan û şopandinê bi kar tînin. Serlêdanên kar herî dereng çar hefte piştî dawiya pêvajoya serlêdanê tên jêbirin, heke hûn qebûl nekin ku em wan dirêjtir biparêzin.
+- Heke hûn e-nameyekê ji me re bişînin, em peyama we tenê ji bo bersivdan û şopandinê bi kar tînin. Serlêdanên kar herî dereng çar hefte piştî dawiya pêvajoya serlêdanê tên jêbirin, ji bilî ku hûn razî bibin em wan dirêjtir biparêzin.
 - Em daneyên kesane nafiroşin û wan ji bo reklam an profîlkirinê bi kar naînin.
 
 ## Em kî ne
@@ -29,7 +29,7 @@ Ev polîtîka tenê zagrosian.com digire nav xwe. Hevalo û berhemên me yên di
 
 Dema ku hûn rûpelekê vedikin, geroka we bi awayekî otomatîk agahiyên teknîkî yên ku ji bo pêşkêşkirina wê pêwîst in dişîne: navnîşana IPya we, dîrok û dema daxwazê, rûpela ku hatiye xwestin, geroka we û pergala xebitandinê ya we, û heke hebe, rûpela ku hûn jê hatine.
 
-Pêşkêşkarê me yê hostingê, Cloudflare, van agahiyan bi kar tîne da ku malperê pêşkêş bike, wê berdest bihêle û ji êrîş û bikaranîna xerab biparêze, bo nimûne bi parzûnkirina trafîka zirardar. Em bi xwe tomarên serverê (log) naparêzin. Di hesabê me yê Cloudflareê de em dikarin statîstîkên giştî bibînin, wekî hejmara daxwazan û welatên ku ew jê tên, ku nasnameya we eşkere nakin.
+Pêşkêşkarê me yê hostingê, Cloudflare, van agahiyan bi kar tîne da ku malperê pêşkêş bike, wê berdest bihêle û ji êrîş û bikaranîna xerab biparêze, bo nimûne bi parzûnkirina trafîka zirardar. Em bi xwe tomarên serverê (log) naparêzin. Di hesabê me yê li Cloudflare de em dikarin statîstîkên giştî bibînin, wekî hejmara daxwazan û welatên ku ew jê tên, ku nasnameya we eşkere nakin.
 
 **Bingeha hiqûqî:** berjewendiya me ya rewa di xebitandina malpereke ewle û pêbawer de (xala 6(1)(f) ya GDPRê).
 
@@ -74,7 +74,7 @@ Dibe ku Cloudflare kukiyeke bi tevahî pêwîst, wekî `__cf_bm` an `cf_clearanc
 
 Em daneyên kesane nafiroşin û bi kirê nadin. Em wan tenê bi pêşkêşkarên xizmetê re parve dikin ku di xebitandina malperê û birêvebirina e-nameyan de alîkariya me dikin, û tenê bi qasî ku ew hewce dikin:
 
-- **Cloudflare, Inc.** malperê host dike û xizmetên belavkirina naverokê û ewlekariyê pêşkêş dike. Cloudflare li ser navê me û li gorî [peymana xwe ya pêvajokirina daneyan](https://www.cloudflare.com/cloudflare-customer-dpa/) (Data Processing Addendum) daneyan pêvajo dike. Her wiha li [polîtîkaya nepeniyê ya Cloudflareê](https://www.cloudflare.com/privacypolicy/) binêrin.
+- **Cloudflare, Inc.** malperê host dike û xizmetên belavkirina naverokê û ewlekariyê pêşkêş dike. Cloudflare li ser navê me û li gorî [peymana xwe ya pêvajokirina daneyan](https://www.cloudflare.com/cloudflare-customer-dpa/) (Data Processing Addendum) daneyan pêvajo dike. Her wiha li [polîtîkaya nepeniyê ya Cloudflare](https://www.cloudflare.com/privacypolicy/) binêrin.
 - **Pêşkêşkarên xizmeta e-nameyê** e-nameyên me distînin, tomar dikin û dişînin.
 
 Dibe ku em daneyên kesane eşkere jî bikin dema ku qanûn wê dixwaze, bo nimûne wekî bersiva daxwazeke qanûnî ya ji desthilateke giştî, an jî dema ku ji bo diyarkirin, bikaranîn an parastina mafên hiqûqî pêwîst be.

@@ -17,6 +17,8 @@ export const site = {
   url: 'https://zagrosian.com',
   /** Headquarters, as an ISO 3166 country code. */
   country: 'NL',
+  /** The headquarters' time zone, for the local time shown in About. */
+  timeZone: 'Europe/Amsterdam',
   /**
    * Addresses shown on the site. privacy@, legal@ and careers@ appear only in the
    * legal pages (src/content/legal), where they are written out.

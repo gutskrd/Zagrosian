@@ -11,7 +11,7 @@
  * keeps it up to date afterwards.
  */
 
-type Preference = 'system' | 'light' | 'dark';
+export type Preference = 'system' | 'light' | 'dark';
 type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'theme';
@@ -95,6 +95,14 @@ function choose(preference: Preference, origin: { x: number; y: number }) {
   transition.finished.finally(() => {
     delete root.dataset.themeSwitching;
   });
+}
+
+/** The visitor's current choice: system, light or dark. */
+export const currentPreference = (): Preference => readPreference();
+
+/** Sets the theme from another control, such as the quick navigation menu. */
+export function setThemePreference(preference: Preference) {
+  choose(preference, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
 }
 
 export function initTheme() {

@@ -4,11 +4,11 @@ description: Wie Zagrosian personenbezogene Daten verarbeitet, wenn Sie zagrosia
 updated: 2026-09-29
 ---
 
-Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen, zu welchem Zweck wir das tun und welche Rechte Sie haben. Wir erheben sehr wenig, deshalb ist sie kurz.
+Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen, zu welchem Zweck wir das tun und welche Rechte Sie haben. Da wir nur sehr wenige Daten erheben, ist sie kurz.
 
 ## Zusammenfassung
 
-- zagrosian.com hat keine Benutzerkonten, Formulare, Werbung, Analysedienste oder Tracking.
+- Auf zagrosian.com gibt es keine Benutzerkonten, Formulare, Werbung, Analysedienste oder Tracking.
 - Wir setzen keine Cookies. Unser Hosting-Anbieter kann ein technisch notwendiges Sicherheits-Cookie setzen, wenn er prüfen muss, ob Zugriffe legitim sind. Wenn Sie ein Design oder eine Sprache wählen, speichert Ihr Browser diese Wahl ausschließlich auf Ihrem Gerät.
 - Um die Website auszuliefern, verarbeitet unser Hosting-Anbieter technische Daten wie Ihre IP-Adresse.
 - zagrosian.com verlinkt auf unsere Profile bei Instagram und TikTok, lädt aber nichts von diesen Plattformen. Auf den Plattformen selbst gelten deren eigene Datenschutzrichtlinien.
@@ -19,7 +19,7 @@ Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wen
 
 Zagrosian mit Sitz in den Niederlanden ist für die in dieser Erklärung beschriebene Verarbeitung personenbezogener Daten verantwortlich („Verantwortlicher“ im Sinne der Datenschutz-Grundverordnung, DSGVO).
 
-Bei allen Fragen zu dieser Erklärung, einschließlich Anfragen zu Ihren personenbezogenen Daten, schreiben Sie an [privacy@zagrosian.com](mailto:privacy@zagrosian.com). Wir sind nicht verpflichtet, einen Datenschutzbeauftragten zu benennen, und haben dies auch nicht getan.
+Bei allen Fragen zu dieser Erklärung, auch zu Ihren personenbezogenen Daten, erreichen Sie uns unter [privacy@zagrosian.com](mailto:privacy@zagrosian.com). Wir sind nicht verpflichtet, einen Datenschutzbeauftragten zu benennen, und haben dies auch nicht getan.
 
 Diese Erklärung gilt nur für zagrosian.com. Für Hevalo und unsere anderen Produkte gelten eigene Datenschutzerklärungen.
 
@@ -49,14 +49,14 @@ Wir treffen keine Entscheidungen über Sie, die ausschließlich auf einer automa
 
 ## Soziale Medien
 
-Wir haben Profile bei [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) und [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com verlinkt lediglich darauf: Die Website bettet keine Beiträge ein und lädt nichts von diesen Plattformen, sodass sie von unserer Website keine Daten erhalten, bis Sie einem Link folgen.
+Wir haben Profile bei [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) und [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com verlinkt lediglich darauf: Die Website bettet keine Beiträge ein und lädt nichts von diesen Plattformen, sodass diese erst dann Daten erhalten, wenn Sie einem Link folgen.
 
 Wenn Sie unsere Profile besuchen, ihnen folgen oder mit ihnen interagieren, verarbeitet die jeweilige Plattform Ihre personenbezogenen Daten nach ihrer eigenen Datenschutzrichtlinie und ist für diese Verarbeitung verantwortlich:
 
 - **Instagram** wird in der Europäischen Union von der Meta Platforms Ireland Limited bereitgestellt. Siehe die [Datenschutzrichtlinie von Instagram](https://privacycenter.instagram.com/policy).
 - **TikTok** wird im Europäischen Wirtschaftsraum von der TikTok Technology Limited, Irland, bereitgestellt. Siehe die [Datenschutzrichtlinie von TikTok](https://www.tiktok.com/legal/page/eea/privacy-policy/en).
 
-Beide Plattformen stellen uns zusammengefasste Statistiken zu unseren Profilen und Beiträgen bereit, etwa die Zahl der Aufrufe und Follower und die Länder, aus denen sie stammen. Diese Statistiken lassen keinen Rückschluss auf Ihre Person zu, und wir haben keinen Einfluss darauf, wie die Plattformen sie erstellen. Für Instagram sind wir und Meta für diese Statistiken gemeinsam verantwortlich, geregelt im [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum) von Meta. Meta hat dafür die primäre Verantwortung übernommen, auch für die Bearbeitung von Anfragen zu Ihren Rechten; Sie können sich aber auch an uns wenden.
+Beide Plattformen stellen uns zusammengefasste Statistiken zu unseren Profilen und Beiträgen bereit, etwa die Zahl der Aufrufe und Follower und die Länder, aus denen sie stammen. Diese Statistiken lassen keinen Rückschluss auf Ihre Person zu, und wir haben keinen Einfluss darauf, wie die Plattformen sie erstellen. Für Instagram sind Meta und wir für diese Statistiken gemeinsam verantwortlich; die Einzelheiten regelt Metas [Controller Addendum](https://www.facebook.com/legal/terms/page_controller_addendum). Meta hat dafür die primäre Verantwortung übernommen, auch für die Bearbeitung von Anfragen zu Ihren Rechten; Sie können sich aber auch an uns wenden.
 
 Wenn Sie unsere Beiträge auf diesen Plattformen kommentieren oder uns dort eine Nachricht senden, sehen wir Ihren Benutzernamen, Ihr öffentliches Profil und Ihre Nachricht und nutzen sie nur, um zu antworten. Nachrichten behandeln wir genauso wie E-Mails.
 

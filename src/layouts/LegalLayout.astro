@@ -1,7 +1,7 @@
 ---
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import { i18n } from '../i18n';
+import { format, formatMinutes, i18n } from '../i18n';
 import { site } from '../site';
 import BaseLayout from './BaseLayout.astro';
 
@@ -12,9 +12,9 @@ interface Props {
 
 const { entry, headings } = Astro.props;
 const { title, description, eyebrow, updated } = entry.data;
-const { locale, t, base } = i18n(Astro.url);
+const { locale, info, t, base } = i18n(Astro.url);
 
-const updatedLabel = new Intl.DateTimeFormat(locale, {
+const updatedLabel = new Intl.DateTimeFormat(info.intl, {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -28,6 +28,11 @@ const sections = headings.filter((heading) => heading.depth === 2);
 const longestWord = Math.max(...title.split(/\s+/).map((word) => [...word].length));
 const fit = longestWord <= 15 ? undefined : longestWord <= 17 ? 'md' : 'sm';
 const isTranslation = locale !== 'en';
+
+// About 200 words a minute, the usual estimate for reading on screen.
+const words = (entry.body ?? '').split(/\s+/).filter(Boolean).length;
+const minutes = Math.max(1, Math.round(words / 200));
+const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale, minutes, t.legal.readingTimeUnit) });
 ---
 
 <BaseLayout
@@ -38,13 +43,29 @@ const isTranslation = locale !== 'en';
 >
   <div class="reading-progress" aria-hidden="true" data-reading-progress><span></span></div>
 
-  <article class="legal" aria-labelledby="legal-title">
+  <article
+    class="legal"
+    aria-labelledby="legal-title"
+    data-legal
+    data-copy-link={t.legal.copyLink}
+    data-link-copied={t.legal.linkCopied}
+  >
     <header class="container legal__header">
       <p class="eyebrow">{eyebrow ?? t.legal.eyebrow}</p>
       <h1 id="legal-title" class:list={['legal__title', fit && `legal__title--${fit}`]}>{title}</h1>
-      <p class="legal__updated">
-        {t.legal.updated} <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
-      </p>
+      <div class="legal__meta">
+        <p class="legal__updated">
+          {t.legal.updated} <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
+          <span class="legal__separator" aria-hidden="true">·</span>
+          <span class="legal__reading">{readingTime}</span>
+        </p>
+        <button class="legal__print" type="button" data-print hidden>
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="M5.5 7.5V3.25h9V7.5M5.5 14H3.25V7.5h13.5V14H14.5M5.5 11.5h9v5.25h-9z" />
+          </svg>
+          {t.legal.print}
+        </button>
+      </div>
       {
         isTranslation && (
           <p class="legal__notice">
@@ -79,6 +100,7 @@ const isTranslation = locale !== 'en';
         <slot />
       </div>
     </div>
+    <p class="visually-hidden" role="status" data-legal-status></p>
   </article>
 </BaseLayout>
 
@@ -143,10 +165,110 @@ const isTranslation = locale !== 'en';
     text-decoration-color: var(--color-underline);
   }
 
-  .legal__updated {
+  .legal__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
     margin-top: 1.5rem;
+  }
+
+  .legal__updated {
     font-size: var(--text-sm);
     color: var(--color-muted);
+  }
+
+  .legal__separator {
+    margin-inline: 0.5rem;
+  }
+
+  .legal__print {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-ink-soft);
+    font: inherit;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .legal__print[hidden] {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .legal__print:hover {
+      border-color: var(--color-line-strong);
+      color: var(--color-ink);
+    }
+  }
+
+  .legal__print svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+  }
+
+  /* Copy-link buttons beside section headings (added by src/scripts/site.ts). */
+  .legal__content :global(.heading-link) {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-inline-start: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0.5rem;
+    background: none;
+    color: var(--color-muted);
+    vertical-align: 0.1em;
+    cursor: pointer;
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .legal__content :global(h2:hover .heading-link),
+  .legal__content :global(.heading-link:focus-visible),
+  .legal__content :global(.heading-link[data-copied]) {
+    opacity: 1;
+  }
+
+  /* Without a mouse to hover with, the buttons are always visible. */
+  @media (hover: none) {
+    .legal__content :global(.heading-link) {
+      opacity: 1;
+    }
+  }
+
+  .legal__content :global(.heading-link:hover) {
+    color: var(--color-ink);
+  }
+
+  .legal__content :global(.heading-link svg) {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .legal__content :global(.heading-link[data-copied]) {
+    color: var(--color-ink);
   }
 
   .legal__grid {

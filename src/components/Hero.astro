@@ -40,7 +40,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       </div>
     </div>
 
-    <figure class="hero__emblem intro" data-parallax="0.08">
+    <figure class="hero__emblem intro" data-parallax="0.08" data-depth>
       <Griffin alt={t.hero.griffinAlt} sizes="(min-width: 64rem) 34vw, min(64vw, 22rem)" loading="eager" />
     </figure>
   </div>
@@ -164,6 +164,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   .hero__emblem :global(.griffin) {
     display: block;
     width: 100%;
+  }
+
+  /* Room for the griffin to lean towards the pointer in 3D (motion.ts). */
+  .hero__emblem {
+    perspective: 80rem;
   }
 
   @media (min-width: 64rem) {

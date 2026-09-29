@@ -15,7 +15,9 @@ const { t } = i18n(Astro.url);
     <div class="showcase__body">
       <div class="showcase__identity">
         <div class="showcase__icon" data-reveal>
-          <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
+          <span class="showcase__tilt" data-tilt>
+            <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
+          </span>
         </div>
         <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
         <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
@@ -61,6 +63,42 @@ const { t } = i18n(Astro.url);
     display: block;
     width: 100%;
     filter: drop-shadow(0 0.75rem 2rem rgb(118 104 230 / 0.35));
+  }
+
+  /* Under a mouse pointer the icon tilts towards it, with a soft highlight
+     where the light would catch it (motion.ts sets the custom properties). */
+  .showcase__icon {
+    perspective: 32rem;
+  }
+
+  .showcase__tilt {
+    position: relative;
+    display: block;
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.7s var(--ease-out);
+  }
+
+  .showcase__tilt[data-tilting] {
+    transition-duration: 0.15s;
+  }
+
+  .showcase__tilt::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 23%;
+    background: radial-gradient(
+      circle at var(--glare-x, 50%) var(--glare-y, 0%),
+      rgb(255 255 255 / 0.5),
+      rgb(255 255 255 / 0) 60%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .showcase__tilt[data-tilting]::after {
+    opacity: 1;
   }
 
   .showcase__name {
