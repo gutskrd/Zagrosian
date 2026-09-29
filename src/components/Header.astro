@@ -139,6 +139,15 @@ const nav = navigation(locale);
     box-shadow: 0 1px 0 var(--color-line);
   }
 
+  /* For visitors who ask for less transparency, the header is solid. */
+  @media (prefers-reduced-transparency: reduce) {
+    .site-header {
+      background: var(--color-paper);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
   .site-header__inner {
     display: flex;
     align-items: center;

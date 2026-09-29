@@ -41,7 +41,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     </div>
 
     <figure class="hero__emblem intro" data-parallax="0.08" data-depth>
-      <Emblem alt={t.hero.emblemAlt} loading="eager" />
+      <div class="hero__art">
+        <Emblem alt={t.hero.emblemAlt} loading="eager" />
+        <canvas class="hero__ink" aria-hidden="true" data-ink-canvas></canvas>
+      </div>
     </figure>
   </div>
 </section>
@@ -49,6 +52,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 <style>
   .hero {
     padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
+    /* The ink may drift past the sides of the screen, but never scrolls it. */
+    overflow-x: clip;
   }
 
   .hero__grid {
@@ -169,6 +174,69 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   /* Room for the horseman to lean towards the pointer in 3D (motion.ts). */
   .hero__emblem {
     perspective: 80rem;
+  }
+
+  .hero__art {
+    position: relative;
+  }
+
+  /* The horseman in ink particles (src/scripts/ink.ts). The canvas reaches past
+     the drawing, so the ink has room to move; ink.ts sizes and places it in
+     whole device pixels. It is hidden until the first particles are drawn. */
+  .hero__ink {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  :global(:root[data-ink='ready']) .hero__ink {
+    opacity: 1;
+  }
+
+  /* With the ink, the image keeps its place (for the layout, screen readers
+     and printing) but is not shown, and the ink gives the entrance instead. */
+  :global(:root[data-ink]) .hero__emblem {
+    animation: none;
+  }
+
+  :global(:root:is([data-ink='pending'], [data-ink='loading'], [data-ink='ready'])) .hero__art :global(.emblem) {
+    opacity: 0;
+  }
+
+  /* Should the ink stop (a device that cannot keep up, or the graphics
+     processor dropping it), the image fades back in its place. */
+  :global(:root[data-ink='off']) .hero__ink,
+  :global(:root[data-ink='off']) .hero__art :global(.emblem) {
+    transition: opacity 0.5s ease;
+  }
+
+  /* Should the script never start, the image appears after a moment anyway. */
+  :global(:root[data-ink='pending']) .hero__art :global(.emblem) {
+    animation: ink-fallback 0.8s ease 3s both;
+  }
+
+  @keyframes ink-fallback {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media print, (forced-colors: active) {
+    .hero__ink {
+      display: none;
+    }
+
+    .hero__art :global(.emblem) {
+      opacity: 1 !important;
+      animation: none !important;
+    }
   }
 
   @media (min-width: 64rem) {

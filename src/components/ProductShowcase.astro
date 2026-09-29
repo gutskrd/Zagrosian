@@ -8,7 +8,7 @@ import SplitText from './SplitText.astro';
 const { t } = i18n(Astro.url);
 ---
 
-<section id="hevalo" class="showcase" aria-labelledby="hevalo-title">
+<section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight>
   <div class="container">
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
@@ -43,8 +43,31 @@ const { t } = i18n(Astro.url);
   /* A tinted band that sets the products apart. Like the rest of the page, it
      follows the light or dark theme. */
   .showcase {
+    position: relative;
+    isolation: isolate;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
+  }
+
+  /* Under a mouse pointer, a soft light follows it across the band, as if the
+     product were lit from where you look (motion.ts sets --spot-x/--spot-y). */
+  .showcase::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      40rem circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      var(--color-spot),
+      transparent 70%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+
+  .showcase[data-spot]::before {
+    opacity: 1;
   }
 
   .showcase__body {
@@ -78,7 +101,17 @@ const { t } = i18n(Astro.url);
     transition: transform 0.7s var(--ease-out);
   }
 
-  .showcase__tilt[data-tilting] {
+  /* On arrival the icon turns to face the reader (site.ts sets data-reveal). */
+  .showcase__icon[data-reveal='pending'] .showcase__tilt {
+    --tilt-x: 10deg;
+    --tilt-y: -65deg;
+  }
+
+  .showcase__icon[data-reveal='done'] .showcase__tilt {
+    transition-duration: 1.4s;
+  }
+
+  .showcase__icon .showcase__tilt[data-tilting] {
     transition-duration: 0.15s;
   }
 

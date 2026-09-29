@@ -79,7 +79,7 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   language.ts, theme.ts and theme-init.js
+                   ink.ts (the hero horseman in WebGL), language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -153,8 +153,9 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Hero:** the headline rises line by line from behind masks on load; the horseman rides in,
-  revealed from the tail forwards, and drifts slightly slower than the page (`data-parallax`).
+- **Hero:** the headline rises line by line from behind masks on load, and the horseman drifts
+  slightly slower than the page (`data-parallax`). He is drawn in ink particles (below); where that
+  is not used, he rides in, revealed from the tail forwards.
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -162,9 +163,12 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   hairline across.
 - **Motto:** the sun turns slowly as the section scrolls past (`data-spin`), and the Kurdish
   sentence rises word by word.
-- **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
-- **Pointer depth:** with a mouse, the hero horseman leans slightly towards the pointer and the Hevalo
-  icon tilts under it with a soft highlight. Touch screens and *reduce motion* get none of this.
+- **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
+  (`data-rise`).
+- **Products:** the Hevalo icon turns to face the reader as it comes into view.
+- **Pointer depth:** with a mouse, the hero horseman turns towards the pointer in 3D, a soft light
+  follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
+  it with a highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 
 Rules the code follows:
@@ -175,6 +179,32 @@ Rules the code follows:
 - No HTML is generated in the browser and no `style` attributes are written, so the
   Content-Security-Policy and Trusted Types rules in `public/_headers` stay strict.
 - Split headings keep their full text as their accessible name.
+
+### The horseman in ink
+
+[`src/scripts/ink.ts`](src/scripts/ink.ts) redraws the hero emblem with WebGL as particles of ink:
+one for each pixel of the drawing that holds ink (about 50,000, or 200,000 on high-density screens),
+each as dark as its pixel, so at rest they form the drawing exactly.
+
+- On load the ink gathers from behind and to the left, tail first, as the horseman rides in.
+- A pointer moving across the drawing blows the ink aside like wind, and a tap or click does the same
+  where it lands; it always settles back into place.
+- As the hero scrolls away, the drawing leans back and its ink drifts apart, and it gathers again on
+  the way back up.
+- The ink follows the light and dark theme within the theme transition.
+
+The `<img>` stays in the page underneath: it is the image screen readers, search engines and printers
+get, and the fallback. [`theme-init.js`](src/scripts/theme-init.js) sets `data-ink` on `<html>` before
+the first paint, so the still image is not shown first, but only when *reduce motion* is off, colours
+are not forced, the visitor is not saving data (*Data Saver*) and the browser has WebGL. The script is
+loaded separately, only on pages with the hero. If WebGL is software-rendered (as in headless
+browsers and on machines whose graphics driver is blocked), the device cannot keep up (under about
+20 frames a second), the drawing cannot be read, or the script fails or never runs, the still image
+returns (within about three seconds).
+
+It costs nothing while nothing moves: frames are drawn only during the entrance, the wind or a
+scroll, and only while the hero is on screen. Phones and low-memory devices get fewer, larger
+particles.
 
 ## Readable by machines
 
@@ -275,7 +305,8 @@ is missing.
 - **Page transitions:** browsers that support cross-document view transitions cross-fade between
   pages, with the header staying in place.
 - **Accessibility preferences:** besides light and dark mode and *reduce motion*, the site responds to
-  *increase contrast* (darker secondary text and lines) and to Windows' forced colours (high contrast),
+  *increase contrast* (darker secondary text and lines), to *reduce transparency* (a solid header and
+  a plain dimmed backdrop behind quick navigation) and to Windows' forced colours (high contrast),
   where buttons get outlines and drawn marks use the system text colour.
 
 ## Deploying to Cloudflare

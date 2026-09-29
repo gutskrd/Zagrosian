@@ -127,19 +127,24 @@ function parallax(frame: HTMLElement, layer: HTMLElement, strength: number): Scr
   };
 }
 
-/** The footer wordmark rises out of its baseline as the footer comes into view. */
+/**
+ * The footer wordmark rises out of its baseline as the footer comes into view,
+ * standing up in 3D from lying back on it (transform-origin: bottom).
+ */
 function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
-  let shift = 0;
+  let rest = 0;
+  let depth = 600;
   return {
     target: frame,
     measure(viewportHeight) {
       const rect = frame.getBoundingClientRect();
       const progress = clamp((viewportHeight - rect.top) / rect.height);
       const eased = 1 - (1 - progress) ** 3;
-      shift = (1 - eased) * 60;
+      rest = 1 - eased;
+      depth = Math.max(600, rect.width * 0.9);
     },
     render() {
-      layer.style.transform = `translate3d(0, ${shift.toFixed(2)}%, 0)`;
+      layer.style.transform = `perspective(${depth.toFixed(0)}px) rotateX(${(rest * 70).toFixed(2)}deg) translate3d(0, ${(rest * 40).toFixed(2)}%, 0)`;
     },
   };
 }
@@ -228,7 +233,8 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero horseman leans slightly towards the  */
-/* pointer, and the Hevalo icon tilts under it with a soft highlight.          */
+/* pointer, a soft light follows it across the products band, and the Hevalo  */
+/* icon tilts under it with a highlight.                                      */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
@@ -236,7 +242,8 @@ function initPointerDepth() {
 
   // The horseman follows the pointer across the whole window, eased towards it
   // frame by frame. It uses the individual `rotate` and `translate` properties,
-  // so it combines with the scroll parallax on `transform`.
+  // so it combines with the scroll parallax on `transform`. The layer holds
+  // both the image and the ink canvas (ink.ts), so either way he turns as one.
   const emblem = document.querySelector<HTMLElement>('[data-depth]');
   const layer = emblem?.firstElementChild;
   if (emblem && layer instanceof HTMLElement) {
@@ -282,6 +289,28 @@ function initPointerDepth() {
       targetY = 0;
       start();
     });
+  }
+
+  // A soft light follows the pointer across the products band.
+  for (const surface of document.querySelectorAll<HTMLElement>('[data-spotlight]')) {
+    let queued = false;
+    let x = 0;
+    let y = 0;
+    surface.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      x = event.clientX;
+      y = event.clientY;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        const rect = surface.getBoundingClientRect();
+        surface.style.setProperty('--spot-x', `${(x - rect.left).toFixed(0)}px`);
+        surface.style.setProperty('--spot-y', `${(y - rect.top).toFixed(0)}px`);
+        surface.toggleAttribute('data-spot', true);
+      });
+    });
+    surface.addEventListener('pointerleave', () => surface.removeAttribute('data-spot'));
   }
 
   for (const tilt of document.querySelectorAll<HTMLElement>('[data-tilt]')) {

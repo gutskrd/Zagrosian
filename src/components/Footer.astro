@@ -172,6 +172,8 @@ const year = new Date().getFullYear();
     /* Optical alignment with the text column. */
     margin-left: -0.04em;
     padding-bottom: 0.2em;
+    /* It stands up from its baseline as the footer scrolls in (motion.ts). */
+    transform-origin: 50% 100%;
   }
 
   .site-footer__bottom {

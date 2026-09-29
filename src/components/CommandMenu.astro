@@ -234,6 +234,14 @@ const searchText = (entry: Entry) =>
     backdrop-filter: blur(3px);
   }
 
+  /* Less transparency: the page behind is dimmed further, without the blur. */
+  @media (prefers-reduced-transparency: reduce) {
+    .command::backdrop {
+      background: rgb(10 10 10 / 0.7);
+      backdrop-filter: none;
+    }
+  }
+
   :global([data-theme='dark']) .command {
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.02),
