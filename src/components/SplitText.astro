@@ -30,9 +30,10 @@ const { text, as: Tag = 'h2', effect = 'rise', id, class: className, ...attribut
 
 // A newline in `text` starts a new line, e.g. one sentence per line.
 const lines = text.split('\n').map((line) => line.split(' '));
-// Keep the last two words together, so the heading never ends on a lone word.
+// Keep the last two words together, so the heading never ends on a lone short
+// word. Longer pairs are left to wrap, or they could overflow narrow screens.
 const lastLine = lines[lines.length - 1];
-if (lastLine.length > 2) {
+if (lastLine.length > 2 && lastLine.slice(-2).join(' ').length <= 16) {
   const last = lastLine.pop();
   lastLine[lastLine.length - 1] += `\u00a0${last}`;
 }
