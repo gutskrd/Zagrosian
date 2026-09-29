@@ -108,10 +108,12 @@ src/
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun).
-- **Hevalo icon** (`src/assets/brand/hevalo-source.png`): Hevalo's app icon, shown above the product
-  name and in the hero's *coming soon* notice. The source's corners are semi-transparent white; the
-  served versions (`hevalo-96/192/288.webp`) have them made fully transparent, so the icon sits cleanly
-  on dark backgrounds.
+- **Hevalo logo** (`src/assets/brand/hevalo-black-source.png` and `hevalo-white-source.png`): the H
+  with antlers, shown above the product name and in the hero's *coming soon* notice. The site uses
+  `hevalo-mark.svg` (1.2 KB), traced from the black version: upscaled 6× and lightly blurred to smooth
+  the edges, at threshold 128, rounded to whole units. It is filled with `currentColor`, so the one
+  inline file is black in the light theme and white in the dark one. If the logo changes, trace it
+  again with the same settings.
 
 - **Fonts:** Latin text is set in Inter and Arabic script (Arabic, Sorani and Persian) in
   [Vazirmatn](https://github.com/rastikerdar/vazirmatn), both self-hosted variable fonts under the OFL.

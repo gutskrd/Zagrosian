@@ -1,43 +1,28 @@
 ---
 /**
- * Hevalo's app icon. Served as WebP at three sizes, so each screen downloads
- * only the resolution it needs.
+ * Hevalo's logo: the H with antlers, traced from Hevalo's black and white
+ * logos (src/assets/brand/hevalo-*-source.png). Inlined and filled with the
+ * text colour, so it is black in the light theme and white in the dark one,
+ * as sharp at 20 px as at 200, with nothing extra to download.
  */
-import icon96 from '../assets/brand/hevalo-96.webp';
-import icon192 from '../assets/brand/hevalo-192.webp';
-import icon288 from '../assets/brand/hevalo-288.webp';
+import HevaloMark from '../assets/brand/hevalo-mark.svg';
 
 interface Props {
-  /** Rendered width, as a `sizes` value, e.g. "20px". */
-  sizes: string;
-  /** Leave empty when the icon sits next to the Hevalo name. */
+  /** Leave empty when the logo sits next to the Hevalo name. */
   alt?: string;
   class?: string;
-  loading?: 'eager' | 'lazy';
 }
 
-const { sizes, alt = '', class: className, loading = 'lazy' } = Astro.props;
-
-const srcset = [icon96, icon192, icon288].map((image) => `${image.src} ${image.width}w`).join(', ');
+const { alt = '', class: className } = Astro.props;
+const label = alt ? { role: 'img' as const, 'aria-label': alt } : { 'aria-hidden': 'true' as const };
 ---
 
-<img
-  class:list={['hevalo-icon', className]}
-  src={icon192.src}
-  srcset={srcset}
-  sizes={sizes}
-  width={icon192.width}
-  height={icon192.height}
-  alt={alt}
-  loading={loading}
-  decoding="async"
-  draggable="false"
-/>
+<HevaloMark class:list={['hevalo-icon', className]} focusable="false" {...label} />
 
 <style>
-  .hevalo-icon {
+  /* The mark is a component, so this reaches it as a global class. Callers set
+     its width or height; the other follows its proportions. */
+  :global(.hevalo-icon) {
     flex: none;
-    height: auto;
-    user-select: none;
   }
 </style>

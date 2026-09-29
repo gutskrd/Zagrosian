@@ -16,7 +16,7 @@ const { t } = i18n(Astro.url);
       <div class="showcase__identity">
         <div class="showcase__icon" data-reveal>
           <span class="showcase__tilt" data-tilt>
-            <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
+            <HevaloIcon />
           </span>
         </div>
         <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} data-velocity />
@@ -76,32 +76,31 @@ const { t } = i18n(Astro.url);
     margin-top: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
-  /* The app icon, with a soft glow in its own colour. */
+  /* Hevalo's logo, in the text colour: black on light, white on dark. */
   .showcase__icon {
-    width: clamp(4.5rem, 3.5rem + 2.5vw, 6rem);
+    width: clamp(4rem, 3.25rem + 2vw, 5.25rem);
     margin-bottom: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+    color: var(--color-ink);
   }
 
   .showcase__icon :global(.hevalo-icon) {
     display: block;
     width: 100%;
-    filter: drop-shadow(0 0.75rem 2rem rgb(118 104 230 / 0.35));
   }
 
-  /* Under a mouse pointer the icon tilts towards it, with a soft highlight
-     where the light would catch it (motion.ts sets the custom properties). */
+  /* Under a mouse pointer the logo tilts towards it (motion.ts sets the
+     custom properties). */
   .showcase__icon {
     perspective: 32rem;
   }
 
   .showcase__tilt {
-    position: relative;
     display: block;
     transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
     transition: transform 0.7s var(--ease-out);
   }
 
-  /* On arrival the icon turns to face the reader (site.ts sets data-reveal). */
+  /* On arrival the logo turns to face the reader (site.ts sets data-reveal). */
   .showcase__icon[data-reveal='pending'] .showcase__tilt {
     --tilt-x: 10deg;
     --tilt-y: -65deg;
@@ -115,24 +114,6 @@ const { t } = i18n(Astro.url);
     transition-duration: 0.15s;
   }
 
-  .showcase__tilt::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 23%;
-    background: radial-gradient(
-      circle at var(--glare-x, 50%) var(--glare-y, 0%),
-      rgb(255 255 255 / 0.5),
-      rgb(255 255 255 / 0) 60%
-    );
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-  }
-
-  .showcase__tilt[data-tilting]::after {
-    opacity: 1;
-  }
 
   .showcase__name {
     font-size: clamp(4.5rem, 1.75rem + 13vw, 13.5rem);
