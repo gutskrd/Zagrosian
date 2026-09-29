@@ -1,26 +1,17 @@
+import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { initMotion } from './motion';
 import { initTheme } from './theme';
 
-/**
- * Adds a hairline under the sticky header once the page has scrolled, and
- * switches the header to its dark treatment while it sits over a dark section.
- */
+/** Adds a hairline under the sticky header once the page has scrolled. */
 function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-site-header]');
   if (!header) return;
 
-  const darkSections = [...document.querySelectorAll<HTMLElement>('.inverse')];
   let queued = false;
 
   const update = () => {
     queued = false;
-    const line = header.offsetHeight / 2;
-    const onDark = darkSections.some((section) => {
-      const rect = section.getBoundingClientRect();
-      return rect.top <= line && rect.bottom >= line;
-    });
     header.toggleAttribute('data-scrolled', window.scrollY > 4);
-    header.toggleAttribute('data-on-dark', onDark);
   };
 
   update();
@@ -149,9 +140,9 @@ function initCopyButtons() {
       try {
         await navigator.clipboard.writeText(value);
         button.toggleAttribute('data-copied', true);
-        if (status) status.textContent = `${value} copied to the clipboard.`;
+        if (status) status.textContent = button.dataset.copiedMessage ?? '';
       } catch {
-        if (status) status.textContent = `Could not copy. Select ${value} to copy it instead.`;
+        if (status) status.textContent = button.dataset.copyFailedMessage ?? '';
       }
       reset = window.setTimeout(() => {
         button.removeAttribute('data-copied');
@@ -168,4 +159,6 @@ initTableOfContents();
 initSectionNav();
 initCopyButtons();
 initTheme();
+initLanguageMenu();
+initLanguageSuggestion();
 initMotion();

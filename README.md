@@ -3,7 +3,8 @@
 The website of Zagrosian, the technology company behind [Hevalo](https://hevalo.app).
 
 Built with [Astro](https://astro.build) as a fully static site: no server, no database, no forms, no
-cookies and no third-party requests.
+cookies and no third-party requests. Available in the nine languages of Hevalo: Kurdish (Kurmanji and
+Sorani), English, Dutch, German, Spanish, French, Turkish and Arabic.
 
 ## Commands
 
@@ -20,10 +21,12 @@ Requires Node 22.12 or later.
 
 ## Editing content
 
-- [`src/site.ts`](src/site.ts): company name, country, title, description, products, and all
-  homepage copy (`home`). The homepage, its Markdown version and `llms.txt` are built from this one
-  file, so change text here rather than in the components. It also holds the email addresses shown on
-  the homepage. Each address appears only where it is needed:
+- [`src/i18n/messages/`](src/i18n/messages/): all interface and homepage text, one file per language
+  (see **Languages** below). The homepage, its Markdown versions and `llms.txt` are built from these
+  files, so change text there rather than in the components.
+- [`src/site.ts`](src/site.ts): facts that are the same in every language: company name, country,
+  Hevalo's name and address, the Kurdish phrases, social profiles and the email addresses. Each address
+  appears only where it is needed:
 
   | Address                 | Where it appears                                       |
   | ----------------------- | ------------------------------------------------------ |
@@ -42,43 +45,49 @@ Requires Node 22.12 or later.
   If you add or remove a profile, update the Social media section of the privacy policy too.
 - Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement after
-  the Hevalo section, in [`Motto.astro`](src/components/Motto.astro). *Ji Kurdan, ji bo Kurdan.*
-  ("By Kurds, for Kurds") is in the footer. Both use the `kurdish` class, which sets them in the same
-  serif italic as hevalo.app (see **Fonts** below).
+  the Hevalo section, in [`Motto.astro`](src/components/Motto.astro), with a translation underneath in
+  every language except Kurmanji (`motto` in the message files). *Ji Kurdan, ji bo Kurdan.*
+  ("By Kurds, for Kurds") is in the footer. Both stay in Kurmanji in every language and use the
+  `kurdish` class, which sets them in the same serif italic as hevalo.app (see **Fonts** below).
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
-  [`ProductShowcase.astro`](src/components/ProductShowcase.astro). When the apps are out, replace it
-  with links to the App Store and Google Play.
+  [`ProductShowcase.astro`](src/components/ProductShowcase.astro) (text: `hevalo.comingSoon*` in the
+  message files). When the apps are out, replace it with links to the App Store and Google Play.
 - [`src/components/`](src/components/): homepage sections.
-- [`src/pages/privacy.md`](src/pages/privacy.md), [`terms.md`](src/pages/terms.md) and
-  [`security.md`](src/pages/security.md): legal pages, written in Markdown. When you change one, update
-  its `updated:` date. Email addresses and company details are written out in these files, so update
-  them there too if they change.
+- [`src/content/legal/`](src/content/legal/): the privacy policy, terms of use and security policy,
+  written in Markdown, with one folder per language (`en/privacy.md`, `de/privacy.md`, …). English is
+  the original; each translated page says so and links to it. When you change a page, change every
+  language and update each `updated:` date. Email addresses and company details are written out in
+  these files, so update them there too if they change.
 
 ## Structure
 
 ```
-public/            Favicons, logo, social image, manifest, robots.txt and Cloudflare _headers
+public/            Favicons, logo, social images (og.png and og/<language>.png), manifest,
+                   robots.txt and Cloudflare _headers
 src/
   assets/brand/    Griffin emblem, the 21-ray sun and the Hevalo app icon (sources and sized variants)
-  assets/fonts/    Inter subset with the Kurmanji letters Ş and ş
-  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, ThemeToggle,
-                   ThemeSwitch, …
+  assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
+  components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, LanguagePicker,
+                   LanguageSuggestion, ThemeToggle, ThemeSwitch, …
+  content/legal/   Legal pages in Markdown, one folder per language
+  i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
                    NoticeLayout (404)
   lib/             structured-data.ts (JSON-LD) and pages.ts (Markdown versions and llms.txt)
-  pages/           Homepage, legal pages, 404, sitemap.xml, llms.txt, llms-full.txt, the Markdown
-                   versions ([page].md.ts) and .well-known/security.txt
+  pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
+                   llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, mobile menu, section highlighting, scroll reveals, copy button,
-                   legal table of contents), motion.ts, theme.ts and theme-init.js (light/dark)
-  styles/          Font, design tokens and base styles
-  site.ts          Site configuration and content
+                   legal table of contents), motion.ts, language.ts, theme.ts and theme-init.js
+  styles/          Fonts, design tokens and base styles
+  site.ts          Facts that are the same in every language
 ```
 
 ## Brand assets
 
 - **Griffin** (`src/assets/brand/griffin-source.png`): the emblem, used in the header, the hero, the
-  Google logo (`public/logo.png`) and the social image (`public/og.png`, which also shows the hero
-  headline; update it if the headline changes). The site serves it as
+  Google logo (`public/logo.png`) and the social images (`public/og.png` in English and
+  `public/og/<language>.png`, which also show the hero headline in that language; update them if the
+  headline changes). The site serves it as
   16-colour PNGs at 96–960 px wide (`griffin-*.png`), which for black line art are smaller than WebP or
   AVIF. To regenerate a variant:
   `node -e "require('sharp')('src/assets/brand/griffin-source.png').resize({ width: 480 }).png({ palette: true, colours: 16, dither: 0 }).toFile('src/assets/brand/griffin-480.png')"`
@@ -90,20 +99,25 @@ src/
   served versions (`hevalo-96/192/288.webp`) have them made fully transparent, so the icon sits cleanly
   on dark backgrounds.
 
-- **Fonts:** everything is set in Inter, self-hosted, except Kurdish phrases. Those use the `kurdish`
+- **Fonts:** Latin text is set in Inter and Arabic script (Arabic and Sorani) in
+  [Vazirmatn](https://github.com/rastikerdar/vazirmatn), both self-hosted variable fonts under the OFL.
+  Vazirmatn is designed to match Latin sans-serifs like Inter and covers the Sorani letters (ڕ ڵ ۆ ێ
+  ە). The browser downloads it only when Arabic script is on screen: on Arabic and Sorani pages, and
+  elsewhere when the visitor reaches for the language menu, which lists those two languages in their
+  own script. Kurdish phrases use the `kurdish`
   class in `src/styles/global.css`, the same serif italic as hevalo.app:
   `'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif`. These are
   fonts already on the visitor's device (Iowan Old Style on Apple devices, Palatino Linotype on
   Windows), so nothing is downloaded. Widths differ between them, so the motto's size leaves room for
   the widest.
 
-  Inter's main file covers basic Latin, which already includes ê, î and û;
-  `src/assets/fonts/inter-kurmanji-opsz.woff2` adds Ş and ş, the only Kurmanji letters missing from
-  it, for Kurdish words in Inter text, and loads only on pages that use them. It was cut from Fontsource's Inter Latin Extended file
-  (OFL, licence alongside it) with fontTools:
+  Inter's main file covers basic Latin, which already includes every letter of Dutch, German, Spanish
+  and French, and ç, ö, ü, ê, î and û; `src/assets/fonts/inter-latin-extra-opsz.woff2` adds the five
+  letters still missing for Turkish and Kurmanji (Ğ ğ İ Ş ş), and loads only on pages that use them.
+  It was cut from Fontsource's Inter Latin Extended file (OFL) with fontTools:
   `pyftsubset node_modules/@fontsource-variable/inter/files/inter-latin-ext-opsz-normal.woff2
-  --unicodes=U+015E,U+015F --layout-features='*' --flavor=woff2
-  --output-file=src/assets/fonts/inter-kurmanji-opsz.woff2`.
+  --unicodes=U+011E,U+011F,U+0130,U+015E,U+015F --layout-features='*' --flavor=woff2
+  --output-file=src/assets/fonts/inter-latin-extra-opsz.woff2`.
 
 ## Light and dark theme
 
@@ -137,7 +151,6 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Motto:** the sun turns slowly as the section scrolls past (`data-spin`), and the Kurdish
   sentence rises word by word.
 - **Footer:** the Zagrosian wordmark rises out of its baseline as the footer appears (`data-rise`).
-- **Header:** switches to the dark palette while it sits over a dark section.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 
 Rules the code follows:
@@ -159,14 +172,68 @@ and other tools read directly:
   contact points, social profiles, the Hevalo brand) and the page itself, with breadcrumbs and a
   last-modified date on the legal pages. Nodes refer to each other by `@id`, so they form one
   description of the company.
-- **Markdown versions:** every page is also published as Markdown (`/index.md`, `/privacy.md`,
-  `/terms.md`, `/security.md`) and linked from the page with `<link rel="alternate" type="text/markdown">`.
+- **Markdown versions:** every page, in every language, is also published as Markdown (`/index.md`,
+  `/privacy.md`, `/de/index.md`, `/de/privacy.md`, …) and linked from the page with
+  `<link rel="alternate" type="text/markdown">`.
 - **llms.txt:** [`/llms.txt`](https://zagrosian.com/llms.txt) is a short overview for language models
-  in the [llms.txt](https://llmstxt.org) format, and `/llms-full.txt` has the text of every page in one
-  file. Both are built from the same content as the pages ([`src/lib/pages.ts`](src/lib/pages.ts)).
+  in the [llms.txt](https://llmstxt.org) format, with links to every language, and `/llms-full.txt` has
+  the text of every English page in one file. Both are built from the same content as the pages
+  ([`src/lib/pages.ts`](src/lib/pages.ts)).
 - **Sitemap, robots.txt, web app manifest and security.txt** complete the picture.
 
 The Markdown and text files are marked `noindex`, so search results always show the real pages.
+
+## Languages
+
+The site is in the same nine languages as Hevalo, listed in
+[`src/i18n/locales.ts`](src/i18n/locales.ts):
+
+| Language            | Code  | Address         | Direction     |
+| ------------------- | ----- | --------------- | ------------- |
+| English (default)   | `en`  | `/`             | left to right |
+| Kurdish (Kurmanji)  | `ku`  | `/ku`           | left to right |
+| Kurdish (Sorani)    | `ckb` | `/ckb`          | right to left |
+| Dutch               | `nl`  | `/nl`           | left to right |
+| German              | `de`  | `/de`           | left to right |
+| Spanish             | `es`  | `/es`           | left to right |
+| French              | `fr`  | `/fr`           | left to right |
+| Turkish             | `tr`  | `/tr`           | left to right |
+| Arabic              | `ar`  | `/ar`           | right to left |
+
+Every page exists in every language at the same path under the language's prefix (`/privacy`,
+`/de/privacy`, `/ar/privacy`), each with its own 404 page. The language is read from the address, so
+pages are fully static and every language can be indexed.
+
+- **Text:** [`src/i18n/messages/en.ts`](src/i18n/messages/en.ts) defines every string; each other
+  language file has the same shape, so a missing or extra string is a type error at build time.
+  The Kurdish and Arabic translations use the same words as Hevalo's own interface where they overlap.
+  Brand and product names stay in Latin script.
+- **Choosing a language:** the globe button in the header opens a menu with every language, each
+  written in that language (a native popover, so it works with keyboard and screen readers and needs
+  no script to open). On phones the list is in the menu. Visitors whose browser prefers another
+  available language see a small suggestion to switch, written in that language; it never redirects.
+  Once they choose or dismiss it, it does not appear again (`language-chosen` in `localStorage`, which
+  the privacy policy mentions).
+- **Right to left:** Arabic and Sorani pages set `dir="rtl"`. Layout uses logical CSS properties, so
+  it mirrors by itself; arrows flip, and Arabic script gets no letter-spacing and taller lines. Latin
+  text inside them (brand names, email addresses, the Kurmanji motto) keeps its own direction and
+  spacing.
+- **Long words:** German and Dutch headings are hyphenated where the browser supports it; legal titles
+  with long compounds (such as *Datenschutzerklärung*) are sized so the word fits a phone screen, and
+  as a last resort a word breaks rather than overflowing.
+- **Search engines:** every page lists all its translations with `hreflang` links (plus `x-default`
+  for English), in the page and in the sitemap. Each page has its own `og:locale` and social image
+  (`public/og/<code>.png`), the structured data gives each page's language, and Cloudflare sends a
+  matching `Content-Language` header (`public/_headers`).
+- **Legal pages:** the English text is the original. Translations carry a notice that the English
+  version applies if they differ. Have translations reviewed by a native speaker, and a lawyer where it
+  matters, before relying on them.
+
+To add a language: add it to `locales` in `src/i18n/locales.ts`, add a message file in
+`src/i18n/messages/` and import it in `src/i18n/index.ts`, add its legal pages under
+`src/content/legal/<code>/`, add its two `Content-Language` rules to `public/_headers`, and make its
+social image `public/og/<code>.png`. The build fails if the message file or any of the legal pages
+is missing.
 
 ## Browser features
 

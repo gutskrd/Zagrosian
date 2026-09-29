@@ -1,29 +1,27 @@
 ---
+import { i18n } from '../i18n';
+import { hevalo } from '../site';
 import SplitText from './SplitText.astro';
-import { headquarters, hevalo, home } from '../site';
+
+const { t } = i18n(Astro.url);
 ---
 
 <section id="about" class="about section" aria-labelledby="about-title">
   <div class="container about__grid">
-    <p class="eyebrow" data-reveal>About</p>
+    <p class="eyebrow" data-reveal>{t.about.eyebrow}</p>
 
     <div class="about__body" data-reveal>
-      <SplitText
-        id="about-title"
-        class="about__statement"
-        effect="highlight"
-        text={home.mission}
-      />
-      <p class="about__text lead">{home.approach}</p>
+      <SplitText id="about-title" class="about__statement" effect="highlight" text={t.about.mission} />
+      <p class="about__text lead">{t.about.approach}</p>
 
       <dl class="about__facts rule">
         <div>
-          <dt>Headquarters</dt>
-          <dd>{headquarters}</dd>
+          <dt>{t.about.headquartersLabel}</dt>
+          <dd>{t.about.headquarters}</dd>
         </div>
         <div>
-          <dt>Products</dt>
-          <dd><a href={hevalo.url}>{hevalo.name}</a></dd>
+          <dt>{t.about.productsLabel}</dt>
+          <dd><a href={hevalo.url} lang="en" dir="ltr">{hevalo.name}</a></dd>
         </div>
       </dl>
     </div>

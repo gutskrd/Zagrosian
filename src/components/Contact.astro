@@ -1,37 +1,46 @@
 ---
+import { format, i18n } from '../i18n';
+import { site } from '../site';
 import Arrow from './Arrow.astro';
 import SplitText from './SplitText.astro';
-import { home, site } from '../site';
 
+const { t, localize } = i18n(Astro.url);
 const { contact, press } = site.emails;
 ---
 
 <section id="contact" class="contact section" aria-labelledby="contact-title">
   <div class="container contact__grid">
     <div>
-      <p class="eyebrow" data-reveal>Contact</p>
-      <SplitText id="contact-title" class="heading-2 contact__title" text="Get in touch." />
-      <p class="contact__text lead" data-reveal>{home.contact}</p>
+      <p class="eyebrow" data-reveal>{t.contact.eyebrow}</p>
+      <SplitText id="contact-title" class="heading-2 contact__title" text={t.contact.title} />
+      <p class="contact__text lead" data-reveal>{t.contact.lead}</p>
     </div>
 
     <address class="contact__panel" data-reveal>
       <a class="contact__email" href={`mailto:${contact}`}>
-        <span>{contact}</span>
+        <span dir="ltr">{contact}</span>
         <Arrow class="contact__arrow" />
       </a>
 
       <div class="contact__actions">
         {/* Shown by script only where the Clipboard API is available. */}
-        <button class="contact__copy" type="button" data-copy={contact} hidden>
-          <span class="contact__copy-idle">Copy address</span>
-          <span class="contact__copy-done" aria-hidden="true">Copied</span>
+        <button
+          class="contact__copy"
+          type="button"
+          data-copy={contact}
+          data-copied-message={format(t.contact.copiedStatus, { email: contact })}
+          data-copy-failed-message={format(t.contact.copyFailed, { email: contact })}
+          hidden
+        >
+          <span class="contact__copy-idle">{t.contact.copy}</span>
+          <span class="contact__copy-done" aria-hidden="true">{t.contact.copied}</span>
         </button>
         <p class="visually-hidden" role="status" data-copy-status></p>
       </div>
 
       <p class="contact__note">
-        Press enquiries: <a href={`mailto:${press}`}>{press}</a><br />
-        To report a security issue, please see our <a href="/security">security policy</a>.
+        {t.contact.press} <a href={`mailto:${press}`} dir="ltr">{press}</a><br />
+        {t.contact.security.before} <a href={localize('/security')}>{t.contact.security.link}</a>{t.contact.security.after}
       </p>
     </address>
   </div>

@@ -3,12 +3,14 @@ import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal
 import themeInit from '../scripts/theme-init.js?url';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import LanguageSuggestion from '../components/LanguageSuggestion.astro';
+import { defaultLocale, i18n, localizePath, locales } from '../i18n';
 import { structuredData, toJsonLd } from '../lib/structured-data';
 import { site } from '../site';
 import '../styles/global.css';
 
 interface Props {
-  /** Full document title. Defaults to the site title. */
+  /** Full document title. Defaults to the site title in the page's language. */
   title?: string;
   description?: string;
   /** Keep error pages out of search results. */
@@ -19,21 +21,40 @@ interface Props {
   dateModified?: string;
 }
 
-const { title = site.title, description = site.description, noindex = false, breadcrumb, dateModified } = Astro.props;
+const { locale, info, t, base } = i18n(Astro.url);
+const { title = t.meta.title, description = t.meta.description, noindex = false, breadcrumb, dateModified } = Astro.props;
 
+const absolute = (path: string) => new URL(path, site.url).href;
 // Pages build to /name.html, but are served (and should be linked) as /name.
-const path = Astro.url.pathname.replace(/(index)?\.html$/, '');
-const canonical = new URL(path, site.url).href;
-const ogImage = new URL('/og.png', site.url).href;
-// Every indexable page also has a Markdown version (src/pages/[page].md.ts).
-const markdown = path === '/' ? '/index.md' : `${path}.md`;
+const path = localizePath(locale, base);
+const canonical = absolute(path);
+// Every page except the 404 page exists in every language.
+const alternates = noindex
+  ? []
+  : [
+      ...locales.map(({ code }) => ({ hreflang: code, href: absolute(localizePath(code, base)) })),
+      { hreflang: 'x-default', href: absolute(base) },
+    ];
+const ogImage = absolute(locale === defaultLocale ? '/og.png' : `/og/${locale}.png`);
+// Every indexable page also has a Markdown version: /index.md, /de/index.md, /de/privacy.md.
+const markdown = base === '/' ? `${path === '/' ? '' : path}/index.md` : `${path}.md`;
 const jsonLd = noindex
   ? undefined
-  : toJsonLd(structuredData({ url: canonical, title, description, breadcrumb, dateModified }));
+  : toJsonLd(
+      structuredData({
+        url: canonical,
+        title,
+        description,
+        locale,
+        home: { name: t.nav.home, url: absolute(localizePath(locale, '/')) },
+        breadcrumb,
+        dateModified,
+      }),
+    );
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale} dir={info.dir}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,6 +62,7 @@ const jsonLd = noindex
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {alternates.map(({ hreflang, href }) => <link rel="alternate" hreflang={hreflang} href={href} />)}
     {!noindex && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown" />}
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
@@ -53,14 +75,19 @@ const jsonLd = noindex
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content={info.ogLocale} />
+    {
+      locales
+        .filter(({ code }) => code !== locale)
+        .map(({ ogLocale }) => <meta property="og:locale:alternate" content={ogLocale} />)
+    }
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${site.name}: ${site.tagline}`} />
+    <meta property="og:image:alt" content={`${site.name}: ${t.meta.tagline}`} />
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
@@ -68,12 +95,13 @@ const jsonLd = noindex
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t.common.skipToContent}</a>
     <Header />
     <main id="main">
       <slot />
     </main>
     <Footer />
+    <LanguageSuggestion />
 
     <script>
       import '../scripts/site';

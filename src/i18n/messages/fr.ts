@@ -1,0 +1,109 @@
+import type { Messages } from './en';
+
+/* French typography: a no-break space ( ) comes before ":" and the like. */
+export const fr: Messages = {
+  meta: {
+    title: 'Zagrosian — La technologie au quotidien',
+    tagline: 'La technologie au quotidien.',
+    description:
+      'Zagrosian est une entreprise technologique indépendante basée aux Pays-Bas. Nous concevons et développons des produits grand public, à commencer par Hevalo, une application pour apprendre le kurde.',
+  },
+  common: {
+    skipToContent: 'Aller au contenu',
+    homeLink: 'Zagrosian, accueil',
+    primaryNav: 'Navigation principale',
+    footerNav: 'Pied de page',
+    socialNav: 'Réseaux sociaux',
+    legalNav: 'Informations légales',
+    menu: 'Menu',
+    close: 'Fermer',
+    backToTop: 'Haut de page',
+  },
+  nav: {
+    home: 'Accueil',
+    hevalo: 'Hevalo',
+    about: 'À propos',
+    contact: 'Contact',
+    visitHevalo: 'Découvrir Hevalo',
+    privacy: 'Confidentialité',
+    terms: 'Conditions',
+    security: 'Sécurité',
+  },
+  theme: {
+    toggle: 'Thème sombre',
+    legend: 'Thème',
+    system: 'Système',
+    light: 'Clair',
+    dark: 'Sombre',
+  },
+  language: {
+    label: 'Langue',
+    suggestion: 'Cette page est aussi disponible en français.',
+    switchTo: 'Lire en français',
+    dismiss: 'Fermer',
+  },
+  hero: {
+    notice: 'Hevalo arrive sur iOS et Android',
+    headline: ['La technologie', 'au quotidien.'],
+    lead: 'Zagrosian est une entreprise technologique indépendante basée aux Pays-Bas. Nous concevons et développons des produits grand public, à commencer par Hevalo, une application pour apprendre le kurde.',
+    products: 'Nos produits',
+    about: 'À propos de Zagrosian',
+    griffinAlt: 'Le griffon de Zagrosian',
+  },
+  hevalo: {
+    eyebrow: 'Produits',
+    category: 'Apprentissage du kurde',
+    description:
+      'Une application pour apprendre le kurde grâce à de courtes leçons et à des jeux à partager entre amis. D’abord disponible en kurmandji ; d’autres dialectes suivront.',
+    visit: 'Visiter hevalo.app',
+    website: 'Site web',
+    comingSoon: 'Bientôt disponible',
+    comingSoonTitle: 'Hevalo pour iOS et Android.',
+    comingSoonNote:
+      'Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
+  },
+  motto: 'La vie est plus douce en kurde.',
+  about: {
+    eyebrow: 'À propos',
+    mission:
+      'Notre mission est de créer des logiciels que l’on prend plaisir à utiliser chaque jour : rapides, respectueux de la vie privée et bien conçus.',
+    approach: 'Zagrosian est une entreprise privée. Nous concevons et développons nos produits en interne.',
+    headquartersLabel: 'Siège',
+    headquarters: 'Pays-Bas',
+    productsLabel: 'Produits',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Contactez-nous.',
+    lead: 'Pour toute demande générale ou proposition de partenariat, écrivez-nous par e-mail.',
+    general: 'Demandes générales :',
+    copy: 'Copier l’adresse',
+    copied: 'Copiée',
+    copiedStatus: 'L’adresse {email} a été copiée dans le presse-papiers.',
+    copyFailed: 'Copie impossible. Sélectionnez {email} pour copier l’adresse.',
+    press: 'Presse :',
+    security: {
+      before: 'Pour signaler un problème de sécurité, consultez notre',
+      link: 'politique de sécurité',
+      after: '.',
+    },
+  },
+  footer: {
+    about: ['Entreprise technologique indépendante', 'basée aux Pays-Bas.'],
+  },
+  legal: {
+    eyebrow: 'Informations légales',
+    updated: 'Dernière mise à jour',
+    contents: 'Sur cette page',
+    translationNotice:
+      'Ceci est une traduction. En cas de divergence avec la version anglaise, la version anglaise prévaut.',
+    readEnglish: 'Lire la version anglaise',
+  },
+  notFound: {
+    title: 'Page introuvable',
+    heading: 'Cette page n’existe pas.',
+    description: 'La page que vous cherchez est introuvable.',
+    body: 'Le lien est peut-être erroné, ou la page a été déplacée.',
+    back: 'Retour à l’accueil',
+  },
+};

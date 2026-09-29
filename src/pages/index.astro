@@ -1,17 +1,5 @@
 ---
-import About from '../components/About.astro';
-import Contact from '../components/Contact.astro';
-import Hero from '../components/Hero.astro';
-import Motto from '../components/Motto.astro';
-import ProductShowcase from '../components/ProductShowcase.astro';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { hevalo } from '../site';
+import HomePage from '../components/HomePage.astro';
 ---
 
-<BaseLayout>
-  <Hero />
-  <ProductShowcase product={hevalo} />
-  <Motto />
-  <About />
-  <Contact />
-</BaseLayout>
+<HomePage />

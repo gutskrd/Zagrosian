@@ -5,15 +5,18 @@
  * readers work as usual; the sliding indicator follows the
  * `data-theme-preference` attribute on <html>.
  */
+import { i18n } from '../i18n';
+
+const { t } = i18n(Astro.url);
 const options = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: t.theme.system },
+  { value: 'light', label: t.theme.light },
+  { value: 'dark', label: t.theme.dark },
 ] as const;
 ---
 
 <fieldset class="theme-switch" data-theme-switch>
-  <legend class="visually-hidden">Theme</legend>
+  <legend class="visually-hidden">{t.theme.legend}</legend>
   <span class="theme-switch__thumb" aria-hidden="true"></span>
   {
     options.map(({ value, label }) => (
@@ -62,7 +65,7 @@ const options = [
   .theme-switch__thumb {
     position: absolute;
     top: var(--inset);
-    left: var(--inset);
+    inset-inline-start: var(--inset);
     width: var(--option);
     height: var(--option);
     border-radius: 50%;
@@ -71,11 +74,11 @@ const options = [
   }
 
   :global(:root[data-theme-preference='light']) .theme-switch__thumb {
-    transform: translateX(100%);
+    transform: translateX(calc(100% * var(--direction)));
   }
 
   :global(:root[data-theme-preference='dark']) .theme-switch__thumb {
-    transform: translateX(200%);
+    transform: translateX(calc(200% * var(--direction)));
   }
 
   .theme-switch__option {

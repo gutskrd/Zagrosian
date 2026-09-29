@@ -1,0 +1,109 @@
+import type { Messages } from './en';
+
+/* Kurmancî. Words shared with Hevalo's own interface (Biçe naverokê, Menû,
+   Bigire, Di rê de, Hat kopîkirin, Rûpel nehat dîtin) are kept the same. */
+export const ku: Messages = {
+  meta: {
+    title: 'Zagrosian — Teknolojî ji bo jiyana rojane',
+    tagline: 'Teknolojî ji bo jiyana rojane.',
+    description:
+      'Zagrosian şirketeke teknolojiyê ya serbixwe ye û navenda wê li Holendayê ye. Em ji bo bikarhêneran berheman disêwirînin û çêdikin; ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
+  },
+  common: {
+    skipToContent: 'Biçe naverokê',
+    homeLink: 'Zagrosian, rûpela sereke',
+    primaryNav: 'Navîgasyona sereke',
+    footerNav: 'Binê rûpelê',
+    socialNav: 'Medyaya civakî',
+    legalNav: 'Hiqûqî',
+    menu: 'Menû',
+    close: 'Bigire',
+    backToTop: 'Vegere jor',
+  },
+  nav: {
+    home: 'Rûpela sereke',
+    hevalo: 'Hevalo',
+    about: 'Derbarê me de',
+    contact: 'Têkilî',
+    visitHevalo: 'Serdana Hevalo bike',
+    privacy: 'Nepenî',
+    terms: 'Şert û merc',
+    security: 'Ewlekarî',
+  },
+  theme: {
+    toggle: 'Tema tarî',
+    legend: 'Tema',
+    system: 'Pergal',
+    light: 'Ronî',
+    dark: 'Tarî',
+  },
+  language: {
+    label: 'Ziman',
+    suggestion: 'Ev rûpel bi kurmancî jî heye.',
+    switchTo: 'Bi kurmancî bixwîne',
+    dismiss: 'Bigire',
+  },
+  hero: {
+    notice: 'Hevalo tê ser iOS û Androidê',
+    headline: ['Teknolojî ji bo', 'jiyana rojane.'],
+    lead: 'Zagrosian şirketeke teknolojiyê ya serbixwe ye û navenda wê li Holendayê ye. Em ji bo bikarhêneran berheman disêwirînin û çêdikin; ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
+    products: 'Berhemên me',
+    about: 'Derbarê Zagrosian de',
+    griffinAlt: 'Grîfona Zagrosian',
+  },
+  hevalo: {
+    eyebrow: 'Berhem',
+    category: 'Fêrbûna kurdî',
+    description:
+      'Sepanek ji bo fêrbûna kurdî bi dersên kurt û lîstikên ku bi hevalan re tên lîstin. Pêşî bi kurmancî heye; zaravayên din jî di plana me de ne.',
+    visit: 'Serdana hevalo.app bike',
+    website: 'Malper',
+    comingSoon: 'Di rê de',
+    comingSoonTitle: 'Hevalo ji bo iOS û Androidê.',
+    comingSoonNote: 'Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
+  },
+  // The motto is already in Kurmancî.
+  motto: '',
+  about: {
+    eyebrow: 'Derbarê me de',
+    mission:
+      'Armanca me ew e ku em nermalavên wisa çêbikin ku mirov her roj bi kêfxweşî bi kar bînin: bilez, nepeniyê diparêzin û bi baldarî hatine sêwirandin.',
+    approach: 'Zagrosian şirketeke taybet e. Em berhemên xwe bi xwe disêwirînin û çêdikin.',
+    headquartersLabel: 'Navend',
+    headquarters: 'Holenda',
+    productsLabel: 'Berhem',
+  },
+  contact: {
+    eyebrow: 'Têkilî',
+    title: 'Bi me re têkilî daynin.',
+    lead: 'Ji bo pirsên giştî û hevkariyan, ji kerema xwe bi e-nameyê bi me re têkilî daynin.',
+    general: 'Pirsên giştî:',
+    copy: 'Navnîşanê kopî bike',
+    copied: 'Hat kopîkirin',
+    copiedStatus: '{email} hat kopîkirin.',
+    copyFailed: 'Kopîkirin pêk nehat. Ji bo kopîkirinê {email} hilbijêre.',
+    press: 'Çapemenî:',
+    security: {
+      before: 'Ji bo ragihandina pirsgirêkeke ewlekariyê, ji kerema xwe li',
+      link: 'polîtîkaya me ya ewlekariyê',
+      after: ' binêrin.',
+    },
+  },
+  footer: {
+    about: ['Şirketeke teknolojiyê ya serbixwe', 'li Holendayê.'],
+  },
+  legal: {
+    eyebrow: 'Hiqûqî',
+    updated: 'Nûvekirina dawî',
+    contents: 'Di vê rûpelê de',
+    translationNotice: 'Ev wergerek e. Heke ji guhertoya îngilîzî cuda be, guhertoya îngilîzî derbasdar e.',
+    readEnglish: 'Guhertoya îngilîzî bixwîne',
+  },
+  notFound: {
+    title: 'Rûpel nehat dîtin',
+    heading: 'Ev rûpel tune ye.',
+    description: 'Rûpela ku tu lê digeriyayî nehat dîtin.',
+    body: 'Dibe ku girêdan xelet be, an jî rûpel hatibe guhastin.',
+    back: 'Vegere rûpela sereke',
+  },
+};

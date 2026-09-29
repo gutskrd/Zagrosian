@@ -1,9 +1,16 @@
 ---
-import { hevalo, home, site } from '../site';
+import { i18n } from '../i18n';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
 import Griffin from './Griffin.astro';
 import HevaloIcon from './HevaloIcon.astro';
+
+const { t } = i18n(Astro.url);
+
+// The headline is sized so its longest line fits the column. Most languages
+// fit the default; longer lines step the size down (see .hero__title--*).
+const longest = Math.max(...t.hero.headline.map((line) => [...line].length));
+const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? 'sm' : 'xs';
 ---
 
 <section class="hero" aria-labelledby="hero-title">
@@ -11,13 +18,13 @@ import HevaloIcon from './HevaloIcon.astro';
     <div class="hero__text">
       <a class="hero__notice intro" href="#hevalo">
         <HevaloIcon class="hero__notice-icon" sizes="20px" loading="eager" />
-        <span>{hevalo.name} is coming to {hevalo.availability.comingSoon.join(' and ')}</span>
+        <span>{t.hero.notice}</span>
         <Arrow direction="down" class="hero__notice-arrow" />
       </a>
 
-      <h1 id="hero-title" class="hero__title">
+      <h1 id="hero-title" class:list={['hero__title', fit && `hero__title--${fit}`]}>
         {
-          home.headline.map((line) => (
+          t.hero.headline.map((line) => (
             <span class="hero__line">
               <span>{line}</span>
             </span>
@@ -25,16 +32,16 @@ import HevaloIcon from './HevaloIcon.astro';
         }
       </h1>
 
-      <p class="hero__lead lead intro">{home.lead}</p>
+      <p class="hero__lead lead intro">{t.hero.lead}</p>
 
       <div class="hero__actions intro">
-        <Cta href="#hevalo" arrow="down">Our products</Cta>
-        <Cta href="#about" variant="text">About {site.name}</Cta>
+        <Cta href="#hevalo" arrow="down">{t.hero.products}</Cta>
+        <Cta href="#about" variant="text">{t.hero.about}</Cta>
       </div>
     </div>
 
     <figure class="hero__emblem intro" data-parallax="0.08">
-      <Griffin alt="The Zagrosian griffin" sizes="(min-width: 64rem) 34vw, min(64vw, 22rem)" loading="eager" />
+      <Griffin alt={t.hero.griffinAlt} sizes="(min-width: 64rem) 34vw, min(64vw, 22rem)" loading="eager" />
     </figure>
   </div>
 </section>
@@ -71,7 +78,7 @@ import HevaloIcon from './HevaloIcon.astro';
 
   .hero__notice :global(.hero__notice-icon) {
     width: 1.25rem;
-    margin-left: -0.25rem;
+    margin-inline-start: -0.25rem;
   }
 
   .hero__notice :global(.hero__notice-arrow) {
@@ -109,6 +116,18 @@ import HevaloIcon from './HevaloIcon.astro';
     font-size: min(var(--text-display), 16cqi, 18svh);
     line-height: 0.98;
     letter-spacing: -0.045em;
+  }
+
+  .hero__title--md {
+    font-size: min(var(--text-display), 14cqi, 18svh);
+  }
+
+  .hero__title--sm {
+    font-size: min(var(--text-display), 12.5cqi, 18svh);
+  }
+
+  .hero__title--xs {
+    font-size: min(var(--text-display), 11cqi, 18svh);
   }
 
   /* Each line rises from behind its own mask on load. */

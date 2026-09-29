@@ -1,0 +1,24 @@
+---
+/**
+ * A legal page (privacy, terms or security) in the language of the URL, from
+ * src/content/legal/<language>/<page>.md.
+ */
+import { getEntry, render } from 'astro:content';
+import { i18n, type LegalSlug } from '../i18n';
+import LegalLayout from '../layouts/LegalLayout.astro';
+
+interface Props {
+  slug: LegalSlug;
+}
+
+const { slug } = Astro.props;
+const { locale } = i18n(Astro.url);
+
+const entry = await getEntry('legal', `${locale}/${slug}`);
+if (!entry) throw new Error(`Missing translation: src/content/legal/${locale}/${slug}.md`);
+const { Content, headings } = await render(entry);
+---
+
+<LegalLayout entry={entry} headings={headings}>
+  <Content />
+</LegalLayout>

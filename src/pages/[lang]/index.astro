@@ -1,0 +1,9 @@
+---
+import type { GetStaticPaths } from 'astro';
+import HomePage from '../../components/HomePage.astro';
+import { prefixedLocales } from '../../i18n';
+
+export const getStaticPaths = (() => prefixedLocales.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+---
+
+<HomePage />

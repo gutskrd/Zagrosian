@@ -1,5 +1,4 @@
 ---
-layout: ../layouts/LegalLayout.astro
 title: Security
 eyebrow: Responsible disclosure
 description: How to report a security vulnerability in zagrosian.com, Hevalo or other Zagrosian services.

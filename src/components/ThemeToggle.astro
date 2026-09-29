@@ -5,10 +5,13 @@
  * circle slides over it and the rays fold away. Its state follows the
  * `data-theme` attribute on <html>, so it is right from the first paint.
  */
+import { i18n } from '../i18n';
+
+const { t } = i18n(Astro.url);
 ---
 
 <button class="theme-toggle" type="button" aria-pressed="false" data-theme-toggle>
-  <span class="visually-hidden">Dark theme</span>
+  <span class="visually-hidden">{t.theme.toggle}</span>
   <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <mask id="theme-toggle-shadow" maskUnits="userSpaceOnUse">
       <rect width="24" height="24" fill="#fff"></rect>

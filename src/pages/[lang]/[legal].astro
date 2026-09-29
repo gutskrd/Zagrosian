@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalPage from '../../components/LegalPage.astro';
+import { legalSlugs, prefixedLocales } from '../../i18n';
+
+export const getStaticPaths = (() =>
+  prefixedLocales.flatMap((lang) => legalSlugs.map((legal) => ({ params: { lang, legal }, props: { slug: legal } })))) satisfies GetStaticPaths;
+
+const { slug } = Astro.props;
+---
+
+<LegalPage slug={slug} />

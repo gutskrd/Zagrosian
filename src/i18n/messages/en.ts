@@ -1,0 +1,114 @@
+/**
+ * English text for the site. Every other language file has the same shape (the
+ * `Messages` type), so a missing translation is a type error. The page, its
+ * Markdown version and llms.txt are all built from these files.
+ *
+ * Kurdish phrases that are part of the brand (the motto and the footer line)
+ * stay in Kurmanji in every language; see src/site.ts.
+ */
+export const en = {
+  meta: {
+    title: 'Zagrosian — Technology for everyday life',
+    tagline: 'Technology for everyday life.',
+    description:
+      'Zagrosian is an independent technology company based in the Netherlands. We design and build consumer products, starting with Hevalo, an app for learning Kurdish.',
+  },
+  common: {
+    skipToContent: 'Skip to content',
+    homeLink: 'Zagrosian, home',
+    primaryNav: 'Primary',
+    footerNav: 'Footer',
+    socialNav: 'Social media',
+    legalNav: 'Legal',
+    menu: 'Menu',
+    close: 'Close',
+    backToTop: 'Back to top',
+  },
+  nav: {
+    home: 'Home',
+    hevalo: 'Hevalo',
+    about: 'About',
+    contact: 'Contact',
+    visitHevalo: 'Visit Hevalo',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    security: 'Security',
+  },
+  theme: {
+    toggle: 'Dark theme',
+    legend: 'Theme',
+    system: 'System',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  language: {
+    label: 'Language',
+    /** Offered to visitors whose browser prefers this language (written in this language). */
+    suggestion: 'This page is also available in English.',
+    switchTo: 'Read in English',
+    dismiss: 'Dismiss',
+  },
+  hero: {
+    notice: 'Hevalo is coming to iOS and Android',
+    /** One entry per line of the headline. */
+    headline: ['Technology for', 'everyday life.'],
+    lead: 'Zagrosian is an independent technology company based in the Netherlands. We design and build consumer products, starting with Hevalo, an app for learning Kurdish.',
+    products: 'Our products',
+    about: 'About Zagrosian',
+    griffinAlt: 'The Zagrosian griffin',
+  },
+  hevalo: {
+    eyebrow: 'Products',
+    category: 'Kurdish language learning',
+    description:
+      'An app for learning Kurdish through short lessons and games played with friends. Available first in Kurmanji, with more dialects planned.',
+    visit: 'Visit hevalo.app',
+    website: 'Website',
+    comingSoon: 'Coming soon',
+    comingSoonTitle: 'Hevalo for iOS and Android.',
+    comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
+  },
+  /** Translation of the Kurmanji motto "Jiyan bi kurdî xweştire." Empty in Kurmanji. */
+  motto: 'Life is sweeter in Kurdish.',
+  about: {
+    eyebrow: 'About',
+    mission: 'Our mission is to build software people enjoy using every day: fast, private and well designed.',
+    approach: 'Zagrosian is privately owned. We design and build our products in-house.',
+    headquartersLabel: 'Headquarters',
+    headquarters: 'Netherlands',
+    productsLabel: 'Products',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Get in touch.',
+    lead: 'For general enquiries and partnerships, please contact us by email.',
+    general: 'General enquiries:',
+    copy: 'Copy address',
+    copied: 'Copied',
+    copiedStatus: '{email} copied to the clipboard.',
+    copyFailed: 'Could not copy. Select {email} to copy it instead.',
+    press: 'Press enquiries:',
+    /** "To report a security issue, please see our [security policy]." */
+    security: { before: 'To report a security issue, please see our', link: 'security policy', after: '.' },
+  },
+  footer: {
+    about: ['Independent technology company', 'based in the Netherlands.'],
+  },
+  legal: {
+    eyebrow: 'Legal',
+    updated: 'Last updated',
+    contents: 'On this page',
+    /** Shown on translated legal pages only. */
+    translationNotice: 'This is a translation. If it differs from the English version, the English version applies.',
+    readEnglish: 'Read the English version',
+  },
+  notFound: {
+    title: 'Page not found',
+    heading: 'This page doesn’t exist.',
+    description: 'The page you were looking for could not be found.',
+    body: 'The link may be broken, or the page may have moved.',
+    back: 'Back to homepage',
+  },
+};
+
+export type Messages = typeof en;

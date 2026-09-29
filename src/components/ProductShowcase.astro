@@ -1,50 +1,48 @@
 ---
-import SplitText from './SplitText.astro';
+import { i18n } from '../i18n';
+import { hevalo } from '../site';
 import Cta from './Cta.astro';
 import HevaloIcon from './HevaloIcon.astro';
-import type { Product } from '../site';
+import SplitText from './SplitText.astro';
 
-interface Props {
-  product: Product;
-}
-
-const { product } = Astro.props;
-const id = product.name.toLowerCase();
-const domain = new URL(product.url).hostname;
+const { t } = i18n(Astro.url);
 ---
 
-<section id={id} class="showcase inverse" aria-labelledby={`${id}-title`}>
+<section id="hevalo" class="showcase" aria-labelledby="hevalo-title">
   <div class="container">
-    <p class="eyebrow" data-reveal>Products</p>
+    <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
       <div class="showcase__identity">
         <div class="showcase__icon" data-reveal>
           <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
         </div>
-        <SplitText id={`${id}-title`} class="showcase__name" text={product.name} />
-        <p class="showcase__byline" data-reveal>{product.category}</p>
+        <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
+        <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
       </div>
 
       <div class="showcase__details" data-reveal>
-        <p class="showcase__description">{product.description}</p>
-        <Cta href={product.url} variant="inverse">Visit {domain}</Cta>
+        <p class="showcase__description">{t.hevalo.description}</p>
+        <Cta href={hevalo.url}>{t.hevalo.visit}</Cta>
       </div>
     </div>
 
     <div class="showcase__soon rule" data-reveal>
       <div class="showcase__soon-heading">
-        <p class="showcase__status"><span class="status-dot" aria-hidden="true"></span>Coming soon</p>
-        <h3 class="showcase__soon-title">{product.name} for {product.availability.comingSoon.join(' and ')}.</h3>
+        <p class="showcase__status"><span class="status-dot" aria-hidden="true"></span>{t.hevalo.comingSoon}</p>
+        <h3 class="showcase__soon-title">{t.hevalo.comingSoonTitle}</h3>
       </div>
-      <p class="showcase__soon-text">{product.availability.comingSoonNote}</p>
+      <p class="showcase__soon-text">{t.hevalo.comingSoonNote}</p>
     </div>
   </div>
 </section>
 
 <style>
+  /* A tinted band that sets the products apart. Like the rest of the page, it
+     follows the light or dark theme. */
   .showcase {
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
+    background: var(--color-surface);
   }
 
   .showcase__body {
@@ -71,14 +69,20 @@ const domain = new URL(product.url).hostname;
     line-height: 0.86;
     letter-spacing: -0.055em;
     /* Optical alignment: the H's stem sits slightly inside the text box. */
-    margin-left: -0.05em;
+    margin-inline-start: -0.05em;
+  }
+
+  /* Right to left, the word ends at the edge instead: the tight letter-spacing
+     leaves the last letter's ink about 0.03em outside its box, so it moves in. */
+  :global([dir='rtl']) .showcase__name {
+    margin-inline-start: 0.03em;
   }
 
   .showcase__byline {
     margin-top: 1.5rem;
     font-size: var(--text-lead);
     letter-spacing: -0.011em;
-    color: var(--color-night-muted);
+    color: var(--color-muted);
   }
 
   .showcase__details {
@@ -99,7 +103,7 @@ const domain = new URL(product.url).hostname;
     gap: 1.5rem;
     margin-top: clamp(5rem, 3rem + 7vw, 9rem);
     padding-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
-    --rule-color: var(--color-night-line);
+    --rule-color: var(--color-line-strong);
   }
 
   .showcase__status {
@@ -108,7 +112,7 @@ const domain = new URL(product.url).hostname;
     gap: 0.625rem;
     font-size: var(--text-sm);
     font-weight: 500;
-    color: var(--color-night-muted);
+    color: var(--color-muted);
   }
 
   .showcase__soon-title {
@@ -122,7 +126,7 @@ const domain = new URL(product.url).hostname;
 
   .showcase__soon-text {
     max-width: 28rem;
-    color: var(--color-night-muted);
+    color: var(--color-muted);
   }
 
   @media (min-width: 64rem) {

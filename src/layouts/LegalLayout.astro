@@ -1,29 +1,33 @@
 ---
-import type { MarkdownLayoutProps } from 'astro';
+import type { MarkdownHeading } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { i18n } from '../i18n';
 import { site } from '../site';
 import BaseLayout from './BaseLayout.astro';
 
-type Props = MarkdownLayoutProps<{
-  title: string;
-  description: string;
-  /** Small label above the title. */
-  eyebrow?: string;
-  /** Date of the last material change, e.g. 2026-09-28. */
-  updated: string | Date;
-}>;
+interface Props {
+  entry: CollectionEntry<'legal'>;
+  headings: MarkdownHeading[];
+}
 
-const { frontmatter, headings } = Astro.props;
-const { title, description, eyebrow = 'Legal' } = frontmatter;
+const { entry, headings } = Astro.props;
+const { title, description, eyebrow, updated } = entry.data;
+const { locale, t, base } = i18n(Astro.url);
 
-const updated = new Date(frontmatter.updated);
-const updatedLabel = updated.toLocaleDateString('en-GB', {
+const updatedLabel = new Intl.DateTimeFormat(locale, {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
   timeZone: 'UTC',
-});
+}).format(updated);
 
 const sections = headings.filter((heading) => heading.depth === 2);
+
+// The title is sized so its longest word fits a phone screen: long compounds
+// such as "Datenschutzerklärung" step the size down (see .legal__title--*).
+const longestWord = Math.max(...title.split(/\s+/).map((word) => [...word].length));
+const fit = longestWord <= 15 ? undefined : longestWord <= 17 ? 'md' : 'sm';
+const isTranslation = locale !== 'en';
 ---
 
 <BaseLayout
@@ -36,19 +40,29 @@ const sections = headings.filter((heading) => heading.depth === 2);
 
   <article class="legal" aria-labelledby="legal-title">
     <header class="container legal__header">
-      <p class="eyebrow">{eyebrow}</p>
-      <h1 id="legal-title" class="legal__title">{title}</h1>
+      <p class="eyebrow">{eyebrow ?? t.legal.eyebrow}</p>
+      <h1 id="legal-title" class:list={['legal__title', fit && `legal__title--${fit}`]}>{title}</h1>
       <p class="legal__updated">
-        Last updated <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
+        {t.legal.updated} <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
       </p>
+      {
+        isTranslation && (
+          <p class="legal__notice">
+            {t.legal.translationNotice}{' '}
+            <a href={base} hreflang="en">
+              {t.legal.readEnglish}
+            </a>
+          </p>
+        )
+      }
     </header>
 
     <div class="container legal__grid">
       {
         sections.length > 0 && (
-          <nav class="legal__toc" aria-label="On this page">
+          <nav class="legal__toc" aria-label={t.legal.contents}>
             <details class="legal__toc-details" data-toc>
-              <summary class="legal__toc-title">On this page</summary>
+              <summary class="legal__toc-title">{t.legal.contents}</summary>
               <ol>
                 {sections.map((section) => (
                   <li>
@@ -85,11 +99,15 @@ const sections = headings.filter((heading) => heading.depth === 2);
     height: 100%;
     background: var(--color-ink);
     transform: scaleX(0);
-    transform-origin: left;
+    transform-origin: var(--start);
   }
 
   .legal {
     padding-block: clamp(4.5rem, 2.5rem + 7vw, 8rem) var(--section-space);
+  }
+
+  .legal__header {
+    container-type: inline-size;
   }
 
   .legal__title {
@@ -97,6 +115,32 @@ const sections = headings.filter((heading) => heading.depth === 2);
     font-size: var(--text-h2);
     line-height: 1.04;
     letter-spacing: -0.035em;
+  }
+
+  .legal__title--md {
+    font-size: min(var(--text-h2), 10.5cqi);
+  }
+
+  .legal__title--sm {
+    font-size: min(var(--text-h2), 9.2cqi);
+  }
+
+  .legal__notice {
+    max-width: 42rem;
+    margin-top: 1.25rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+  }
+
+  /* The padding enlarges the tap area to 24px without moving the text. */
+  .legal__notice a {
+    padding-block: 0.1875rem;
+    color: var(--color-ink);
+    text-decoration-color: var(--color-underline);
   }
 
   .legal__updated {
@@ -226,17 +270,17 @@ const sections = headings.filter((heading) => heading.depth === 2);
   }
 
   .legal__content :global(ul) {
-    padding-left: 1.25rem;
+    padding-inline-start: 1.25rem;
     list-style: disc;
   }
 
   .legal__content :global(ol) {
-    padding-left: 1.25rem;
+    padding-inline-start: 1.25rem;
     list-style: decimal;
   }
 
   .legal__content :global(li) {
-    padding-left: 0.25rem;
+    padding-inline-start: 0.25rem;
   }
 
   .legal__content :global(li + li) {

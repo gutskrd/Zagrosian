@@ -1,10 +1,12 @@
 /* ==========================================================================
    Fonts
    Inter, self-hosted. The optical-size axis gives tighter, sharper letterforms
-   at display sizes. The Latin subset covers Kurmanji's ê, î, û and ç; a
-   3 KB subset adds ş and Ş (src/assets/fonts, made with fontTools from the
-   Latin Extended file). Browsers only download a face when the page uses one
-   of its characters.
+   at display sizes. Its Latin file covers English, Dutch, German, Spanish,
+   French and most of Kurmanji and Turkish; a 5 KB subset adds the rest
+   (Ğ ğ İ Ş ş; src/assets/fonts, cut with fontTools from the Latin Extended
+   file). Arabic and Sorani use Vazirmatn, which Inter does not cover.
+   Browsers only download a face when the page uses one of its characters, so
+   English pages never load the Arabic font.
    ========================================================================== */
 
 @font-face {
@@ -23,8 +25,20 @@
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('../assets/fonts/inter-kurmanji-opsz.woff2') format('woff2');
-  unicode-range: U+015E-015F;
+  src: url('../assets/fonts/inter-latin-extra-opsz.woff2') format('woff2');
+  unicode-range: U+011E-011F, U+0130, U+015E-015F;
+}
+
+/* Arabic script, for Arabic and Sorani Kurdish (including ڕ ڵ ۆ ێ ە). */
+@font-face {
+  font-family: 'Vazirmatn Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2') format('woff2');
+  unicode-range:
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
 }
 
 /* Arial adjusted to Inter's metrics, so the swap causes no layout shift. */
@@ -43,7 +57,7 @@
 
 :root {
   /* Colour: black and white, with a small set of neutrals. Light is the default;
-     the dark palette below follows the visitor's system setting. */
+     the dark palette below applies when the visitor or their system chooses it. */
   --color-paper: #ffffff;
   --color-ink: #0a0a0a;
   --color-ink-soft: #3d3d3d;
@@ -53,18 +67,10 @@
   --color-surface: #f5f5f4;
   --color-underline: #c4c4c4;
   --color-solid-hover: #2b2b2b;
-  /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the About surface,
-     above the 3:1 minimum for large text. */
+  /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the surface
+     colour, above the 3:1 minimum for large text. */
   --color-dim: #878785;
   --header-bg: rgb(255 255 255 / 0.84);
-
-  /* Inverse surfaces (the product showcase). */
-  --color-night: #0a0a0a;
-  --color-night-ink: #fafafa;
-  --color-night-muted: #a3a3a3;
-  --color-night-line: #2a2a2a;
-  --color-night-edge: transparent;
-  --color-inverse-hover: #d9d9d9;
 
   /* Line-art brand images are black; they are inverted on dark surfaces. */
   --art-filter: none;
@@ -72,7 +78,7 @@
   --focus-ring: var(--color-ink);
 
   /* Type */
-  --font-sans: 'Inter Variable', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Vazirmatn Variable', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
   /* Kurdish phrases use the same serif as Hevalo (hevalo.app): fonts already on the
      device, so nothing is downloaded. */
   --font-kurdish: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
@@ -117,16 +123,17 @@
   --color-dim: #666666;
   --header-bg: rgb(10 10 10 / 0.8);
 
-  --color-night: #141414;
-  --color-night-line: #2e2e2e;
-  --color-night-edge: #242424;
-
   --art-filter: invert(1);
 }
 
 /* ==========================================================================
    Base
    ========================================================================== */
+
+/* `hidden` always hides, even on elements whose styles set a display value. */
+[hidden] {
+  display: none !important;
+}
 
 *,
 *::before,
@@ -184,6 +191,26 @@ h3 {
   text-wrap: balance;
 }
 
+/* Long words, such as German and Dutch compounds ("Nutzungsbedingungen",
+   "Gebruiksvoorwaarden"), must never run past the edge of a small screen.
+   Headings in those languages are hyphenated, long words only; as a last
+   resort, any word breaks rather than overflowing. Headings use `anywhere`
+   so that a grid or flex column holding one can still shrink to the screen. */
+body {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+
+:is(h1, h2, h3):is(:lang(de), :lang(nl)) {
+  hyphens: auto;
+  hyphenate-limit-chars: 10 4 4;
+}
+
 p {
   text-wrap: pretty;
 }
@@ -232,29 +259,11 @@ svg {
   padding-block: var(--section-space);
 }
 
-.inverse {
-  --focus-ring: var(--color-night-ink);
-  background: var(--color-night);
-  color: var(--color-night-ink);
-  box-shadow:
-    inset 0 1px 0 var(--color-night-edge),
-    inset 0 -1px 0 var(--color-night-edge);
-}
-
-.inverse ::selection {
-  background: var(--color-night-ink);
-  color: var(--color-night);
-}
-
 .eyebrow {
   font-size: var(--text-sm);
   font-weight: 500;
   line-height: 1.4;
   color: var(--color-muted);
-}
-
-.inverse .eyebrow {
-  color: var(--color-night-muted);
 }
 
 .kurdish {
@@ -329,7 +338,7 @@ svg {
 .skip-link {
   position: fixed;
   top: 0.75rem;
-  left: 0.75rem;
+  inset-inline-start: 0.75rem;
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 999px;
@@ -448,6 +457,12 @@ svg {
   display: inline-block;
 }
 
+/* A word wider than its line wraps inside its mask instead of overflowing. */
+.split__word,
+.split__inner {
+  max-width: 100%;
+}
+
 [data-split='pending'] .split__inner {
   transform: translateY(110%);
 }
@@ -474,7 +489,7 @@ svg {
   left: 0;
   height: 1px;
   background: var(--rule-color, var(--color-line));
-  transform-origin: left;
+  transform-origin: var(--start);
   transition: transform 1.4s var(--ease-out) var(--reveal-delay, 0s);
 }
 
@@ -495,6 +510,41 @@ svg {
 }
 
 /* ==========================================================================
+   Right-to-left languages (Arabic, Sorani Kurdish)
+   Layout uses logical properties (margin-inline-start and so on), so it
+   mirrors by itself. What remains: the side animations start from, and
+   Arabic script, whose letters join, so it gets no letter-spacing, and whose
+   marks above and below the letters need taller lines.
+   ========================================================================== */
+
+:root {
+  /* The side where lines start, for transform-origin; -1 flips horizontal movement. */
+  --start: left;
+  --direction: 1;
+}
+
+[dir='rtl'] {
+  --start: right;
+  --direction: -1;
+}
+
+/* Arrows that point forward or back, and the external-link arrow, mirror. */
+[dir='rtl'] :is(.arrow--right, .arrow--left, .arrow--up-right) {
+  scale: -1 1;
+}
+
+/* Latin text on these pages (the wordmark, "Hevalo", the Kurmanji motto,
+   email addresses) is marked lang="en" or dir="ltr" and keeps its spacing. */
+:root:is([lang='ar'], [lang='ckb']) :not(:lang(en), [dir='ltr'], [dir='ltr'] *) {
+  letter-spacing: 0 !important;
+}
+
+:root:is([lang='ar'], [lang='ckb'])
+  :is(h1, h2, h3, .hero__title, .heading-2, .about__statement, .legal__title, .notice__title, .showcase__soon-title) {
+  line-height: 1.3 !important;
+}
+
+/* ==========================================================================
    Accessibility preferences
    ========================================================================== */
 
@@ -508,8 +558,6 @@ svg {
     --color-line-strong: #5c5c5c;
     --color-underline: #5c5c5c;
     --color-dim: var(--color-ink);
-    --color-night-muted: #d9d9d9;
-    --color-night-line: #737373;
   }
 }
 
@@ -521,7 +569,6 @@ svg {
     --color-line-strong: #999999;
     --color-underline: #999999;
     --color-dim: var(--color-ink);
-    --color-night-line: #737373;
   }
 }
 

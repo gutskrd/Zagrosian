@@ -4,8 +4,8 @@ import Arrow, { type ArrowDirection } from './Arrow.astro';
 
 interface Props extends HTMLAttributes<'a'> {
   href: string;
-  /** `solid` on light backgrounds, `inverse` on dark ones, `text` for a quiet secondary link. */
-  variant?: 'solid' | 'inverse' | 'text';
+  /** `solid` for the main action, `text` for a quiet secondary link. */
+  variant?: 'solid' | 'text';
   arrow?: ArrowDirection;
 }
 
@@ -39,29 +39,16 @@ const { variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro
     transform: scale(0.97);
   }
 
-  .cta--solid,
-  .cta--inverse {
+  .cta--solid {
     min-height: 3.25rem;
     padding: 0 1.5rem;
     border-radius: 999px;
-  }
-
-  .cta--solid {
     background: var(--color-ink);
     color: var(--color-paper);
   }
 
   .cta--solid:hover {
     background: var(--color-solid-hover);
-  }
-
-  .cta--inverse {
-    background: var(--color-night-ink);
-    color: var(--color-night);
-  }
-
-  .cta--inverse:hover {
-    background: var(--color-inverse-hover);
   }
 
   .cta--text {

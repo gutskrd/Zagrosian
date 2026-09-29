@@ -1,9 +1,13 @@
 ---
+import { i18n, navigation } from '../i18n';
+import { hevalo, kurdish, site, socialProfiles } from '../site';
 import Arrow from './Arrow.astro';
 import SocialIcon from './SocialIcon.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
-import { footerNav, home, legalNav, site, socialProfiles } from '../site';
 
+const { locale, t } = i18n(Astro.url);
+const nav = navigation(locale);
+const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
 ---
 
@@ -11,22 +15,22 @@ const year = new Date().getFullYear();
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__about">
-        <p class="site-footer__motto kurdish" lang="ku">{home.footerMotto.ku}</p>
+        <p class="site-footer__motto kurdish" lang="ku" dir="ltr">{kurdish.footer}</p>
         <p>
-          Independent technology company<br />
-          based in {site.country}.
+          {t.footer.about[0]}<br />
+          {t.footer.about[1]}
         </p>
       </div>
 
       <div class="site-footer__navs">
-        <nav aria-label="Footer">
+        <nav aria-label={t.common.footerNav}>
           <ul class="site-footer__links">
             {
-              footerNav.map((link) => (
+              footerLinks.map((link) => (
                 <li>
                   <a class="site-footer__link" href={link.href}>
                     {link.label}
-                    {link.external && <Arrow direction="up-right" class="site-footer__external" />}
+                    {'external' in link && <Arrow direction="up-right" class="site-footer__external" />}
                   </a>
                 </li>
               ))
@@ -34,7 +38,7 @@ const year = new Date().getFullYear();
           </ul>
         </nav>
 
-        <nav aria-label="Social media">
+        <nav aria-label={t.common.socialNav}>
           <ul class="site-footer__social">
             {
               socialProfiles.map((profile) => (
@@ -51,7 +55,7 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="site-footer__mark" aria-hidden="true" data-rise>
+    <div class="site-footer__mark" aria-hidden="true" data-rise dir="ltr">
       <span>{site.name}</span>
     </div>
 
@@ -60,10 +64,10 @@ const year = new Date().getFullYear();
         <p><small>&copy; {year} {site.legalName}</small></p>
         <ThemeSwitch />
       </div>
-      <nav aria-label="Legal">
+      <nav aria-label={t.common.legalNav}>
         <ul class="site-footer__legal">
           {
-            legalNav.map((link) => (
+            nav.legal.map((link) => (
               <li>
                 <a class="site-footer__link" href={link.href}>
                   {link.label}
@@ -73,7 +77,7 @@ const year = new Date().getFullYear();
           }
           <li>
             <a class="site-footer__link" href="#top">
-              Back to top
+              {t.common.backToTop}
               <Arrow direction="up" />
             </a>
           </li>

@@ -1,10 +1,15 @@
 /**
  * schema.org structured data (JSON-LD) for every page. Each page describes
- * itself as a WebPage that belongs to the WebSite, which is published by the
- * Organization. The nodes reference each other by @id, so search engines and
- * other machines can join them into one description of the company.
+ * itself as a WebPage, in its own language, that belongs to the WebSite, which
+ * is published by the Organization. The nodes reference each other by @id, so
+ * search engines and other machines can join them into one description of the
+ * company. The Organization and WebSite are described in English on every page,
+ * so they are identical wherever they appear.
  */
+import { locales, messages, type Locale } from '../i18n';
 import { hevalo, site, socialProfiles } from '../site';
+
+const english = messages('en');
 
 const home = `${site.url}/`;
 
@@ -19,6 +24,9 @@ export interface PageData {
   url: string;
   title: string;
   description: string;
+  locale: Locale;
+  /** The homepage in the page's language, as the first breadcrumb. */
+  home: { name: string; url: string };
   /** The page's name in breadcrumbs; set for pages below the homepage. */
   breadcrumb?: string;
   /** Date of the last material change (YYYY-MM-DD). */
@@ -26,7 +34,7 @@ export interface PageData {
 }
 
 export function structuredData(page: PageData) {
-  const isHome = page.url === home;
+  const isHome = page.url === page.home.url;
   const breadcrumbId = `${page.url}#breadcrumb`;
 
   const graph: Record<string, unknown>[] = [
@@ -35,8 +43,8 @@ export function structuredData(page: PageData) {
       '@id': ids.website,
       url: home,
       name: site.name,
-      description: site.description,
-      inLanguage: 'en',
+      description: english.meta.description,
+      inLanguage: locales.map((locale) => locale.code),
       publisher: { '@id': ids.organization },
     },
     {
@@ -46,12 +54,12 @@ export function structuredData(page: PageData) {
       url: home,
       logo: { '@type': 'ImageObject', url: `${site.url}/logo.png`, width: 512, height: 512 },
       image: `${site.url}/og.png`,
-      description: site.description,
-      slogan: site.tagline,
+      description: english.meta.description,
+      slogan: english.meta.tagline,
       email: site.emails.contact,
-      address: { '@type': 'PostalAddress', addressCountry: 'NL' },
+      address: { '@type': 'PostalAddress', addressCountry: site.country },
       areaServed: 'Worldwide',
-      knowsLanguage: ['en', 'ku'],
+      knowsLanguage: locales.map((locale) => locale.code),
       contactPoint: [
         { '@type': 'ContactPoint', contactType: 'general inquiries', email: site.emails.contact },
         { '@type': 'ContactPoint', contactType: 'press', email: site.emails.press },
@@ -65,7 +73,7 @@ export function structuredData(page: PageData) {
       name: hevalo.name,
       url: hevalo.url,
       logo: hevalo.logo,
-      description: hevalo.description,
+      description: english.hevalo.description,
     },
     {
       '@type': 'WebPage',
@@ -73,12 +81,17 @@ export function structuredData(page: PageData) {
       url: page.url,
       name: page.title,
       description: page.description,
-      inLanguage: 'en',
+      inLanguage: page.locale,
       isPartOf: { '@id': ids.website },
       publisher: { '@id': ids.organization },
       ...(isHome && {
         about: { '@id': ids.organization },
-        primaryImageOfPage: { '@type': 'ImageObject', url: `${site.url}/og.png`, width: 1200, height: 630 },
+        primaryImageOfPage: {
+          '@type': 'ImageObject',
+          url: page.locale === 'en' ? `${site.url}/og.png` : `${site.url}/og/${page.locale}.png`,
+          width: 1200,
+          height: 630,
+        },
       }),
       ...(page.dateModified && { dateModified: page.dateModified }),
       ...(page.breadcrumb && { breadcrumb: { '@id': breadcrumbId } }),
@@ -90,7 +103,7 @@ export function structuredData(page: PageData) {
       '@type': 'BreadcrumbList',
       '@id': breadcrumbId,
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: home },
+        { '@type': 'ListItem', position: 1, name: page.home.name, item: page.home.url },
         { '@type': 'ListItem', position: 2, name: page.breadcrumb, item: page.url },
       ],
     });

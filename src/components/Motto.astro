@@ -1,7 +1,10 @@
 ---
+import { i18n } from '../i18n';
+import { kurdish } from '../site';
 import SplitText from './SplitText.astro';
 import Sun from './Sun.astro';
-import { home } from '../site';
+
+const { t } = i18n(Astro.url);
 ---
 
 <section class="motto section" aria-labelledby="motto-title">
@@ -9,8 +12,8 @@ import { home } from '../site';
     <div class="motto__sun" data-spin>
       <Sun />
     </div>
-    <SplitText id="motto-title" class="motto__text kurdish" lang="ku" text={home.motto.ku} />
-    <p class="motto__translation lead" data-reveal>{home.motto.en}</p>
+    <SplitText id="motto-title" class="motto__text kurdish" lang="ku" dir="ltr" text={kurdish.motto} />
+    {t.motto && <p class="motto__translation lead" data-reveal>{t.motto}</p>}
   </div>
 </section>
 

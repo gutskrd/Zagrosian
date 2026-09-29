@@ -1,5 +1,6 @@
 ---
 import Cta from '../components/Cta.astro';
+import { i18n } from '../i18n';
 import { site } from '../site';
 import BaseLayout from './BaseLayout.astro';
 
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const { title, eyebrow, heading, description } = Astro.props;
+const { t, localize } = i18n(Astro.url);
 ---
 
 <BaseLayout title={`${title} — ${site.name}`} description={description} noindex>
@@ -22,7 +24,7 @@ const { title, eyebrow, heading, description } = Astro.props;
       <div class="notice__body lead">
         <slot />
       </div>
-      <Cta class="notice__back" href="/" variant="text" arrow="left">Back to homepage</Cta>
+      <Cta class="notice__back" href={localize('/')} variant="text" arrow="left">{t.notFound.back}</Cta>
     </div>
   </section>
 </BaseLayout>

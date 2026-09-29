@@ -1,0 +1,107 @@
+import type { Messages } from './en';
+
+export const es: Messages = {
+  meta: {
+    title: 'Zagrosian — Tecnología para el día a día',
+    tagline: 'Tecnología para el día a día.',
+    description:
+      'Zagrosian es una empresa tecnológica independiente con sede en los Países Bajos. Diseñamos y desarrollamos productos de consumo, empezando por Hevalo, una aplicación para aprender kurdo.',
+  },
+  common: {
+    skipToContent: 'Saltar al contenido',
+    homeLink: 'Zagrosian, inicio',
+    primaryNav: 'Navegación principal',
+    footerNav: 'Pie de página',
+    socialNav: 'Redes sociales',
+    legalNav: 'Información legal',
+    menu: 'Menú',
+    close: 'Cerrar',
+    backToTop: 'Volver arriba',
+  },
+  nav: {
+    home: 'Inicio',
+    hevalo: 'Hevalo',
+    about: 'Nosotros',
+    contact: 'Contacto',
+    visitHevalo: 'Visitar Hevalo',
+    privacy: 'Privacidad',
+    terms: 'Términos',
+    security: 'Seguridad',
+  },
+  theme: {
+    toggle: 'Tema oscuro',
+    legend: 'Tema',
+    system: 'Sistema',
+    light: 'Claro',
+    dark: 'Oscuro',
+  },
+  language: {
+    label: 'Idioma',
+    suggestion: 'Esta página también está disponible en español.',
+    switchTo: 'Leer en español',
+    dismiss: 'Cerrar',
+  },
+  hero: {
+    notice: 'Hevalo llega a iOS y Android',
+    headline: ['Tecnología para', 'el día a día.'],
+    lead: 'Zagrosian es una empresa tecnológica independiente con sede en los Países Bajos. Diseñamos y desarrollamos productos de consumo, empezando por Hevalo, una aplicación para aprender kurdo.',
+    products: 'Nuestros productos',
+    about: 'Sobre Zagrosian',
+    griffinAlt: 'El emblema del grifo de Zagrosian',
+  },
+  hevalo: {
+    eyebrow: 'Productos',
+    category: 'Aprendizaje del kurdo',
+    description:
+      'Una aplicación para aprender kurdo con lecciones breves y juegos para jugar con amigos. Disponible primero en kurmanji, con más dialectos previstos.',
+    visit: 'Visitar hevalo.app',
+    website: 'Sitio web',
+    comingSoon: 'Próximamente',
+    comingSoonTitle: 'Hevalo para iOS y Android.',
+    comingSoonNote: 'Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
+  },
+  motto: 'La vida es más dulce en kurdo.',
+  about: {
+    eyebrow: 'Nosotros',
+    mission:
+      'Nuestra misión es crear software que la gente disfrute usando cada día: rápido, respetuoso con la privacidad y bien diseñado.',
+    approach: 'Zagrosian es una empresa de propiedad privada. Diseñamos y desarrollamos nuestros productos internamente.',
+    headquartersLabel: 'Sede',
+    headquarters: 'Países Bajos',
+    productsLabel: 'Productos',
+  },
+  contact: {
+    eyebrow: 'Contacto',
+    title: 'Hablemos.',
+    lead: 'Para consultas generales y colaboraciones, escríbenos por correo electrónico.',
+    general: 'Consultas generales:',
+    copy: 'Copiar dirección',
+    copied: 'Copiada',
+    copiedStatus: '{email} se ha copiado al portapapeles.',
+    copyFailed: 'No se ha podido copiar. Selecciona {email} para copiar la dirección.',
+    press: 'Prensa:',
+    security: {
+      before: 'Para informar de un problema de seguridad, consulta nuestra',
+      link: 'política de seguridad',
+      after: '.',
+    },
+  },
+  footer: {
+    about: ['Empresa tecnológica independiente', 'con sede en los Países Bajos.'],
+  },
+  legal: {
+    eyebrow: 'Información legal',
+    updated: 'Última actualización',
+    contents: 'En esta página',
+    translationNotice:
+      'Esta es una traducción. Si difiere de la versión en inglés, prevalece la versión en inglés.',
+    readEnglish: 'Leer la versión en inglés',
+  },
+  notFound: {
+    title: 'Página no encontrada',
+    heading: 'Esta página no existe.',
+    description: 'No se ha encontrado la página que buscabas.',
+    body: 'Es posible que el enlace esté roto o que la página se haya movido.',
+    back: 'Volver al inicio',
+  },
+};

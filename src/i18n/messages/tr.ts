@@ -1,0 +1,106 @@
+import type { Messages } from './en';
+
+export const tr: Messages = {
+  meta: {
+    title: 'Zagrosian — Günlük yaşam için teknoloji',
+    tagline: 'Günlük yaşam için teknoloji.',
+    description:
+      'Zagrosian, Hollanda merkezli bağımsız bir teknoloji şirketidir. Kürtçe öğrenme uygulaması Hevalo’dan başlayarak tüketicilere yönelik ürünler tasarlıyor ve geliştiriyoruz.',
+  },
+  common: {
+    skipToContent: 'İçeriğe geç',
+    homeLink: 'Zagrosian, ana sayfa',
+    primaryNav: 'Ana gezinme',
+    footerNav: 'Alt bilgi',
+    socialNav: 'Sosyal medya',
+    legalNav: 'Yasal',
+    menu: 'Menü',
+    close: 'Kapat',
+    backToTop: 'Başa dön',
+  },
+  nav: {
+    home: 'Ana sayfa',
+    hevalo: 'Hevalo',
+    about: 'Hakkımızda',
+    contact: 'İletişim',
+    visitHevalo: 'Hevalo’yu ziyaret et',
+    privacy: 'Gizlilik',
+    terms: 'Koşullar',
+    security: 'Güvenlik',
+  },
+  theme: {
+    toggle: 'Koyu tema',
+    legend: 'Tema',
+    system: 'Sistem',
+    light: 'Açık',
+    dark: 'Koyu',
+  },
+  language: {
+    label: 'Dil',
+    suggestion: 'Bu sayfa Türkçe olarak da mevcut.',
+    switchTo: 'Türkçe oku',
+    dismiss: 'Kapat',
+  },
+  hero: {
+    notice: 'Hevalo iOS ve Android’e geliyor',
+    headline: ['Günlük yaşam', 'için teknoloji.'],
+    lead: 'Zagrosian, Hollanda merkezli bağımsız bir teknoloji şirketidir. Kürtçe öğrenme uygulaması Hevalo’dan başlayarak tüketicilere yönelik ürünler tasarlıyor ve geliştiriyoruz.',
+    products: 'Ürünlerimiz',
+    about: 'Zagrosian hakkında',
+    griffinAlt: 'Zagrosian’ın grifonu',
+  },
+  hevalo: {
+    eyebrow: 'Ürünler',
+    category: 'Kürtçe öğrenme',
+    description:
+      'Kısa dersler ve arkadaşlarla oynanan oyunlarla Kürtçe öğreten bir uygulama. İlk olarak Kurmanci ile kullanıma sunuluyor; başka lehçeler de planlanıyor.',
+    visit: 'hevalo.app’i ziyaret et',
+    website: 'Web sitesi',
+    comingSoon: 'Çok yakında',
+    comingSoonTitle: 'iOS ve Android için Hevalo.',
+    comingSoonNote: 'Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
+  },
+  motto: 'Hayat Kürtçe daha tatlı.',
+  about: {
+    eyebrow: 'Hakkımızda',
+    mission:
+      'Misyonumuz, insanların her gün kullanmaktan keyif aldığı yazılımlar geliştirmek: hızlı, gizliliğe saygılı ve özenle tasarlanmış.',
+    approach: 'Zagrosian özel bir şirkettir. Ürünlerimizi kendi bünyemizde tasarlıyor ve geliştiriyoruz.',
+    headquartersLabel: 'Merkez',
+    headquarters: 'Hollanda',
+    productsLabel: 'Ürünler',
+  },
+  contact: {
+    eyebrow: 'İletişim',
+    title: 'Bize ulaşın.',
+    lead: 'Genel sorular ve iş birlikleri için lütfen bize e-posta gönderin.',
+    general: 'Genel sorular:',
+    copy: 'Adresi kopyala',
+    copied: 'Kopyalandı',
+    copiedStatus: '{email} panoya kopyalandı.',
+    copyFailed: 'Kopyalanamadı. Kopyalamak için {email} adresini seçin.',
+    press: 'Basın:',
+    security: {
+      before: 'Bir güvenlik sorununu bildirmek için lütfen',
+      link: 'güvenlik politikamıza',
+      after: ' bakın.',
+    },
+  },
+  footer: {
+    about: ['Hollanda merkezli bağımsız', 'teknoloji şirketi.'],
+  },
+  legal: {
+    eyebrow: 'Yasal',
+    updated: 'Son güncelleme',
+    contents: 'Bu sayfada',
+    translationNotice: 'Bu bir çeviridir. İngilizce sürümle arasında fark olması durumunda İngilizce sürüm geçerlidir.',
+    readEnglish: 'İngilizce sürümü okuyun',
+  },
+  notFound: {
+    title: 'Sayfa bulunamadı',
+    heading: 'Bu sayfa mevcut değil.',
+    description: 'Aradığınız sayfa bulunamadı.',
+    body: 'Bağlantı hatalı olabilir ya da sayfa taşınmış olabilir.',
+    back: 'Ana sayfaya dön',
+  },
+};

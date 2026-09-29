@@ -1,0 +1,17 @@
+---
+/** The homepage, in the language of the URL (src/pages/index.astro and src/pages/[lang]/index.astro). */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import About from './About.astro';
+import Contact from './Contact.astro';
+import Hero from './Hero.astro';
+import Motto from './Motto.astro';
+import ProductShowcase from './ProductShowcase.astro';
+---
+
+<BaseLayout>
+  <Hero />
+  <ProductShowcase />
+  <Motto />
+  <About />
+  <Contact />
+</BaseLayout>

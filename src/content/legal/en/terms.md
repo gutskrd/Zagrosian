@@ -1,5 +1,4 @@
 ---
-layout: ../layouts/LegalLayout.astro
 title: Terms of Use
 description: The terms that apply when you use zagrosian.com.
 updated: 2026-09-28
