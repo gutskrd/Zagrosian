@@ -1,28 +1,82 @@
 ---
 /**
- * Hevalo's logo: the H with antlers, traced from Hevalo's black and white
- * logos (src/assets/brand/hevalo-*-source.png). Inlined and filled with the
- * text colour, so it is black in the light theme and white in the dark one,
- * as sharp at 20 px as at 200, with nothing extra to download.
+ * Hevalo's app icon: the deer, and from 1 December to 6 January the deer
+ * dressed for Christmas. theme-init.js marks the season before the page is
+ * drawn, so the icon never swaps in front of the visitor.
+ *
+ * Each comes as WebP at three sizes, so a screen downloads only the resolution
+ * it needs, and only the one in season: both images are lazy, and browsers do
+ * not download a lazy image that is not displayed.
  */
-import HevaloMark from '../assets/brand/hevalo-mark.svg';
+import christmas96 from '../assets/brand/hevalo-christmas-96.webp';
+import christmas192 from '../assets/brand/hevalo-christmas-192.webp';
+import christmas288 from '../assets/brand/hevalo-christmas-288.webp';
+import icon96 from '../assets/brand/hevalo-96.webp';
+import icon192 from '../assets/brand/hevalo-192.webp';
+import icon288 from '../assets/brand/hevalo-288.webp';
 
 interface Props {
-  /** Leave empty when the logo sits next to the Hevalo name. */
+  /** Rendered width, as a `sizes` value, e.g. "20px". */
+  sizes: string;
+  /** Leave empty when the icon sits next to the Hevalo name. */
   alt?: string;
   class?: string;
 }
 
-const { alt = '', class: className } = Astro.props;
-const label = alt ? { role: 'img' as const, 'aria-label': alt } : { 'aria-hidden': 'true' as const };
+const { sizes, alt = '', class: className } = Astro.props;
+
+const variants = [
+  { season: 'everyday', images: [icon96, icon192, icon288] },
+  { season: 'christmas', images: [christmas96, christmas192, christmas288] },
+];
 ---
 
-<HevaloMark class:list={['hevalo-icon', className]} focusable="false" {...label} />
+<span class:list={['hevalo-icon', className]}>
+  {
+    variants.map(({ season, images }) => (
+      <img
+        class="hevalo-icon__image"
+        data-season={season}
+        src={images[1].src}
+        srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+        sizes={sizes}
+        width={images[1].width}
+        height={images[1].height}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        draggable="false"
+      />
+    ))
+  }
+</span>
 
 <style>
-  /* The mark is a component, so this reaches it as a global class. Callers set
-     its width or height; the other follows its proportions. */
-  :global(.hevalo-icon) {
+  .hevalo-icon {
+    display: flow-root;
     flex: none;
+    user-select: none;
+  }
+
+  .hevalo-icon__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* The Christmas deer's scarf hangs below the square (192 × 220 against
+     192 × 192). It overhangs instead of making the icon taller, so the page
+     around it is the same in every season. */
+  .hevalo-icon__image[data-season='christmas'] {
+    display: none;
+    margin-block-end: calc(100% * (1 - 220 / 192));
+  }
+
+  :global(:root[data-season='christmas']) .hevalo-icon__image[data-season='everyday'] {
+    display: none;
+  }
+
+  :global(:root[data-season='christmas']) .hevalo-icon__image[data-season='christmas'] {
+    display: block;
   }
 </style>

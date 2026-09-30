@@ -234,7 +234,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero horseman leans slightly towards the  */
 /* pointer, a soft light follows it across the products band, and the Hevalo  */
-/* logo tilts under it.                                                       */
+/* icon tilts under it with a highlight.                                      */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
@@ -321,10 +321,12 @@ function initPointerDepth() {
       const py = clamp((event.clientY - rect.top) / rect.height);
       tilt.style.setProperty('--tilt-x', `${((0.5 - py) * 18).toFixed(2)}deg`);
       tilt.style.setProperty('--tilt-y', `${((px - 0.5) * 18).toFixed(2)}deg`);
+      tilt.style.setProperty('--glare-x', `${(px * 100).toFixed(1)}%`);
+      tilt.style.setProperty('--glare-y', `${(py * 100).toFixed(1)}%`);
       tilt.toggleAttribute('data-tilting', true);
     });
     tilt.addEventListener('pointerleave', () => {
-      for (const name of ['--tilt-x', '--tilt-y']) tilt.style.removeProperty(name);
+      for (const name of ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y']) tilt.style.removeProperty(name);
       tilt.removeAttribute('data-tilting');
     });
   }

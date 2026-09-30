@@ -5,7 +5,8 @@
 // It also decides, before the first paint, whether the hero horseman will be
 // drawn in ink particles (ink.ts), so the still image is not shown first, and
 // whether the opening screen plays (intro.ts): on the first homepage visit of
-// a session, when motion is welcome.
+// a session, when motion is welcome. And from 1 December to 6 January, Hevalo's
+// icon is its Christmas version (HevaloIcon.astro).
 (function () {
   var preference = 'system';
   try {
@@ -18,6 +19,11 @@
   var root = document.documentElement;
   root.dataset.theme = dark ? 'dark' : 'light';
   root.dataset.themePreference = preference;
+
+  var today = new Date();
+  if (today.getMonth() === 11 || (today.getMonth() === 0 && today.getDate() <= 6)) {
+    root.dataset.season = 'christmas';
+  }
 
   var motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
 
