@@ -2,8 +2,8 @@
 import { i18n } from '../i18n';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
-import Emblem from './Emblem.astro';
 import HevaloIcon from './HevaloIcon.astro';
+import Logo from './Logo.astro';
 
 const { t } = i18n(Astro.url);
 
@@ -45,10 +45,9 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       </div>
     </div>
 
-    <figure class="hero__emblem intro" data-parallax="0.08" data-depth data-cursor="wind">
+    <figure class="hero__mark intro" data-parallax="0.08" data-depth>
       <div class="hero__art">
-        <Emblem alt={t.hero.emblemAlt} loading="eager" />
-        <canvas class="hero__ink" aria-hidden="true" data-ink-canvas></canvas>
+        <Logo class="hero__logo" size="hero" alt={t.hero.logoAlt} loading="eager" fetchpriority="high" />
       </div>
     </figure>
   </div>
@@ -57,7 +56,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 <style>
   .hero {
     padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
-    /* The ink may drift past the sides of the screen, but never scrolls it. */
+    /* The logo's glow may reach past the sides of the screen, but never scrolls it. */
     overflow-x: clip;
   }
 
@@ -165,83 +164,19 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
   }
 
-  .hero__emblem {
+  /* The logo, with a soft glow in its own colour. With a mouse it leans
+     towards the pointer in 3D (motion.ts). */
+  .hero__mark {
     justify-self: center;
-    width: min(80vw, 26rem);
+    width: min(64vw, 18rem);
     margin: 0;
-  }
-
-  .hero__emblem :global(.emblem) {
-    display: block;
-    width: 100%;
-  }
-
-  /* Room for the horseman to lean towards the pointer in 3D (motion.ts). */
-  .hero__emblem {
     perspective: 80rem;
   }
 
-  .hero__art {
-    position: relative;
-  }
-
-  /* The horseman in ink particles (src/scripts/ink.ts). The canvas reaches past
-     the drawing, so the ink has room to move; ink.ts sizes and places it in
-     whole device pixels. It is hidden until the first particles are drawn. */
-  .hero__ink {
-    position: absolute;
-    inset: 0;
+  .hero__mark :global(.hero__logo) {
+    display: block;
     width: 100%;
-    height: 100%;
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  :global(:root[data-ink='ready']) .hero__ink {
-    opacity: 1;
-  }
-
-  /* With the ink, the image keeps its place (for the layout, screen readers
-     and printing) but is not shown, and the ink gives the entrance instead. */
-  :global(:root[data-ink]) .hero__emblem {
-    animation: none;
-  }
-
-  :global(:root:is([data-ink='pending'], [data-ink='loading'], [data-ink='ready'])) .hero__art :global(.emblem) {
-    opacity: 0;
-  }
-
-  /* Should the ink stop (a device that cannot keep up, or the graphics
-     processor dropping it), the image fades back in its place. */
-  :global(:root[data-ink='off']) .hero__ink,
-  :global(:root[data-ink='off']) .hero__art :global(.emblem) {
-    transition: opacity 0.5s ease;
-  }
-
-  /* Should the script never start, the image appears after a moment anyway. */
-  :global(:root[data-ink='pending']) .hero__art :global(.emblem) {
-    animation: ink-fallback 0.8s ease 3s both;
-  }
-
-  @keyframes ink-fallback {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
-  }
-
-  @media print, (forced-colors: active) {
-    .hero__ink {
-      display: none;
-    }
-
-    .hero__art :global(.emblem) {
-      opacity: 1 !important;
-      animation: none !important;
-    }
+    filter: drop-shadow(0 1.5rem 3rem rgb(64 66 160 / 0.35));
   }
 
   @media (min-width: 64rem) {
@@ -255,12 +190,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       grid-column: 1 / span 7;
     }
 
-    .hero__emblem {
+    .hero__mark {
       grid-column: 8 / span 5;
       align-self: center;
-      justify-self: end;
       width: 100%;
-      max-width: 34rem;
+      max-width: 22rem;
     }
   }
 
@@ -289,8 +223,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       animation-delay: 0.4s;
     }
 
-    .hero__emblem {
-      animation: emblem 1.6s var(--ease-out) 0.3s both;
+    .hero__mark {
+      animation: logo-in 1.4s var(--ease-out) 0.3s both;
     }
   }
 
@@ -307,23 +241,12 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
-  /* The horseman rides in: revealed from the tail forwards as he moves into
-     place. The drawing faces right in every language, so this is not mirrored.
-     The negative insets leave room for the pointer tilt, so nothing is clipped
-     once he has arrived. */
-  @keyframes emblem {
+  /* The logo rises into place as it comes into focus. */
+  @keyframes logo-in {
     from {
       opacity: 0;
-      transform: translateX(-3rem);
-      clip-path: inset(-20% 100% -20% -20%);
-    }
-
-    40% {
-      opacity: 1;
-    }
-
-    to {
-      clip-path: inset(-20% -20% -20% -20%);
+      transform: translateY(2.5rem) scale(0.92);
+      filter: blur(0.5rem);
     }
   }
 </style>

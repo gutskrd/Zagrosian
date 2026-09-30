@@ -65,8 +65,8 @@ Requires Node 22.12 or later.
 public/            Favicons, logo, social images (og.png and og/<language>.png), manifest,
                    robots.txt and Cloudflare _headers
 src/
-  assets/brand/    The emblem (source PNG, detailed and simplified SVGs), the 21-ray sun and the Hevalo
-                   app icon
+  assets/brand/    The Zagrosian logo (source PNG and WebP sizes), the 21-ray sun and the Hevalo app
+                   icon
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, CommandMenu,
                    LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
@@ -79,32 +79,32 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   ink.ts (the hero horseman in WebGL), intro.ts (opening screen), sound.ts,
-                   cursor.ts, magnetic.ts, smooth.ts, text.ts, language.ts, theme.ts and
-                   theme-init.js
+                   intro.ts (opening screen), sound.ts, cursor.ts, magnetic.ts, smooth.ts,
+                   text.ts, language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
 
 ## Brand assets
 
-- **Emblem** (`src/assets/brand/zagros-logo-source.png`): a horseman on a galloping horse, drawn as a
-  woodcut. The source is a 574 × 435 px PNG, too small to stay sharp on large or high-density screens,
-  so the site uses vectors traced from it (with [potrace](https://potrace.sourceforge.net) at 4×, then
-  [SVGO](https://svgo.dev)), which are sharp at any size and a fraction of the weight:
-  - `emblem.svg`, the detailed drawing (ink threshold 85, specks under 3 px² removed), for large
-    sizes: the hero ([`Emblem.astro`](src/components/Emblem.astro)), the Google logo
-    (`public/logo.png`), the app icons and the social images (`public/og.png` in English and
-    `public/og/<language>.png`, which also show the hero headline in that language; update them if
-    the headline changes).
-  - `emblem-mark.svg`, a simplified silhouette (the source blurred by 7 px at 4× before tracing, at
-    threshold 170), which stays legible at 16–48 px: the header and the favicons (`favicon.svg`,
-    `favicon.ico` and `favicon-96.png`).
+- **Logo** (`src/assets/brand/zagros-logo-source.png`): two hands reaching towards each other on a
+  glossy indigo tile. In the 499 × 500 px source the logo itself is only 219 px across, too small for
+  the hero or high-density screens, so the site uses a master sharpened to 1,307 px: the colours and
+  gloss come from a smooth (Mitchell) 6× upscale, which suits soft gradients; the edges that should be
+  crisp, the tile's outline and where the dark hands and band meet the light shapes, are traced with
+  [potrace](https://potrace.sourceforge.net) and redrawn, with the colours on each side carried up to
+  the new edge. The glossy frame keeps the upscale's own colours. From the master:
+  - `zagrosian-logo-{64…1080}.webp`, seven widths (quality 82) for
+    [`Logo.astro`](src/components/Logo.astro), so the 30 px mark in the header and menu, the opening
+    screen and the hero each download only the size they need;
+  - the favicons (`favicon.ico` with 16, 32 and 48 px, `favicon-96.png`), the app icons
+    (`icon-192.png`, `icon-512.png`, and `apple-touch-icon.png`, whose corners take the colour of the
+    logo's frame because Apple rounds them itself), the Google logo (`public/logo.png`), all 256-colour
+    PNGs, and the social images (`public/og.png` in English and `public/og/<language>.png`, which also
+    show the hero headline in that language; update them if the headline changes).
 
-  Both are black paths filled with `currentColor`. The header inlines the silhouette, so it takes the
-  text colour of the current theme; the hero shows the drawing as an image, turned white in dark mode
-  by `--art-filter`. If the artwork changes, trace it again with the same settings and regenerate the
-  icons and social images.
+  If the logo changes, sharpen the new one the same way and regenerate the sizes, icons and social
+  images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun).
@@ -150,17 +150,15 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
   motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
   follows system changes while *System* is selected.
 - Colours are tokens in `src/styles/global.css`, with the dark values under
-  `:root[data-theme='dark']`; line art is inverted on dark surfaces. Without JavaScript the site stays
-  light and the controls are hidden.
+  `:root[data-theme='dark']`. Without JavaScript the site stays light and the controls are hidden.
 
 ## Motion
 
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Hero:** the headline rises line by line from behind masks on load, and the horseman drifts
-  slightly slower than the page (`data-parallax`). He is drawn in ink particles (below); where that
-  is not used, he rides in, revealed from the tail forwards.
+- **Hero:** the headline rises line by line from behind masks on load, the logo rises into place and
+  comes into focus, and it drifts slightly slower than the page (`data-parallax`).
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -171,7 +169,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
 - **Products:** the Hevalo icon turns to face the reader as it comes into view.
-- **Pointer depth:** with a mouse, the hero horseman turns towards the pointer in 3D, a soft light
+- **Pointer depth:** with a mouse, the hero logo turns towards the pointer in 3D, a soft light
   follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
   it with a highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
@@ -186,32 +184,6 @@ Rules the code follows:
   Types rules in `public/_headers` stay strict.
 - Split headings keep their full text as their accessible name.
 
-### The horseman in ink
-
-[`src/scripts/ink.ts`](src/scripts/ink.ts) redraws the hero emblem with WebGL as particles of ink:
-one for each pixel of the drawing that holds ink (about 50,000, or 200,000 on high-density screens),
-each as dark as its pixel, so at rest they form the drawing exactly.
-
-- On load the ink gathers from behind and to the left, tail first, as the horseman rides in.
-- A pointer moving across the drawing blows the ink aside like wind, and a tap or click does the same
-  where it lands; it always settles back into place.
-- As the hero scrolls away, the drawing leans back and its ink drifts apart, and it gathers again on
-  the way back up.
-- The ink follows the light and dark theme within the theme transition.
-
-The `<img>` stays in the page underneath: it is the image screen readers, search engines and printers
-get, and the fallback. [`theme-init.js`](src/scripts/theme-init.js) sets `data-ink` on `<html>` before
-the first paint, so the still image is not shown first, but only when *reduce motion* is off, colours
-are not forced, the visitor is not saving data (*Data Saver*) and the browser has WebGL. The script is
-loaded separately, only on pages with the hero. If WebGL is software-rendered (as in headless
-browsers and on machines whose graphics driver is blocked), the device cannot keep up (under about
-20 frames a second), the drawing cannot be read, or the script fails or never runs, the still image
-returns (within about three seconds).
-
-It costs nothing while nothing moves: frames are drawn only during the entrance, the wind or a
-scroll, and only while the hero is on screen. Phones and low-memory devices get fewer, larger
-particles. On the first visit of a session the ink waits for the opening screen to lift.
-
 ## The studio experience
 
 The site behaves like a design studio's: an opening screen, sound, a custom cursor, magnetic
@@ -221,8 +193,8 @@ back for visitors who prefer reduced motion, and the site works fully without it
 
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
   [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
-  the horseman fills in as a counter runs to 100 (in the page's own digits, so Persian and Arabic
-  count in theirs). It follows the page's real loading and takes one to three seconds; then the
+  the logo fills with colour from the bottom up, over a faint grey copy of itself, as a counter runs
+  to 100 (in the page's own digits, so Persian and Arabic count in theirs). It follows the page's real loading and takes one to three seconds; then the
   curtain rises and the hero's entrance plays from the start, and the screen is removed from the
   page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
   motion*, and lifts by itself after four seconds should the script not start. Its words are drawn by
@@ -243,8 +215,8 @@ back for visitors who prefer reduced motion, and the site works fully without it
   press. It pauses while the tab is hidden.
 - **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a ring exactly where the pointer
   is (no lag) that inverts what is under it. Over a link or a plain button it becomes a lens; over an
-  external link it adds an arrow; over a magnetic button it steps aside while the button answers; over
-  the ink horseman it widens like a breath of wind. Over text fields the system cursor returns. It
+  external link it adds an arrow; over a magnetic button it steps aside while the button answers. Over
+  text fields the system cursor returns. It
   never lingers: it disappears when the pointer leaves the window, the window loses focus or the page
   is left (so it is not frozen into the page transition), and returns with the next move. It is a
   manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
@@ -253,7 +225,7 @@ back for visitors who prefer reduced motion, and the site works fully without it
   so phones and tablets never download them (every page's main script is about 8 KB compressed).
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
-  the header is the same at every size: the emblem, then Visit Hevalo (from 768px), quick navigation
+  the header is the same at every size: the logo, then Visit Hevalo (from 768px), quick navigation
   (from 1024px), the world icon for languages ([`Globe.astro`](src/components/Globe.astro), whose
   meridians spin on hover), sound, theme, and the menu button: two dots on their own, which flip across
   to each other's side on hover (the label rolls with them) and stretch into an X when the menu opens. The menu is a full-screen, always-dark panel that drops

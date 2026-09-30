@@ -75,9 +75,6 @@
   /* The light that follows the pointer across the products band. */
   --color-spot: rgb(255 255 255 / 0.95);
 
-  /* Line-art brand images are black; they are inverted on dark surfaces. */
-  --art-filter: none;
-
   --focus-ring: var(--color-ink);
 
   /* Type */
@@ -132,8 +129,6 @@
   --color-dim: #666666;
   --header-bg: rgb(10 10 10 / 0.8);
   --color-spot: rgb(255 255 255 / 0.05);
-
-  --art-filter: invert(1);
 }
 
 /* ==========================================================================
@@ -746,12 +741,6 @@ svg {
   scale: 0;
 }
 
-/* Over the ink horseman: a wide, light ring, like a breath of wind. */
-.cursor[data-state='wind'] .cursor__shape {
-  scale: 3.6;
-  border-color: rgb(255 255 255 / 0.5);
-}
-
 .cursor[data-pressed] .cursor__shape {
   scale: 0.7;
 }
@@ -819,7 +808,6 @@ html.lenis {
     --color-muted: #555;
     --color-line: #ccc;
     --color-surface: #fff;
-    --art-filter: none;
   }
 
   .skip-link,

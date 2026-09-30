@@ -266,20 +266,3 @@ initSound();
 if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
   void import('./desktop').then(({ initDesktop }) => initDesktop());
 }
-
-// The hero horseman in ink particles, loaded separately and only when
-// theme-init.js has found it welcome and the page has a hero.
-if (document.documentElement.dataset.ink) {
-  if (document.querySelector('[data-ink-canvas]')) {
-    import('./ink')
-      .then(({ initInk }) => initInk())
-      .catch(() => {
-        // Back to the still image, without replaying its entrance once shown.
-        const root = document.documentElement;
-        if (root.dataset.ink === 'ready') root.dataset.ink = 'off';
-        else delete root.dataset.ink;
-      });
-  } else {
-    delete document.documentElement.dataset.ink;
-  }
-}

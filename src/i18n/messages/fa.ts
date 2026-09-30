@@ -58,7 +58,7 @@ export const fa: Messages = {
     lead: 'Zagrosian شرکت مستقل فناوری با دفتر مرکزی در هلند است. ما محصولات دیجیتال برای کاربران طراحی و توسعه می‌دهیم و نخستین آن‌ها Hevalo است: اپلیکیشنی برای یادگیری زبان کردی.',
     products: 'محصولات ما',
     about: 'دربارهٔ Zagrosian',
-    emblemAlt: 'نشان Zagrosian: سواری بر اسبی در حال تاختن',
+    logoAlt: 'لوگوی Zagrosian: دو دست که به سوی هم دراز شده‌اند',
   },
   hevalo: {
     eyebrow: 'محصولات',

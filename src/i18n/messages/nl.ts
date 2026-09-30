@@ -55,7 +55,7 @@ export const nl: Messages = {
     lead: 'Zagrosian is een onafhankelijk technologiebedrijf uit Nederland. We ontwerpen en bouwen producten voor consumenten, te beginnen met Hevalo: een app om Koerdisch te leren.',
     products: 'Onze producten',
     about: 'Over Zagrosian',
-    emblemAlt: 'Het embleem van Zagrosian: een ruiter op een galopperend paard',
+    logoAlt: 'Het logo van Zagrosian: twee handen die naar elkaar reiken',
   },
   hevalo: {
     eyebrow: 'Producten',

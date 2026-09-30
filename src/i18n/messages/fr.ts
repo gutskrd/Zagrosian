@@ -56,7 +56,7 @@ export const fr: Messages = {
     lead: 'Zagrosian est une entreprise technologique indépendante basée aux Pays-Bas. Nous concevons et développons des produits grand public, à commencer par Hevalo, une application pour apprendre le kurde.',
     products: 'Nos produits',
     about: 'À propos de Zagrosian',
-    emblemAlt: 'L’emblème de Zagrosian : un cavalier sur un cheval au galop',
+    logoAlt: 'Le logo de Zagrosian : deux mains tendues l’une vers l’autre',
   },
   hevalo: {
     eyebrow: 'Produits',

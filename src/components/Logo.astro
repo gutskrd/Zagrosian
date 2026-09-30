@@ -1,0 +1,56 @@
+---
+/**
+ * The Zagrosian logo: two hands reaching towards each other on an indigo
+ * tile. From src/assets/brand/zagros-logo-source.png, sharpened for large
+ * screens (see the README), and served as WebP at seven widths, so each use
+ * downloads only the resolution it needs:
+ * - `mark`: 30 px, beside the wordmark in the header and the site menu;
+ * - `hero`: the homepage hero. The opening screen shows it smaller but asks
+ *   for the same file, so the browser downloads it once for both.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import logo64 from '../assets/brand/zagrosian-logo-64.webp';
+import logo128 from '../assets/brand/zagrosian-logo-128.webp';
+import logo192 from '../assets/brand/zagrosian-logo-192.webp';
+import logo360 from '../assets/brand/zagrosian-logo-360.webp';
+import logo540 from '../assets/brand/zagrosian-logo-540.webp';
+import logo720 from '../assets/brand/zagrosian-logo-720.webp';
+import logo1080 from '../assets/brand/zagrosian-logo-1080.webp';
+
+/** Other attributes (such as `data-*`) go on the image. */
+interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'sizes' | 'width' | 'height'> {
+  size: 'mark' | 'hero';
+  /** Leave empty when the logo sits next to the Zagrosian name. */
+  alt?: string;
+}
+
+const { size, alt = '', class: className, loading = 'lazy', ...attributes } = Astro.props;
+
+// The hero's width (Hero.astro): 22rem on wide screens, else min(64vw, 18rem).
+const sizes = size === 'mark' ? '30px' : '(min-width: 64rem) 22rem, min(64vw, 18rem)';
+
+const images = [logo64, logo128, logo192, logo360, logo540, logo720, logo1080];
+const srcset = images.map((image) => `${image.src} ${image.width}w`).join(', ');
+---
+
+<img
+  class:list={['zagrosian-logo', className]}
+  src={logo192.src}
+  srcset={srcset}
+  sizes={sizes}
+  width={logo192.width}
+  height={logo192.height}
+  alt={alt}
+  loading={loading}
+  decoding="async"
+  draggable="false"
+  {...attributes}
+/>
+
+<style>
+  .zagrosian-logo {
+    flex: none;
+    height: auto;
+    user-select: none;
+  }
+</style>

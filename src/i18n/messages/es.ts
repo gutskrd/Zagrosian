@@ -55,7 +55,7 @@ export const es: Messages = {
     lead: 'Zagrosian es una empresa tecnológica independiente con sede en los Países Bajos. Diseñamos y desarrollamos productos de consumo, empezando por Hevalo, una aplicación para aprender kurdo.',
     products: 'Nuestros productos',
     about: 'Sobre Zagrosian',
-    emblemAlt: 'El emblema de Zagrosian: un jinete sobre un caballo al galope',
+    logoAlt: 'El logotipo de Zagrosian: dos manos que se tienden la una hacia la otra',
   },
   hevalo: {
     eyebrow: 'Productos',

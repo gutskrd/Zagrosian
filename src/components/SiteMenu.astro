@@ -14,10 +14,10 @@
  */
 import { i18n, localizePath, locales, navigation } from '../i18n';
 import { hevalo, site, socialProfiles } from '../site';
-import EmblemMark from '../assets/brand/emblem-mark.svg';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
 import Globe from './Globe.astro';
+import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 import RollText from './RollText.astro';
 import SocialIcon from './SocialIcon.astro';
@@ -33,7 +33,7 @@ const year = new Date().getFullYear();
 <nav id="site-menu" class="site-menu" popover aria-label={t.common.menu} data-site-menu data-lenis-prevent>
   <div class="container site-menu__bar">
     <a class="site-menu__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <EmblemMark class="site-menu__mark" aria-hidden="true" focusable="false" />
+      <Logo class="site-menu__mark" size="mark" />
       <Wordmark />
     </a>
     <MenuButton action="close" />
@@ -201,9 +201,7 @@ const year = new Date().getFullYear();
   }
 
   .site-menu__home :global(.site-menu__mark) {
-    flex: none;
-    width: auto;
-    height: 1.875rem;
+    width: 1.875rem;
   }
 
   /* ------------------------------------------------------------------------ */

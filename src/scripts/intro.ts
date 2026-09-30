@@ -2,11 +2,10 @@
  * The opening screen (src/components/Preloader.astro).
  *
  * The counter follows the page's real loading (the window's load event), and
- * takes at least a second so it can be read, three at most. The horseman
- * fills in and the line draws across with it. Then the curtain rises, and the
- * hero's entrance plays from the start as it is uncovered: the headline, the
- * ink (`intro:end`) and the rest. Afterwards the screen is removed from the
- * page.
+ * takes at least a second so it can be read, three at most. The logo fills
+ * with colour and the line draws across with it. Then the curtain rises, and
+ * the hero's entrance plays from the start as it is uncovered (`intro:end`).
+ * Afterwards the screen is removed from the page.
  *
  * Numbers are written in the page's own digits (Persian and Arabic use
  * their own), through Intl.NumberFormat.
@@ -31,7 +30,7 @@ export function initIntro() {
 
   const count = screen.querySelector<HTMLElement>('[data-intro-count]');
   const bar = screen.querySelector<HTMLElement>('[data-intro-bar]');
-  const rider = screen.querySelector<SVGElement>('[data-intro-rider]');
+  const logo = screen.querySelector<HTMLElement>('[data-intro-logo]');
   const digits = new Intl.NumberFormat(root.lang || undefined, { maximumFractionDigits: 0 });
 
   let loaded = document.readyState === 'complete';
@@ -46,8 +45,8 @@ export function initIntro() {
     if (percent !== written && count) count.textContent = digits.format(percent);
     written = percent;
     if (bar) bar.style.transform = `scaleX(${progress.toFixed(4)})`;
-    // The drawing faces right in every language, so it fills from the left.
-    if (rider) rider.style.clipPath = `inset(0 ${((1 - progress) * 100).toFixed(2)}% 0 0)`;
+    // Filled from the bottom up, the same in every language.
+    if (logo) logo.style.clipPath = `inset(${((1 - progress) * 100).toFixed(2)}% 0 0 0)`;
   };
 
   const leave = () => {

@@ -2,11 +2,10 @@
 // colours. Loaded as a small blocking script in <head> (an inline script would
 // break the Content-Security-Policy). The controls are in theme.ts.
 //
-// It also decides, before the first paint, whether the hero horseman will be
-// drawn in ink particles (ink.ts), so the still image is not shown first, and
-// whether the opening screen plays (intro.ts): on the first homepage visit of
-// a session, when motion is welcome. And from 1 December to 6 January, Hevalo's
-// icon is its Christmas version (HevaloIcon.astro).
+// It also decides, before the first paint, whether the opening screen plays
+// (intro.ts): on the first homepage visit of a session, when motion is
+// welcome. And from 1 December to 6 January, Hevalo's icon is its Christmas
+// version (HevaloIcon.astro).
 (function () {
   var preference = 'system';
   try {
@@ -35,17 +34,5 @@
     }
   } catch (error) {
     // Without session storage it would play on every visit, so it does not.
-  }
-
-  // Only when motion is welcome, the visitor is not saving data, colours are
-  // not forced and the browser has WebGL.
-  var connection = navigator.connection;
-  if (
-    motion &&
-    !matchMedia('(forced-colors: active)').matches &&
-    !(connection && connection.saveData) &&
-    'WebGLRenderingContext' in window
-  ) {
-    root.dataset.ink = 'pending';
   }
 })();

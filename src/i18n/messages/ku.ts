@@ -57,7 +57,7 @@ export const ku: Messages = {
     lead: 'Zagrosian şirketeke teknolojiyê ya serbixwe ye û navenda wê li Holendayê ye. Em ji bo bikarhêneran berheman disêwirînin û çêdikin; ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
     products: 'Berhemên me',
     about: 'Derbarê Zagrosian de',
-    emblemAlt: 'Nîşana Zagrosian: siwarek li ser hespekî ku dibeze',
+    logoAlt: 'Logoya Zagrosian: du dest ku ber bi hev ve dirêj dibin',
   },
   hevalo: {
     eyebrow: 'Berhem',

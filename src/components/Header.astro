@@ -1,7 +1,7 @@
 ---
 /**
  * The site header, the same at every size, as on a studio's site: the
- * emblem and wordmark, then a few controls, and the menu button (two dots)
+ * logo and wordmark, then a few controls, and the menu button (two dots)
  * that opens the full-screen menu (SiteMenu.astro), where the pages are.
  *
  * From left to right, as room allows: Visit Hevalo (from 768px), quick
@@ -11,6 +11,7 @@
  */
 import Arrow from './Arrow.astro';
 import LanguagePicker from './LanguagePicker.astro';
+import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 import RollText from './RollText.astro';
 import SiteMenu from './SiteMenu.astro';
@@ -19,7 +20,6 @@ import ThemeToggle from './ThemeToggle.astro';
 import Wordmark from './Wordmark.astro';
 import { i18n } from '../i18n';
 import { hevalo } from '../site';
-import EmblemMark from '../assets/brand/emblem-mark.svg';
 
 const { t, localize } = i18n(Astro.url);
 ---
@@ -27,7 +27,7 @@ const { t, localize } = i18n(Astro.url);
 <header class="site-header" data-site-header>
   <div class="container site-header__inner">
     <a class="site-header__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <EmblemMark class="site-header__mark" aria-hidden="true" focusable="false" />
+      <Logo class="site-header__mark" size="mark" loading="eager" />
       <Wordmark />
     </a>
 
@@ -117,12 +117,8 @@ const { t, localize } = i18n(Astro.url);
     text-decoration: none;
   }
 
-  /* The emblem's silhouette, which reads at this size; drawn in the text
-     colour, so it follows the theme. */
   .site-header__home :global(.site-header__mark) {
-    flex: none;
-    width: auto;
-    height: 1.875rem;
+    width: 1.875rem;
   }
 
   .site-header__end {

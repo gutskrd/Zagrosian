@@ -55,7 +55,7 @@ export const de: Messages = {
     lead: 'Zagrosian ist ein unabhängiges Technologieunternehmen mit Sitz in den Niederlanden. Wir gestalten und entwickeln Produkte für Verbraucher – den Anfang macht Hevalo, eine App zum Kurdischlernen.',
     products: 'Unsere Produkte',
     about: 'Über Zagrosian',
-    emblemAlt: 'Das Emblem von Zagrosian: ein Reiter auf einem galoppierenden Pferd',
+    logoAlt: 'Das Logo von Zagrosian: zwei Hände, die sich einander entgegenstrecken',
   },
   hevalo: {
     eyebrow: 'Produkte',

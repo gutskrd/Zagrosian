@@ -232,7 +232,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 }
 
 /* -------------------------------------------------------------------------- */
-/* Pointer depth: with a mouse, the hero horseman leans slightly towards the  */
+/* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
 /* pointer, a soft light follows it across the products band, and the Hevalo  */
 /* icon tilts under it with a highlight.                                      */
 /* -------------------------------------------------------------------------- */
@@ -240,13 +240,12 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 function initPointerDepth() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  // The horseman follows the pointer across the whole window, eased towards it
+  // The logo follows the pointer across the whole window, eased towards it
   // frame by frame. It uses the individual `rotate` and `translate` properties,
-  // so it combines with the scroll parallax on `transform`. The layer holds
-  // both the image and the ink canvas (ink.ts), so either way he turns as one.
-  const emblem = document.querySelector<HTMLElement>('[data-depth]');
-  const layer = emblem?.firstElementChild;
-  if (emblem && layer instanceof HTMLElement) {
+  // so it combines with the scroll parallax on `transform`.
+  const depth = document.querySelector<HTMLElement>('[data-depth]');
+  const layer = depth?.firstElementChild;
+  if (depth && layer instanceof HTMLElement) {
     let targetX = 0;
     let targetY = 0;
     let x = 0;
@@ -256,7 +255,7 @@ function initPointerDepth() {
 
     new IntersectionObserver(([entry]) => {
       inView = entry.isIntersecting;
-    }).observe(emblem);
+    }).observe(depth);
 
     const step = () => {
       x += (targetX - x) * 0.07;

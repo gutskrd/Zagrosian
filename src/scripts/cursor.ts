@@ -7,8 +7,7 @@
  *   lens; an external link adds an arrow pointing out;
  * - a magnetic button: it steps aside, and the button leans towards the
  *   pointer instead (magnetic.ts);
- * - a text field: the system's text cursor returns;
- * - the ink horseman: a wide, light ring.
+ * - a text field: the system's text cursor returns.
  * Pressing tightens it.
  *
  * It never lingers where the pointer no longer is: it disappears when the
@@ -22,7 +21,7 @@
 
 const root = document.documentElement;
 
-type State = 'link' | 'external' | 'button' | 'text' | 'wind' | '';
+type State = 'link' | 'external' | 'button' | 'text' | '';
 
 function stateOf(target: Element | null): State {
   if (!target) return '';
@@ -34,7 +33,6 @@ function stateOf(target: Element | null): State {
     const url = new URL(link.href, location.href);
     return url.origin !== location.origin && url.protocol.startsWith('http') ? 'external' : 'link';
   }
-  if (target.closest('[data-cursor="wind"]')) return 'wind';
   return '';
 }
 
