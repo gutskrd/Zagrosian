@@ -1,56 +1,65 @@
 ---
 /**
- * The Zagrosian logo: two hands reaching towards each other on an indigo
- * tile. From src/assets/brand/zagros-logo-source.png, sharpened for large
- * screens (see the README), and served as WebP at seven widths, so each use
- * downloads only the resolution it needs:
- * - `mark`: 30 px, beside the wordmark in the header and the site menu;
- * - `hero`: the homepage hero. The opening screen shows it smaller but asks
- *   for the same file, so the browser downloads it once for both.
+ * The Zagrosian logo: a Z whose two halves are hands reaching towards each
+ * other. Traced from Zagrosian's black and white logos
+ * (src/assets/brand/zagrosian-logo-*-source.png) and inlined, so it is sharp
+ * at any size and costs no download. Both are filled with the text colour.
+ *
+ * The black logo is shown in the light theme and the white one in the dark
+ * theme: they are drawn to match, the white one a touch finer, as white on
+ * black reads heavier. `tone="light"` always shows the white one, for surfaces
+ * that are dark in both themes (the site menu, the opening screen).
+ *
+ * It is decoration beside the Zagrosian name, so it is hidden from screen
+ * readers; other attributes (such as `data-*`) go on the wrapper.
  */
 import type { HTMLAttributes } from 'astro/types';
-import logo64 from '../assets/brand/zagrosian-logo-64.webp';
-import logo128 from '../assets/brand/zagrosian-logo-128.webp';
-import logo192 from '../assets/brand/zagrosian-logo-192.webp';
-import logo360 from '../assets/brand/zagrosian-logo-360.webp';
-import logo540 from '../assets/brand/zagrosian-logo-540.webp';
-import logo720 from '../assets/brand/zagrosian-logo-720.webp';
-import logo1080 from '../assets/brand/zagrosian-logo-1080.webp';
+import DarkLogo from '../assets/brand/zagrosian-logo-dark.svg';
+import LightLogo from '../assets/brand/zagrosian-logo-light.svg';
 
-/** Other attributes (such as `data-*`) go on the image. */
-interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'sizes' | 'width' | 'height'> {
-  size: 'mark' | 'hero';
-  /** Leave empty when the logo sits next to the Zagrosian name. */
-  alt?: string;
+interface Props extends HTMLAttributes<'span'> {
+  tone?: 'auto' | 'light';
 }
 
-const { size, alt = '', class: className, loading = 'lazy', ...attributes } = Astro.props;
-
-// The hero's width (Hero.astro): 22rem on wide screens, else min(64vw, 18rem).
-const sizes = size === 'mark' ? '30px' : '(min-width: 64rem) 22rem, min(64vw, 18rem)';
-
-const images = [logo64, logo128, logo192, logo360, logo540, logo720, logo1080];
-const srcset = images.map((image) => `${image.src} ${image.width}w`).join(', ');
+const { tone = 'auto', class: className, ...attributes } = Astro.props;
 ---
 
-<img
-  class:list={['zagrosian-logo', className]}
-  src={logo192.src}
-  srcset={srcset}
-  sizes={sizes}
-  width={logo192.width}
-  height={logo192.height}
-  alt={alt}
-  loading={loading}
-  decoding="async"
-  draggable="false"
-  {...attributes}
-/>
+<span class:list={['logo', `logo--${tone}`, className]} aria-hidden="true" {...attributes}>
+  {tone === 'auto' && <DarkLogo class="logo__shape logo__shape--dark" focusable="false" />}
+  <LightLogo class="logo__shape logo__shape--light" focusable="false" />
+</span>
 
 <style>
-  .zagrosian-logo {
+  .logo {
+    display: inline-grid;
     flex: none;
-    height: auto;
     user-select: none;
+  }
+
+  .logo :global(.logo__shape) {
+    grid-area: 1 / 1;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .logo--auto :global(.logo__shape--light),
+  :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--dark) {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--light) {
+    display: block;
+  }
+
+  /* Printed pages are always light. */
+  @media print {
+    :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--dark) {
+      display: block;
+    }
+
+    :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--light) {
+      display: none;
+    }
   }
 </style>

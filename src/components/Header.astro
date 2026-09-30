@@ -27,7 +27,7 @@ const { t, localize } = i18n(Astro.url);
 <header class="site-header" data-site-header>
   <div class="container site-header__inner">
     <a class="site-header__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <Logo class="site-header__mark" size="mark" loading="eager" />
+      <Logo class="site-header__mark" />
       <Wordmark />
     </a>
 
@@ -118,7 +118,7 @@ const { t, localize } = i18n(Astro.url);
   }
 
   .site-header__home :global(.site-header__mark) {
-    width: 1.875rem;
+    width: 1.75rem;
   }
 
   .site-header__end {

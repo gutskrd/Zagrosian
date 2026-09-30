@@ -33,7 +33,7 @@ const year = new Date().getFullYear();
 <nav id="site-menu" class="site-menu" popover aria-label={t.common.menu} data-site-menu data-lenis-prevent>
   <div class="container site-menu__bar">
     <a class="site-menu__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <Logo class="site-menu__mark" size="mark" />
+      <Logo class="site-menu__mark" tone="light" />
       <Wordmark />
     </a>
     <MenuButton action="close" />
@@ -201,7 +201,7 @@ const year = new Date().getFullYear();
   }
 
   .site-menu__home :global(.site-menu__mark) {
-    width: 1.875rem;
+    width: 1.75rem;
   }
 
   /* ------------------------------------------------------------------------ */

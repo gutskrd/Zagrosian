@@ -1,8 +1,8 @@
 ---
 /**
  * The opening screen, on the first homepage visit of a session: a dark
- * curtain where the logo fills with colour as a counter runs to 100, then
- * slides away as the hero enters (src/scripts/intro.ts).
+ * curtain where the logo fills in as a counter runs to 100, then slides
+ * away as the hero enters (src/scripts/intro.ts).
  *
  * theme-init.js decides before the first paint (`data-intro` on <html>), and
  * only when motion is welcome. It is decoration, hidden from screen readers,
@@ -25,8 +25,8 @@ const { t } = i18n(Astro.url);
   </div>
 
   <div class="intro-screen__mark">
-    <Logo class="intro-screen__logo intro-screen__logo--ghost" size="hero" loading="eager" fetchpriority="high" />
-    <Logo class="intro-screen__logo intro-screen__logo--fill" size="hero" loading="eager" fetchpriority="high" data-intro-logo />
+    <Logo class="intro-screen__logo intro-screen__logo--ghost" tone="light" />
+    <Logo class="intro-screen__logo intro-screen__logo--fill" tone="light" data-intro-logo />
   </div>
 
   <div class="intro-screen__bottom">
@@ -101,24 +101,22 @@ const { t } = i18n(Astro.url);
     opacity: 0.6;
   }
 
-  /* The logo fills with colour from the bottom up as the counter runs, over a
-     faint grey copy of itself (intro.ts sets the clip). It is the hero's
-     image file (Logo.astro), so it costs no extra download, and it comes
-     first in the page, so it carries the hero's high priority. */
+  /* The logo fills in from the bottom up as the counter runs, over a faint
+     copy of itself (intro.ts sets the clip). */
   .intro-screen__mark {
     display: grid;
     place-self: center;
-    width: clamp(6rem, 4.5rem + 6vw, 9rem);
+    width: clamp(5rem, 4rem + 5vw, 8rem);
   }
 
   .intro-screen__mark :global(.intro-screen__logo) {
     grid-area: 1 / 1;
     width: 100%;
+    color: var(--intro-ink);
   }
 
   .intro-screen__mark :global(.intro-screen__logo--ghost) {
-    filter: grayscale(1);
-    opacity: 0.22;
+    opacity: 0.14;
   }
 
   .intro-screen__mark :global(.intro-screen__logo--fill) {

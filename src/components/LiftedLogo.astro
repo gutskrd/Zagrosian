@@ -1,0 +1,47 @@
+---
+/**
+ * The lifted Zagrosian logo: the two hands on a glossy black and silver tile,
+ * for the homepage hero. From src/assets/brand/zagrosian-logo-lifted-source.png,
+ * sharpened for large screens (see the README), and served as WebP at four
+ * widths, so each screen downloads only the resolution it needs.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import lifted360 from '../assets/brand/zagrosian-logo-lifted-360.webp';
+import lifted540 from '../assets/brand/zagrosian-logo-lifted-540.webp';
+import lifted720 from '../assets/brand/zagrosian-logo-lifted-720.webp';
+import lifted1080 from '../assets/brand/zagrosian-logo-lifted-1080.webp';
+
+/** Other attributes (such as `fetchpriority`) go on the image. */
+interface Props extends Omit<HTMLAttributes<'img'>, 'src' | 'srcset' | 'sizes' | 'width' | 'height'> {
+  alt?: string;
+}
+
+const { alt = '', class: className, loading = 'lazy', ...attributes } = Astro.props;
+
+// The hero's width (Hero.astro): 22rem on wide screens, else min(64vw, 18rem).
+const sizes = '(min-width: 64rem) 22rem, min(64vw, 18rem)';
+const images = [lifted360, lifted540, lifted720, lifted1080];
+const srcset = images.map((image) => `${image.src} ${image.width}w`).join(', ');
+---
+
+<img
+  class:list={['lifted-logo', className]}
+  src={lifted540.src}
+  srcset={srcset}
+  sizes={sizes}
+  width={lifted540.width}
+  height={lifted540.height}
+  alt={alt}
+  loading={loading}
+  decoding="async"
+  draggable="false"
+  {...attributes}
+/>
+
+<style>
+  .lifted-logo {
+    flex: none;
+    height: auto;
+    user-select: none;
+  }
+</style>

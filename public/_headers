@@ -40,6 +40,12 @@
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
+# The SVG favicon switches between the black and the white logo with the
+# browser's colour scheme, through a <style> inside it. It holds no script.
+/favicon.svg
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+
 # Plain-text versions for machines: each page as Markdown and the llms.txt
 # summary. Search results should show the HTML pages, so these are noindex;
 # AI assistants and other tools can still read them.

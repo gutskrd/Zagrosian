@@ -3,7 +3,7 @@
  *
  * The counter follows the page's real loading (the window's load event), and
  * takes at least a second so it can be read, three at most. The logo fills
- * with colour and the line draws across with it. Then the curtain rises, and
+ * in and the line draws across with it. Then the curtain rises, and
  * the hero's entrance plays from the start as it is uncovered (`intro:end`).
  * Afterwards the screen is removed from the page.
  *
@@ -30,7 +30,7 @@ export function initIntro() {
 
   const count = screen.querySelector<HTMLElement>('[data-intro-count]');
   const bar = screen.querySelector<HTMLElement>('[data-intro-bar]');
-  const logo = screen.querySelector<HTMLElement>('[data-intro-logo]');
+  const logo = screen.querySelector<HTMLElement | SVGElement>('[data-intro-logo]');
   const digits = new Intl.NumberFormat(root.lang || undefined, { maximumFractionDigits: 0 });
 
   let loaded = document.readyState === 'complete';

@@ -3,7 +3,7 @@ import { i18n } from '../i18n';
 import Arrow from './Arrow.astro';
 import Cta from './Cta.astro';
 import HevaloIcon from './HevaloIcon.astro';
-import Logo from './Logo.astro';
+import LiftedLogo from './LiftedLogo.astro';
 
 const { t } = i18n(Astro.url);
 
@@ -47,7 +47,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
     <figure class="hero__mark intro" data-parallax="0.08" data-depth>
       <div class="hero__art">
-        <Logo class="hero__logo" size="hero" alt={t.hero.logoAlt} loading="eager" fetchpriority="high" />
+        <LiftedLogo class="hero__logo" alt={t.hero.logoAlt} loading="eager" fetchpriority="high" />
       </div>
     </figure>
   </div>
@@ -56,7 +56,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 <style>
   .hero {
     padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
-    /* The logo's glow may reach past the sides of the screen, but never scrolls it. */
+    /* The logo's shadow may reach past the sides of the screen, but never scrolls it. */
     overflow-x: clip;
   }
 
@@ -164,19 +164,25 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
   }
 
-  /* The logo, with a soft glow in its own colour. With a mouse it leans
-     towards the pointer in 3D (motion.ts). */
+  /* The lifted logo, casting a soft shadow (a faint glow on dark). With a
+     mouse it leans towards the pointer in 3D (motion.ts). */
   .hero__mark {
+    --logo-shadow: rgb(0 0 0 / 0.28);
+
     justify-self: center;
     width: min(64vw, 18rem);
     margin: 0;
     perspective: 80rem;
   }
 
+  :global(:root[data-theme='dark']) .hero__mark {
+    --logo-shadow: rgb(255 255 255 / 0.1);
+  }
+
   .hero__mark :global(.hero__logo) {
     display: block;
     width: 100%;
-    filter: drop-shadow(0 1.5rem 3rem rgb(64 66 160 / 0.35));
+    filter: drop-shadow(0 1.5rem 3rem var(--logo-shadow));
   }
 
   @media (min-width: 64rem) {

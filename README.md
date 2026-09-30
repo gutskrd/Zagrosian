@@ -65,8 +65,8 @@ Requires Node 22.12 or later.
 public/            Favicons, logo, social images (og.png and og/<language>.png), manifest,
                    robots.txt and Cloudflare _headers
 src/
-  assets/brand/    The Zagrosian logo (source PNG and WebP sizes), the 21-ray sun and the Hevalo app
-                   icon
+  assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
+                   sizes), the 21-ray sun and the Hevalo app icon
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, ProductShowcase, Motto, About, Contact, CommandMenu,
                    LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
@@ -87,23 +87,35 @@ src/
 
 ## Brand assets
 
-- **Logo** (`src/assets/brand/zagros-logo-source.png`): two hands reaching towards each other on a
-  glossy indigo tile. In the 499 × 500 px source the logo itself is only 219 px across, too small for
-  the hero or high-density screens, so the site uses a master sharpened to 1,307 px: the colours and
-  gloss come from a smooth (Mitchell) 6× upscale, which suits soft gradients; the edges that should be
-  crisp, the tile's outline and where the dark hands and band meet the light shapes, are traced with
-  [potrace](https://potrace.sourceforge.net) and redrawn, with the colours on each side carried up to
-  the new edge. The glossy frame keeps the upscale's own colours. From the master:
-  - `zagrosian-logo-{64…1080}.webp`, seven widths (quality 82) for
-    [`Logo.astro`](src/components/Logo.astro), so the 30 px mark in the header and menu, the opening
-    screen and the hero each download only the size they need;
-  - the favicons (`favicon.ico` with 16, 32 and 48 px, `favicon-96.png`), the app icons
-    (`icon-192.png`, `icon-512.png`, and `apple-touch-icon.png`, whose corners take the colour of the
-    logo's frame because Apple rounds them itself), the Google logo (`public/logo.png`), all 256-colour
-    PNGs, and the social images (`public/og.png` in English and `public/og/<language>.png`, which also
-    show the hero headline in that language; update them if the headline changes).
+- **Logo:** a Z whose two halves are hands reaching towards each other, in three versions (sources
+  in `src/assets/brand/zagrosian-logo-*-source.png`):
+  - **Black and white** (`dark` and `light`), the logo everywhere: the header and site menu, the
+    opening screen, the favicons, the app icons, the Google logo (`public/logo.png`) and the social
+    images. They are the same Z, the white one drawn a touch finer, as white on black reads heavier.
+    Each is traced to a vector (6× upscale, lightly blurred, threshold 50%, potrace, then SVGO:
+    about 2 KB each), `zagrosian-logo-dark.svg` and `zagrosian-logo-light.svg`, filled with
+    `currentColor`. [`Logo.astro`](src/components/Logo.astro) inlines them: the black one in the
+    light theme, the white one in the dark theme, and always the white one on the dark menu and
+    opening screen.
+    - `favicon.svg` holds both and switches with the browser's colour scheme (through a `<style>`,
+      which its own header rule in `public/_headers` allows); `favicon-96.png` (black) and
+      `favicon-96-dark.png` (white) do the same for browsers without SVG icons, and `favicon.ico`
+      (16, 32 and 48 px) is black.
+    - The app icons (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`) are the black logo on
+      white, well inside the area phones may round or crop.
+    - The social images (`public/og.png` in English and `public/og/<language>.png`) show the white
+      logo beside the hero headline in that language; update them if the headline changes.
+  - **Lifted**: the hands on a glossy black and silver tile, in the homepage hero
+    ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). In the 499 × 500 px source the tile is
+    only 219 px across, too small for the hero or high-density screens, so the site uses a master
+    sharpened to 1,303 px: the colours and gloss come from a smooth (Mitchell) 6× upscale, which
+    suits soft gradients; the edges that should be crisp, the tile's outline and where the black
+    hands and band meet the light shapes, are traced with
+    [potrace](https://potrace.sourceforge.net) and redrawn, with the colours on each side carried up
+    to the new edge. The glossy frame keeps the upscale's own colours. It is served as WebP at 360,
+    540, 720 and 1080 px (quality 82).
 
-  If the logo changes, sharpen the new one the same way and regenerate the sizes, icons and social
+  If a logo changes, trace or sharpen the new one the same way and regenerate the icons and social
   images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
@@ -157,8 +169,8 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Hero:** the headline rises line by line from behind masks on load, the logo rises into place and
-  comes into focus, and it drifts slightly slower than the page (`data-parallax`).
+- **Hero:** the headline rises line by line from behind masks on load, the lifted logo rises into
+  place and comes into focus, and it drifts slightly slower than the page (`data-parallax`).
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -169,7 +181,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
 - **Products:** the Hevalo icon turns to face the reader as it comes into view.
-- **Pointer depth:** with a mouse, the hero logo turns towards the pointer in 3D, a soft light
+- **Pointer depth:** with a mouse, the lifted logo turns towards the pointer in 3D, a soft light
   follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
   it with a highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
@@ -193,10 +205,10 @@ back for visitors who prefer reduced motion, and the site works fully without it
 
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
   [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
-  the logo fills with colour from the bottom up, over a faint grey copy of itself, as a counter runs
-  to 100 (in the page's own digits, so Persian and Arabic count in theirs). It follows the page's real loading and takes one to three seconds; then the
-  curtain rises and the hero's entrance plays from the start, and the screen is removed from the
-  page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
+  the white logo fills in from the bottom up, over a faint copy of itself, as a counter runs to 100
+  (in the page's own digits, so Persian and Arabic count in theirs). It follows the page's real
+  loading and takes one to three seconds; then the curtain rises and the hero's entrance plays from
+  the start, and the screen is removed from the page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
   motion*, and lifts by itself after four seconds should the script not start. Its words are drawn by
   CSS, so the page's text (what search engines and AI crawlers read) starts with the headline.
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
