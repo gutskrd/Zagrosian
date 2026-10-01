@@ -79,8 +79,8 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   intro.ts (opening screen), sound.ts, cursor.ts, magnetic.ts, smooth.ts,
-                   text.ts, language.ts, theme.ts and theme-init.js
+                   intro.ts (opening screen), eyes.ts (Hevalo's eyes), sound.ts, cursor.ts,
+                   magnetic.ts, smooth.ts, text.ts, language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -129,6 +129,12 @@ src/
   served WebPs (`hevalo-96/192/288.webp`, `hevalo-christmas-96/192/288.webp`) are cropped to the same
   360 px box at (70, 64) in the 500 px sources, so the two line up; the Christmas deer's scarf hangs
   below it. Near-invisible pixels (alpha ≤ 8) are made fully transparent, and the WebPs are quality 80.
+  The deer's eyes follow the pointer ([`eyes.ts`](src/scripts/eyes.ts)): the mouse, or on a touch
+  screen the finger, while it touches and for a moment after. The served WebPs have the pupils
+  painted out (filled from the white around them), and the pupils, with their highlights, are drawn
+  over the images at the places they have in the artwork; each moves within the white of its eye and
+  returns to the artwork's pose, turned in, when there is nothing to follow. The two icons share the
+  same eyes. Not with *reduce motion*; in forced colours the pupils keep their colour.
 
 - **Fonts:** Latin text is set in Inter and Arabic script (Arabic, Sorani and Persian) in
   [Vazirmatn](https://github.com/rastikerdar/vazirmatn), both self-hosted variable fonts under the OFL.

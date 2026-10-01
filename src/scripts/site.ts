@@ -1,4 +1,5 @@
 import { initCommandMenu } from './command';
+import { initEyes } from './eyes';
 import { initIntro } from './intro';
 import { initSound } from './sound';
 import { initText } from './text';
@@ -260,6 +261,7 @@ initLanguageSuggestion();
 initMotion();
 initText();
 initSound();
+initEyes();
 
 // Smooth scrolling, the custom cursor and magnetic buttons are for a mouse or
 // trackpad: loaded separately, so phones and tablets never download them.
