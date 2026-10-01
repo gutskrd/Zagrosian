@@ -53,7 +53,7 @@ export const ku: Messages = {
   },
   intro: {
     welcome: '',
-    enter: 'Kerem bikin',
+    enter: 'Têkeve',
     hintPointer: 'Bigerîne an bitikîne',
     hintTouch: 'Ber bi jor ve bikişîne an bitikîne',
   },

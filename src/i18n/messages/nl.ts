@@ -51,7 +51,7 @@ export const nl: Messages = {
   },
   intro: {
     welcome: 'Welkom.',
-    enter: 'Kom binnen',
+    enter: 'Binnengaan',
     hintPointer: 'Scroll of klik',
     hintTouch: 'Veeg omhoog of tik',
   },

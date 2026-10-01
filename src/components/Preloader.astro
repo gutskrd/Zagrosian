@@ -8,14 +8,16 @@
  * of the greeting, and ink fills them from left to right as the page loads,
  * led by a soft band of light, as the glass logo above fills from the bottom.
  * Under it, "welcome" rolls through the site's languages like a counter and
- * comes to rest in the page's own (in Sorani on the Kurmanji pages, which
- * need no translation). When the page is ready, the light passes over the
- * greeting once more.
+ * comes to rest in the page's own. When the page is ready, the light passes
+ * over the greeting once more.
  *
  * Then the visitor comes in, by raising the sun. The loading line becomes a
  * horizon, and over it, in a small round window, the Kurdish sun stands half
- * risen, turning slowly, with the host's "come in" in the page's language
- * (`intro.enter`). Scrolling, swiping up or dragging lifts the whole curtain
+ * risen, turning slowly, over "Enter" (`intro.enter`). Every few seconds,
+ * "welcome" and "Enter" turn together to the next language, so the visitor
+ * is welcomed and invited in each of the site's languages in turn; how to
+ * come in stays in the page's own. Scrolling, swiping up or dragging lifts
+ * the whole curtain
  * under the hand, against a growing resistance, as the sun climbs, a ring
  * around it fills, dawn spreads along the horizon and the light crosses the
  * greeting; let go early and it all settles back, go far enough and the
@@ -45,14 +47,18 @@ let count = 0;
 const words = kurdish.welcome.split(' ').map((word) => [...word].map((char) => ({ char, index: count++ })));
 const layers = ['ghost', 'fill', 'glow'] as const;
 
-// "Welcome" in every language but Kurmanji, ending with the page's own.
-const others = locales.filter((info) => info.code !== 'ku');
-const own = others.findIndex((info) => info.code === (locale === 'ku' ? 'ckb' : locale));
-const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((info) => ({
+// "Welcome" and "Enter" in every language, in the same order, ending with the
+// page's own (where the first roll comes to rest; Kurmanji welcomes with the
+// greeting itself). The first language comes again at the end, so that the
+// reels can turn on for ever (intro.ts).
+const own = locales.findIndex((info) => info.code === locale);
+const turns = [...locales.slice(own + 1), ...locales.slice(0, own + 1)].map((info) => ({
   lang: info.code,
   dir: info.dir,
-  text: messages(info.code).intro.welcome,
+  welcome: messages(info.code).intro.welcome || kurdish.welcome,
+  enter: messages(info.code).intro.enter,
 }));
+const reel = [...turns, turns[0]];
 ---
 
 <div class="intro-screen" aria-hidden="true" data-intro-screen>
@@ -88,9 +94,9 @@ const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((in
       }
     </div>
 
-    <div class="intro-screen__reel">
+    <div class="intro-screen__reel intro-screen__reel--welcome">
       <span class="intro-screen__track" data-intro-track>
-        {welcomes.map((welcome) => <span lang={welcome.lang} dir={welcome.dir} data-label={welcome.text} />)}
+        {reel.map((turn) => <span lang={turn.lang} dir={turn.dir} data-label={turn.welcome} />)}
       </span>
     </div>
   </div>
@@ -103,7 +109,11 @@ const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((in
           <span class="intro-screen__sky"><span class="intro-screen__sun"><Sun /></span></span>
         </span>
       </span>
-      <span class="intro-screen__invite" data-label={t.intro.enter}></span>
+      <span class="intro-screen__reel intro-screen__reel--enter">
+        <span class="intro-screen__track" data-intro-track>
+          {reel.map((turn) => <span lang={turn.lang} dir={turn.dir} data-label={turn.enter} />)}
+        </span>
+      </span>
       <span class="intro-screen__hint intro-screen__hint--pointer" data-label={t.intro.hintPointer}></span>
       <span class="intro-screen__hint intro-screen__hint--touch" data-label={t.intro.hintTouch}></span>
     </div>
@@ -381,18 +391,23 @@ const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((in
     --i: 15;
   }
 
-  /* "Welcome", one language at a time, in a window one line high whose top
-     and bottom fade out. The script moves the track up a line at a time
-     (`--step`), quickly at first, and it settles on the page's language. */
+  /* "Welcome" and "Enter", one language at a time, each in a window one line
+     high whose top and bottom fade out. The script moves the tracks up a line
+     at a time (`--step`): quickly at first, as the page loads, coming to rest
+     on the page's language, then a line every few seconds. */
   .intro-screen__reel {
     --line: 1.5em;
 
+    display: block;
     height: var(--line);
     overflow: clip;
+    mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent);
+  }
+
+  .intro-screen__reel--welcome {
     font-size: clamp(1.125rem, 0.9rem + 0.9vw, 1.75rem);
     letter-spacing: -0.01em;
     opacity: 0.62;
-    mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent);
     animation: intro-reel 0.9s var(--ease-out) 0.5s both;
     transition: opacity 0.6s ease;
   }
@@ -417,7 +432,12 @@ const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((in
     white-space: nowrap;
   }
 
-  .intro-screen:is([data-state='done'], [data-state='ready']) .intro-screen__reel {
+  /* Back to the first language, which is also the last, without a jump. */
+  .intro-screen__track[data-snap] {
+    transition: none;
+  }
+
+  .intro-screen:is([data-state='done'], [data-state='ready']) .intro-screen__reel--welcome {
     opacity: 1;
   }
 
@@ -530,7 +550,7 @@ const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((in
     }
   }
 
-  .intro-screen__invite {
+  .intro-screen__reel--enter {
     font-size: clamp(0.9375rem, 0.85rem + 0.3vw, 1.125rem);
     font-weight: 560;
     letter-spacing: -0.005em;

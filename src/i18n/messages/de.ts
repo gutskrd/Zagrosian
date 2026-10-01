@@ -51,7 +51,7 @@ export const de: Messages = {
   },
   intro: {
     welcome: 'Willkommen.',
-    enter: 'Herein',
+    enter: 'Eintreten',
     hintPointer: 'Scrollen oder klicken',
     hintTouch: 'Nach oben wischen oder tippen',
   },

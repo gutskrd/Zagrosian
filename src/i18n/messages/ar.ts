@@ -52,7 +52,7 @@ export const ar: Messages = {
   },
   intro: {
     welcome: 'أهلاً وسهلاً.',
-    enter: 'تفضّلوا',
+    enter: 'دخول',
     hintPointer: 'مرّر أو انقر',
     hintTouch: 'اسحب للأعلى أو انقر',
   },

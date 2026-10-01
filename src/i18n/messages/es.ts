@@ -51,7 +51,7 @@ export const es: Messages = {
   },
   intro: {
     welcome: 'Bienvenidos.',
-    enter: 'Adelante',
+    enter: 'Entrar',
     hintPointer: 'Desplázate o haz clic',
     hintTouch: 'Desliza hacia arriba o toca',
   },

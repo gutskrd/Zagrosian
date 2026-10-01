@@ -52,7 +52,7 @@ export const fr: Messages = {
   },
   intro: {
     welcome: 'Bienvenue.',
-    enter: 'Entrez',
+    enter: 'Entrer',
     hintPointer: 'Faites défiler ou cliquez',
     hintTouch: 'Balayez vers le haut ou touchez',
   },

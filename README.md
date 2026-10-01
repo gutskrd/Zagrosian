@@ -268,15 +268,17 @@ back for visitors who prefer reduced motion, and the site works fully without it
     it; ink fills them from left to right as the page loads, led by a soft band of light, while the
     glass logo above fills from the bottom and a counter runs to 100 (in the page's own digits, so
     Persian and Arabic count in theirs). Under the greeting, "welcome" rolls through the site's
-    languages and comes to rest in the page's own (in Sorani on the Kurmanji pages, which need no
-    translation; `intro.welcome` in the message files). It follows the page's real loading, about
+    languages and comes to rest in the page's own (`intro.welcome` in the message files; Kurmanji
+    welcomes with the greeting itself). It follows the page's real loading, about
     two to three and a half seconds, and ends with the light passing over the greeting once more.
     The ink and the light are windows that slide over still letters, so nothing is redrawn as they
     move.
   - *Coming in: a sunrise.* The loading line becomes a horizon, and over it, in a small round
-    window, the Kurdish sun stands half risen, turning slowly, with a host's "come in" in the page's
-    language (*Kerem bikin*, *Buyurun*, *بفرمایید*… `intro.enter`) and how to come in, for a mouse
-    or a touch screen (`intro.hintPointer`, `intro.hintTouch`). Scrolling, swiping up or dragging
+    window, the Kurdish sun stands half risen, turning slowly, over "Enter" (`intro.enter`) and how
+    to come in, for a mouse or a touch screen, in the page's language (`intro.hintPointer`,
+    `intro.hintTouch`). Every few seconds "welcome" and "Enter" turn together to the next of the
+    site's ten languages (*Welkom. Binnengaan*, *Hoş geldiniz. Giriş*, *خوش آمدید. ورود*, *Bi xêr
+    hatin. Têkeve*…), round and round for as long as the visitor waits. Scrolling, swiping up or dragging
     lifts the whole curtain under the hand, against a resistance that grows the higher it goes (the
     rubber band of iOS scrolling), while the sun climbs, a ring around it fills, dawn spreads along
     the foot of the screen and the light crosses the greeting. Let go short of the top and it all

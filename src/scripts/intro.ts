@@ -8,7 +8,9 @@
  * rest on the page's own. At the end the light passes over the greeting once
  * more.
  *
- * Then it waits for the visitor to come in. Scrolling, swiping up or
+ * Then it waits for the visitor to come in, over "Enter"; every few seconds
+ * "welcome" and "Enter" turn together to the next of the site's languages,
+ * round and round, until the visitor comes in. Scrolling, swiping up or
  * dragging lifts the curtain, which follows the hand against a resistance
  * that grows the higher it goes (the rubber band of iOS scrolling); as it
  * does, the sun rises, the ring around it fills, dawn spreads along the foot
@@ -38,6 +40,8 @@ const GLINT = 700;
 /** How long the visitor is left alone before the curtain shows it can lift, and how often after that. */
 const NUDGE_AFTER = 2600;
 const NUDGE_EVERY = 5200;
+/** How long "welcome" and "Enter" stay in one language while the visitor waits. */
+const TURN_EVERY = 2600;
 /** Keys that would scroll the page underneath. */
 const SCROLL_KEYS = [' ', 'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'];
 const SEARCH_ENGINES = /(^|\.)(google|bing|duckduckgo|yahoo|yandex|baidu|ecosia|qwant|startpage|search\.brave|naver|seznam)\./;
@@ -60,8 +64,10 @@ export function initIntro() {
   const bar = screen.querySelector<HTMLElement>('[data-intro-bar]');
   const logo = screen.querySelector<HTMLElement | SVGElement>('[data-intro-logo]');
   const greeting = screen.querySelector<HTMLElement>('[data-intro-greeting]');
-  const track = screen.querySelector<HTMLElement>('[data-intro-track]');
-  const steps = (track?.children.length ?? 1) - 1;
+  // "Welcome" and "Enter": the same languages in the same order, the first
+  // again at the end (Preloader.astro).
+  const tracks = [...screen.querySelectorAll<HTMLElement>('[data-intro-track]')];
+  const languages = (tracks[0]?.children.length ?? 2) - 1;
   const digits = new Intl.NumberFormat(root.lang || undefined, { maximumFractionDigits: 0 });
   const gated = !fromSearchEngine();
 
@@ -69,10 +75,30 @@ export function initIntro() {
   window.addEventListener('load', () => (loaded = true), { once: true });
 
   let state: 'loading' | 'ready' | 'leaving' = 'loading';
+  let step = -1;
+  let turning = 0;
+
+  const turnTo = (next: number) => {
+    step = next;
+    for (const track of tracks) track.style.setProperty('--step', String(step));
+  };
+
+  // Then on to the next language every few seconds, for as long as the
+  // visitor waits. After the last comes the first again (its copy at the end
+  // of the tracks), and the tracks go back to their start without a jump.
+  const turn = () => {
+    turnTo(step + 1);
+    if (step < languages) return;
+    window.setTimeout(() => {
+      for (const track of tracks) track.dataset.snap = '';
+      turnTo(0);
+      void tracks[0]?.offsetHeight;
+      for (const track of tracks) delete track.dataset.snap;
+    }, 800);
+  };
   const started = performance.now();
   let shown = 0;
   let written = -1;
-  let step = -1;
 
   const render = (progress: number) => {
     const percent = Math.round(progress * 100);
@@ -85,10 +111,10 @@ export function initIntro() {
     // The greeting is Kurmanji, so it fills from left to right on every page.
     greeting?.style.setProperty('--fill', progress.toFixed(4));
     greeting?.style.setProperty('--light', progress.toFixed(4));
-    // Most of the languages go by while the counter is quick, early on.
-    const next = Math.round(progress * steps);
-    if (next !== step && track) track.style.setProperty('--step', String(next));
-    step = next;
+    // Most of the languages go by while the counter is quick, early on, and
+    // the roll comes to rest on the page's own, the last.
+    const next = Math.round(progress * (languages - 1));
+    if (next !== step) turnTo(next);
   };
 
   /* -------------------------------------------------------------------------
@@ -238,6 +264,7 @@ export function initIntro() {
     if (state === 'leaving') return;
     state = 'leaving';
     stop();
+    window.clearInterval(turning);
     window.clearTimeout(wheelTimer);
     window.removeEventListener('keydown', onKey);
     screen.style.setProperty('--pull', '1');
@@ -270,6 +297,7 @@ export function initIntro() {
     screen.dataset.cursor = 'link';
     lift(0);
     scheduleNudge(NUDGE_AFTER);
+    turning = window.setInterval(turn, TURN_EVERY);
   };
 
   // The light passes over the whole greeting once more.

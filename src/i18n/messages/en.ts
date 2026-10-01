@@ -62,8 +62,8 @@ export const en = {
   intro: {
     /** Translation of the Kurmanji greeting "Bi xêr hatin." Empty in Kurmanji. */
     welcome: 'Welcome.',
-    /** The invitation in, once the page has loaded: a host's "come in", as said in the language. */
-    enter: 'Come in',
+    /** The way in, once the page has loaded. The screen shows it in every language in turn. */
+    enter: 'Enter',
     /** How to come in, with a mouse or trackpad, and on a touch screen. */
     hintPointer: 'Scroll or click',
     hintTouch: 'Swipe up or tap',

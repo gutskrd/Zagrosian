@@ -54,7 +54,7 @@ export const ckb: Messages = {
   },
   intro: {
     welcome: 'بەخێربێن.',
-    enter: 'فەرموون',
+    enter: 'چوونەژوورەوە',
     hintPointer: 'سکرۆڵ بکە یان کلیک بکە',
     hintTouch: 'بۆ سەرەوە ڕایبکێشە یان دەستی لێ بدە',
   },

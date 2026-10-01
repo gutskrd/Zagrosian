@@ -54,7 +54,7 @@ export const fa: Messages = {
   },
   intro: {
     welcome: 'خوش آمدید.',
-    enter: 'بفرمایید',
+    enter: 'ورود',
     hintPointer: 'اسکرول کنید یا کلیک کنید',
     hintTouch: 'به بالا بکشید یا ضربه بزنید',
   },

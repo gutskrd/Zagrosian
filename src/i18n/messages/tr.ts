@@ -51,7 +51,7 @@ export const tr: Messages = {
   },
   intro: {
     welcome: 'Hoş geldiniz.',
-    enter: 'Buyurun',
+    enter: 'Giriş',
     hintPointer: 'Kaydırın veya tıklayın',
     hintTouch: 'Yukarı kaydırın veya dokunun',
   },
