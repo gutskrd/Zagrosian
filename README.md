@@ -195,7 +195,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   place while the scroll moves time on inside it, one idea per scene, text that rises with the
   visuals, and only sizes, transforms, opacity and clip paths moving.
   1. **The values.** As the hero scrolls away, the glass logo stays on the screen and settles
-     beside Zagrosian's three values (*Fast. Private. Simple.*, `story.values` in the message
+     beside Zagrosian's three values (*Simplicity. Privacy. Clarity.*, `story.values` in the message
      files). Each flips up in 3D from behind a mask in turn, the newest lit and the others dimmed,
      and the logo turns a notch with each; then all three are lit together.
   2. **The dive.** The values lift away; the logo comes to the middle, faces the reader and the

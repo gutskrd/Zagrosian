@@ -80,13 +80,13 @@ export const en = {
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {
-    values: ['Fast.', 'Private.', 'Simple.'],
+    values: ['Simplicity.', 'Privacy.', 'Clarity.'],
   },
   /** Translation of the Kurmanji motto "Jiyan bi kurdî xweştire." Empty in Kurmanji. */
   motto: 'Life is sweeter in Kurdish.',
   about: {
     eyebrow: 'About',
-    mission: 'Our mission is to build software people enjoy using every day: fast, private and simple.',
+    mission: 'Our mission is to build software people enjoy using every day: simple, private and clear.',
     approach: 'Zagrosian is privately owned. We design and build our products in-house.',
     headquartersLabel: 'Headquarters',
     headquarters: 'Netherlands',

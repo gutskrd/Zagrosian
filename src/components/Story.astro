@@ -32,8 +32,8 @@ import Sun from './Sun.astro';
 
 const { t } = i18n(Astro.url);
 
-// The values are sized to their column: the longest word must fit on a line.
-const longest = Math.max(...t.story.values.flatMap((value) => value.split(' ')).map((word) => [...word].length));
+// The values are sized to their column: each must fit on a line.
+const longest = Math.max(...t.story.values.map((value) => [...value].length));
 const fit = longest <= 10 ? undefined : longest <= 13 ? 'md' : longest <= 16 ? 'sm' : 'xs';
 
 const words = kurdish.motto.split(' ');

@@ -69,12 +69,12 @@ export const nl: Messages = {
     comingSoonNote: 'De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
   },
   story: {
-    values: ['Snel.', 'Privacyvriendelijk.', 'Eenvoudig.'],
+    values: ['Eenvoud.', 'Privacy.', 'Helderheid.'],
   },
   motto: 'In het Koerdisch is het leven zoeter.',
   about: {
     eyebrow: 'Over ons',
-    mission: 'Onze missie is software te maken die mensen elke dag graag gebruiken: snel, privacyvriendelijk en eenvoudig.',
+    mission: 'Onze missie is software te maken die mensen elke dag graag gebruiken: eenvoudig, privacyvriendelijk en helder.',
     approach: 'Zagrosian is in particuliere handen. We ontwerpen en bouwen onze producten zelf.',
     headquartersLabel: 'Hoofdkantoor',
     headquarters: 'Nederland',
