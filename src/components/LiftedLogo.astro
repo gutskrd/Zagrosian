@@ -1,7 +1,7 @@
 ---
 /**
  * The lifted Zagrosian logo: the two hands set in a block of clear glass, in
- * 3D, for the homepage hero and the opening screen.
+ * 3D, for the homepage hero (and, from there, the story under it).
  *
  * It is drawn, not an image, so it is sharp at any size. The shapes are
  * traced from the lifted logo (src/assets/brand/zagrosian-logo-lifted-source.png)
@@ -13,8 +13,8 @@
  * redraw as the block turns, and what is behind it is soft already.)
  *
  * On the light page the dark parts of the logo are smoked glass and the rest
- * is clear; on the dark page (and the opening screen) the light parts are
- * frosted and the rest is clear.
+ * is clear; on the dark page the light parts are frosted and the rest is
+ * clear.
  *
  * On the homepage it travels into the story under the hero as the page
  * scrolls (src/scripts/story.ts), which sets its pose in custom properties on
@@ -26,11 +26,9 @@ import source from '../assets/brand/zagrosian-logo-lifted.svg?raw';
 interface Props extends HTMLAttributes<'span'> {
   /** Leave empty when the logo is decoration. */
   alt?: string;
-  /** `dark` for surfaces that are dark in both themes (the opening screen). */
-  tone?: 'auto' | 'dark';
 }
 
-const { alt = '', tone = 'auto', class: className, ...attributes } = Astro.props;
+const { alt = '', class: className, ...attributes } = Astro.props;
 const label = alt ? { role: 'img' as const, 'aria-label': alt } : { 'aria-hidden': 'true' as const };
 
 // The traced light shapes; the dark ones are the tile less those.
@@ -40,7 +38,7 @@ const dark = `M0 0H1290V1290H0Z${light}`;
 const slices = Array.from({ length: 20 }, (_, index) => index + 1);
 ---
 
-<span class:list={['lifted-logo', `lifted-logo--${tone}`, className]} {...label} {...attributes}>
+<span class:list={['lifted-logo', className]} {...label} {...attributes}>
   <span class="lifted-logo__body">
     <span class="lifted-logo__back"></span>
     {slices.map((depth) => <span class="lifted-logo__slice" data-depth={depth} />)}
@@ -77,8 +75,7 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     user-select: none;
   }
 
-  :global(:root[data-theme='dark']) .lifted-logo--auto,
-  .lifted-logo--dark {
+  :global(:root[data-theme='dark']) .lifted-logo {
     --body: rgb(255 255 255 / 0.05);
     --haze: rgb(255 255 255 / 0.15);
     --edge: rgb(255 255 255 / 0.11);

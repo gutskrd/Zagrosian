@@ -20,7 +20,6 @@ export const fa: Messages = {
     menu: 'منو',
     close: 'بستن',
     backToTop: 'بازگشت به بالا',
-    loading: 'در حال بارگذاری',
   },
   nav: {
     home: 'صفحهٔ اصلی',
@@ -43,20 +42,12 @@ export const fa: Messages = {
     label: 'صدا',
     on: 'روشن کردن صدا',
     off: 'خاموش کردن صدا',
-    prompt: 'با صدا دلنشین‌تر است.',
-    dismiss: 'نه، ممنون',
   },
   language: {
     label: 'زبان',
     suggestion: 'این صفحه به زبان فارسی نیز در دسترس است.',
     switchTo: 'مشاهده به فارسی',
     dismiss: 'بستن',
-  },
-  intro: {
-    welcome: 'خوش آمدید.',
-    enter: 'ورود',
-    hintPointer: 'اسکرول کنید یا کلیک کنید',
-    hintTouch: 'به بالا بکشید یا ضربه بزنید',
   },
   hero: {
     notice: 'Hevalo به‌زودی برای iOS و اندروید',

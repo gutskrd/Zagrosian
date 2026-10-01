@@ -17,7 +17,6 @@ export const nl: Messages = {
     menu: 'Menu',
     close: 'Sluiten',
     backToTop: 'Terug naar boven',
-    loading: 'Laden',
   },
   nav: {
     home: 'Home',
@@ -40,20 +39,12 @@ export const nl: Messages = {
     label: 'Geluid',
     on: 'Geluid aanzetten',
     off: 'Geluid uitzetten',
-    prompt: 'Het mooist met geluid.',
-    dismiss: 'Nee, bedankt',
   },
   language: {
     label: 'Taal',
     suggestion: 'Deze pagina is ook beschikbaar in het Nederlands.',
     switchTo: 'Lees in het Nederlands',
     dismiss: 'Sluiten',
-  },
-  intro: {
-    welcome: 'Welkom.',
-    enter: 'Binnengaan',
-    hintPointer: 'Scroll of klik',
-    hintTouch: 'Veeg omhoog of tik',
   },
   hero: {
     notice: 'Hevalo komt naar iOS en Android',

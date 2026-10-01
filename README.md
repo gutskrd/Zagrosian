@@ -46,15 +46,14 @@ Requires Node 22.12 or later.
 - Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement at
   the end of the homepage story, in [`Story.astro`](src/components/Story.astro), with a translation
-  underneath in every language except Kurmanji (`motto` in the message files). The site opens with
-  *Bi xêr hatin.* ("Welcome", on the opening screen) and closes with *Mala we ava.* ("Thank you",
-  literally "may your home prosper", in the footer). The Hevalo section carries a proverb, one of the
+  underneath in every language except Kurmanji (`motto` in the message files). The site closes with
+  *Mala we ava.* ("Thank you", literally "may your home prosper", in the footer). The Hevalo section carries a proverb, one of the
   *gotinên pêşiyan* ("sayings of the forebears", as Kurdish proverbs are called), and credits it as
   one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree flourishes on its own roots,
-  a person in their own language"), *Gotina pêşiyan*. The greeting and the thanks are everyday
-  expressions, not proverbs, so they carry no such credit. All of them are in `kurdish` in
+  a person in their own language"), *Gotina pêşiyan*. The thanks is an everyday expression, not a
+  proverb, so it carries no such credit. All of them are in `kurdish` in
   [`src/site.ts`](src/site.ts), stay in Kurmanji in every language with a translation in the message
-  files (`intro.welcome`, `footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets
+  files (`footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets
   them in the same serif italic as hevalo.app (see **Fonts** below). On right-to-left pages they still
   run left to right, but line up on the right with the rest of the page.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
@@ -87,7 +86,7 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   story.ts (the homepage story), intro.ts (opening screen), eyes.ts
+                   story.ts (the homepage story), eyes.ts
                    (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, smooth.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
@@ -99,13 +98,12 @@ src/
 - **Logo:** a Z whose two halves are hands reaching towards each other, in three versions (sources
   in `src/assets/brand/zagrosian-logo-*-source.png`):
   - **Black and white** (`dark` and `light`), the logo everywhere: the header and site menu, the
-    opening screen, the favicons, the app icons, the Google logo (`public/logo.png`) and the social
+    favicons, the app icons, the Google logo (`public/logo.png`) and the social
     images. They are the same Z, the white one drawn a touch finer, as white on black reads heavier.
     Each is traced to a vector (6× upscale, lightly blurred, threshold 50%, potrace, then SVGO:
     about 2 KB each), `zagrosian-logo-dark.svg` and `zagrosian-logo-light.svg`, filled with
     `currentColor`. [`Logo.astro`](src/components/Logo.astro) inlines them: the black one in the
-    light theme, the white one in the dark theme, and always the white one on the dark menu and
-    opening screen.
+    light theme, the white one in the dark theme, and always the white one on the dark menu.
     - `favicon.svg` holds both and switches with the browser's colour scheme (through a `<style>`,
       which its own header rule in `public/_headers` allows); `favicon-96.png` (black) and
       `favicon-96-dark.png` (white) do the same for browsers without SVG icons, and `favicon.ico`
@@ -114,8 +112,8 @@ src/
       white, well inside the area phones may round or crop.
     - The social images (`public/og.png` in English and `public/og/<language>.png`) show the white
       logo beside the hero headline in that language; update them if the headline changes.
-  - **Lifted**: the hands set in a block of clear glass, in 3D, in the homepage hero and the
-    opening screen ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). It is drawn rather
+  - **Lifted**: the hands set in a block of clear glass, in 3D, in the homepage hero
+    ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). It is drawn rather
     than shown as an image, so it is sharp at any size: the light shapes are traced from the lifted
     logo (the light regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
     `zagrosian-logo-lifted.svg`, 2 KB; the dark parts are the tile less those), and the block is
@@ -179,9 +177,9 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 
 - [`src/scripts/theme-init.js`](src/scripts/theme-init.js) is a tiny blocking script in `<head>`
   that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
-  is an external file because the Content-Security-Policy forbids inline scripts. Before the first
-  paint it also decides whether the opening screen plays and, when motion is welcome, makes room
-  for the homepage story (`data-story`), so nothing shifts when it starts.
+  is an external file because the Content-Security-Policy forbids inline scripts. When motion is
+  welcome, it also makes room before the first paint for the homepage story (`data-story`), so
+  nothing shifts when it starts.
 - [`src/scripts/theme.ts`](src/scripts/theme.ts) runs the controls. Where the browser supports view
   transitions, the new theme spreads out in a circle from the control that was used; with *reduce
   motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
@@ -256,51 +254,14 @@ Rules the code follows:
 
 ## The studio experience
 
-The site behaves like a design studio's: an opening screen, sound, a custom cursor, magnetic
+The site behaves like a design studio's: sound, a custom cursor, magnetic
 buttons, rolling labels, smooth scrolling and cinematic page changes. All of it is original: the
 sounds are synthesised in the browser, and nothing is borrowed from another site. Every piece steps
 back for visitors who prefer reduced motion, and the site works fully without it.
 
-- **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
-  [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain that
-  welcomes the visitor in Kurdish, *Bi xêr hatin.* ("Welcome"), and waits for them to come in.
-  - *Loading.* The greeting's letters stand up into place one by one, in 3D, over a faint copy of
-    it; ink fills them from left to right as the page loads, led by a soft band of light, while the
-    glass logo above fills from the bottom and a counter runs to 100 (in the page's own digits, so
-    Persian and Arabic count in theirs). Under the greeting, "welcome" rolls through the site's
-    languages and comes to rest in the page's own (`intro.welcome` in the message files). It follows the page's real loading, about
-    two to three and a half seconds, and ends with the light passing over the greeting once more.
-    The ink and the light are windows that slide over still letters, so nothing is redrawn as they
-    move.
-  - *Coming in: a sunrise.* The loading line becomes a horizon, and over it, in a small round
-    window, the Kurdish sun stands half risen, turning slowly, over "Enter" (`intro.enter`) and how
-    to come in, for a mouse or a touch screen, in the page's language (`intro.hintPointer`,
-    `intro.hintTouch`). Every few seconds "welcome" and "Enter" turn together to the next of the
-    site's ten languages (*Welkom. Binnengaan*, *Hoş geldiniz. Giriş*, *خوش آمدید. ورود*…), round
-    and round for as long as the visitor waits. On Kurmanji's turn the welcome line stays empty, as
-    the greeting above is Kurmanji already, and only "Enter" changes, to *Têkeve*. Scrolling, swiping up or dragging
-    lifts the whole curtain under the hand, against a resistance that grows the higher it goes (the
-    rubber band of iOS scrolling), while the sun climbs, a ring around it fills, dawn spreads along
-    the foot of the screen and the light crosses the greeting. Let go short of the top and it all
-    settles back, as on a spring; go far enough (about two turns of a mouse wheel) and the curtain
-    flies up, the hero's entrance plays from the start, and the screen is removed from the page. A
-    click, a tap or any key comes straight in, so no one has to drag (WCAG 2.5.1 and 2.5.7). Left
-    alone, the curtain lifts a little every few seconds, to show that it can. The page underneath is
-    held still until the curtain has gone and the scrolling has paused, so a trackpad's momentum does
-    not carry the visitor past the top.
-  - *Search visitors are not stopped.* Visitors who arrive from a search engine (by the referrer)
-    get the loading screen only: the curtain rises by itself once the page has loaded. Google counts
-    an overlay that has to be dismissed right after a search result is followed as intrusive, and
-    ranks such pages lower on phones.
-
-  It is decoration, hidden from screen readers, which read the page underneath; never shown without
-  JavaScript or with *reduce motion*; and lifts by itself after four seconds should the script not
-  start. Its words and numbers are drawn by CSS from attributes, so the page's text (what search
-  engines and AI crawlers read) starts with the headline. Over it, the custom cursor shows that it
-  can be clicked.
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
-  off until the visitor turns it on, from the header (the level meter), the site menu, quick
-  navigation, or a small card offered once. Everything is synthesised with the Web Audio API, so no
+  off until the visitor turns it on, from the header (the level meter), the site menu or quick
+  navigation; nothing asks. Everything is synthesised with the Web Audio API, so no
   audio files are downloaded and the Content-Security-Policy needs no media sources; the synthesiser
   itself (5 KB) is downloaded only once sound is on:
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
@@ -373,8 +334,8 @@ and other tools read directly:
   the Markdown versions.
 - **Clean text in the HTML:** crawlers that read the raw HTML (most AI crawlers do) get every piece of
   text once and in order. Rolling button labels draw their letters with CSS from `data-char`
-  attributes instead of repeating the label, the opening screen's words are drawn by CSS, and the
-  headline's lines are separated by a real space.
+  attributes instead of repeating the label, and the headline's lines are separated by a real
+  space.
 
 The Markdown and text files are marked `noindex`, so search results always show the real pages.
 

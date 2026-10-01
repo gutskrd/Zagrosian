@@ -23,7 +23,6 @@ export const en = {
     menu: 'Menu',
     close: 'Close',
     backToTop: 'Back to top',
-    loading: 'Loading',
   },
   nav: {
     home: 'Home',
@@ -47,9 +46,6 @@ export const en = {
     label: 'Sound',
     on: 'Turn sound on',
     off: 'Turn sound off',
-    /** Offered once to first-time visitors, with the `on` and `dismiss` buttons. */
-    prompt: 'Best experienced with sound.',
-    dismiss: 'No thanks',
   },
   language: {
     label: 'Language',
@@ -57,16 +53,6 @@ export const en = {
     suggestion: 'This page is also available in English.',
     switchTo: 'Read in English',
     dismiss: 'Dismiss',
-  },
-  /** The opening screen (Preloader.astro). */
-  intro: {
-    /** Translation of the Kurmanji greeting "Bi xêr hatin." Empty in Kurmanji. */
-    welcome: 'Welcome.',
-    /** The way in, once the page has loaded. The screen shows it in every language in turn. */
-    enter: 'Enter',
-    /** How to come in, with a mouse or trackpad, and on a touch screen. */
-    hintPointer: 'Scroll or click',
-    hintTouch: 'Swipe up or tap',
   },
   hero: {
     notice: 'Hevalo is coming to iOS and Android',

@@ -2,11 +2,9 @@
 // colours. Loaded as a small blocking script in <head> (an inline script would
 // break the Content-Security-Policy). The controls are in theme.ts.
 //
-// It also decides, before the first paint, whether the opening screen plays
-// (intro.ts): on the first homepage visit of a session, when motion is
-// welcome. When it is, the homepage also makes room for its pinned story
-// (story.ts), so nothing shifts when it starts. And from
-// 1 December to 6 January, Hevalo's icon is its Christmas version
+// When motion is welcome, it also makes room before the first paint for the
+// homepage's pinned story (story.ts), so nothing shifts when it starts. And
+// from 1 December to 6 January, Hevalo's icon is its Christmas version
 // (HevaloIcon.astro).
 (function () {
   var preference = 'system';
@@ -28,14 +26,4 @@
 
   var motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
   if (motion) root.dataset.story = 'ready';
-
-  // The opening screen: homepages only (/, /de, /ckb, …), once per session.
-  try {
-    if (motion && /^\/([a-z]{2,3})?$/.test(location.pathname) && !sessionStorage.getItem('intro')) {
-      sessionStorage.setItem('intro', '1');
-      root.dataset.intro = 'loading';
-    }
-  } catch (error) {
-    // Without session storage it would play on every visit, so it does not.
-  }
 })();

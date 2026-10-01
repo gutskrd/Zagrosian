@@ -1,6 +1,5 @@
 import { initCommandMenu } from './command';
 import { initEyes } from './eyes';
-import { initIntro } from './intro';
 import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
@@ -244,8 +243,6 @@ function initLegalTools() {
   }
 }
 
-// First, so the opening screen's counter starts at once.
-initIntro();
 initHeader();
 initMenu();
 initReveal();

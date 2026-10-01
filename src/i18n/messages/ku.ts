@@ -7,7 +7,7 @@ export const ku: Messages = {
     title: 'Zagrosian — Teknolojî ji bo jiyana rojane',
     tagline: 'Teknolojî ji bo jiyana rojane.',
     description:
-      'Zagrosian şirketeke teknolojiyê ya serbixwe ye û navenda wê li Holendayê ye. Em ji bo bikarhêneran berheman disêwirînin û çêdikin; ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
+      'Zagrosian şirketeke teknolojiyê ya serbixwe ye li Holendayê. Em berheman ji bo bikarhêneran çêdikin; ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
   },
   common: {
     skipToContent: 'Biçe naverokê',
@@ -19,7 +19,6 @@ export const ku: Messages = {
     menu: 'Menû',
     close: 'Bigire',
     backToTop: 'Vegere jor',
-    loading: 'Tê barkirin',
   },
   nav: {
     home: 'Rûpela sereke',
@@ -42,20 +41,12 @@ export const ku: Messages = {
     label: 'Deng',
     on: 'Deng vêxe',
     off: 'Deng vemirîne',
-    prompt: 'Bi deng xweştir e.',
-    dismiss: 'Na, spas',
   },
   language: {
     label: 'Ziman',
     suggestion: 'Ev rûpel bi kurmancî jî heye.',
     switchTo: 'Bi kurmancî bixwîne',
     dismiss: 'Bigire',
-  },
-  intro: {
-    welcome: '',
-    enter: 'Têkeve',
-    hintPointer: 'Bigerîne an bitikîne',
-    hintTouch: 'Ber bi jor ve bikişîne an bitikîne',
   },
   hero: {
     notice: 'Hevalo tê ser iOS û Androidê',

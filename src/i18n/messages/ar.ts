@@ -18,7 +18,6 @@ export const ar: Messages = {
     menu: 'القائمة',
     close: 'إغلاق',
     backToTop: 'العودة إلى الأعلى',
-    loading: 'جارٍ التحميل',
   },
   nav: {
     home: 'الرئيسية',
@@ -41,20 +40,12 @@ export const ar: Messages = {
     label: 'الصوت',
     on: 'تشغيل الصوت',
     off: 'إيقاف الصوت',
-    prompt: 'التجربة أجمل مع الصوت.',
-    dismiss: 'لا، شكرًا',
   },
   language: {
     label: 'اللغة',
     suggestion: 'هذه الصفحة متاحة أيضًا باللغة العربية.',
     switchTo: 'تصفّح بالعربية',
     dismiss: 'إغلاق',
-  },
-  intro: {
-    welcome: 'أهلاً وسهلاً.',
-    enter: 'دخول',
-    hintPointer: 'مرّر أو انقر',
-    hintTouch: 'اسحب للأعلى أو انقر',
   },
   hero: {
     notice: 'Hevalo قريبًا على iOS وأندرويد',

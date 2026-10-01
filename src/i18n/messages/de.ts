@@ -5,7 +5,7 @@ export const de: Messages = {
     title: 'Zagrosian — Technologie für den Alltag',
     tagline: 'Technologie für den Alltag.',
     description:
-      'Zagrosian ist ein unabhängiges Technologieunternehmen mit Sitz in den Niederlanden. Wir gestalten und entwickeln Produkte für Verbraucher – den Anfang macht Hevalo, eine App zum Kurdischlernen.',
+      'Zagrosian ist ein unabhängiges Technologieunternehmen aus den Niederlanden. Wir entwickeln Produkte für Verbraucher, zuerst Hevalo, eine App zum Kurdischlernen.',
   },
   common: {
     skipToContent: 'Zum Inhalt springen',
@@ -17,7 +17,6 @@ export const de: Messages = {
     menu: 'Menü',
     close: 'Schließen',
     backToTop: 'Nach oben',
-    loading: 'Wird geladen',
   },
   nav: {
     home: 'Startseite',
@@ -40,20 +39,12 @@ export const de: Messages = {
     label: 'Ton',
     on: 'Ton einschalten',
     off: 'Ton ausschalten',
-    prompt: 'Am schönsten mit Ton.',
-    dismiss: 'Nein, danke',
   },
   language: {
     label: 'Sprache',
     suggestion: 'Diese Seite gibt es auch auf Deutsch.',
     switchTo: 'Auf Deutsch lesen',
     dismiss: 'Schließen',
-  },
-  intro: {
-    welcome: 'Willkommen.',
-    enter: 'Eintreten',
-    hintPointer: 'Scrollen oder klicken',
-    hintTouch: 'Nach oben wischen oder tippen',
   },
   hero: {
     notice: 'Hevalo kommt auf iOS und Android',

@@ -56,8 +56,6 @@ export const hevalo = {
 export const kurdish = {
   /** Hevalo's motto, "Life is sweeter in Kurdish": the end of the homepage story (`motto`). */
   motto: 'Jiyan bi kurdî xweştire.',
-  /** "Welcome", to everyone: the opening screen (`intro.welcome`). */
-  welcome: 'Bi xêr hatin.',
   /** "Thank you", literally "may your home prosper": the footer (`footer.thanks`). */
   thanks: 'Mala we ava.',
   /** A proverb, shown with Hevalo (`hevalo.proverb`). */

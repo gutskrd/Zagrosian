@@ -17,7 +17,6 @@ export const tr: Messages = {
     menu: 'Menü',
     close: 'Kapat',
     backToTop: 'Başa dön',
-    loading: 'Yükleniyor',
   },
   nav: {
     home: 'Ana sayfa',
@@ -40,20 +39,12 @@ export const tr: Messages = {
     label: 'Ses',
     on: 'Sesi aç',
     off: 'Sesi kapat',
-    prompt: 'Sesle daha güzel.',
-    dismiss: 'Hayır, teşekkürler',
   },
   language: {
     label: 'Dil',
     suggestion: 'Bu sayfa Türkçe olarak da mevcut.',
     switchTo: 'Türkçe oku',
     dismiss: 'Kapat',
-  },
-  intro: {
-    welcome: 'Hoş geldiniz.',
-    enter: 'Giriş',
-    hintPointer: 'Kaydırın veya tıklayın',
-    hintTouch: 'Yukarı kaydırın veya dokunun',
   },
   hero: {
     notice: 'Hevalo iOS ve Android’e geliyor',
