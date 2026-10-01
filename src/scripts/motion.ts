@@ -17,6 +17,8 @@
  * visible and static.
  */
 
+import { initLogoTurn } from './logo-turn';
+
 const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -367,6 +369,7 @@ export function initMotion() {
     }
 
     initPointerDepth();
+    initLogoTurn();
   }
 
   if ('IntersectionObserver' in window) runScrollEffects(effects);

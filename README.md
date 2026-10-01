@@ -79,8 +79,9 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   intro.ts (opening screen), eyes.ts (Hevalo's eyes), sound.ts, cursor.ts,
-                   magnetic.ts, smooth.ts, text.ts, language.ts, theme.ts and theme-init.js
+                   logo-turn.ts (the hero logo turning over), intro.ts (opening screen), eyes.ts
+                   (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, smooth.ts, text.ts,
+                   language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -110,18 +111,24 @@ src/
     than shown as an image, so it is sharp at any size: the light shapes are traced from the lifted
     logo (the light regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
     `zagrosian-logo-lifted.svg`, 2 KB; the dark parts are the tile less those), and the block is
-    built in CSS 3D: a back face that blurs what is behind the glass (`backdrop-filter`), twenty
-    thin layers that make its edge, the logo floating between the faces within a thin frame as in
-    the original, and a front face that only catches the light (a bevel, a glare and a streak), so
-    the logo stays crisp. It rests turned a little, so its depth shows, and in the hero it turns
-    further towards the pointer over two soft lights that show through it. On the light page the
-    logo's dark parts and frame are smoked glass and the rest clear; on the dark page (and the
-    always-dark opening screen) its light parts are frosted and the rest clear.
+    built in CSS 3D: a back face that tints the glass and casts its shadow, twenty thin layers that
+    make its edge, the logo floating between the faces within a thin frame as in the original, and
+    a front face that only catches the light (a bevel, a glare and a streak), so the logo stays
+    crisp. It rests turned a little, so its depth shows, and in the hero it turns further towards
+    the pointer over two soft lights that show through it. On the light page the logo's dark parts
+    and frame are smoked glass and the rest clear; on the dark page (and the always-dark opening
+    screen) its light parts are frosted and the rest clear.
+    The block has two sides: turned over, it shows the Kurdish sun in the same glass, drawn from
+    the sun's geometry (21 straight rays, the gaps between them at 51.2% of the rays' length, as
+    measured on the artwork) so its points are exact. In the hero it turns over as the page
+    scrolls (see Motion). The glass does not blur what is behind it (`backdrop-filter`): the
+    lights behind it are soft already, and a backdrop blur is costly to redraw while the block
+    turns; a faint haze inside the glass on the dark page stands in for it.
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
-  (`sun-*-64.png`, cropped to the sun).
+  (`sun-*-64.png`, cropped to the sun). The back of the lifted logo draws it as a vector.
 - **Hevalo icon** (`src/assets/brand/hevalo-source.png` and `hevalo-christmas-source.png`): Hevalo's
   app icon, the deer, shown above the product name and in the hero's *coming soon* notice. From
   1 December to 6 January the site shows the Christmas version instead: `theme-init.js` sets
@@ -179,6 +186,18 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 
 - **Hero:** the headline rises line by line from behind masks on load, the lifted logo rises into
   place and comes into focus, and it drifts slightly slower than the page (`data-parallax`).
+- **Hero logo turn** ([`logo-turn.ts`](src/scripts/logo-turn.ts), `data-logo-turn`): as the logo
+  rises up the screen, the glass block leans back, rolls and turns over to the Kurdish sun. Twice
+  on the way it opens up, its layers parting and twisting about its middle, first one way and
+  then back, and it is a solid block again when seen edge-on. A streak of light slides off one
+  face and onto the other, and the two lights behind the glass trade places. The sun grows into
+  place, then keeps turning slowly as the logo leaves the screen; scrolling back plays it all
+  backwards. The pose follows the scroll with a little weight (it eases in over about a tenth of
+  a second), and a fast scroll parts the layers a little further. It works the same with a mouse,
+  a trackpad or a finger. Only custom properties on the hero figure change, through the CSSOM;
+  the page's layout is read on load and resize, never while scrolling, and nothing runs once the
+  logo has settled or is off screen. Without JavaScript, with *reduce motion*, on the opening
+  screen and in print the logo rests, logo side up.
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
