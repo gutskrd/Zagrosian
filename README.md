@@ -105,15 +105,18 @@ src/
       white, well inside the area phones may round or crop.
     - The social images (`public/og.png` in English and `public/og/<language>.png`) show the white
       logo beside the hero headline in that language; update them if the headline changes.
-  - **Lifted**: the hands on a tile of glass, in the homepage hero and the opening screen
-    ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). It is drawn rather than shown as an
-    image, so it is sharp at any size: the light shapes are traced from the lifted logo (the light
-    regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
-    `zagrosian-logo-lifted.svg`, 2 KB), and the tile is made in CSS: a rounded square of glass
-    (`backdrop-filter`), a thin frame around the shapes as in the original, a sheen at the top left
-    and a bright rim. On the light page the glass is smoked and the shapes frosted white; on the
-    dark page (and the always-dark opening screen) the glass is clear. In the hero two soft lights
-    sit behind it and show through, blurred, as it leans towards the pointer.
+  - **Lifted**: the hands set in a block of clear glass, in 3D, in the homepage hero and the
+    opening screen ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). It is drawn rather
+    than shown as an image, so it is sharp at any size: the light shapes are traced from the lifted
+    logo (the light regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
+    `zagrosian-logo-lifted.svg`, 2 KB; the dark parts are the tile less those), and the block is
+    built in CSS 3D: a back face that blurs what is behind the glass (`backdrop-filter`), twenty
+    thin layers that make its edge, the logo floating between the faces within a thin frame as in
+    the original, and a front face that only catches the light (a bevel, a glare and a streak), so
+    the logo stays crisp. It rests turned a little, so its depth shows, and in the hero it turns
+    further towards the pointer over two soft lights that show through it. On the light page the
+    logo's dark parts and frame are smoked glass and the rest clear; on the dark page (and the
+    always-dark opening screen) its light parts are frosted and the rest clear.
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The

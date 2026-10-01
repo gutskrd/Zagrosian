@@ -164,13 +164,13 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
   }
 
-  /* The glass logo. With a mouse it leans towards the pointer in 3D
+  /* The glass logo, in 3D. With a mouse it leans towards the pointer
      (motion.ts) and moves over two soft lights behind it, which show through
      the glass, blurred. (No filter or opacity may sit on its ancestors once
-     it is in place: they would hide what is behind the glass from it.) */
+     it is in place: they would flatten it and hide what is behind it.) */
   .hero__mark {
-    --light-a: rgb(0 0 0 / 0.13);
-    --light-b: rgb(0 0 0 / 0.07);
+    --light-a: rgb(0 0 0 / 0.09);
+    --light-b: rgb(0 0 0 / 0.05);
 
     position: relative;
     justify-self: center;
@@ -211,6 +211,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   .hero__art {
     position: relative;
     z-index: 1;
+    transform-style: preserve-3d;
   }
 
   .hero__mark :global(.hero__logo) {
