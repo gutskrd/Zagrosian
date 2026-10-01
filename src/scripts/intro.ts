@@ -75,14 +75,18 @@ export function initIntro() {
   requestAnimationFrame(tick);
 }
 
-/** Plays the hero's CSS entrance again from the start, now that it can be seen. */
+/**
+ * Plays the hero's CSS entrance again from the start, now that it can be seen,
+ * with the logo travelling down the page (journey.ts), which sits beside it.
+ */
 function replayHero() {
-  const hero = document.querySelector('.hero');
-  if (!hero || typeof hero.getAnimations !== 'function') return;
-  for (const animation of hero.getAnimations({ subtree: true })) {
-    if (animation instanceof CSSAnimation) {
-      animation.currentTime = 0;
-      animation.play();
+  if (typeof Element.prototype.getAnimations !== 'function') return;
+  for (const part of document.querySelectorAll('.hero, .journey')) {
+    for (const animation of part.getAnimations({ subtree: true })) {
+      if (animation instanceof CSSAnimation) {
+        animation.currentTime = 0;
+        animation.play();
+      }
     }
   }
 }

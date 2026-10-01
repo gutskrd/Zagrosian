@@ -9,7 +9,7 @@ const { t } = i18n(Astro.url);
 
 <section class="motto section" aria-labelledby="motto-title">
   <div class="container motto__inner">
-    <div class="motto__sun" data-spin>
+    <div class="motto__sun" data-spin data-journey-dock>
       <Sun />
     </div>
     <SplitText id="motto-title" class="motto__text kurdish" lang="ku" dir="ltr" text={kurdish.motto} />
@@ -27,6 +27,18 @@ const { t } = i18n(Astro.url);
   .motto__sun {
     font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
     margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  /* The logo travelling down the page lands here as the sun (journey.ts):
+     this one is hidden until it has. */
+  :global(:root[data-journey='on']) .motto__sun:not([data-landed]) {
+    visibility: hidden;
+  }
+
+  @media print {
+    :global(:root[data-journey='on']) .motto__sun:not([data-landed]) {
+      visibility: visible;
+    }
   }
 
   /* The motto is set in system serifs, whose widths vary by device. Sizes allow

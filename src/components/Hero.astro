@@ -45,13 +45,26 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       </div>
     </div>
 
-    <figure class="hero__mark intro" data-parallax="0.08" data-depth data-logo-turn>
+    <figure class="hero__mark intro" data-journey-from>
       <div class="hero__art">
         <LiftedLogo class="hero__logo" alt={t.hero.logoAlt} />
       </div>
     </figure>
   </div>
 </section>
+
+{
+  /* The logo's journey down the page (src/scripts/journey.ts): the room it
+     travels through below the hero, and the layer it travels in, fixed to the
+     screen. The script copies the logo into it; both are unused without
+     JavaScript or with reduced motion. */
+}
+<div class="journey-stage" aria-hidden="true"></div>
+<div class="journey" aria-hidden="true" data-journey-layer>
+  <div class="journey__art" data-lean>
+    <div class="journey__tilt"></div>
+  </div>
+</div>
 
 <style>
   .hero {
@@ -115,8 +128,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
-  /* The headline is sized to its column: "Technology for" is about 6.1em wide. */
+  /* The headline is sized to its column: "Technology for" is about 6.1em wide.
+     The text stays above the travelling logo, which may pass behind it. */
   .hero__text {
+    position: relative;
+    z-index: 2;
     container-type: inline-size;
   }
 
@@ -164,20 +180,26 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
   }
 
-  /* The glass logo, in 3D. With a mouse it leans towards the pointer
-     (motion.ts) and moves over two soft lights behind it, which show through
-     the glass. As the page scrolls it turns over to the sun (logo-turn.ts),
-     and the lights trade places behind it (--turned, 0 to 1).
-
+  /* The glass logo, in 3D, over two soft lights that show through the glass.
      The lights are gradients that fall off as a disc blurred by 1.75rem
      would, rather than blurred discs: a large blur behind 3D glass is costly
-     to redraw while the logo turns. (No filter or opacity may sit on the
+     to redraw while the logo moves. (No filter or opacity may sit on the
      logo's ancestors once it is in place: they would flatten it.) */
-  .hero__mark {
+  .hero__mark,
+  .journey {
     --glow: 0 0 0;
     --glow-a: 0.09;
     --glow-b: 0.05;
+  }
 
+  :global(:root[data-theme='dark']) .hero__mark,
+  :global(:root[data-theme='dark']) .journey {
+    --glow: 255 255 255;
+    --glow-a: 0.22;
+    --glow-b: 0.11;
+  }
+
+  .hero__mark {
     position: relative;
     justify-self: center;
     width: min(64vw, 18rem);
@@ -185,14 +207,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     perspective: 80rem;
   }
 
-  :global(:root[data-theme='dark']) .hero__mark {
-    --glow: 255 255 255;
-    --glow-a: 0.22;
-    --glow-b: 0.11;
-  }
-
   .hero__mark::before,
-  .hero__mark::after {
+  .hero__mark::after,
+  .journey__art::before,
+  .journey__art::after {
     content: '';
     position: absolute;
     aspect-ratio: 1;
@@ -200,7 +218,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   /* A disc 64% of the logo wide, centred near its top right corner. */
-  .hero__mark::before {
+  .hero__mark::before,
+  .journey__art::before {
     top: -26.5%;
     right: -28.5%;
     width: 105%;
@@ -213,11 +232,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       rgb(var(--glow) / calc(var(--glow-a) * 0.02)) 92%,
       rgb(var(--glow) / 0)
     );
-    transform: translate(calc(var(--turned, 0) * -47.5%), calc(var(--turned, 0) * 9.75%));
   }
 
   /* A disc 52% of the logo wide, centred near its bottom left corner. */
-  .hero__mark::after {
+  .hero__mark::after,
+  .journey__art::after {
     bottom: -26.75%;
     left: -28.75%;
     width: 93.5%;
@@ -230,13 +249,102 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       rgb(var(--glow) / calc(var(--glow-b) * 0.02)) 91%,
       rgb(var(--glow) / 0)
     );
-    transform: translate(calc(var(--turned, 0) * 51%), calc(var(--turned, 0) * -7.8%));
   }
 
   .hero__art {
     position: relative;
     z-index: 1;
     transform-style: preserve-3d;
+  }
+
+  /* The journey. theme-init.js makes room for it before the first paint
+     (`data-journey`), and journey.ts turns it on once the logo is copied into
+     its layer (`data-journey='on'`). The logo in the hero then stays in place
+     for screen readers, unseen, and the copy travels instead.
+
+     The layer is fixed to the screen, under the hero text and the products
+     band, which passes over it like a curtain. Once the sun has landed in
+     the motto, the motto's own sun takes over (`data-landed`). With a mouse
+     the logo still leans towards the pointer (motion.ts). As it turns over,
+     the lights trade places behind it (--turned, 0 to 1), and they fade as
+     it lands (--lights). */
+  .journey-stage,
+  .journey {
+    display: none;
+  }
+
+  :global(:root[data-journey]) .journey-stage {
+    display: block;
+    height: 170svh;
+  }
+
+  :global(:root[data-journey='on']) .journey {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .journey[data-hidden],
+  .journey[data-landed] {
+    visibility: hidden;
+  }
+
+  /* Only what can be seen is drawn (journey.ts): one side of the logo or the
+     other, both while it turns, and no edge while it fills the screen. */
+  .journey[data-side='logo'] :global(:is(.lifted-logo__back--sun, .lifted-logo__sun, .lifted-logo__front--sun)),
+  .journey[data-side='sun']
+    :global(:is(.lifted-logo__back:not(.lifted-logo__back--sun), .lifted-logo__frame, .lifted-logo__inner, .lifted-logo__front:not(.lifted-logo__front--sun))),
+  .journey[data-flat] :global(.lifted-logo__slice) {
+    visibility: hidden;
+  }
+
+  .journey__art {
+    position: absolute;
+    top: 0;
+    left: 0;
+    perspective: 80rem;
+    transform-origin: 50% 50%;
+  }
+
+  .journey__art::before {
+    transform: translate(calc(var(--turned, 0) * -47.5%), calc(var(--turned, 0) * 9.75%));
+    opacity: var(--lights, 1);
+  }
+
+  .journey__art::after {
+    transform: translate(calc(var(--turned, 0) * 51%), calc(var(--turned, 0) * -7.8%));
+    opacity: var(--lights, 1);
+  }
+
+  .journey__tilt {
+    position: relative;
+    z-index: 1;
+    transform-style: preserve-3d;
+  }
+
+  :global(:root[data-journey='on']) .hero__art,
+  :global(:root[data-journey='on']) .hero__mark::before,
+  :global(:root[data-journey='on']) .hero__mark::after {
+    opacity: 0;
+  }
+
+  /* Printed, the logo stays in the hero. */
+  @media print {
+    :global(:root[data-journey]) .journey-stage,
+    :global(:root[data-journey='on']) .journey {
+      display: none;
+    }
+
+    :global(:root[data-journey='on']) .hero__art,
+    :global(:root[data-journey='on']) .hero__mark::before,
+    :global(:root[data-journey='on']) .hero__mark::after {
+      opacity: 1;
+    }
   }
 
   .hero__mark :global(.hero__logo) {
@@ -287,7 +395,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       animation-delay: 0.4s;
     }
 
-    .hero__mark {
+    .hero__mark,
+    .journey__tilt {
       animation: logo-in 1.4s var(--ease-out) 0.3s both;
     }
   }

@@ -79,7 +79,7 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   logo-turn.ts (the hero logo turning over), intro.ts (opening screen), eyes.ts
+                   journey.ts (the logo's journey down the page), intro.ts (opening screen), eyes.ts
                    (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, smooth.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
@@ -120,15 +120,18 @@ src/
     screen) its light parts are frosted and the rest clear.
     The block has two sides: turned over, it shows the Kurdish sun in the same glass, drawn from
     the sun's geometry (21 straight rays, the gaps between them at 51.2% of the rays' length, as
-    measured on the artwork) so its points are exact. In the hero it turns over as the page
-    scrolls (see Motion). The glass does not blur what is behind it (`backdrop-filter`): the
-    lights behind it are soft already, and a backdrop blur is costly to redraw while the block
-    turns; a faint haze inside the glass on the dark page stands in for it.
+    measured on the artwork, [`src/lib/sun.ts`](src/lib/sun.ts)) so its points are exact. On
+    the homepage it travels down the page as it scrolls and turns over (see Motion). Its glass
+    can melt away (`--glass`), leaving a solid sun. The glass does not blur what is behind it
+    (`backdrop-filter`): the lights behind it are soft already, and a backdrop blur is costly to
+    redraw while the block moves; a faint haze inside the glass on the dark page stands in for it.
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
-- **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
-  Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
-  (`sun-*-64.png`, cropped to the sun). The back of the lifted logo draws it as a vector.
+- **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
+  is drawn from its measured geometry ([`src/lib/sun.ts`](src/lib/sun.ts): 21 straight rays, the
+  gaps between them at 51.2% of the rays' length), so it is sharp at any size: in the colour of the
+  text above the Kurdish motto ([`Sun.astro`](src/components/Sun.astro)), and on the back of the
+  lifted logo.
 - **Hevalo icon** (`src/assets/brand/hevalo-source.png` and `hevalo-christmas-source.png`): Hevalo's
   app icon, the deer, shown above the product name and in the hero's *coming soon* notice. From
   1 December to 6 January the site shows the Christmas version instead: `theme-init.js` sets
@@ -171,7 +174,9 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 
 - [`src/scripts/theme-init.js`](src/scripts/theme-init.js) is a tiny blocking script in `<head>`
   that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
-  is an external file because the Content-Security-Policy forbids inline scripts.
+  is an external file because the Content-Security-Policy forbids inline scripts. Before the first
+  paint it also decides whether the opening screen plays and, when motion is welcome, makes room
+  for the logo's journey on the homepage (`data-journey`), so nothing shifts when it starts.
 - [`src/scripts/theme.ts`](src/scripts/theme.ts) runs the controls. Where the browser supports view
   transitions, the new theme spreads out in a circle from the control that was used; with *reduce
   motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
@@ -184,20 +189,29 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Hero:** the headline rises line by line from behind masks on load, the lifted logo rises into
-  place and comes into focus, and it drifts slightly slower than the page (`data-parallax`).
-- **Hero logo turn** ([`logo-turn.ts`](src/scripts/logo-turn.ts), `data-logo-turn`): as the logo
-  rises up the screen, the glass block leans back, rolls and turns over to the Kurdish sun. Twice
-  on the way it opens up, its layers parting and twisting about its middle, first one way and
-  then back, and it is a solid block again when seen edge-on. A streak of light slides off one
-  face and onto the other, and the two lights behind the glass trade places. The sun grows into
-  place, then keeps turning slowly as the logo leaves the screen; scrolling back plays it all
-  backwards. The pose follows the scroll with a little weight (it eases in over about a tenth of
-  a second), and a fast scroll parts the layers a little further. It works the same with a mouse,
-  a trackpad or a finger. Only custom properties on the hero figure change, through the CSSOM;
-  the page's layout is read on load and resize, never while scrolling, and nothing runs once the
-  logo has settled or is off screen. Without JavaScript, with *reduce motion*, on the opening
-  screen and in print the logo rests, logo side up.
+- **Hero:** the headline rises line by line from behind masks on load, and the lifted logo rises
+  into place and comes into focus.
+- **The logo's journey** ([`journey.ts`](src/scripts/journey.ts)): the glass logo leaves its place
+  in the hero and stays on the screen as the page scrolls. It glides to the middle and turns to face
+  the reader (keeping to its side until the hero's text has gone), then grows until the inside of
+  the logo fills the whole screen, and holds there a moment. Shrinking back, it turns over, as one
+  solid block, to the Kurdish sun, which grows into place and turns slowly with the scroll; the two
+  lights behind the glass trade places and a streak of light slides from one face to the other.
+  The products band rises over it like a curtain (`data-journey-curtain`). When the band has
+  passed, the sun is still there, and the motto comes up to meet it: the glass melts away, the
+  lights fade, and the sun shrinks into the place, size, turn and colour of the motto's own sun
+  (`data-journey-dock`), which then takes over (`data-landed`). Scrolling back plays it all
+  backwards, on a phone as with a mouse.
+  How it works: below the hero is room for the show (`.journey-stage`, 170% of the screen's
+  height), made by `theme-init.js` before the first paint. The script copies the hero's logo into a
+  layer fixed to the screen (`[data-journey-layer]`), under the hero text and the products band;
+  the original stays in the hero, unseen, for screen readers. Each frame sets the copy's transform
+  and pose (custom properties) from the scroll position. Smaller than in the hero, the copy is laid
+  out at its size rather than scaled down, and nothing that cannot be seen is drawn: the side
+  turned away, the block's edge while it fills the screen, and the whole layer while the band
+  covers it. The page is measured on load and resize only. Without JavaScript, with *reduce
+  motion* and in print, the logo stays in the hero and the motto keeps its sun; the room below the
+  hero is then not there.
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -208,7 +222,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
 - **Products:** the Hevalo icon turns to face the reader as it comes into view.
-- **Pointer depth:** with a mouse, the lifted logo turns towards the pointer in 3D, a soft light
+- **Pointer depth:** with a mouse, the travelling logo leans towards the pointer in 3D, a soft light
   follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
   it with a highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.

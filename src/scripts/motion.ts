@@ -17,7 +17,7 @@
  * visible and static.
  */
 
-import { initLogoTurn } from './logo-turn';
+import { initJourney } from './journey';
 
 const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
@@ -111,22 +111,6 @@ function runScrollEffects(effects: ScrollEffect[]) {
   for (const effect of effects) observer.observe(effect.target);
   window.addEventListener('scroll', request, { passive: true });
   window.addEventListener('resize', request, { passive: true });
-}
-
-/** A layer that drifts slightly slower than the page, for a sense of depth. */
-function parallax(frame: HTMLElement, layer: HTMLElement, strength: number): ScrollEffect {
-  let offset = 0;
-  return {
-    target: frame,
-    measure(viewportHeight) {
-      const rect = frame.getBoundingClientRect();
-      const fromCentre = rect.top + rect.height / 2 - viewportHeight / 2;
-      offset = clamp(-fromCentre * strength, -64, 64);
-    },
-    render() {
-      layer.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
-    },
-  };
 }
 
 /**
@@ -244,8 +228,9 @@ function initPointerDepth() {
 
   // The logo follows the pointer across the whole window, eased towards it
   // frame by frame. It uses the individual `rotate` and `translate` properties,
-  // so it combines with the scroll parallax on `transform`.
-  const depth = document.querySelector<HTMLElement>('[data-depth]');
+  // so it combines with its entrance animation on `transform`. (On the
+  // homepage this is the logo travelling down the page, journey.ts.)
+  const depth = document.querySelector<HTMLElement>('[data-lean]');
   const layer = depth?.firstElementChild;
   if (depth && layer instanceof HTMLElement) {
     let targetX = 0;
@@ -349,11 +334,6 @@ export function initMotion() {
   if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
     initSplitHeadings();
 
-    for (const frame of document.querySelectorAll<HTMLElement>('[data-parallax]')) {
-      const layer = frame.firstElementChild;
-      if (layer instanceof HTMLElement) effects.push(parallax(frame, layer, Number(frame.dataset.parallax) || 0.1));
-    }
-
     for (const frame of document.querySelectorAll<HTMLElement>('[data-rise]')) {
       const layer = frame.firstElementChild;
       if (layer instanceof HTMLElement) effects.push(rise(frame, layer));
@@ -369,7 +349,7 @@ export function initMotion() {
     }
 
     initPointerDepth();
-    initLogoTurn();
+    initJourney();
   }
 
   if ('IntersectionObserver' in window) runScrollEffects(effects);
