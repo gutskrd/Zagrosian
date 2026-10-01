@@ -46,9 +46,17 @@ Requires Node 22.12 or later.
 - Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement at
   the end of the homepage story, in [`Story.astro`](src/components/Story.astro), with a translation
-  underneath in every language except Kurmanji (`motto` in the message files). *Ji Kurdan, ji bo Kurdan.*
-  ("By Kurds, for Kurds") is in the footer. Both stay in Kurmanji in every language and use the
-  `kurdish` class, which sets them in the same serif italic as hevalo.app (see **Fonts** below).
+  underneath in every language except Kurmanji (`motto` in the message files). The site opens with
+  *Bi xêr hatin.* ("Welcome", on the opening screen) and closes with *Mala we ava.* ("Thank you",
+  literally "may your home prosper", in the footer). The Hevalo section carries a proverb, one of the
+  *gotinên pêşiyan* ("sayings of the forebears", as Kurdish proverbs are called), and credits it as
+  one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree flourishes on its own roots,
+  a person in their own language"), *Gotina pêşiyan*. The greeting and the thanks are everyday
+  expressions, not proverbs, so they carry no such credit. All of them are in `kurdish` in
+  [`src/site.ts`](src/site.ts), stay in Kurmanji in every language with a translation in the message
+  files (`intro.welcome`, `footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets
+  them in the same serif italic as hevalo.app (see **Fonts** below). On right-to-left pages they still
+  run left to right, but line up on the right with the rest of the page.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro) (text: `hevalo.comingSoon*` in the
   message files). When the apps are out, replace it with links to the App Store and Google Play.
@@ -254,11 +262,17 @@ sounds are synthesised in the browser, and nothing is borrowed from another site
 back for visitors who prefer reduced motion, and the site works fully without it.
 
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
-  [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
-  the glass logo fills up from the bottom, over a faint copy of itself, as a counter runs to 100
-  (in the page's own digits, so Persian and Arabic count in theirs). It follows the page's real
-  loading and takes one to three seconds; then the curtain rises and the hero's entrance plays from
-  the start, and the screen is removed from the page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
+  [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain that
+  welcomes the visitor in Kurdish, *Bi xêr hatin.* ("Welcome"). Its letters stand up into place one by
+  one, in 3D, out of a blur, over a faint copy of the greeting; ink fills them from left to right as
+  the page loads, led by a soft band of light, while the glass logo above fills from the bottom and
+  a counter runs to 100 (in the page's own digits, so Persian and Arabic count in theirs). Under the
+  greeting, "welcome" rolls through the site's languages and comes to rest in the page's own (in
+  Sorani on the Kurmanji pages, which need no translation; `intro.welcome` in the message files).
+  It follows the page's real loading and takes about two to three and a half seconds; when the page
+  is ready the light passes over the greeting once more, the curtain rises and the hero's entrance
+  plays from the start, and the screen is removed from the page. A click, a tap or a key lifts it at
+  once. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
   motion*, and lifts by itself after four seconds should the script not start. Its words are drawn by
   CSS, so the page's text (what search engines and AI crawlers read) starts with the headline.
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):

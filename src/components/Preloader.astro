@@ -1,8 +1,16 @@
 ---
 /**
  * The opening screen, on the first homepage visit of a session: a dark
- * curtain where the glass logo fills up as a counter runs to 100, then
- * slides away as the hero enters (src/scripts/intro.ts).
+ * curtain that welcomes the visitor in Kurdish, "Bi xêr hatin.", then slides
+ * away as the hero enters (src/scripts/intro.ts).
+ *
+ * The greeting's letters rise into place one by one, in 3D, over a faint copy
+ * of the greeting, and ink fills them from left to right as the page loads,
+ * led by a soft band of light, as the glass logo above fills from the bottom.
+ * Under it, "welcome" rolls through the site's languages like a counter and
+ * comes to rest in the page's own (in Sorani on the Kurmanji pages, which
+ * need no translation). When the page is ready, the light passes over the
+ * greeting once more and the curtain rises.
  *
  * theme-init.js decides before the first paint (`data-intro` on <html>), and
  * only when motion is welcome. It is decoration, hidden from screen readers,
@@ -12,10 +20,25 @@
  * engines and AI crawlers read) starts with the real headline; the script
  * removes it from the page once it has lifted.
  */
-import { i18n } from '../i18n';
+import { i18n, locales, messages } from '../i18n';
+import { kurdish } from '../site';
 import LiftedLogo from './LiftedLogo.astro';
 
-const { t } = i18n(Astro.url);
+const { locale, t } = i18n(Astro.url);
+
+// The greeting, letter by letter; `data-i` staggers them (see the CSS).
+let count = 0;
+const words = kurdish.welcome.split(' ').map((word) => [...word].map((char) => ({ char, index: count++ })));
+const layers = ['ghost', 'fill', 'glow'] as const;
+
+// "Welcome" in every language but Kurmanji, ending with the page's own.
+const others = locales.filter((info) => info.code !== 'ku');
+const own = others.findIndex((info) => info.code === (locale === 'ku' ? 'ckb' : locale));
+const welcomes = [...others.slice(own + 1), ...others.slice(0, own + 1)].map((info) => ({
+  lang: info.code,
+  dir: info.dir,
+  text: messages(info.code).intro.welcome,
+}));
 ---
 
 <div class="intro-screen" aria-hidden="true" data-intro-screen>
@@ -24,9 +47,38 @@ const { t } = i18n(Astro.url);
     <span class="intro-screen__label" data-label={t.common.loading}></span>
   </div>
 
-  <div class="intro-screen__mark">
-    <LiftedLogo class="intro-screen__logo intro-screen__logo--ghost" tone="dark" />
-    <LiftedLogo class="intro-screen__logo intro-screen__logo--fill" tone="dark" data-intro-logo />
+  <div class="intro-screen__stage">
+    <div class="intro-screen__mark">
+      <LiftedLogo class="intro-screen__logo intro-screen__logo--ghost" tone="dark" />
+      <LiftedLogo class="intro-screen__logo intro-screen__logo--fill" tone="dark" data-intro-logo />
+    </div>
+
+    <div class="intro-screen__greeting kurdish" lang="ku" dir="ltr" data-intro-greeting>
+      {
+        layers.map((layer) => (
+          <span class={`intro-screen__window intro-screen__window--${layer}`}>
+            <span class="intro-screen__line">
+              {words.map((word, w) => (
+                <>
+                  {w > 0 && ' '}
+                  <span class="intro-screen__word">
+                    {word.map(({ char, index }) => (
+                      <span class="intro-screen__char" data-i={index} data-label={char} />
+                    ))}
+                  </span>
+                </>
+              ))}
+            </span>
+          </span>
+        ))
+      }
+    </div>
+
+    <div class="intro-screen__reel">
+      <span class="intro-screen__track" data-intro-track>
+        {welcomes.map((welcome) => <span lang={welcome.lang} dir={welcome.dir} data-label={welcome.text} />)}
+      </span>
+    </div>
   </div>
 
   <div class="intro-screen__bottom">
@@ -74,8 +126,7 @@ const { t } = i18n(Astro.url);
     gap: 1rem;
   }
 
-  .intro-screen__wordmark::before,
-  .intro-screen__label::before {
+  .intro-screen [data-label]::before {
     content: attr(data-label);
   }
 
@@ -101,13 +152,20 @@ const { t } = i18n(Astro.url);
     opacity: 0.6;
   }
 
-  /* The glass logo fills up from the bottom as the counter runs, over a
-     faint copy of itself (intro.ts sets the clip). It is drawn
-     (LiftedLogo.astro), so there is nothing to download. */
+  .intro-screen__stage {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: clamp(1.25rem, 0.75rem + 2vw, 2.25rem);
+    container-type: inline-size;
+  }
+
+  /* The glass logo fills up from the bottom as the page loads, over a faint
+     copy of itself (intro.ts sets the clip). It is drawn (LiftedLogo.astro),
+     so there is nothing to download. */
   .intro-screen__mark {
     display: grid;
-    place-self: center;
-    width: clamp(6rem, 4.5rem + 6vw, 9rem);
+    width: clamp(3.25rem, 2.75rem + 2.5vw, 5.25rem);
   }
 
   .intro-screen__mark :global(.intro-screen__logo) {
@@ -124,16 +182,212 @@ const { t } = i18n(Astro.url);
     clip-path: inset(100% 0 0 0);
   }
 
+  /* The greeting: three copies of it, one on another, each seen through a
+     window as wide as the greeting whose letters rise from its foot. A faint
+     copy; the ink, whose window slides in from the left with the page's
+     loading (`--fill`, from 0 to 1) and has a soft leading edge, so the ink
+     seems to flow in; and a band of light just behind that edge (`--light`),
+     which leads the ink and passes over the whole greeting at the end (both
+     set by intro.ts). As a window slides one way, the letters in it slide
+     back the other, so they stay put: only the windows move, and nothing
+     has to be drawn again as they do. */
+  .intro-screen__greeting {
+    --fill: 0;
+    --light: 0;
+    --edge: 0.5em;
+
+    display: grid;
+    font-size: min(15cqi, 19svh, 10rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    /* Centres the letters, not the windows, which are wider (below). */
+    translate: calc(var(--edge) / 2) 0;
+  }
+
+  /* Each window is wider than the greeting by its soft edge, so that at the
+     end the edge lies past the last letter. */
+  .intro-screen__window {
+    grid-area: 1 / 1;
+    padding-inline-end: var(--edge);
+    /* Clips the letters, as they rise, to the window (see the masks). */
+    mask-image: linear-gradient(#000, #000);
+  }
+
+  .intro-screen__line {
+    display: block;
+    padding: 0.1em 0.12em 0.18em;
+  }
+
+  .intro-screen__window--ghost {
+    opacity: 0.16;
+  }
+
+  /* At 0 the window lies wholly before the greeting, at 1 wholly over it. */
+  .intro-screen__window--fill,
+  .intro-screen__window--glow {
+    translate: calc((var(--at) - 1) * 100%) 0;
+    will-change: translate;
+  }
+
+  .intro-screen__window--fill > .intro-screen__line,
+  .intro-screen__window--glow > .intro-screen__line {
+    translate: calc((1 - var(--at)) * (100% + var(--edge))) 0;
+    will-change: translate;
+  }
+
+  .intro-screen__window--fill {
+    --at: var(--fill);
+
+    mask-image: linear-gradient(90deg, #000 calc(100% - var(--edge)), transparent);
+  }
+
+  .intro-screen__window--glow {
+    --at: var(--light);
+
+    color: #fff;
+    text-shadow:
+      0 0 0.1em rgb(255 255 255 / 0.9),
+      0 0 0.45em rgb(255 255 255 / 0.5);
+    mask-image: linear-gradient(90deg, transparent calc(100% - 1.8em), #000 calc(100% - var(--edge)), transparent);
+  }
+
+  /* Each letter stands up into place, in turn, from the window's foot. */
+  .intro-screen__word {
+    display: inline-block;
+    perspective: 4em;
+  }
+
+  .intro-screen__char {
+    --i: 0;
+
+    display: inline-block;
+    transform-origin: 50% 85%;
+    animation: intro-char 1.1s var(--ease-out) calc(0.12s + var(--i) * 0.055s) both;
+  }
+
+  @keyframes intro-char {
+    from {
+      opacity: 0;
+      transform: translateY(0.7em) rotateX(-85deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .intro-screen__char[data-i='1'] {
+    --i: 1;
+  }
+
+  .intro-screen__char[data-i='2'] {
+    --i: 2;
+  }
+
+  .intro-screen__char[data-i='3'] {
+    --i: 3;
+  }
+
+  .intro-screen__char[data-i='4'] {
+    --i: 4;
+  }
+
+  .intro-screen__char[data-i='5'] {
+    --i: 5;
+  }
+
+  .intro-screen__char[data-i='6'] {
+    --i: 6;
+  }
+
+  .intro-screen__char[data-i='7'] {
+    --i: 7;
+  }
+
+  .intro-screen__char[data-i='8'] {
+    --i: 8;
+  }
+
+  .intro-screen__char[data-i='9'] {
+    --i: 9;
+  }
+
+  .intro-screen__char[data-i='10'] {
+    --i: 10;
+  }
+
+  .intro-screen__char[data-i='11'] {
+    --i: 11;
+  }
+
+  .intro-screen__char[data-i='12'] {
+    --i: 12;
+  }
+
+  .intro-screen__char[data-i='13'] {
+    --i: 13;
+  }
+
+  .intro-screen__char[data-i='14'] {
+    --i: 14;
+  }
+
+  .intro-screen__char[data-i='15'] {
+    --i: 15;
+  }
+
+  /* "Welcome", one language at a time, in a window one line high whose top
+     and bottom fade out. The script moves the track up a line at a time
+     (`--step`), quickly at first, and it settles on the page's language. */
+  .intro-screen__reel {
+    --line: 1.5em;
+
+    height: var(--line);
+    overflow: clip;
+    font-size: clamp(1.125rem, 0.9rem + 0.9vw, 1.75rem);
+    letter-spacing: -0.01em;
+    opacity: 0.62;
+    mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent);
+    animation: intro-reel 0.9s var(--ease-out) 0.5s both;
+    transition: opacity 0.6s ease;
+  }
+
+  @keyframes intro-reel {
+    from {
+      opacity: 0;
+      translate: 0 0.75rem;
+    }
+  }
+
+  .intro-screen__track {
+    display: grid;
+    justify-items: center;
+    transform: translateY(calc(var(--step, 0) * var(--line) * -1));
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .intro-screen__track > span {
+    height: var(--line);
+    line-height: var(--line);
+    white-space: nowrap;
+  }
+
+  .intro-screen[data-state='done'] .intro-screen__reel {
+    opacity: 1;
+  }
+
   .intro-screen__bottom {
     display: grid;
     gap: 1rem;
   }
 
   .intro-screen__count {
-    font-size: clamp(5rem, 2rem + 16vw, 15rem);
+    font-size: clamp(2.75rem, 1.5rem + 5vw, 6rem);
     font-weight: 300;
     line-height: 0.8;
-    letter-spacing: -0.06em;
+    letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
   }
 

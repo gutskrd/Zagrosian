@@ -49,10 +49,21 @@ export const hevalo = {
   logo: 'https://hevalo.app/logo.png',
 };
 
-/** Kurdish phrases that belong to the brand and stay in Kurmanji in every language. */
+/**
+ * Kurdish phrases that belong to the brand and stay in Kurmanji in every
+ * language, each with a translation in the message files.
+ */
 export const kurdish = {
+  /** Hevalo's motto, "Life is sweeter in Kurdish": the end of the homepage story (`motto`). */
   motto: 'Jiyan bi kurdî xweştire.',
-  footer: 'Ji Kurdan, ji bo Kurdan.',
+  /** "Welcome", to everyone: the opening screen (`intro.welcome`). */
+  welcome: 'Bi xêr hatin.',
+  /** "Thank you", literally "may your home prosper": the footer (`footer.thanks`). */
+  thanks: 'Mala we ava.',
+  /** A proverb, shown with Hevalo (`hevalo.proverb`). */
+  proverb: 'Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.',
+  /** "Proverb" (literally "a saying of the forebears"), the proverb's credit. */
+  proverbSource: 'Gotina pêşiyan',
 };
 
 export const socialProfiles: SocialProfile[] = [

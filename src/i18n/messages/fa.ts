@@ -52,6 +52,9 @@ export const fa: Messages = {
     switchTo: 'مشاهده به فارسی',
     dismiss: 'بستن',
   },
+  intro: {
+    welcome: 'خوش آمدید.',
+  },
   hero: {
     notice: 'Hevalo به‌زودی برای iOS و اندروید',
     headline: ['فناوری برای', 'زندگی روزمره.'],
@@ -70,6 +73,8 @@ export const fa: Messages = {
     comingSoon: 'به‌زودی',
     comingSoonTitle: 'Hevalo برای iOS و اندروید.',
     comingSoonNote: 'اپلیکیشن‌های بومی در حال توسعه‌اند و در App Store و Google Play عرضه خواهند شد.',
+    proverb: 'درخت بر ریشهٔ خود سبز می‌شود و انسان در زبان خود.',
+    proverbSource: 'ضرب‌المثل کردی',
   },
   story: {
     values: ['سادگی.', 'حریم خصوصی.', 'وضوح.'],
@@ -103,6 +108,7 @@ export const fa: Messages = {
   },
   footer: {
     about: ['شرکت مستقل فناوری', 'با دفتر مرکزی در هلند.'],
+    thanks: 'سپاس. واژه‌به‌واژه: خانه‌تان آباد.',
   },
   legal: {
     eyebrow: 'اطلاعات حقوقی',

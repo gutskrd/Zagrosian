@@ -1,6 +1,6 @@
 ---
 import { i18n } from '../i18n';
-import { hevalo } from '../site';
+import { hevalo, kurdish } from '../site';
 import Cta from './Cta.astro';
 import HevaloIcon from './HevaloIcon.astro';
 import SplitText from './SplitText.astro';
@@ -28,6 +28,18 @@ const { t } = i18n(Astro.url);
         <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
       </div>
     </div>
+
+    {/* Why Hevalo exists, in a Kurdish proverb, credited as one ("gotina pêşiyan"). */}
+    <figure class="showcase__proverb" data-reveal>
+      <blockquote class="showcase__proverb-text kurdish" lang="ku" dir="ltr">
+        <p>{kurdish.proverb}</p>
+      </blockquote>
+      {t.hevalo.proverb && <p class="showcase__proverb-translation">{t.hevalo.proverb}</p>}
+      <figcaption class="showcase__proverb-source">
+        <span lang="ku" dir="ltr">{kurdish.proverbSource}</span>
+        {t.hevalo.proverbSource && <span>{t.hevalo.proverbSource}</span>}
+      </figcaption>
+    </figure>
 
     <div class="showcase__soon rule" data-reveal>
       <div class="showcase__soon-heading">
@@ -168,6 +180,60 @@ const { t } = i18n(Astro.url);
     font-size: var(--text-lead);
     line-height: 1.45;
     letter-spacing: -0.011em;
+  }
+
+  /* The proverb: large, in the serif italic of the site's Kurdish, with its
+     translation and its credit under it. */
+  .showcase__proverb {
+    display: grid;
+    gap: 1.25rem;
+    margin: clamp(4.5rem, 3rem + 5vw, 8rem) 0 0;
+  }
+
+  .showcase__proverb-text {
+    max-width: 19em;
+    margin: 0;
+    font-size: clamp(1.875rem, 1.2rem + 2.8vw, 3.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Kurmanji runs left to right, but lines up with the page's own side. */
+  :global(:root[dir='rtl']) .showcase__proverb-text {
+    text-align: right;
+  }
+
+  .showcase__proverb-translation {
+    max-width: 32rem;
+    font-size: var(--text-lead);
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+
+  .showcase__proverb-source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* A short rule before the credit, and a dot between its two names. */
+  .showcase__proverb-source::before {
+    content: '';
+    align-self: center;
+    width: 1.5rem;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .showcase__proverb-source span + span::before {
+    content: '·';
+    margin-inline-end: 0.75rem;
   }
 
   .showcase__soon {

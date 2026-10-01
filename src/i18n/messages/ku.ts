@@ -51,6 +51,9 @@ export const ku: Messages = {
     switchTo: 'Bi kurmancî bixwîne',
     dismiss: 'Bigire',
   },
+  intro: {
+    welcome: '',
+  },
   hero: {
     notice: 'Hevalo tê ser iOS û Androidê',
     headline: ['Teknolojî ji bo', 'jiyana rojane.'],
@@ -69,6 +72,8 @@ export const ku: Messages = {
     comingSoon: 'Di rê de',
     comingSoonTitle: 'Hevalo ji bo iOS û Androidê.',
     comingSoonNote: 'Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
+    proverb: '',
+    proverbSource: '',
   },
   story: {
     values: ['Sadeyî.', 'Nepenî.', 'Zelalî.'],
@@ -103,6 +108,7 @@ export const ku: Messages = {
   },
   footer: {
     about: ['Şirketeke teknolojiyê ya serbixwe', 'li Holendayê.'],
+    thanks: '',
   },
   legal: {
     eyebrow: 'Hiqûqî',

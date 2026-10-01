@@ -50,6 +50,9 @@ export const fr: Messages = {
     switchTo: 'Lire en français',
     dismiss: 'Fermer',
   },
+  intro: {
+    welcome: 'Bienvenue.',
+  },
   hero: {
     notice: 'Hevalo arrive sur iOS et Android',
     headline: ['La technologie', 'au quotidien.'],
@@ -69,6 +72,8 @@ export const fr: Messages = {
     comingSoonTitle: 'Hevalo pour iOS et Android.',
     comingSoonNote:
       'Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
+    proverb: 'L’arbre s’épanouit sur ses propres racines, l’être humain dans sa propre langue.',
+    proverbSource: 'Proverbe kurde',
   },
   story: {
     values: ['Simplicité.', 'Confidentialité.', 'Clarté.'],
@@ -102,6 +107,7 @@ export const fr: Messages = {
   },
   footer: {
     about: ['Entreprise technologique indépendante', 'basée aux Pays-Bas.'],
+    thanks: 'Merci. Littéralement : que votre maison prospère.',
   },
   legal: {
     eyebrow: 'Informations légales',

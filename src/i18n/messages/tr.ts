@@ -49,6 +49,9 @@ export const tr: Messages = {
     switchTo: 'Türkçe oku',
     dismiss: 'Kapat',
   },
+  intro: {
+    welcome: 'Hoş geldiniz.',
+  },
   hero: {
     notice: 'Hevalo iOS ve Android’e geliyor',
     headline: ['Günlük yaşam', 'için teknoloji.'],
@@ -67,6 +70,8 @@ export const tr: Messages = {
     comingSoon: 'Çok yakında',
     comingSoonTitle: 'iOS ve Android için Hevalo.',
     comingSoonNote: 'Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
+    proverb: 'Ağaç kendi kökünde, insan kendi dilinde yeşerir.',
+    proverbSource: 'Kürt atasözü',
   },
   story: {
     values: ['Sadelik.', 'Gizlilik.', 'Netlik.'],
@@ -100,6 +105,7 @@ export const tr: Messages = {
   },
   footer: {
     about: ['Hollanda merkezli bağımsız', 'teknoloji şirketi.'],
+    thanks: 'Teşekkürler. Kelimesi kelimesine: Eviniz bayındır olsun.',
   },
   legal: {
     eyebrow: 'Yasal',

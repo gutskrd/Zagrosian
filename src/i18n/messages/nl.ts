@@ -49,6 +49,9 @@ export const nl: Messages = {
     switchTo: 'Lees in het Nederlands',
     dismiss: 'Sluiten',
   },
+  intro: {
+    welcome: 'Welkom.',
+  },
   hero: {
     notice: 'Hevalo komt naar iOS en Android',
     headline: ['Technologie', 'voor elke dag.'],
@@ -67,6 +70,8 @@ export const nl: Messages = {
     comingSoon: 'Binnenkort',
     comingSoonTitle: 'Hevalo voor iOS en Android.',
     comingSoonNote: 'De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
+    proverb: 'Een boom bloeit op zijn eigen wortels, een mens in zijn eigen taal.',
+    proverbSource: 'Koerdisch spreekwoord',
   },
   story: {
     values: ['Eenvoud.', 'Privacy.', 'Helderheid.'],
@@ -99,6 +104,7 @@ export const nl: Messages = {
   },
   footer: {
     about: ['Onafhankelijk technologiebedrijf', 'uit Nederland.'],
+    thanks: 'Dank u. Letterlijk: moge uw huis bloeien.',
   },
   legal: {
     eyebrow: 'Juridisch',

@@ -65,6 +65,9 @@ ${t.hero.lead}
 
 ${t.hevalo.category}. ${t.hevalo.description}
 
+> *${kurdish.proverb}*${t.hevalo.proverb ? ` (${t.hevalo.proverb})` : ''}
+> — ${kurdish.proverbSource}${t.hevalo.proverbSource ? `, ${t.hevalo.proverbSource}` : ''}
+
 - ${t.hevalo.website}: [${hevalo.domain}](${hevalo.url})
 - ${t.hevalo.comingSoon}: ${t.hevalo.comingSoonTitle} ${t.hevalo.comingSoonNote}
 

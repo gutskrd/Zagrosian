@@ -50,6 +50,9 @@ export const ar: Messages = {
     switchTo: 'تصفّح بالعربية',
     dismiss: 'إغلاق',
   },
+  intro: {
+    welcome: 'أهلاً وسهلاً.',
+  },
   hero: {
     notice: 'Hevalo قريبًا على iOS وأندرويد',
     headline: ['تقنية', 'للحياة اليومية.'],
@@ -68,6 +71,8 @@ export const ar: Messages = {
     comingSoon: 'قريبًا',
     comingSoonTitle: 'Hevalo على iOS وأندرويد.',
     comingSoonNote: 'التطبيقات الأصلية قيد التطوير، وستكون متاحة على App Store وGoogle Play.',
+    proverb: 'تزهر الشجرة على جذورها، ويزهر الإنسان في لغته.',
+    proverbSource: 'مثل كردي',
   },
   story: {
     values: ['البساطة.', 'الخصوصية.', 'الوضوح.'],
@@ -100,6 +105,7 @@ export const ar: Messages = {
   },
   footer: {
     about: ['شركة تقنية مستقلة', 'مقرّها هولندا.'],
+    thanks: 'شكراً. وحرفياً: ليكن بيتكم عامراً.',
   },
   legal: {
     eyebrow: 'معلومات قانونية',

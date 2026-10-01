@@ -15,8 +15,10 @@ const year = new Date().getFullYear();
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__about">
-        <p class="site-footer__motto kurdish" lang="ku" dir="ltr">{kurdish.footer}</p>
-        <p>
+        {/* The site's last word: "thank you", as the opening screen's first was "welcome". */}
+        <p class="site-footer__motto kurdish" lang="ku" dir="ltr">{kurdish.thanks}</p>
+        {t.footer.thanks && <p class="site-footer__gloss">{t.footer.thanks}</p>}
+        <p class="site-footer__company">
           {t.footer.about[0]}<br />
           {t.footer.about[1]}
         </p>
@@ -104,9 +106,21 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__motto {
-    margin-bottom: 0.375rem;
     font-size: 1.0625rem;
     color: var(--color-ink);
+  }
+
+  /* Kurmanji runs left to right, but lines up with the page's own side. */
+  :global(:root[dir='rtl']) .site-footer__motto {
+    text-align: right;
+  }
+
+  .site-footer__gloss {
+    font-size: var(--text-xs);
+  }
+
+  .site-footer__company {
+    margin-top: 1rem;
   }
 
   .site-footer__navs {

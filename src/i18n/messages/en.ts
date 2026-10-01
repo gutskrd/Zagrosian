@@ -58,6 +58,10 @@ export const en = {
     switchTo: 'Read in English',
     dismiss: 'Dismiss',
   },
+  /** The opening screen: translation of the Kurmanji greeting "Bi xêr hatin." Empty in Kurmanji. */
+  intro: {
+    welcome: 'Welcome.',
+  },
   hero: {
     notice: 'Hevalo is coming to iOS and Android',
     /** One entry per line of the headline. */
@@ -77,6 +81,10 @@ export const en = {
     comingSoon: 'Coming soon',
     comingSoonTitle: 'Hevalo for iOS and Android.',
     comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
+    /** Translation of the Kurmanji proverb shown with Hevalo (`kurdish.proverb` in src/site.ts). Empty in Kurmanji. */
+    proverb: 'A tree flourishes on its own roots, a person in their own language.',
+    /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
+    proverbSource: 'Kurdish proverb',
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {
@@ -109,6 +117,8 @@ export const en = {
   },
   footer: {
     about: ['Independent technology company', 'based in the Netherlands.'],
+    /** Translation of the Kurmanji "Mala we ava." (thank you). Empty in Kurmanji. */
+    thanks: 'Thank you. Literally: may your home prosper.',
   },
   legal: {
     eyebrow: 'Legal',

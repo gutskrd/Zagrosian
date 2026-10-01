@@ -52,6 +52,9 @@ export const ckb: Messages = {
     switchTo: 'بە سۆرانی بیخوێنەوە',
     dismiss: 'داخستن',
   },
+  intro: {
+    welcome: 'بەخێربێن.',
+  },
   hero: {
     notice: 'Hevalo دێتە سەر iOS و ئەندرۆید',
     headline: ['تەکنەلۆژیا بۆ', 'ژیانی ڕۆژانە.'],
@@ -70,6 +73,8 @@ export const ckb: Messages = {
     comingSoon: 'بەم زووانە',
     comingSoonTitle: 'Hevalo بۆ iOS و ئەندرۆید.',
     comingSoonNote: 'ئەپە ڕەسەنەکان لە قۆناغی گەشەپێداندان و لە App Store و Google Play بەردەست دەبن.',
+    proverb: 'دار لەسەر ڕەگی خۆی سەوز دەبێت و مرۆڤ لەسەر زمانی خۆی.',
+    proverbSource: 'پەندی پێشینانی کوردی',
   },
   story: {
     values: ['سادەیی.', 'تایبەتێتی.', 'ڕوونی.'],
@@ -103,6 +108,7 @@ export const ckb: Messages = {
   },
   footer: {
     about: ['کۆمپانیایەکی سەربەخۆی تەکنەلۆژی', 'لە هۆڵەندا.'],
+    thanks: 'سوپاس. وشە بە وشە: ماڵتان ئاوا.',
   },
   legal: {
     eyebrow: 'یاسایی',

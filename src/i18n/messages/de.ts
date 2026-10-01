@@ -49,6 +49,9 @@ export const de: Messages = {
     switchTo: 'Auf Deutsch lesen',
     dismiss: 'Schließen',
   },
+  intro: {
+    welcome: 'Willkommen.',
+  },
   hero: {
     notice: 'Hevalo kommt auf iOS und Android',
     headline: ['Technologie', 'für den Alltag.'],
@@ -67,6 +70,8 @@ export const de: Messages = {
     comingSoon: 'Demnächst',
     comingSoonTitle: 'Hevalo für iOS und Android.',
     comingSoonNote: 'Die nativen Apps befinden sich in der Entwicklung und erscheinen im App Store und bei Google Play.',
+    proverb: 'Ein Baum gedeiht auf seinen eigenen Wurzeln, ein Mensch in seiner eigenen Sprache.',
+    proverbSource: 'Kurdisches Sprichwort',
   },
   story: {
     values: ['Einfachheit.', 'Privatsphäre.', 'Klarheit.'],
@@ -100,6 +105,7 @@ export const de: Messages = {
   },
   footer: {
     about: ['Unabhängiges Technologieunternehmen', 'mit Sitz in den Niederlanden.'],
+    thanks: 'Danke. Wörtlich: Möge Ihr Haus gedeihen.',
   },
   legal: {
     eyebrow: 'Rechtliches',
