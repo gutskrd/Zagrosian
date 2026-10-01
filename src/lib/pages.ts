@@ -108,6 +108,7 @@ export async function textPages(): Promise<TextPage[]> {
       description: t.meta.description,
       url: absolute(localizePath(locale, '/')),
       markdownUrl: absolute(markdownPath(locale, 'index')),
+      updated: site.updated,
       markdown: homeMarkdown(locale),
     };
 

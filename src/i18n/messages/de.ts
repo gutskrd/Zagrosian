@@ -69,13 +69,13 @@ export const de: Messages = {
     comingSoonNote: 'Die nativen Apps befinden sich in der Entwicklung und erscheinen im App Store und bei Google Play.',
   },
   story: {
-    values: ['Schnell.', 'Datensparsam.', 'Durchdacht gestaltet.'],
+    values: ['Schnell.', 'Datensparsam.', 'Einfach.'],
   },
   motto: 'Auf Kurdisch ist das Leben süßer.',
   about: {
     eyebrow: 'Über uns',
     mission:
-      'Unsere Mission ist es, Software zu entwickeln, die Menschen jeden Tag gern nutzen: schnell, datensparsam und durchdacht gestaltet.',
+      'Unsere Mission ist es, Software zu entwickeln, die Menschen jeden Tag gern nutzen: schnell, datensparsam und einfach.',
     approach: 'Zagrosian befindet sich in Privatbesitz. Wir gestalten und entwickeln unsere Produkte selbst.',
     headquartersLabel: 'Hauptsitz',
     headquarters: 'Niederlande',

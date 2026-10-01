@@ -69,13 +69,13 @@ export const es: Messages = {
     comingSoonNote: 'Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
   },
   story: {
-    values: ['Rápido.', 'Privado.', 'Bien diseñado.'],
+    values: ['Rápido.', 'Privado.', 'Sencillo.'],
   },
   motto: 'La vida es más dulce en kurdo.',
   about: {
     eyebrow: 'Nosotros',
     mission:
-      'Nuestra misión es crear software que la gente disfrute usando cada día: rápido, respetuoso con la privacidad y bien diseñado.',
+      'Nuestra misión es crear software que la gente disfrute usando cada día: rápido, respetuoso con la privacidad y sencillo.',
     approach: 'Zagrosian es una empresa de propiedad privada. Diseñamos y desarrollamos nuestros productos con un equipo propio.',
     headquartersLabel: 'Sede',
     headquarters: 'Países Bajos',

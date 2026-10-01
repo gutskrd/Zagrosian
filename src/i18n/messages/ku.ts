@@ -71,14 +71,14 @@ export const ku: Messages = {
     comingSoonNote: 'Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
   },
   story: {
-    values: ['Bilez.', 'Nepeniyê diparêzin.', 'Bi baldarî hatine sêwirandin.'],
+    values: ['Bilez.', 'Nepeniyê diparêzin.', 'Hêsan.'],
   },
   // The motto is already in Kurmancî.
   motto: '',
   about: {
     eyebrow: 'Derbarê me de',
     mission:
-      'Armanca me ew e ku em nermalavên wisa çêbikin ku mirov her roj bi kêfxweşî bi kar bînin: bilez, nepeniyê diparêzin û bi baldarî hatine sêwirandin.',
+      'Armanca me ew e ku em nermalavên wisa çêbikin ku mirov her roj bi kêfxweşî bi kar bînin: bilez, nepeniyê diparêzin û hêsan in.',
     approach: 'Zagrosian şirketeke taybet e. Em berhemên xwe bi xwe disêwirînin û çêdikin.',
     headquartersLabel: 'Navend',
     headquarters: 'Holenda',

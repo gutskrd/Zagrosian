@@ -15,6 +15,17 @@ export const site = {
   /** Name used in legal documents. Update when the company is registered. */
   legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
+  /**
+   * Date of the homepage's last material change (YYYY-MM-DD), for the sitemap.
+   * Update it when the homepage's text changes.
+   */
+  updated: '2026-10-01',
+  /**
+   * IndexNow key, which lets the site tell search engines about changed pages
+   * (`npm run indexnow`). It is public by design: public/<key>.txt holds it, to
+   * show the site owns it.
+   */
+  indexNowKey: '7c9302be7e61891041f0aa00b0435b84',
   /** Headquarters, as an ISO 3166 country code. */
   country: 'NL',
   /** The headquarters' time zone, for the local time shown in About. */

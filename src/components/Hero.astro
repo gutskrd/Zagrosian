@@ -261,8 +261,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
      copied into this layer (`data-story='on'`). The logo in the hero then
      stays in place for screen readers, unseen, and the copy travels instead:
      fixed to the screen, under the hero text, it settles beside the story's
-     values and dives into its own ink (`data-hidden` once the story's vector
-     copy takes over). With a mouse it still leans towards the pointer
+     values and the camera flies into it (`data-hidden` once the story's
+     scene has taken over). With a mouse it still leans towards the pointer
      (motion.ts). */
   .journey {
     display: none;
@@ -280,6 +280,12 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   .journey[data-hidden] {
+    visibility: hidden;
+  }
+
+  /* Grown past the screen as the camera flies in, the block's edge cannot
+     be seen, so it is not drawn. */
+  .journey[data-flat] :global(.lifted-logo__slice) {
     visibility: hidden;
   }
 

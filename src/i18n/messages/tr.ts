@@ -69,13 +69,13 @@ export const tr: Messages = {
     comingSoonNote: 'Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
   },
   story: {
-    values: ['Hızlı.', 'Gizliliğe saygılı.', 'Özenle tasarlanmış.'],
+    values: ['Hızlı.', 'Gizliliğe saygılı.', 'Sade.'],
   },
   motto: 'Hayat Kürtçe daha tatlı.',
   about: {
     eyebrow: 'Hakkımızda',
     mission:
-      'Misyonumuz, insanların her gün kullanmaktan keyif aldığı yazılımlar geliştirmek: hızlı, gizliliğe saygılı ve özenle tasarlanmış.',
+      'Misyonumuz, insanların her gün kullanmaktan keyif aldığı yazılımlar geliştirmek: hızlı, gizliliğe saygılı ve sade.',
     approach: 'Zagrosian özel bir şirkettir. Ürünlerimizi kendi bünyemizde tasarlıyor ve geliştiriyoruz.',
     headquartersLabel: 'Merkez',
     headquarters: 'Hollanda',

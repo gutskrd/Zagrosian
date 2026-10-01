@@ -78,15 +78,15 @@ export const en = {
     comingSoonTitle: 'Hevalo for iOS and Android.',
     comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
   },
-  /** Zagrosian's three values, from the mission below, shown one by one under the hero. */
+  /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {
-    values: ['Fast.', 'Private.', 'Well designed.'],
+    values: ['Fast.', 'Private.', 'Simple.'],
   },
   /** Translation of the Kurmanji motto "Jiyan bi kurdî xweştire." Empty in Kurmanji. */
   motto: 'Life is sweeter in Kurdish.',
   about: {
     eyebrow: 'About',
-    mission: 'Our mission is to build software people enjoy using every day: fast, private and well designed.',
+    mission: 'Our mission is to build software people enjoy using every day: fast, private and simple.',
     approach: 'Zagrosian is privately owned. We design and build our products in-house.',
     headquartersLabel: 'Headquarters',
     headquarters: 'Netherlands',

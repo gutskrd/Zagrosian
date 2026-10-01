@@ -32,6 +32,10 @@
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
+/7c9302be7e61891041f0aa00b0435b84.txt
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
+
 /sitemap.xml
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:

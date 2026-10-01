@@ -190,27 +190,31 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   into place and comes into focus.
 - **The story** ([`Story.astro`](src/components/Story.astro), [`story.ts`](src/scripts/story.ts)):
   a walkthrough under the hero, pinned to the screen for four and a half screens of scrolling, in
-  four chapters. It follows what award-winning scroll stories do (Apple's product pages, the
-  Lando Norris site that was Awwwards' Site of the Year 2025): a stage pinned in place while the
-  scroll moves time on inside it, one idea per scene, text that rises with the visuals, and only
-  transforms, opacity and clip paths moving.
+  four chapters, all in glass and in 3D. It follows what award-winning scroll stories do (Apple's
+  product pages, the Lando Norris site that was Awwwards' Site of the Year 2025): a stage pinned in
+  place while the scroll moves time on inside it, one idea per scene, text that rises with the
+  visuals, and only sizes, transforms, opacity and clip paths moving.
   1. **The values.** As the hero scrolls away, the glass logo stays on the screen and settles
-     beside Zagrosian's three values (*Fast. Private. Well designed.*, from the mission). Each rises
-     from behind a mask in turn, the newest lit and the others dimmed, and the logo turns a notch
-     with each; then all three are lit together.
+     beside Zagrosian's three values (*Fast. Private. Simple.*, `story.values` in the message
+     files). Each flips up in 3D from behind a mask in turn, the newest lit and the others dimmed,
+     and the logo turns a notch with each; then all three are lit together.
   2. **The dive.** The values lift away; the logo comes to the middle, faces the reader and the
-     camera dives into its ink: the smoked dark parts on the light page, the frosted light parts on
-     the dark page. For the dive the glass logo crossfades into a flat copy drawn as vectors
-     (`.story__lens`), sized to match the logo's depth in the glass, so it stays perfectly sharp
-     however close the camera gets. Where it dives was found with a distance transform of the
-     logo's shapes: the point deepest inside the ink.
+     camera flies into the glass: the front pane slides past and fades, and the block's layers
+     spread apart in perspective as the camera nears the logo's ink (the smoked dark parts on the
+     light page, the frosted light parts on the dark page). The logo grows by its size rather than
+     by scaling, so the browser draws it sharp all the way in, and while it is larger than the
+     screen its edge layers are not drawn. Where it flies in was found with a distance transform of
+     the logo's shapes: the point deepest inside the ink.
   3. **The sun.** The ink becomes a scene in the other theme's colours (`.story__scene`). The
-     Kurdish sun rises from below, large, turning, and comes to rest above the motto, which rises
-     word by word with its translation. The header switches to the scene's colours while the scene
-     is behind it (`data-inverse`, global.css).
+     Kurdish sun rises as a thick piece of glass ([`GlassSun.astro`](src/components/GlassSun.astro):
+     a back face, twelve layers through its depth and a bevelled front, each cut to the sun's
+     outline with `clip-path`), tumbling and catching the light, with a soft glow behind it; it
+     comes to rest facing the reader above the motto, which rises word by word with its
+     translation. The header switches to the scene's colours while the scene is behind it
+     (`data-inverse`, global.css).
   4. **The iris.** The scene closes into the sun like an iris (a `clip-path` circle), and leaves the
-     sun and the motto in the page's own colours: inside the circle the white motto, outside it the
-     ink one, in exactly the same place. Then the stage lets go and they scroll on.
+     sun and the motto in the page's own colours: inside the circle the scene's motto, outside it
+     the page's, in exactly the same place. Then the stage lets go and they scroll on.
   A line along the foot of the stage shows how far along the story is. Scrolling back plays it all
   backwards, on a phone as with a mouse. Everything is a function of the scroll position: the page
   is measured on load and resize only, the logo travels in a layer fixed to the screen
@@ -218,6 +222,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   the copies used for effects are hidden from assistive technology. `theme-init.js` makes room
   for the story before the first paint (`data-story`). Without JavaScript, with *reduce motion* and
   in print, the story is a plain section: the values as a heading, then the sun and the motto.
+  Its text is in the HTML either way, so search engines and AI crawlers read it.
 - **Headings:** [`SplitText`](src/components/SplitText.astro) splits a heading into words at build
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
@@ -345,6 +350,12 @@ ranks happens off the site, and is up to Zagrosian:
 - Verify the domain in [Google Search Console](https://search.google.com/search-console) and
   [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit `https://zagrosian.com/sitemap.xml`
   (Bing's index also feeds ChatGPT search and other assistants).
+- After each deploy, run `npm run indexnow` ([`scripts/indexnow.mjs`](scripts/indexnow.mjs)): it
+  tells search engines that support [IndexNow](https://www.indexnow.org) (Bing, Yandex, Seznam,
+  Naver) about every page in the live sitemap, so they crawl them soon. The key is in `src/site.ts`
+  and `public/<key>.txt`. Google does not use IndexNow; it reads the sitemap, whose dates come from
+  each legal page's `updated` field and, for the homepage, from `updated` in `src/site.ts`: change
+  that date when the homepage's text changes.
 - Link to zagrosian.com from hevalo.app and from the Instagram and TikTok profiles, and keep the
   company's name and description the same everywhere.
 - Once the company is registered, add it to [Wikidata](https://www.wikidata.org) with its official
