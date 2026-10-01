@@ -48,14 +48,15 @@ const words = kurdish.welcome.split(' ').map((word) => [...word].map((char) => (
 const layers = ['ghost', 'fill', 'glow'] as const;
 
 // "Welcome" and "Enter" in every language, in the same order, ending with the
-// page's own (where the first roll comes to rest; Kurmanji welcomes with the
-// greeting itself). The first language comes again at the end, so that the
+// page's own (where the first roll comes to rest). On Kurmanji's turn the
+// welcome line stays empty, as the greeting above is Kurmanji already, and only
+// "Enter" changes. The first language comes again at the end, so that the
 // reels can turn on for ever (intro.ts).
 const own = locales.findIndex((info) => info.code === locale);
 const turns = [...locales.slice(own + 1), ...locales.slice(0, own + 1)].map((info) => ({
   lang: info.code,
   dir: info.dir,
-  welcome: messages(info.code).intro.welcome || kurdish.welcome,
+  welcome: messages(info.code).intro.welcome,
   enter: messages(info.code).intro.enter,
 }));
 const reel = [...turns, turns[0]];
