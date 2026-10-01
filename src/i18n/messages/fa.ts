@@ -71,6 +71,9 @@ export const fa: Messages = {
     comingSoonTitle: 'Hevalo برای iOS و اندروید.',
     comingSoonNote: 'اپلیکیشن‌های بومی در حال توسعه‌اند و در App Store و Google Play عرضه خواهند شد.',
   },
+  story: {
+    values: ['سریع.', 'حافظ حریم خصوصی.', 'با دقت طراحی‌شده.'],
+  },
   motto: 'زندگی به زبان کردی شیرین‌تر است.',
   about: {
     eyebrow: 'دربارهٔ ما',

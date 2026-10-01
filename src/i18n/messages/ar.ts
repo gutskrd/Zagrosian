@@ -69,6 +69,9 @@ export const ar: Messages = {
     comingSoonTitle: 'Hevalo على iOS وأندرويد.',
     comingSoonNote: 'التطبيقات الأصلية قيد التطوير، وستكون متاحة على App Store وGoogle Play.',
   },
+  story: {
+    values: ['سريعة.', 'تحترم الخصوصية.', 'مصمّمة بعناية.'],
+  },
   motto: 'الحياة أحلى بالكردية.',
   about: {
     eyebrow: 'من نحن',

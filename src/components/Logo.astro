@@ -52,6 +52,18 @@ const { tone = 'auto', class: className, ...attributes } = Astro.props;
     display: block;
   }
 
+  /* In a part of the page drawn in the other theme's colours (`data-inverse`,
+     global.css), the other version shows. */
+  :global(:root:not([data-theme='dark']) [data-inverse]) .logo--auto :global(.logo__shape--dark),
+  :global(:root[data-theme='dark'] [data-inverse]) .logo--auto :global(.logo__shape--light) {
+    display: none;
+  }
+
+  :global(:root:not([data-theme='dark']) [data-inverse]) .logo--auto :global(.logo__shape--light),
+  :global(:root[data-theme='dark'] [data-inverse]) .logo--auto :global(.logo__shape--dark) {
+    display: block;
+  }
+
   /* Printed pages are always light. */
   @media print {
     :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--dark) {

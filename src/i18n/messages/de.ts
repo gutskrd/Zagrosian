@@ -68,6 +68,9 @@ export const de: Messages = {
     comingSoonTitle: 'Hevalo für iOS und Android.',
     comingSoonNote: 'Die nativen Apps befinden sich in der Entwicklung und erscheinen im App Store und bei Google Play.',
   },
+  story: {
+    values: ['Schnell.', 'Datensparsam.', 'Durchdacht gestaltet.'],
+  },
   motto: 'Auf Kurdisch ist das Leben süßer.',
   about: {
     eyebrow: 'Über uns',

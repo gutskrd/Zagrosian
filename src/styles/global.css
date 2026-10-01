@@ -131,6 +131,38 @@
   --color-spot: rgb(255 255 255 / 0.05);
 }
 
+/* A part of the page in the other theme's colours: the header while the
+   homepage story shows a scene in those colours behind it (story.ts). */
+:root:not([data-theme='dark']) [data-inverse] {
+  --color-paper: #0a0a0a;
+  --color-ink: #f2f2f2;
+  --color-ink-soft: #bdbdbd;
+  --color-muted: #8f8f8f;
+  --color-line: #242424;
+  --color-line-strong: #333333;
+  --color-surface: #121212;
+  --color-underline: #555555;
+  --color-solid-hover: #d4d4d4;
+  --color-dim: #666666;
+  --header-bg: rgb(10 10 10 / 0.8);
+  --color-spot: rgb(255 255 255 / 0.05);
+}
+
+:root[data-theme='dark'] [data-inverse] {
+  --color-paper: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #3d3d3d;
+  --color-muted: #6b6b6b;
+  --color-line: #e5e5e5;
+  --color-line-strong: #d4d4d2;
+  --color-surface: #f5f5f4;
+  --color-underline: #c4c4c4;
+  --color-solid-hover: #2b2b2b;
+  --color-dim: #878785;
+  --header-bg: rgb(255 255 255 / 0.84);
+  --color-spot: rgb(255 255 255 / 0.95);
+}
+
 /* ==========================================================================
    Base
    ========================================================================== */

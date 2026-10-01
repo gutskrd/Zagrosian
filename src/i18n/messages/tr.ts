@@ -68,6 +68,9 @@ export const tr: Messages = {
     comingSoonTitle: 'iOS ve Android için Hevalo.',
     comingSoonNote: 'Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
   },
+  story: {
+    values: ['Hızlı.', 'Gizliliğe saygılı.', 'Özenle tasarlanmış.'],
+  },
   motto: 'Hayat Kürtçe daha tatlı.',
   about: {
     eyebrow: 'Hakkımızda',

@@ -64,7 +64,17 @@ const jsonLd = noindex
     <script is:inline src={themeInit}></script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {
+      noindex ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <link rel="canonical" href={canonical} />
+          {/* Search engines may show large previews and full snippets. */}
+          <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        </>
+      )
+    }
     {alternates.map(({ hreflang, href }) => <link rel="alternate" hreflang={hreflang} href={href} />)}
     {!noindex && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown" />}
 

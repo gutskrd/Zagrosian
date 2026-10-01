@@ -17,7 +17,7 @@
  * visible and static.
  */
 
-import { initJourney } from './journey';
+import { initStory } from './story';
 
 const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
@@ -135,21 +135,6 @@ function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
   };
 }
 
-/** The sun turns slowly as its section passes through the viewport. */
-function spin(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
-  let angle = 0;
-  return {
-    target: frame,
-    measure(viewportHeight) {
-      const rect = frame.getBoundingClientRect();
-      angle = clamp((viewportHeight - rect.top) / (viewportHeight + rect.height)) * 60;
-    },
-    render() {
-      layer.style.transform = `rotate(${angle.toFixed(2)}deg)`;
-    },
-  };
-}
-
 /** Words in a heading light up one by one as the reader scrolls past it. */
 function highlight(heading: HTMLElement): ScrollEffect {
   const words = [...heading.querySelectorAll<HTMLElement>('.split__word')];
@@ -227,9 +212,10 @@ function initPointerDepth() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
   // The logo follows the pointer across the whole window, eased towards it
-  // frame by frame. It uses the individual `rotate` and `translate` properties,
-  // so it combines with its entrance animation on `transform`. (On the
-  // homepage this is the logo travelling down the page, journey.ts.)
+  // frame by frame. It leans with the individual `rotate` and `translate`
+  // properties, so the lean combines with its entrance animation on
+  // `transform`. (On the homepage this is the logo on its way into the story,
+  // story.ts.)
   const depth = document.querySelector<HTMLElement>('[data-lean]');
   const layer = depth?.firstElementChild;
   if (depth && layer instanceof HTMLElement) {
@@ -247,9 +233,12 @@ function initPointerDepth() {
     const step = () => {
       x += (targetX - x) * 0.07;
       y += (targetY - y) * 0.07;
-      const angle = Math.hypot(x, y) * 7;
-      layer.style.rotate = angle > 0.01 ? `${(-y).toFixed(3)} ${x.toFixed(3)} 0 ${angle.toFixed(2)}deg` : '';
-      layer.style.translate = `${(x * 12).toFixed(2)}px ${(y * 8).toFixed(2)}px`;
+      // Set as custom properties, which the layer's styles turn into its
+      // `rotate` and `translate` (Hero.astro), so the story can ease the lean
+      // away (`--lean`) when the logo comes to face the reader.
+      layer.style.setProperty('--lean-x', x.toFixed(3));
+      layer.style.setProperty('--lean-y', y.toFixed(3));
+      layer.style.setProperty('--lean-angle', `${(Math.hypot(x, y) * 7).toFixed(2)}deg`);
       if (Math.abs(targetX - x) + Math.abs(targetY - y) > 0.002) requestAnimationFrame(step);
       else running = false;
     };
@@ -339,17 +328,12 @@ export function initMotion() {
       if (layer instanceof HTMLElement) effects.push(rise(frame, layer));
     }
 
-    for (const frame of document.querySelectorAll<HTMLElement>('[data-spin]')) {
-      const layer = frame.firstElementChild;
-      if (layer instanceof HTMLElement) effects.push(spin(frame, layer));
-    }
-
     for (const heading of document.querySelectorAll<HTMLElement>('[data-highlight]')) {
       effects.push(highlight(heading));
     }
 
     initPointerDepth();
-    initJourney();
+    initStory();
   }
 
   if ('IntersectionObserver' in window) runScrollEffects(effects);

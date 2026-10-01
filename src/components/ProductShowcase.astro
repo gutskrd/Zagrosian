@@ -8,7 +8,7 @@ import SplitText from './SplitText.astro';
 const { t } = i18n(Astro.url);
 ---
 
-<section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight data-journey-curtain>
+<section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight>
   <div class="container">
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
@@ -41,11 +41,9 @@ const { t } = i18n(Astro.url);
 
 <style>
   /* A tinted band that sets the products apart. Like the rest of the page, it
-     follows the light or dark theme. It passes over the logo travelling down
-     the page (journey.ts) like a curtain. */
+     follows the light or dark theme. */
   .showcase {
     position: relative;
-    z-index: 2;
     isolation: isolate;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);

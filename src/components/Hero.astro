@@ -54,12 +54,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 </section>
 
 {
-  /* The logo's journey down the page (src/scripts/journey.ts): the room it
-     travels through below the hero, and the layer it travels in, fixed to the
-     screen. The script copies the logo into it; both are unused without
-     JavaScript or with reduced motion. */
+  /* The layer the logo travels in on its way into the story below
+     (Story.astro, src/scripts/story.ts), fixed to the screen. The script
+     copies the logo into it; it is unused without JavaScript or with reduced
+     motion. */
 }
-<div class="journey-stage" aria-hidden="true"></div>
 <div class="journey" aria-hidden="true" data-journey-layer>
   <div class="journey__art" data-lean>
     <div class="journey__tilt"></div>
@@ -257,28 +256,19 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     transform-style: preserve-3d;
   }
 
-  /* The journey. theme-init.js makes room for it before the first paint
-     (`data-journey`), and journey.ts turns it on once the logo is copied into
-     its layer (`data-journey='on'`). The logo in the hero then stays in place
-     for screen readers, unseen, and the copy travels instead.
-
-     The layer is fixed to the screen, under the hero text and the products
-     band, which passes over it like a curtain. Once the sun has landed in
-     the motto, the motto's own sun takes over (`data-landed`). With a mouse
-     the logo still leans towards the pointer (motion.ts). As it turns over,
-     the lights trade places behind it (--turned, 0 to 1), and they fade as
-     it lands (--lights). */
-  .journey-stage,
+  /* The way into the story. theme-init.js makes room for the story before
+     the first paint (`data-story`), and story.ts turns it on once the logo is
+     copied into this layer (`data-story='on'`). The logo in the hero then
+     stays in place for screen readers, unseen, and the copy travels instead:
+     fixed to the screen, under the hero text, it settles beside the story's
+     values and dives into its own ink (`data-hidden` once the story's vector
+     copy takes over). With a mouse it still leans towards the pointer
+     (motion.ts). */
   .journey {
     display: none;
   }
 
-  :global(:root[data-journey]) .journey-stage {
-    display: block;
-    height: 170svh;
-  }
-
-  :global(:root[data-journey='on']) .journey {
+  :global(:root[data-story='on']) .journey {
     display: block;
     position: fixed;
     top: 0;
@@ -289,17 +279,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     pointer-events: none;
   }
 
-  .journey[data-hidden],
-  .journey[data-landed] {
-    visibility: hidden;
-  }
-
-  /* Only what can be seen is drawn (journey.ts): one side of the logo or the
-     other, both while it turns, and no edge while it fills the screen. */
-  .journey[data-side='logo'] :global(:is(.lifted-logo__back--sun, .lifted-logo__sun, .lifted-logo__front--sun)),
-  .journey[data-side='sun']
-    :global(:is(.lifted-logo__back:not(.lifted-logo__back--sun), .lifted-logo__frame, .lifted-logo__inner, .lifted-logo__front:not(.lifted-logo__front--sun))),
-  .journey[data-flat] :global(.lifted-logo__slice) {
+  .journey[data-hidden] {
     visibility: hidden;
   }
 
@@ -311,38 +291,36 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     transform-origin: 50% 50%;
   }
 
-  .journey__art::before {
-    transform: translate(calc(var(--turned, 0) * -47.5%), calc(var(--turned, 0) * 9.75%));
-    opacity: var(--lights, 1);
-  }
-
-  .journey__art::after {
-    transform: translate(calc(var(--turned, 0) * 51%), calc(var(--turned, 0) * -7.8%));
-    opacity: var(--lights, 1);
-  }
-
+  /* The lean towards the pointer (motion.ts sets the direction, --lean-x and
+     --lean-y from -1 to 1, and the angle), which the story eases away as the
+     logo faces the reader (--lean, 1 to 0). */
   .journey__tilt {
+    --lean-x: 0;
+    --lean-y: 0;
+    --lean-angle: 0deg;
+
     position: relative;
     z-index: 1;
     transform-style: preserve-3d;
+    rotate: calc(var(--lean-y) * -1) var(--lean-x) 0 calc(var(--lean, 1) * var(--lean-angle));
+    translate: calc(var(--lean, 1) * var(--lean-x) * 12px) calc(var(--lean, 1) * var(--lean-y) * 8px);
   }
 
-  :global(:root[data-journey='on']) .hero__art,
-  :global(:root[data-journey='on']) .hero__mark::before,
-  :global(:root[data-journey='on']) .hero__mark::after {
+  :global(:root[data-story='on']) .hero__art,
+  :global(:root[data-story='on']) .hero__mark::before,
+  :global(:root[data-story='on']) .hero__mark::after {
     opacity: 0;
   }
 
   /* Printed, the logo stays in the hero. */
   @media print {
-    :global(:root[data-journey]) .journey-stage,
-    :global(:root[data-journey='on']) .journey {
+    :global(:root[data-story='on']) .journey {
       display: none;
     }
 
-    :global(:root[data-journey='on']) .hero__art,
-    :global(:root[data-journey='on']) .hero__mark::before,
-    :global(:root[data-journey='on']) .hero__mark::after {
+    :global(:root[data-story='on']) .hero__art,
+    :global(:root[data-story='on']) .hero__mark::before,
+    :global(:root[data-story='on']) .hero__mark::after {
       opacity: 1;
     }
   }

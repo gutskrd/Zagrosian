@@ -16,14 +16,12 @@
  * is clear; on the dark page (and the opening screen) the light parts are
  * frosted and the rest is clear.
  *
- * The block has two sides. Turned over, it shows the Kurdish sun of 21 rays,
- * in the same glass. On the homepage it travels down the page with the
- * scroll and turns over (src/scripts/journey.ts), which sets its pose in
- * custom properties on an ancestor; without them it rests, logo side up.
+ * On the homepage it travels into the story under the hero as the page
+ * scrolls (src/scripts/story.ts), which sets its pose in custom properties on
+ * an ancestor; without them it rests as drawn.
  */
 import type { HTMLAttributes } from 'astro/types';
 import source from '../assets/brand/zagrosian-logo-lifted.svg?raw';
-import { sunPath } from '../lib/sun';
 
 interface Props extends HTMLAttributes<'span'> {
   /** Leave empty when the logo is decoration. */
@@ -45,7 +43,6 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
 <span class:list={['lifted-logo', `lifted-logo--${tone}`, className]} {...label} {...attributes}>
   <span class="lifted-logo__body">
     <span class="lifted-logo__back"></span>
-    <span class="lifted-logo__back lifted-logo__back--sun"></span>
     {slices.map((depth) => <span class="lifted-logo__slice" data-depth={depth} />)}
     <span class="lifted-logo__frame"></span>
     <span class="lifted-logo__inner">
@@ -54,14 +51,7 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
         <path class="lifted-logo__light" fill-rule="evenodd" d={light}></path>
       </svg>
     </span>
-    <span class="lifted-logo__sun">
-      <svg viewBox="-100 -100 200 200" aria-hidden="true" focusable="false">
-        <path d={sunPath}></path>
-        <path class="lifted-logo__sun-solid" d={sunPath}></path>
-      </svg>
-    </span>
     <span class="lifted-logo__front"></span>
-    <span class="lifted-logo__front lifted-logo__front--sun"></span>
   </span>
 </span>
 
@@ -75,7 +65,6 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     --edge: rgb(0 0 0 / 0.1);
     --dark: rgb(10 10 12 / 0.72);
     --light: rgb(255 255 255 / 0.3);
-    --sun: rgb(10 10 12 / 0.74);
     --rim: rgb(0 0 0 / 0.16);
     --seam: rgb(0 0 0 / 0.3);
     --shadow: 0 2.2rem 3.5rem -1.2rem rgb(0 0 0 / 0.36), 0 0.6rem 1.2rem -0.6rem rgb(0 0 0 / 0.22);
@@ -95,7 +84,6 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     --edge: rgb(255 255 255 / 0.11);
     --dark: rgb(255 255 255 / 0.04);
     --light: rgb(255 255 255 / 0.8);
-    --sun: rgb(255 255 255 / 0.82);
     --rim: rgb(255 255 255 / 0.22);
     --seam: rgb(255 255 255 / 0.1);
     --shadow: 0 2.4rem 4rem -1.2rem rgb(0 0 0 / 0.9);
@@ -104,41 +92,33 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
   /* Turned a little, so the glass shows its depth even at rest. It turns
      about its own middle, halfway through its thickness, as one solid block.
 
-     Its pose comes from src/scripts/journey.ts: how far it has turned over
-     (--turn), leaned (--tilt) and rolled (--roll); the turn and size of the
-     sun (--sun-turn, --sun-size); where the streak of light is on each face
-     (--glint, --glint-sun); and how much of the glass is left (--glass, 1;
-     at 0 only the sun remains). */
+     Its pose comes from src/scripts/story.ts: how far it has turned (--turn)
+     and leaned (--tilt). */
   .lifted-logo__body {
     position: absolute;
     inset: 0;
-    transform: rotateX(calc(12deg + var(--tilt, 0deg))) rotateY(calc(-18deg + var(--turn, 0deg))) rotateZ(var(--roll, 0deg));
+    transform: rotateX(calc(12deg + var(--tilt, 0deg))) rotateY(calc(-18deg + var(--turn, 0deg)));
     transform-origin: 50% 50% calc(var(--thickness) * -0.5);
     transform-style: preserve-3d;
   }
 
   /* Every layer sits at a fraction `--f` of the way through the block, from
-     the front (0) to the back (1). Each side's faces and contents show only
-     from that side. */
+     the front (0) to the back (1). */
   .lifted-logo__back,
   .lifted-logo__slice,
   .lifted-logo__frame,
   .lifted-logo__inner,
-  .lifted-logo__sun,
   .lifted-logo__front {
     --f: 0;
-    --side: 0deg;
 
     position: absolute;
     inset: 0;
     border-radius: var(--radius);
-    transform: translateZ(calc(var(--thickness) * var(--f) * -1)) rotateY(var(--side));
-    backface-visibility: hidden;
+    transform: translateZ(calc(var(--thickness) * var(--f) * -1));
   }
 
-  /* The glass itself, with its shadow: the back face, and on the sun's side
-     the face that is the back once the block has turned over. On the dark
-     page it is lit from behind, where the lights shine through. */
+  /* The glass itself, with its shadow. On the dark page it is lit from
+     behind, where the lights shine through. */
   .lifted-logo__back {
     --f: 1;
 
@@ -147,20 +127,13 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
       radial-gradient(circle at 18% 84%, var(--haze), rgb(255 255 255 / 0) 42%),
       var(--body);
     box-shadow: var(--shadow);
-    opacity: var(--glass, 1);
-  }
-
-  .lifted-logo__back--sun {
-    --f: 0;
-    --side: 180deg;
   }
 
   /* The edge: thin layers through the thickness of the block, seen from both
      sides. */
   .lifted-logo__slice {
     border: 1.5px solid var(--edge);
-    backface-visibility: visible;
-    opacity: calc(var(--glass, 1) * 0.5);
+    opacity: 0.5;
   }
 
   .lifted-logo__slice[data-depth='1'] {
@@ -287,41 +260,11 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     fill: var(--light);
   }
 
-  /* The sun, on the other side, in clear glass: smoked on the light page,
-     frosted on the dark one. It turns, and grows into place, by itself. */
-  .lifted-logo__sun {
-    --f: 0.55;
-    --side: 180deg;
-
-    inset: 16%;
-    border-radius: 0;
-  }
-
-  .lifted-logo__sun svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    transform: rotate(var(--sun-turn, 0deg)) scale(var(--sun-size, 1));
-  }
-
-  .lifted-logo__sun path {
-    fill: var(--sun);
-  }
-
-  /* As the glass melts away, the sun turns solid, in the colour of the text,
-     like the motto's sun it becomes (Sun.astro). */
-  .lifted-logo__sun .lifted-logo__sun-solid {
-    fill: var(--color-ink);
-    opacity: calc(1 - var(--glass, 1));
-  }
-
-  /* The front faces catch the light: a bright bevel along the top and left,
-     a darker one below, a glare at the top left and a streak across, which
-     slides over the face as the block turns. */
+  /* The front face catches the light: a bright bevel along the top and left,
+     a darker one below, a glare at the top left and a streak across. */
   .lifted-logo__front {
     border: 1px solid var(--rim);
     clip-path: inset(0 round var(--radius));
-    opacity: var(--glass, 1);
     background: linear-gradient(140deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.1) 24%, rgb(255 255 255 / 0) 42%);
     box-shadow:
       inset 0 1.5px 0 rgb(255 255 255 / 0.85),
@@ -336,16 +279,6 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     position: absolute;
     inset: 0;
     background: linear-gradient(118deg, rgb(255 255 255 / 0) 47%, rgb(255 255 255 / 0.22) 53%, rgb(255 255 255 / 0) 60%);
-    transform: translateX(var(--glint, 0%));
-  }
-
-  .lifted-logo__front--sun {
-    --f: 1;
-    --side: 180deg;
-  }
-
-  .lifted-logo__front--sun::before {
-    transform: translateX(var(--glint-sun, 100%));
   }
 
   @media (forced-colors: active) {
@@ -362,8 +295,7 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
       fill: Canvas;
     }
 
-    .lifted-logo__dark,
-    .lifted-logo__sun path {
+    .lifted-logo__dark {
       fill: CanvasText;
     }
   }
@@ -371,16 +303,7 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
   /* Printed, the logo is always at rest. */
   @media print {
     .lifted-logo__body {
-      --glint: 0%;
-      --glass: 1;
-
       transform: rotateX(12deg) rotateY(-18deg);
-    }
-
-    .lifted-logo__back--sun,
-    .lifted-logo__sun,
-    .lifted-logo__front--sun {
-      display: none;
     }
   }
 </style>

@@ -4,8 +4,8 @@
 //
 // It also decides, before the first paint, whether the opening screen plays
 // (intro.ts): on the first homepage visit of a session, when motion is
-// welcome. When it is, the homepage also makes room for the logo's journey
-// down the page (journey.ts), so nothing shifts when it starts. And from
+// welcome. When it is, the homepage also makes room for its pinned story
+// (story.ts), so nothing shifts when it starts. And from
 // 1 December to 6 January, Hevalo's icon is its Christmas version
 // (HevaloIcon.astro).
 (function () {
@@ -27,7 +27,7 @@
   }
 
   var motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
-  if (motion) root.dataset.journey = 'ready';
+  if (motion) root.dataset.story = 'ready';
 
   // The opening screen: homepages only (/, /de, /ckb, …), once per session.
   try {

@@ -78,6 +78,10 @@ export const en = {
     comingSoonTitle: 'Hevalo for iOS and Android.',
     comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
   },
+  /** Zagrosian's three values, from the mission below, shown one by one under the hero. */
+  story: {
+    values: ['Fast.', 'Private.', 'Well designed.'],
+  },
   /** Translation of the Kurmanji motto "Jiyan bi kurdî xweştire." Empty in Kurmanji. */
   motto: 'Life is sweeter in Kurdish.',
   about: {

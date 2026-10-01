@@ -70,6 +70,9 @@ export const fr: Messages = {
     comingSoonNote:
       'Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
   },
+  story: {
+    values: ['Rapide.', 'Privé.', 'Bien conçu.'],
+  },
   motto: 'La vie est plus douce en kurde.',
   about: {
     eyebrow: 'À propos',

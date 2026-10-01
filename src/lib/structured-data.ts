@@ -17,6 +17,7 @@ const ids = {
   website: `${home}#website`,
   organization: `${home}#organization`,
   hevalo: `${home}#hevalo`,
+  hevaloApp: `${home}#hevalo-app`,
 };
 
 export interface PageData {
@@ -74,6 +75,21 @@ export function structuredData(page: PageData) {
       url: hevalo.url,
       logo: hevalo.logo,
       description: english.hevalo.description,
+    },
+    // Hevalo itself: the app, on the web for now (the native apps are coming).
+    {
+      '@type': 'WebApplication',
+      '@id': ids.hevaloApp,
+      name: hevalo.name,
+      url: hevalo.url,
+      description: english.hevalo.description,
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'Web browser',
+      browserRequirements: 'Requires a modern web browser.',
+      inLanguage: 'ku',
+      brand: { '@id': ids.hevalo },
+      publisher: { '@id': ids.organization },
+      image: hevalo.logo,
     },
     {
       '@type': 'WebPage',

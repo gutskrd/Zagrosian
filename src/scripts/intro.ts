@@ -77,7 +77,7 @@ export function initIntro() {
 
 /**
  * Plays the hero's CSS entrance again from the start, now that it can be seen,
- * with the logo travelling down the page (journey.ts), which sits beside it.
+ * with the logo on its way into the story (story.ts), which sits beside it.
  */
 function replayHero() {
   if (typeof Element.prototype.getAnimations !== 'function') return;

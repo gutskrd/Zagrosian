@@ -71,6 +71,9 @@ export const ckb: Messages = {
     comingSoonTitle: 'Hevalo بۆ iOS و ئەندرۆید.',
     comingSoonNote: 'ئەپە ڕەسەنەکان لە قۆناغی گەشەپێداندان و لە App Store و Google Play بەردەست دەبن.',
   },
+  story: {
+    values: ['خێرا.', 'پارێزەری تایبەتێتی.', 'بە وردی دیزاینکراو.'],
+  },
   motto: 'ژیان بە کوردی خۆشترە.',
   about: {
     eyebrow: 'دەربارەی ئێمە',

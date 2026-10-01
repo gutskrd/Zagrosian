@@ -55,6 +55,10 @@ function homeMarkdown(locale: Locale): string {
 
 ${t.hero.lead}
 
+## ${t.story.values.join(' ')}
+
+*${kurdish.motto}*${t.motto ? ` (${t.motto})` : ''}
+
 ## ${t.hevalo.eyebrow}
 
 ### ${hevalo.name}
@@ -72,8 +76,6 @@ ${t.about.approach}
 
 - ${t.about.headquartersLabel}: ${t.about.headquarters}
 - ${t.about.productsLabel}: [${hevalo.name}](${hevalo.url})
-
-*${kurdish.motto}*${t.motto ? ` (${t.motto})` : ''}
 
 ## ${t.contact.eyebrow}
 

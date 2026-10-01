@@ -1,0 +1,406 @@
+---
+/**
+ * The story under the hero: Zagrosian's three values, then the Kurdish sun
+ * and motto.
+ *
+ * Without JavaScript, with reduced motion and in print, it is a plain section:
+ * the values as a heading, and the sun and the motto below them.
+ *
+ * With motion, it is a walkthrough pinned to the screen (src/scripts/story.ts),
+ * in four chapters:
+ *
+ * 1. The values. The glass logo comes down from the hero and settles beside
+ *    them, and turns a notch as each value rises into place.
+ * 2. The dive. The logo comes to the middle, faces the reader and opens up:
+ *    the camera dives into its ink (drawn here as vectors, `.story__lens`, so it
+ *    stays sharp at any size) until the ink fills the screen.
+ * 3. The sun. In the ink, the page in the other theme's colours
+ *    (`.story__scene`), the Kurdish sun rises, comes to rest and the motto
+ *    rises under it, word by word.
+ * 4. The iris. The scene closes into the sun, like an iris, and leaves the
+ *    sun and the motto in the page's own colours, which then scroll on.
+ *
+ * theme-init.js makes room for it before the first paint (`data-story`), so
+ * nothing shifts when the script starts.
+ */
+import { i18n } from '../i18n';
+import { kurdish } from '../site';
+import source from '../assets/brand/zagrosian-logo-lifted.svg?raw';
+import Sun from './Sun.astro';
+
+const { t } = i18n(Astro.url);
+
+// The values are sized to their column: the longest word must fit on a line.
+const longest = Math.max(...t.story.values.flatMap((value) => value.split(' ')).map((word) => [...word].length));
+const fit = longest <= 10 ? undefined : longest <= 13 ? 'md' : longest <= 16 ? 'sm' : 'xs';
+
+// The logo, flat, for the dive: the same shapes as LiftedLogo.astro, on the
+// same 1290-unit tile, with its frame (60 units wide) and rounded corners.
+const light = source.match(/ d="([^"]+)"/)?.[1] ?? '';
+const rounded = (x: number, y: number, size: number, r: number) =>
+  `M${x + r} ${y}H${x + size - r}A${r} ${r} 0 0 1 ${x + size} ${y + r}V${y + size - r}A${r} ${r} 0 0 1 ${x + size - r} ${y + size}H${x + r}A${r} ${r} 0 0 1 ${x} ${y + size - r}V${y + r}A${r} ${r} 0 0 1 ${x + r} ${y}Z`;
+const tile = rounded(0, 0, 1290, 297);
+const opening = rounded(60, 60, 1170, 237);
+
+const words = kurdish.motto.split(' ');
+---
+
+<section id="story" class="story" aria-labelledby="story-title" data-story-section>
+  <div class="story__stage">
+    <div class="container story__grid">
+      <h2 id="story-title" class:list={['story__values', fit && `story__values--${fit}`]}>
+        {
+          t.story.values.map((value, index) => (
+            <>
+              {index > 0 && ' '}
+              <span class="story__value" data-story-value>
+                <span class="story__value-text">{value}</span>
+              </span>
+            </>
+          ))
+        }
+      </h2>
+      <div class="story__slot" aria-hidden="true" data-story-slot></div>
+    </div>
+
+    <svg class="story__lens" aria-hidden="true" focusable="false" data-story-lens>
+      <defs>
+        <clipPath id="story-lens-window">
+          <path d={opening}></path>
+        </clipPath>
+        <linearGradient id="story-lens-glare" x1="0" y1="0" x2="0.64" y2="0.77">
+          <stop offset="0" stop-color="#fff" stop-opacity="0.5"></stop>
+          <stop offset="0.24" stop-color="#fff" stop-opacity="0.1"></stop>
+          <stop offset="0.42" stop-color="#fff" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <g data-story-lens-logo>
+        <path class="story__lens-body" d={tile}></path>
+        <g clip-path="url(#story-lens-window)">
+          <path class="story__lens-dark" fill-rule="evenodd" d={`M0 0H1290V1290H0Z${light}`}></path>
+          <path class="story__lens-light" fill-rule="evenodd" d={light}></path>
+        </g>
+        <path class="story__lens-dark" fill-rule="evenodd" d={`${tile}${opening}`}></path>
+        <path d={tile} fill="url(#story-lens-glare)"></path>
+        <path class="story__lens-rim" d={tile}></path>
+      </g>
+    </svg>
+
+    <div class="story__motto" data-story-motto>
+      <div class="story__sun" data-story-sun><Sun /></div>
+      <p class="story__kurdish kurdish" lang="ku" dir="ltr">{kurdish.motto}</p>
+      {t.motto && <p class="story__translation lead">{t.motto}</p>}
+    </div>
+
+    <div class="story__scene" aria-hidden="true" data-story-scene>
+      <div class="story__motto">
+        <div class="story__sun" data-story-sunrise><Sun /></div>
+        <p class="story__kurdish kurdish" lang="ku" dir="ltr">
+          {
+            words.map((word, index) => (
+              <>
+                {index > 0 && ' '}
+                <span class="story__word">
+                  <span data-story-word>{word}</span>
+                </span>
+              </>
+            ))
+          }
+        </p>
+        {t.motto && <p class="story__translation lead" data-story-translation>{t.motto}</p>}
+      </div>
+    </div>
+
+    <div class="story__progress" aria-hidden="true"><span data-story-progress></span></div>
+  </div>
+</section>
+
+<style>
+  /* ----------------------------------------------------------------------
+     The plain section: the values, then the sun and the motto.
+     ---------------------------------------------------------------------- */
+  .story {
+    padding-block: var(--section-space);
+  }
+
+  .story__grid {
+    display: grid;
+    gap: clamp(2rem, 1rem + 4vw, 4rem);
+  }
+
+  /* The values are sized to their column (see `fit` above). */
+  .story__values {
+    container-type: inline-size;
+    margin: 0;
+    font-size: min(var(--text-display), 17cqi);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .story__values--md {
+    font-size: min(var(--text-display), 13cqi);
+  }
+
+  .story__values--sm {
+    font-size: min(var(--text-display), 10.5cqi);
+  }
+
+  .story__values--xs {
+    font-size: min(var(--text-display), 9cqi);
+  }
+
+  /* Each value on a line of its own, behind a mask it can rise from. */
+  .story__value {
+    display: block;
+    overflow: clip;
+    padding-block-end: 0.1em;
+    margin-block-end: -0.06em;
+  }
+
+  .story__value-text {
+    display: block;
+  }
+
+  .story__motto {
+    display: grid;
+    justify-items: center;
+    margin-top: var(--section-space);
+    text-align: center;
+  }
+
+  .story__sun {
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  /* The motto is set in system serifs, whose widths vary by device. Sizes allow
+     for the widest likely fallback (DejaVu Serif): "kurdî xweştire." is at most
+     7.5em wide, the whole line at most 11.5em. Phones get two lines, wider
+     screens one. */
+  .story__kurdish {
+    margin: 0;
+    font-size: calc((100vw - 2 * var(--gutter)) / 7.8);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  @media (min-width: 48rem) {
+    .story__kurdish {
+      font-size: min(var(--text-display), calc((min(100vw, var(--container)) - 2 * var(--gutter)) / 11.8));
+    }
+  }
+
+  .story__translation {
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    color: var(--color-muted);
+  }
+
+  .story__slot,
+  .story__lens,
+  .story__scene,
+  .story__progress {
+    display: none;
+  }
+
+  /* ----------------------------------------------------------------------
+     The walkthrough: a stage pinned to the screen while the section, five
+     and a half screens tall, scrolls past it.
+     ---------------------------------------------------------------------- */
+  :global(:root[data-story]) .story {
+    height: 560svh;
+    padding: 0;
+  }
+
+  :global(:root[data-story]) .story__stage {
+    position: sticky;
+    top: 0;
+    display: grid;
+    align-content: center;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  /* The values above the logo's place on phones, beside it on wide screens,
+     as in the hero. */
+  :global(:root[data-story='on']) .story__grid {
+    height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-content: center;
+    padding-block: calc(var(--header-height) + 1.5rem) 2rem;
+  }
+
+  :global(:root[data-story='on']) .story__slot {
+    display: block;
+    align-self: center;
+    justify-self: center;
+    width: min(100%, 22rem, 34svh);
+    aspect-ratio: 1;
+  }
+
+  @media (min-width: 64rem) {
+    :global(:root[data-story='on']) .story__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-template-rows: none;
+      column-gap: 2rem;
+      align-items: center;
+    }
+
+    :global(:root[data-story]) .story__values {
+      grid-column: 1 / span 7;
+      font-size: min(var(--text-display), 17cqi, 15svh);
+    }
+
+    :global(:root[data-story]) .story__values--md {
+      font-size: min(var(--text-display), 13cqi, 13svh);
+    }
+
+    :global(:root[data-story]) .story__values--sm {
+      font-size: min(var(--text-display), 10.5cqi, 11svh);
+    }
+
+    :global(:root[data-story]) .story__values--xs {
+      font-size: min(var(--text-display), 9cqi, 10svh);
+    }
+
+    :global(:root[data-story='on']) .story__slot {
+      grid-column: 8 / span 5;
+      width: min(100%, 22rem);
+    }
+  }
+
+  /* Before the script starts (or if it cannot), the motto sits under the
+     values; once it runs, the motto is centred on the stage and waits for its
+     chapter. */
+  :global(:root[data-story]) .story__motto {
+    margin-top: clamp(2rem, 1rem + 4vw, 4rem);
+  }
+
+  :global(:root[data-story='on']) .story__motto {
+    position: absolute;
+    inset: 0;
+    align-content: center;
+    padding-inline: var(--gutter);
+  }
+
+  :global(:root[data-story='on']) .story__motto[data-story-motto] {
+    visibility: hidden;
+  }
+
+  /* The dive: the logo, flat and drawn as vectors, sized and moved by the
+     script (`data-story-lens-logo`), in the glass's colours (LiftedLogo.astro). */
+  :global(:root[data-story='on']) .story__lens {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    visibility: hidden;
+    pointer-events: none;
+
+    --body: rgb(255 255 255 / 0.08);
+    --dark: rgb(10 10 12 / 0.72);
+    --light: rgb(255 255 255 / 0.3);
+    --rim: rgb(0 0 0 / 0.16);
+  }
+
+  :global(:root[data-theme='dark']) .story__lens {
+    --body: rgb(255 255 255 / 0.05);
+    --dark: rgb(255 255 255 / 0.04);
+    --light: rgb(255 255 255 / 0.8);
+    --rim: rgb(255 255 255 / 0.22);
+  }
+
+  .story__lens-body {
+    fill: var(--body);
+  }
+
+  .story__lens-dark {
+    fill: var(--dark);
+  }
+
+  .story__lens-light {
+    fill: var(--light);
+  }
+
+  .story__lens-rim {
+    fill: none;
+    stroke: var(--rim);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* The sun's chapter: the page in the other theme's colours, opened and
+     closed by the script with a circle around the sun (`clip-path`). */
+  :global(:root[data-story='on']) .story__scene {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    visibility: hidden;
+  }
+
+  .story__scene .story__translation {
+    color: inherit;
+    opacity: 0.62;
+  }
+
+  .story__word {
+    display: inline-block;
+    overflow: clip;
+    padding-block-end: 0.12em;
+    margin-block-end: -0.12em;
+  }
+
+  .story__word > span {
+    display: inline-block;
+  }
+
+  /* How far the walkthrough has come, along the foot of the stage. */
+  :global(:root[data-story='on']) .story__progress {
+    position: absolute;
+    inset-inline: var(--gutter);
+    bottom: 1.25rem;
+    display: block;
+    height: 1px;
+    color: var(--color-ink);
+    background: color-mix(in srgb, currentColor 14%, transparent);
+    pointer-events: none;
+  }
+
+  .story__progress > span {
+    display: block;
+    height: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  :global([dir='rtl']) .story__progress > span {
+    transform-origin: right;
+  }
+
+  @media print {
+    :global(:root[data-story]) .story {
+      height: auto;
+      padding-block: var(--section-space);
+    }
+
+    :global(:root[data-story]) .story__stage {
+      position: static;
+      height: auto;
+    }
+
+    :global(:root[data-story='on']) .story__motto[data-story-motto] {
+      position: static;
+      visibility: visible;
+      margin-top: var(--section-space);
+    }
+
+    :global(:root[data-story='on']) :is(.story__lens, .story__scene, .story__progress) {
+      display: none;
+    }
+  }
+</style>

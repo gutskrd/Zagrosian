@@ -70,6 +70,9 @@ export const ku: Messages = {
     comingSoonTitle: 'Hevalo ji bo iOS û Androidê.',
     comingSoonNote: 'Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
   },
+  story: {
+    values: ['Bilez.', 'Nepeniyê diparêzin.', 'Bi baldarî hatine sêwirandin.'],
+  },
   // The motto is already in Kurmancî.
   motto: '',
   about: {

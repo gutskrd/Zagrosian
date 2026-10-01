@@ -68,6 +68,9 @@ export const nl: Messages = {
     comingSoonTitle: 'Hevalo voor iOS en Android.',
     comingSoonNote: 'De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
   },
+  story: {
+    values: ['Snel.', 'Privacyvriendelijk.', 'Doordacht ontworpen.'],
+  },
   motto: 'In het Koerdisch is het leven zoeter.',
   about: {
     eyebrow: 'Over ons',
