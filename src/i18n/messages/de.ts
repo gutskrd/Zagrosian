@@ -51,6 +51,9 @@ export const de: Messages = {
   },
   intro: {
     welcome: 'Willkommen.',
+    enter: 'Herein',
+    hintPointer: 'Scrollen oder klicken',
+    hintTouch: 'Nach oben wischen oder tippen',
   },
   hero: {
     notice: 'Hevalo kommt auf iOS und Android',

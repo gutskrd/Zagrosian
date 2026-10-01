@@ -27,7 +27,8 @@ function stateOf(target: Element | null): State {
   if (!target) return '';
   if (target.closest('input, textarea, select, [contenteditable]')) return 'text';
   if (target.closest('[data-magnetic]')) return 'button';
-  if (target.closest('button, [role="option"], summary, label')) return 'link';
+  // Also the opening screen, once it waits for a click (intro.ts).
+  if (target.closest('button, [role="option"], summary, label, [data-cursor="link"]')) return 'link';
   const link = target.closest<HTMLAnchorElement>('a[href]');
   if (link) {
     const url = new URL(link.href, location.href);

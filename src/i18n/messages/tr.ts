@@ -51,6 +51,9 @@ export const tr: Messages = {
   },
   intro: {
     welcome: 'Hoş geldiniz.',
+    enter: 'Buyurun',
+    hintPointer: 'Kaydırın veya tıklayın',
+    hintTouch: 'Yukarı kaydırın veya dokunun',
   },
   hero: {
     notice: 'Hevalo iOS ve Android’e geliyor',

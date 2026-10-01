@@ -263,18 +263,39 @@ back for visitors who prefer reduced motion, and the site works fully without it
 
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
   [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain that
-  welcomes the visitor in Kurdish, *Bi xêr hatin.* ("Welcome"). Its letters stand up into place one by
-  one, in 3D, out of a blur, over a faint copy of the greeting; ink fills them from left to right as
-  the page loads, led by a soft band of light, while the glass logo above fills from the bottom and
-  a counter runs to 100 (in the page's own digits, so Persian and Arabic count in theirs). Under the
-  greeting, "welcome" rolls through the site's languages and comes to rest in the page's own (in
-  Sorani on the Kurmanji pages, which need no translation; `intro.welcome` in the message files).
-  It follows the page's real loading and takes about two to three and a half seconds; when the page
-  is ready the light passes over the greeting once more, the curtain rises and the hero's entrance
-  plays from the start, and the screen is removed from the page. A click, a tap or a key lifts it at
-  once. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
-  motion*, and lifts by itself after four seconds should the script not start. Its words are drawn by
-  CSS, so the page's text (what search engines and AI crawlers read) starts with the headline.
+  welcomes the visitor in Kurdish, *Bi xêr hatin.* ("Welcome"), and waits for them to come in.
+  - *Loading.* The greeting's letters stand up into place one by one, in 3D, over a faint copy of
+    it; ink fills them from left to right as the page loads, led by a soft band of light, while the
+    glass logo above fills from the bottom and a counter runs to 100 (in the page's own digits, so
+    Persian and Arabic count in theirs). Under the greeting, "welcome" rolls through the site's
+    languages and comes to rest in the page's own (in Sorani on the Kurmanji pages, which need no
+    translation; `intro.welcome` in the message files). It follows the page's real loading, about
+    two to three and a half seconds, and ends with the light passing over the greeting once more.
+    The ink and the light are windows that slide over still letters, so nothing is redrawn as they
+    move.
+  - *Coming in: a sunrise.* The loading line becomes a horizon, and over it, in a small round
+    window, the Kurdish sun stands half risen, turning slowly, with a host's "come in" in the page's
+    language (*Kerem bikin*, *Buyurun*, *بفرمایید*… `intro.enter`) and how to come in, for a mouse
+    or a touch screen (`intro.hintPointer`, `intro.hintTouch`). Scrolling, swiping up or dragging
+    lifts the whole curtain under the hand, against a resistance that grows the higher it goes (the
+    rubber band of iOS scrolling), while the sun climbs, a ring around it fills, dawn spreads along
+    the foot of the screen and the light crosses the greeting. Let go short of the top and it all
+    settles back, as on a spring; go far enough (about two turns of a mouse wheel) and the curtain
+    flies up, the hero's entrance plays from the start, and the screen is removed from the page. A
+    click, a tap or any key comes straight in, so no one has to drag (WCAG 2.5.1 and 2.5.7). Left
+    alone, the curtain lifts a little every few seconds, to show that it can. The page underneath is
+    held still until the curtain has gone and the scrolling has paused, so a trackpad's momentum does
+    not carry the visitor past the top.
+  - *Search visitors are not stopped.* Visitors who arrive from a search engine (by the referrer)
+    get the loading screen only: the curtain rises by itself once the page has loaded. Google counts
+    an overlay that has to be dismissed right after a search result is followed as intrusive, and
+    ranks such pages lower on phones.
+
+  It is decoration, hidden from screen readers, which read the page underneath; never shown without
+  JavaScript or with *reduce motion*; and lifts by itself after four seconds should the script not
+  start. Its words and numbers are drawn by CSS from attributes, so the page's text (what search
+  engines and AI crawlers read) starts with the headline. Over it, the custom cursor shows that it
+  can be clicked.
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
   off until the visitor turns it on, from the header (the level meter), the site menu, quick
   navigation, or a small card offered once. Everything is synthesised with the Web Audio API, so no

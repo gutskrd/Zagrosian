@@ -54,6 +54,9 @@ export const ckb: Messages = {
   },
   intro: {
     welcome: 'بەخێربێن.',
+    enter: 'فەرموون',
+    hintPointer: 'سکرۆڵ بکە یان کلیک بکە',
+    hintTouch: 'بۆ سەرەوە ڕایبکێشە یان دەستی لێ بدە',
   },
   hero: {
     notice: 'Hevalo دێتە سەر iOS و ئەندرۆید',

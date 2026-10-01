@@ -54,6 +54,9 @@ export const fa: Messages = {
   },
   intro: {
     welcome: 'خوش آمدید.',
+    enter: 'بفرمایید',
+    hintPointer: 'اسکرول کنید یا کلیک کنید',
+    hintTouch: 'به بالا بکشید یا ضربه بزنید',
   },
   hero: {
     notice: 'Hevalo به‌زودی برای iOS و اندروید',

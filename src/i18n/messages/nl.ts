@@ -51,6 +51,9 @@ export const nl: Messages = {
   },
   intro: {
     welcome: 'Welkom.',
+    enter: 'Kom binnen',
+    hintPointer: 'Scroll of klik',
+    hintTouch: 'Veeg omhoog of tik',
   },
   hero: {
     notice: 'Hevalo komt naar iOS en Android',

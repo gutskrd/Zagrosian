@@ -6,9 +6,26 @@
  * ink fills the greeting, led by its band of light, the glass logo fills up,
  * the line draws across and "welcome" rolls through the languages, coming to
  * rest on the page's own. At the end the light passes over the greeting once
- * more; then the curtain rises, and the hero's entrance plays from the start
+ * more.
+ *
+ * Then it waits for the visitor to come in. Scrolling, swiping up or
+ * dragging lifts the curtain, which follows the hand against a resistance
+ * that grows the higher it goes (the rubber band of iOS scrolling); as it
+ * does, the sun rises, the ring around it fills, dawn spreads along the foot
+ * of the screen and the light crosses the greeting (`--lift` and `--pull`).
+ * Let go short of the top and it all settles back, as on a spring; reach it
+ * and the curtain flies up. A click, a tap or any key comes in at once, so
+ * no one has to drag (WCAG 2.5.1 and 2.5.7). Left alone, the curtain lifts a
+ * little every few seconds, to show that it can.
+ *
+ * Visitors who come from a search engine are not kept waiting: the curtain
+ * rises by itself as soon as the page has loaded. Google counts an overlay
+ * that has to be dismissed right after a search result is followed as
+ * intrusive, and ranks such pages lower on phones.
+ *
+ * Coming in, the curtain rises and the hero's entrance plays from the start
  * as it is uncovered (`intro:end`). Afterwards the screen is removed from the
- * page. A click, a tap or a key lifts it at once.
+ * page.
  *
  * Numbers are written in the page's own digits (Persian and Arabic use
  * their own), through Intl.NumberFormat.
@@ -18,6 +35,12 @@ const MINIMUM = 1600;
 const MAXIMUM = 3400;
 /** How long the last pass of light over the greeting takes. */
 const GLINT = 700;
+/** How long the visitor is left alone before the curtain shows it can lift, and how often after that. */
+const NUDGE_AFTER = 2600;
+const NUDGE_EVERY = 5200;
+/** Keys that would scroll the page underneath. */
+const SCROLL_KEYS = [' ', 'ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'];
+const SEARCH_ENGINES = /(^|\.)(google|bing|duckduckgo|yahoo|yandex|baidu|ecosia|qwant|startpage|search\.brave|naver|seznam)\./;
 
 const root = document.documentElement;
 
@@ -40,19 +63,21 @@ export function initIntro() {
   const track = screen.querySelector<HTMLElement>('[data-intro-track]');
   const steps = (track?.children.length ?? 1) - 1;
   const digits = new Intl.NumberFormat(root.lang || undefined, { maximumFractionDigits: 0 });
+  const gated = !fromSearchEngine();
 
   let loaded = document.readyState === 'complete';
   window.addEventListener('load', () => (loaded = true), { once: true });
 
+  let state: 'loading' | 'ready' | 'leaving' = 'loading';
   const started = performance.now();
   let shown = 0;
   let written = -1;
   let step = -1;
-  let leaving = false;
 
   const render = (progress: number) => {
     const percent = Math.round(progress * 100);
-    if (percent !== written && count) count.textContent = digits.format(percent);
+    // Drawn by CSS from the attribute, like the screen's words.
+    if (percent !== written && count) count.dataset.label = digits.format(percent);
     written = percent;
     if (bar) bar.style.transform = `scaleX(${progress.toFixed(4)})`;
     // Filled from the bottom up, the same in every language.
@@ -66,47 +91,205 @@ export function initIntro() {
     step = next;
   };
 
-  const leave = () => {
-    if (leaving) return;
-    leaving = true;
-    window.removeEventListener('pointerdown', skip);
-    window.removeEventListener('keydown', skip);
+  /* -------------------------------------------------------------------------
+     Lifting the curtain.
+     ------------------------------------------------------------------------- */
+
+  /** How far the hand moves to come in (about two notches of a mouse wheel), and how far the curtain can give. */
+  const travel = () => Math.min(200, window.innerHeight * 0.26);
+  const give = () => window.innerHeight * 0.45;
+
+  let pull = 0;
+  let motion = 0;
+  let nudgeTimer = 0;
+  let wheelTimer = 0;
+  let drag: { y: number; from: number; moved: number } | null = null;
+
+  /** Moves the curtain for a hand that has moved `distance` pixels; returns how far there is to go, 0 to 1. */
+  const lift = (distance: number) => {
+    pull = Math.max(0, distance);
+    const progress = Math.min(1, pull / travel());
+    const d = give();
+    const raised = (1 - 1 / ((pull * 0.55) / d + 1)) * d;
+    screen.style.setProperty('--lift', raised.toFixed(1));
+    screen.style.setProperty('--pull', progress.toFixed(3));
+    greeting?.style.setProperty('--light', (progress * 1.3).toFixed(4));
+    return progress;
+  };
+
+  const stop = () => {
+    cancelAnimationFrame(motion);
+    window.clearTimeout(nudgeTimer);
+  };
+
+  const scheduleNudge = (delay: number) => {
+    window.clearTimeout(nudgeTimer);
+    nudgeTimer = window.setTimeout(nudge, delay);
+  };
+
+  // Back down, as if on a spring: most of the way in half a second, however
+  // fast the device draws.
+  const settle = () => {
+    stop();
+    let last = performance.now();
+    const fall = (now: number) => {
+      const next = pull * Math.exp(-(now - last) / 130);
+      last = now;
+      if (next < 0.5) {
+        lift(0);
+        scheduleNudge(NUDGE_EVERY);
+        return;
+      }
+      lift(next);
+      motion = requestAnimationFrame(fall);
+    };
+    motion = requestAnimationFrame(fall);
+  };
+
+  // A small lift and back, to show that the curtain can be lifted.
+  function nudge() {
+    const from = performance.now();
+    const rise = (now: number) => {
+      const time = Math.min(1, (now - from) / 1100);
+      lift(Math.sin(time * Math.PI) ** 2 * travel() * 0.22);
+      if (time < 1) motion = requestAnimationFrame(rise);
+      else scheduleNudge(NUDGE_EVERY);
+    };
+    motion = requestAnimationFrame(rise);
+  }
+
+  // The wheel moves the curtain, never the page underneath, until a pause in
+  // the scrolling after the curtain has gone (so a trackpad's momentum does
+  // not carry the visitor past the top). It is caught on its way down, before
+  // the smooth scrolling (smooth.ts) sees it.
+  let quiet = 0;
+  const release = () => window.removeEventListener('wheel', onWheel, { capture: true });
+  const onWheel = (event: WheelEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!screen.isConnected) {
+      window.clearTimeout(quiet);
+      quiet = window.setTimeout(release, 240);
+      return;
+    }
+    if (state !== 'ready') return;
+    stop();
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+    if (lift(pull + event.deltaY * unit) >= 1) {
+      enter();
+      return;
+    }
+    // A pause long enough to be more than the gap between turns of a wheel lets it settle.
+    window.clearTimeout(wheelTimer);
+    wheelTimer = window.setTimeout(settle, 600);
+  };
+
+  const onPointerDown = (event: PointerEvent) => {
+    // Only the main button: a right click is not a way in.
+    if (!event.isPrimary || event.button !== 0) return;
+    // Anyone in a hurry can come in before the page has finished.
+    if (state === 'loading') {
+      enter();
+      return;
+    }
+    if (state !== 'ready') return;
+    stop();
+    drag = { y: event.clientY, from: pull, moved: 0 };
+    screen.setPointerCapture(event.pointerId);
+    screen.dataset.dragging = '';
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!drag || !event.isPrimary) return;
+    drag.moved = Math.max(drag.moved, Math.abs(event.clientY - drag.y));
+    if (lift(drag.from + drag.y - event.clientY) >= 1) enter();
+  };
+
+  const onPointerUp = () => {
+    if (!drag) return;
+    const { moved } = drag;
+    drag = null;
+    delete screen.dataset.dragging;
+    if (state !== 'ready') return;
+    // A click or a tap comes in; so does a lift let go past halfway.
+    if (moved < 8 || pull / travel() > 0.5) enter();
+    else settle();
+  };
+
+  const onKey = (event: KeyboardEvent) => {
+    // Not the browser's own shortcuts (reload, address bar, …).
+    if (event.ctrlKey || event.metaKey || event.altKey || event.key === 'Shift') return;
+    if (SCROLL_KEYS.includes(event.key)) event.preventDefault();
+    enter();
+  };
+
+  window.addEventListener('wheel', onWheel, { capture: true, passive: false });
+  window.addEventListener('keydown', onKey);
+  screen.addEventListener('pointerdown', onPointerDown);
+  screen.addEventListener('pointermove', onPointerMove);
+  screen.addEventListener('pointerup', onPointerUp);
+  screen.addEventListener('pointercancel', onPointerUp);
+
+  /* -------------------------------------------------------------------------
+     Coming in.
+     ------------------------------------------------------------------------- */
+
+  const enter = () => {
+    if (state === 'leaving') return;
+    state = 'leaving';
+    stop();
+    window.clearTimeout(wheelTimer);
+    window.removeEventListener('keydown', onKey);
+    screen.style.setProperty('--pull', '1');
     screen.dataset.state = 'leaving';
     // The hero starts as the curtain begins to rise, so it is seen entering.
     window.setTimeout(() => {
-      delete root.dataset.intro;
       replayHero();
       document.dispatchEvent(new CustomEvent('intro:end'));
     }, 320);
-    window.setTimeout(() => screen.remove(), 1150);
+    // The page is held still (here, and by smooth.ts while `data-intro` is
+    // set) until the curtain has gone, so a scroll that carries on past the
+    // way in does not move it: the visitor arrives at the top.
+    window.setTimeout(() => {
+      screen.remove();
+      delete root.dataset.intro;
+      quiet = window.setTimeout(release, 240);
+    }, 1150);
   };
 
-  // Anyone in a hurry can lift it at once.
-  const skip = (event: Event) => {
-    if (event instanceof KeyboardEvent && ['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return;
-    leave();
+  // Ready: the way in appears (or, from a search engine, the curtain rises).
+  const ready = () => {
+    if (state !== 'loading') return;
+    if (!gated) {
+      enter();
+      return;
+    }
+    state = 'ready';
+    screen.dataset.state = 'ready';
+    // The custom cursor (cursor.ts) shows that the screen can be clicked.
+    screen.dataset.cursor = 'link';
+    lift(0);
+    scheduleNudge(NUDGE_AFTER);
   };
-  window.addEventListener('pointerdown', skip);
-  window.addEventListener('keydown', skip);
 
-  // The light passes over the whole greeting once more, then the curtain rises.
+  // The light passes over the whole greeting once more.
   const glint = () => {
     screen.dataset.state = 'done';
     const from = performance.now();
     const pass = (now: number) => {
-      if (leaving) return;
+      if (state !== 'loading') return;
       const time = Math.min(1, (now - from) / GLINT);
       const eased = time < 0.5 ? 4 * time ** 3 : 1 - (-2 * time + 2) ** 3 / 2;
       // From the greeting's start to well past its end, so no light is left on it.
       greeting?.style.setProperty('--light', (eased * 1.3).toFixed(4));
       if (time < 1) requestAnimationFrame(pass);
-      else leave();
+      else ready();
     };
     requestAnimationFrame(pass);
   };
 
   const tick = (now: number) => {
-    if (leaving) return;
+    if (state !== 'loading') return;
     const elapsed = now - started;
     const time = Math.min(1, elapsed / MINIMUM);
     let target = 1 - (1 - time) ** 3;
@@ -119,6 +302,15 @@ export function initIntro() {
     else glint();
   };
   requestAnimationFrame(tick);
+}
+
+/** Whether the visitor has just followed a link from a search engine's results. */
+function fromSearchEngine() {
+  try {
+    return SEARCH_ENGINES.test(new URL(document.referrer).hostname);
+  } catch {
+    return false;
+  }
 }
 
 /**

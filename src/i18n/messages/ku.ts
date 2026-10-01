@@ -53,6 +53,9 @@ export const ku: Messages = {
   },
   intro: {
     welcome: '',
+    enter: 'Kerem bikin',
+    hintPointer: 'Bigerîne an bitikîne',
+    hintTouch: 'Ber bi jor ve bikişîne an bitikîne',
   },
   hero: {
     notice: 'Hevalo tê ser iOS û Androidê',

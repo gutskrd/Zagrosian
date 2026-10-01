@@ -52,6 +52,9 @@ export const ar: Messages = {
   },
   intro: {
     welcome: 'أهلاً وسهلاً.',
+    enter: 'تفضّلوا',
+    hintPointer: 'مرّر أو انقر',
+    hintTouch: 'اسحب للأعلى أو انقر',
   },
   hero: {
     notice: 'Hevalo قريبًا على iOS وأندرويد',
