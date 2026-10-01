@@ -105,20 +105,17 @@ src/
       white, well inside the area phones may round or crop.
     - The social images (`public/og.png` in English and `public/og/<language>.png`) show the white
       logo beside the hero headline in that language; update them if the headline changes.
-  - **Lifted**: the hands on a tile of translucent glass (70% opaque, with a faint white glow
-    outside its edge), in the homepage hero and the opening screen
-    ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). In the 499 × 500 px source the tile is
-    only 221 px across, too small for the hero or high-density screens, so the site uses a master
-    sharpened to 1,344 px. The tile is made opaque for sharpening: the colours and gloss come from a
-    smooth (Mitchell) 6× upscale, which suits soft gradients; the edges that should be crisp, the
-    tile's outline and where the dark hands and band meet the light shapes, are traced with
-    [potrace](https://potrace.sourceforge.net) and redrawn, with the colours on each side carried up
-    to the new edge, and the glossy frame keeps the upscale's own colours. Then the glass's
-    transparency is put back and the glow laid underneath. It is served as WebP at 360, 540, 720
-    and 1080 px (quality 82).
+  - **Lifted**: the hands on a tile of glass, in the homepage hero and the opening screen
+    ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). It is drawn rather than shown as an
+    image, so it is sharp at any size: the light shapes are traced from the lifted logo (the light
+    regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
+    `zagrosian-logo-lifted.svg`, 2 KB), and the tile is made in CSS: a rounded square of glass
+    (`backdrop-filter`), a thin frame around the shapes as in the original, a sheen at the top left
+    and a bright rim. On the light page the glass is smoked and the shapes frosted white; on the
+    dark page (and the always-dark opening screen) the glass is clear. In the hero two soft lights
+    sit behind it and show through, blurred, as it leans towards the pointer.
 
-  If a logo changes, trace or sharpen the new one the same way and regenerate the icons and social
-  images.
+  If a logo changes, trace the new one the same way and regenerate the icons and social images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. The
   Kurdish motto section uses the black version on light backgrounds and the white version in dark mode
   (`sun-*-64.png`, cropped to the sun).

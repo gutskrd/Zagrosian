@@ -25,8 +25,8 @@ const { t } = i18n(Astro.url);
   </div>
 
   <div class="intro-screen__mark">
-    <LiftedLogo class="intro-screen__logo intro-screen__logo--ghost" loading="eager" fetchpriority="high" />
-    <LiftedLogo class="intro-screen__logo intro-screen__logo--fill" loading="eager" fetchpriority="high" data-intro-logo />
+    <LiftedLogo class="intro-screen__logo intro-screen__logo--ghost" tone="dark" />
+    <LiftedLogo class="intro-screen__logo intro-screen__logo--fill" tone="dark" data-intro-logo />
   </div>
 
   <div class="intro-screen__bottom">
@@ -102,9 +102,8 @@ const { t } = i18n(Astro.url);
   }
 
   /* The glass logo fills up from the bottom as the counter runs, over a
-     faint copy of itself (intro.ts sets the clip). It is the hero's image
-     file (LiftedLogo.astro), so it costs no extra download, and as it comes
-     first in the page it carries the hero's high priority. */
+     faint copy of itself (intro.ts sets the clip). It is drawn
+     (LiftedLogo.astro), so there is nothing to download. */
   .intro-screen__mark {
     display: grid;
     place-self: center;
