@@ -80,7 +80,7 @@ src/
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    intro.ts (opening screen), sound.ts, cursor.ts, magnetic.ts, smooth.ts,
-                   text.ts, language.ts, theme.ts and theme-init.js
+                   water.ts (the hover water), text.ts, language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -105,15 +105,17 @@ src/
       white, well inside the area phones may round or crop.
     - The social images (`public/og.png` in English and `public/og/<language>.png`) show the white
       logo beside the hero headline in that language; update them if the headline changes.
-  - **Lifted**: the hands on a glossy black and silver tile, in the homepage hero
+  - **Lifted**: the hands on a tile of translucent glass (70% opaque, with a faint white glow
+    outside its edge), in the homepage hero and the opening screen
     ([`LiftedLogo.astro`](src/components/LiftedLogo.astro)). In the 499 × 500 px source the tile is
-    only 219 px across, too small for the hero or high-density screens, so the site uses a master
-    sharpened to 1,303 px: the colours and gloss come from a smooth (Mitchell) 6× upscale, which
-    suits soft gradients; the edges that should be crisp, the tile's outline and where the black
-    hands and band meet the light shapes, are traced with
+    only 221 px across, too small for the hero or high-density screens, so the site uses a master
+    sharpened to 1,344 px. The tile is made opaque for sharpening: the colours and gloss come from a
+    smooth (Mitchell) 6× upscale, which suits soft gradients; the edges that should be crisp, the
+    tile's outline and where the dark hands and band meet the light shapes, are traced with
     [potrace](https://potrace.sourceforge.net) and redrawn, with the colours on each side carried up
-    to the new edge. The glossy frame keeps the upscale's own colours. It is served as WebP at 360,
-    540, 720 and 1080 px (quality 82).
+    to the new edge, and the glossy frame keeps the upscale's own colours. Then the glass's
+    transparency is put back and the glow laid underneath. It is served as WebP at 360, 540, 720
+    and 1080 px (quality 82).
 
   If a logo changes, trace or sharpen the new one the same way and regenerate the icons and social
   images.
@@ -205,7 +207,7 @@ back for visitors who prefer reduced motion, and the site works fully without it
 
 - **Opening screen** ([`Preloader.astro`](src/components/Preloader.astro),
   [`intro.ts`](src/scripts/intro.ts)): on the first homepage visit of a session, a dark curtain where
-  the white logo fills in from the bottom up, over a faint copy of itself, as a counter runs to 100
+  the glass logo fills up from the bottom, over a faint copy of itself, as a counter runs to 100
   (in the page's own digits, so Persian and Arabic count in theirs). It follows the page's real
   loading and takes one to three seconds; then the curtain rises and the hero's entrance plays from
   the start, and the screen is removed from the page. It is decoration, hidden from screen readers, never shown without JavaScript or with *reduce
@@ -232,7 +234,25 @@ back for visitors who prefer reduced motion, and the site works fully without it
   never lingers: it disappears when the pointer leaves the window, the window loses focus or the page
   is left (so it is not frozen into the page transition), and returns with the next move. It is a
   manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
-- **Only what the device uses:** smooth scrolling, the cursor and the magnetic buttons
+- **Water** ([`water.ts`](src/scripts/water.ts)): with a mouse, moving over links, buttons, text and
+  images stirs a soft, clear liquid laid over the page, and what is under the pointer wobbles as if
+  seen through it.
+  - The surface is a ripple simulation (WebGL 2, the wave equation at a quarter of the screen's
+    resolution, two steps a frame). The pointer drops ripples as it moves over something, a larger
+    one where it arrives and a splash where it clicks; they spread as rings, catch the light and
+    settle within a few seconds, and travel with the page as it scrolls. Only light and shade are
+    drawn (both zero on still water), so it reads as water in both themes and leaves a still page
+    untouched; nothing is drawn while the water is still.
+  - The wobble is an SVG filter (`#liquid` in [`BaseLayout.astro`](src/layouts/BaseLayout.astro):
+    smoothed fractal noise displacing the element, softened by half a pixel) moved to the text or
+    control under the pointer. It flows while the pointer moves and eases away when it rests or
+    leaves, so text is crisp again once still. Larger type ripples further; very large blocks are
+    left alone, so the filter stays cheap.
+  - It starts with the first movement, so a page that is only read costs nothing. It is not used with
+    *reduce motion* or forced colours; the surface is declined on software-rendered WebGL, without
+    float render targets, or on a device that cannot keep up (under about 20 frames a second), and
+    the wobble works on its own.
+- **Only what the device uses:** smooth scrolling, the cursor, the magnetic buttons and the water
   ([`desktop.ts`](src/scripts/desktop.ts)) are loaded separately and only with a mouse or trackpad,
   so phones and tablets never download them (every page's main script is about 8 KB compressed).
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),

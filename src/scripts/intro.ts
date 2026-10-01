@@ -2,8 +2,8 @@
  * The opening screen (src/components/Preloader.astro).
  *
  * The counter follows the page's real loading (the window's load event), and
- * takes at least a second so it can be read, three at most. The logo fills
- * in and the line draws across with it. Then the curtain rises, and
+ * takes at least a second so it can be read, three at most. The glass logo
+ * fills up and the line draws across with it. Then the curtain rises, and
  * the hero's entrance plays from the start as it is uncovered (`intro:end`).
  * Afterwards the screen is removed from the page.
  *
