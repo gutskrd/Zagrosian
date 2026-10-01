@@ -115,18 +115,6 @@ const jsonLd = noindex
     <SoundPrompt />
     <CommandMenu />
 
-    <!-- The water's wobble (src/scripts/water.ts): the element under the
-         pointer is drawn through this filter while it is stirred. -->
-    <svg class="liquid-defs" aria-hidden="true" focusable="false">
-      <filter id="liquid" x="-20%" y="-50%" width="140%" height="200%" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="1" seed="7" result="noise" data-liquid-noise />
-        <feGaussianBlur in="noise" stdDeviation="3" result="smooth" />
-        <feDisplacementMap in="SourceGraphic" in2="smooth" scale="0" xChannelSelector="R" yChannelSelector="G" result="moved" data-liquid-map />
-        <!-- Softens the displacement's pixel steps, as water softens what is under it. -->
-        <feGaussianBlur in="moved" stdDeviation="0.45" />
-      </filter>
-    </svg>
-
     <script>
       import '../scripts/site';
     </script>
