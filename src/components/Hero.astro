@@ -284,8 +284,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   /* Once the block faces the reader, its edge cannot be seen, so it is not
-     drawn (story.ts). Flying in, the logo is drawn once and then only
-     scaled, by the graphics card. */
+     drawn (story.ts). Flying in, the logo is drawn at sizes that double and
+     scaled between them by the graphics card. */
   .journey[data-flat] :global(.lifted-logo__slice) {
     visibility: hidden;
   }

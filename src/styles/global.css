@@ -878,6 +878,14 @@ html:has(.site-menu:popover-open) {
   transform: translateY(1.25rem);
 }
 
+/* Met while scrolling back up: shown at once (src/scripts/site.ts). */
+[data-reveal='instant'],
+[data-reveal='instant'] *,
+[data-reveal='instant']::before,
+[data-reveal='instant'] *::before {
+  transition: none !important;
+}
+
 /* Split headings (src/components/SplitText.astro): each word rises from behind
    its own mask. The script staggers them with the Web Animations API. */
 .split__word {

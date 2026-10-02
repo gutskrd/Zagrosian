@@ -24,15 +24,18 @@
  * the CSSOM (which the Content-Security-Policy allows).
  *
  * So that nothing lags, the graphics card does the moving: the logo and the
- * sun are drawn once, at the size they need, then moved and scaled. The logo
- * is laid out at its size until it faces the reader; beyond that, flying in,
- * it is scaled, and its perspective shortens as it grows, which gives
- * exactly the picture a larger logo would (a scene and its camera distance
- * scaled together look the same). The sun is drawn at its largest and only
- * ever shrinks, so it stays sharp. And once the logo faces the reader, the
- * layers that make its edge are not drawn: face on, the edge cannot be seen,
- * and twenty see-through layers the size of the screen are what would make
- * the fly-in stutter.
+ * sun are drawn at a size, then moved and scaled. The logo is laid out at its
+ * size until it faces the reader; flying in, it is laid out at steps that
+ * double (`step` below) and scaled between them, and its perspective shortens
+ * as it grows, which gives exactly the picture a larger logo would (a scene
+ * and its camera distance scaled together look the same). The sun, shrinking
+ * from its largest, steps down by halves the same way. Each is therefore
+ * always drawn within twice the size it is seen at, scrolling down or up: a
+ * drawing scaled far beyond that would have to be redrawn at a size the
+ * graphics memory cannot hold when it comes back into view. And once the
+ * logo faces the reader, the layers that make its edge are not drawn: face
+ * on, the edge cannot be seen, and twenty see-through layers the size of the
+ * screen are what would make the fly-in stutter.
  *
  * theme-init.js makes room for the walkthrough (`data-story`) before the first
  * paint when motion is welcome; this script turns it on. Without JavaScript or
@@ -45,6 +48,15 @@ const mix = (from: number, to: number, t: number) => from + (to - from) * t;
 
 /** Between two sizes, so that each step of the scroll grows by the same factor. */
 const zoom = (from: number, to: number, t: number) => from * (to / from) ** t;
+
+/**
+ * The size to lay a scaled drawing out at, on a ladder of doublings and
+ * halvings of `base`: the step at or below `size` when growing past `base`,
+ * at or above it when shrinking below. The drawing is then scaled by less
+ * than two to `size`, and is only laid out (and drawn) again at the next step.
+ */
+const step = (base: number, size: number) =>
+  size >= base ? base * 2 ** Math.floor(Math.log2(size / base)) : base / 2 ** Math.floor(Math.log2(base / size));
 
 /** 0 to 1 between two points, easing in and out. */
 const ease = (from: number, to: number, value: number) => {
@@ -144,9 +156,12 @@ export function initStory() {
 
   // The page, measured: the screen; the logo's place in the hero; where the
   // story starts and how long it stays pinned; and, on the stage, the logo's
-  // place beside the values and the sun's place above the motto.
+  // place beside the values and the sun's place above the motto. The stage
+  // fills the screen even when a phone's address bar slides away; its content
+  // keeps to the part the bar never covers (`view`).
   let width = 0;
   let stageHeight = 0;
+  let view = 0;
   // The perspectives as the CSS sets them, read before this script changes them.
   const perspective = parseFloat(getComputedStyle(art).perspective) || 1280;
   const sunPerspective = parseFloat(getComputedStyle(sunrise).perspective) || 960;
@@ -166,6 +181,7 @@ export function initStory() {
     const spot = place(slot);
     const disc = place(sun);
     stageHeight = stage.offsetHeight;
+    view = stage.clientHeight - parseFloat(getComputedStyle(stage).paddingBottom);
     start = { x: hero.x + hero.width / 2, y: hero.y + hero.width / 2, size: hero.width };
     storyTop = place(story).y;
     pinned = Math.max(1, story.offsetHeight - stageHeight);
@@ -174,11 +190,10 @@ export function initStory() {
     // Faced, the logo fills most of the shorter side of the screen (and never
     // shrinks to get there); the scene's circle starts out large enough to
     // cover the whole stage.
-    dive = Math.max(rest.size * 1.15, Math.min(width, stageHeight) * 0.62);
+    dive = Math.max(rest.size * 1.15, Math.min(width, view) * 0.62);
     cover = Math.hypot(Math.max(sunAt.x, width - sunAt.x), Math.max(sunAt.y, stageHeight - sunAt.y)) + 2;
-    // The sun is drawn once at its largest, as it rises, and scaled from there.
-    large = Math.min(width, stageHeight) * 0.44;
-    sunrise.style.width = `${large.toFixed(2)}px`;
+    // The sun at its largest, as it rises.
+    large = Math.min(width, view) * 0.44;
     written.clear();
   };
 
@@ -202,7 +217,7 @@ export function initStory() {
     const scroll = Math.max(0, window.scrollY);
     const q = (scroll - storyTop) / pinned;
     const middleX = width / 2;
-    const middleY = stageHeight / 2;
+    const middleY = view / 2;
 
     // ---- The glass logo: down from the hero, beside the values, to the
     // middle, and in.
@@ -239,10 +254,11 @@ export function initStory() {
 
     const inScene = ease(DIVE[2] - 0.04, DIVE[2], q);
     const travelling = inScene < 1;
-    // Laid out at its size up to the dive; flying in, scaled from there, with
-    // a perspective as much shorter as it is larger (see above).
+    // Laid out at its size up to the dive; flying in, at steps that double,
+    // and scaled from there, with a perspective as much shorter as it is
+    // larger (see above).
     const flying = size > dive * 1.001;
-    const box = flying ? dive : size;
+    const box = flying ? step(dive, size) : size;
     if (travelling) {
       style(art, 'width', `${box.toFixed(2)}px`, 'art-w');
       style(art, 'height', `${box.toFixed(2)}px`, 'art-h');
@@ -293,15 +309,17 @@ export function initStory() {
     const up = ease(SUN[0], SUN[1], q);
     const settle = ease(SUN[1], SUN[2], q);
     const sunSize = zoom(large, sunAt.size, settle);
+    const sunBox = step(large, sunSize);
     const sunX = mix(middleX, sunAt.x, settle);
     const sunY = mix(mix(stageHeight + large / 2, middleY, up), sunAt.y, settle);
     const spin = q * 160;
     const tumble = 1 - settle;
-    style(sunrise, 'perspective', `${((sunPerspective * large) / sunSize).toFixed(1)}px`, 'sun-p');
+    style(sunrise, 'width', `${sunBox.toFixed(2)}px`, 'sun-w');
+    style(sunrise, 'perspective', `${((sunPerspective * sunBox) / sunSize).toFixed(1)}px`, 'sun-p');
     style(
       sunrise,
       'transform',
-      `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${(sunSize / large).toFixed(4)})`,
+      `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${(sunSize / sunBox).toFixed(4)})`,
       'sun-t',
     );
     style(sunrise, '--sun-pitch', `${(tumble * mix(48, 14, up)).toFixed(2)}deg`);
@@ -331,7 +349,7 @@ export function initStory() {
     const bar = progress.parentElement as HTMLElement;
     style(progress, 'transform', `scaleX(${clamp(q).toFixed(4)})`, 'progress');
     style(bar, 'opacity', q > 0 && q < 1 ? '1' : '0', 'progress-o');
-    bar.toggleAttribute('data-inverse', inView && inScene >= 0.5 && radius > stageHeight - sunAt.y);
+    bar.toggleAttribute('data-inverse', inView && inScene >= 0.5 && radius > view - sunAt.y);
     header?.toggleAttribute('data-inverse', inView && inScene >= 0.5 && radius > sunAt.y);
   };
 

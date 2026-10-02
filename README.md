@@ -210,14 +210,18 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   2. **The dive.** The values lift away; the logo comes to the middle, faces the reader and the
      camera flies into the glass: the front pane slides past and fades, and the block's layers
      spread apart in perspective as the camera nears the logo's ink (the smoked dark parts on the
-     light page, the frosted light parts on the dark page). The logo grows by its size rather than
-     by scaling, so the browser draws it sharp all the way in, and while it is larger than the
-     screen its edge layers are not drawn. Where it flies in was found with a distance transform of
-     the logo's shapes: the point deepest inside the ink.
+     light page, the frosted light parts on the dark page). The graphics card does the growing: the
+     logo is laid out at sizes that double (and the sun, as it settles, at sizes that halve) and is
+     scaled by less than two between them, with its perspective shortened to match, so it is never
+     drawn at more than twice the size it is seen at, scrolling down or up. (Drawn once and scaled
+     thirty times, it had to be redrawn at a size no graphics memory holds when the page scrolled
+     back up into it, and parts of it went missing.) Face on, its edge layers are not drawn. Where
+     it flies in was found with a distance transform of the logo's shapes: the point deepest inside
+     the ink.
   3. **The sun.** The ink becomes a scene in the other theme's colours (`.story__scene`). The
      Kurdish sun rises as a thick piece of glass ([`GlassSun.astro`](src/components/GlassSun.astro):
-     a back face, twelve layers through its depth and a bevelled front, each cut to the sun's
-     outline with `clip-path`), tumbling and catching the light, with a soft glow behind it; it
+     a back face and a bevelled front with a glint, each cut to the sun's outline with
+     `clip-path`), tumbling and catching the light, with a soft glow behind it; it
      comes to rest facing the reader above the motto, which rises word by word with its
      translation. The header switches to the scene's colours while the scene is behind it
      (`data-inverse`, global.css).
@@ -225,7 +229,11 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
      sun and the motto in the page's own colours: inside the circle the scene's motto, outside it
      the page's, in exactly the same place. Then the stage lets go and they scroll on.
   A line along the foot of the stage shows how far along the story is. Scrolling back plays it all
-  backwards, on a phone as with a mouse. Everything is a function of the scroll position: the page
+  backwards, on a phone as with a mouse, and every point looks the same whichever way it was
+  reached. On a phone the stage is as tall as the screen without the address bar (`100lvh`), so
+  its colours reach the bottom edge when the bar slides away, while its content keeps to the part
+  the bar never covers (`100svh`), so nothing moves when the bar comes back. Everything is a
+  function of the scroll position: the page
   is measured on load and resize only, the logo travels in a layer fixed to the screen
   (`[data-journey-layer]`, Hero.astro) whose original stays in the hero for screen readers, and
   the copies used for effects are hidden from assistive technology. `theme-init.js` makes room
@@ -236,7 +244,9 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
 - **Sections:** blocks marked `data-reveal` fade up; elements with the `rule` class draw their top
-  hairline across.
+  hairline across. Entrances (these, the rising headings, lines and decoding labels) only play for
+  what comes up from below: opened part-way down the page (a link to Contact, a reload) and
+  scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
 - **Products:** the Hevalo icon turns to face the reader as it comes into view.

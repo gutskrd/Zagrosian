@@ -26,6 +26,13 @@ const isBelowFold = (element: Element) => element.getBoundingClientRect().top > 
 
 export const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/**
+ * Whether an element came into view from above, as the page scrolls back up
+ * (after a reload or a link part-way down the page). Entrances only play for
+ * what comes up from below; anything met on the way back up is shown as it is.
+ */
+export const enteredFromAbove = (entry: IntersectionObserverEntry) => entry.boundingClientRect.top < 0;
+
 /* -------------------------------------------------------------------------- */
 /* Split headings: words rise one after another as the heading enters view.   */
 /* -------------------------------------------------------------------------- */
@@ -40,6 +47,8 @@ function initSplitHeadings() {
         if (!entry.isIntersecting) continue;
         const heading = entry.target as HTMLElement;
         observer.unobserve(heading);
+        heading.dataset.split = 'done';
+        if (enteredFromAbove(entry)) continue;
 
         heading.querySelectorAll<HTMLElement>('.split__inner').forEach((word, index) => {
           word.animate([{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }], {
@@ -50,7 +59,6 @@ function initSplitHeadings() {
             fill: 'backwards',
           });
         });
-        heading.dataset.split = 'done';
       }
     },
     { rootMargin: '0px 0px -12% 0px' },

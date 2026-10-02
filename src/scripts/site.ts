@@ -8,7 +8,7 @@ import { initEyes } from './eyes';
 import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
-import { initMotion } from './motion';
+import { enteredFromAbove, initMotion } from './motion';
 import { initTheme } from './theme';
 
 /** Adds a hairline under the sticky header once the page has scrolled. */
@@ -53,7 +53,8 @@ function initMenu() {
 
 /**
  * Sections below the fold rise in once as they enter the viewport.
- * Anything already on screen is left untouched, so nothing flickers.
+ * Anything already on screen is left untouched, so nothing flickers, and
+ * anything met while scrolling back up is simply there.
  */
 function initReveal() {
   if (!('IntersectionObserver' in window)) return;
@@ -63,8 +64,15 @@ function initReveal() {
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        (entry.target as HTMLElement).dataset.reveal = 'done';
-        observer.unobserve(entry.target);
+        const element = entry.target as HTMLElement;
+        observer.unobserve(element);
+        if (!enteredFromAbove(entry)) {
+          element.dataset.reveal = 'done';
+          continue;
+        }
+        // Met on the way back up: shown at once, without its transitions.
+        element.dataset.reveal = 'instant';
+        requestAnimationFrame(() => requestAnimationFrame(() => (element.dataset.reveal = 'done')));
       }
     },
     { rootMargin: '0px 0px -8% 0px' },

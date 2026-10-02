@@ -14,6 +14,8 @@
  * DOM API; no HTML is written.
  */
 
+import { enteredFromAbove } from './motion';
+
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const belowFold = (element: Element) => element.getBoundingClientRect().top > window.innerHeight;
 
@@ -75,6 +77,10 @@ function initLines() {
         if (!entry.isIntersecting) continue;
         const paragraph = entry.target as HTMLElement;
         observer.unobserve(paragraph);
+        if (enteredFromAbove(entry)) {
+          paragraph.dataset.lines = 'done';
+          continue;
+        }
         paragraph.dataset.lines = 'active';
         const { text, inners } = splitIntoLines(paragraph);
         const animations = inners.map((inner, index) =>
@@ -151,7 +157,7 @@ function initDecoding() {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         observer.unobserve(entry.target);
-        decode(entry.target as HTMLElement);
+        if (!enteredFromAbove(entry)) decode(entry.target as HTMLElement);
       }
     },
     { rootMargin: '0px 0px -8% 0px' },

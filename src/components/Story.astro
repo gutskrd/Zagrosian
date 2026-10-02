@@ -181,6 +181,12 @@ const words = kurdish.motto.split(' ');
   /* ----------------------------------------------------------------------
      The walkthrough: a stage pinned to the screen while the section, five
      and a half screens tall, scrolls past it.
+
+     On a phone the address bar slides away as the page scrolls down and back
+     as it scrolls up. The stage is as tall as the screen without the bar
+     (100lvh), so its colours always reach the bottom edge, and its content
+     keeps to the part the bar never covers (100svh), so nothing moves when
+     the bar comes and goes. On other screens the two are the same.
      ---------------------------------------------------------------------- */
   :global(:root[data-story]) .story {
     height: 560svh;
@@ -188,11 +194,14 @@ const words = kurdish.motto.split(' ');
   }
 
   :global(:root[data-story]) .story__stage {
+    --bar: calc(100lvh - 100svh);
+
     position: sticky;
     top: 0;
     display: grid;
     align-content: center;
-    height: 100svh;
+    height: 100lvh;
+    padding-bottom: var(--bar);
     overflow: clip;
   }
 
@@ -253,7 +262,7 @@ const words = kurdish.motto.split(' ');
 
   :global(:root[data-story='on']) .story__motto {
     position: absolute;
-    inset: 0;
+    inset: 0 0 var(--bar);
     align-content: center;
     padding-inline: var(--gutter);
   }
@@ -302,8 +311,8 @@ const words = kurdish.motto.split(' ');
     width: 100%;
   }
 
-  /* Drawn once at its largest (story.ts sets the width), then only moved and
-     scaled down, by the graphics card. */
+  /* Drawn at sizes that halve as it settles (story.ts sets the width), and
+     moved and scaled between them by the graphics card. */
   .story__glass-sun {
     will-change: transform;
   }
@@ -336,7 +345,7 @@ const words = kurdish.motto.split(' ');
   :global(:root[data-story='on']) .story__progress {
     position: absolute;
     inset-inline: var(--gutter);
-    bottom: 1.25rem;
+    bottom: calc(var(--bar) + 1.25rem);
     display: block;
     height: 1px;
     color: var(--color-ink);
