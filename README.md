@@ -37,7 +37,7 @@ Requires Node 22.12 or later.
   | `careers@zagrosian.com` | Privacy policy (job applications); add it to a careers page when you have one |
   | `hello@zagrosian.com`   | Not on the site                                        |
 
-- Social profiles (Instagram [@zagrosiano](https://www.instagram.com/zagrosiano/), TikTok
+- Social profiles (Instagram [@zagrosian_official](https://www.instagram.com/zagrosian_official/), TikTok
   [@zagrosianofficial](https://www.tiktok.com/@zagrosianofficial)) are listed in `socialProfiles` in
   `src/site.ts`. They appear in the footer and in the homepage structured data (`sameAs`), which helps
   Google connect them to the company. The icons are inline SVGs from

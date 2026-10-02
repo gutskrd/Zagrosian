@@ -49,7 +49,7 @@ We do not make decisions about you based solely on automated processing, and we 
 
 ## Social media
 
-We have profiles on [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) and [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com only links to them: it does not embed posts or load anything from these platforms, so they receive no data from our website until you follow a link.
+We have profiles on [Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) and [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com only links to them: it does not embed posts or load anything from these platforms, so they receive no data from our website until you follow a link.
 
 When you visit, follow or interact with our profiles, the platform processes your personal data under its own privacy policy and is responsible for that processing:
 

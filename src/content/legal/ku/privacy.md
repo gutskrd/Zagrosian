@@ -49,7 +49,7 @@ Em li ser we biryarên ku tenê li ser pêvajokirina otomatîk hatine avakirin n
 
 ## Medyaya civakî
 
-Profîlên me li ser [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) û [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial) hene. zagrosian.com tenê girêdanan dide wan: ew şandiyan tê de bi cih nake û tiştekî ji van platforman bar nake, ji ber vê yekê heta ku hûn girêdanekê neşopînin, ew ji malpera me ti daneyan nastînin.
+Profîlên me li ser [Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) û [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial) hene. zagrosian.com tenê girêdanan dide wan: ew şandiyan tê de bi cih nake û tiştekî ji van platforman bar nake, ji ber vê yekê heta ku hûn girêdanekê neşopînin, ew ji malpera me ti daneyan nastînin.
 
 Dema ku hûn serdana profîlên me dikin, wan dişopînin an bi wan re têkildar dibin, platform daneyên we yên kesane li gorî polîtîkaya xwe ya nepeniyê pêvajo dike û ji wê pêvajokirinê berpirsiyar e:
 

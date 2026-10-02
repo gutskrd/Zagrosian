@@ -49,7 +49,7 @@ Nous ne prenons aucune décision vous concernant sur le seul fondement d’un tr
 
 ## Réseaux sociaux
 
-Nous avons des profils sur [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) et [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com se contente de renvoyer vers eux : le site n’intègre aucune publication et ne charge rien depuis ces plateformes, qui ne reçoivent donc aucune donnée de notre site tant que vous ne suivez pas un lien.
+Nous avons des profils sur [Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) et [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com se contente de renvoyer vers eux : le site n’intègre aucune publication et ne charge rien depuis ces plateformes, qui ne reçoivent donc aucune donnée de notre site tant que vous ne suivez pas un lien.
 
 Lorsque vous consultez nos profils, vous y abonnez ou interagissez avec eux, la plateforme traite vos données personnelles conformément à sa propre politique de confidentialité et est responsable de ce traitement :
 

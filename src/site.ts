@@ -65,6 +65,6 @@ export const kurdish = {
 };
 
 export const socialProfiles: SocialProfile[] = [
-  { label: 'Instagram', handle: 'zagrosiano', url: 'https://www.instagram.com/zagrosiano/', icon: 'instagram' },
+  { label: 'Instagram', handle: 'zagrosian_official', url: 'https://www.instagram.com/zagrosian_official/', icon: 'instagram' },
   { label: 'TikTok', handle: 'zagrosianofficial', url: 'https://www.tiktok.com/@zagrosianofficial', icon: 'tiktok' },
 ];

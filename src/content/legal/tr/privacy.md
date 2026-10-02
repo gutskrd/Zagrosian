@@ -49,7 +49,7 @@ Hakkınızda yalnızca otomatik işlemeye dayalı kararlar almayız ve ziyaretç
 
 ## Sosyal medya
 
-[Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) ve [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial) üzerinde profillerimiz vardır. zagrosian.com bu profillere yalnızca bağlantı verir: gönderileri sayfaya gömmez ve bu platformlardan hiçbir şey yüklemez. Bu nedenle siz bir bağlantıya tıklayana kadar platformlar web sitemizden hiçbir veri almaz.
+[Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) ve [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial) üzerinde profillerimiz vardır. zagrosian.com bu profillere yalnızca bağlantı verir: gönderileri sayfaya gömmez ve bu platformlardan hiçbir şey yüklemez. Bu nedenle siz bir bağlantıya tıklayana kadar platformlar web sitemizden hiçbir veri almaz.
 
 Profillerimizi ziyaret ettiğinizde, takip ettiğinizde veya onlarla etkileşime geçtiğinizde ilgili platform kişisel verilerinizi kendi gizlilik politikasına göre işler ve bu işlemeden kendisi sorumludur:
 

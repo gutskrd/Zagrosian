@@ -49,7 +49,7 @@ Wij nemen geen besluiten over u die uitsluitend op geautomatiseerde verwerking z
 
 ## Sociale media
 
-Wij hebben profielen op [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) en [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com linkt er alleen naar: de website toont geen ingesloten berichten en laadt niets van deze platforms, dus zij ontvangen geen gegevens via onze website totdat u een link volgt.
+Wij hebben profielen op [Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) en [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com linkt er alleen naar: de website toont geen ingesloten berichten en laadt niets van deze platforms, dus zij ontvangen geen gegevens via onze website totdat u een link volgt.
 
 Als u onze profielen bezoekt, volgt of er interactie mee heeft, verwerkt het platform uw persoonsgegevens volgens zijn eigen privacybeleid en is het zelf verantwoordelijk voor die verwerking:
 

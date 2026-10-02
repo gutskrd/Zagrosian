@@ -49,7 +49,7 @@ Wir treffen keine Entscheidungen über Sie, die ausschließlich auf einer automa
 
 ## Soziale Medien
 
-Wir haben Profile bei [Instagram](https://www.instagram.com/zagrosiano/) (@zagrosiano) und [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com verlinkt lediglich darauf: Die Website bettet keine Beiträge ein und lädt nichts von diesen Plattformen, sodass diese erst dann Daten erhalten, wenn Sie einem Link folgen.
+Wir haben Profile bei [Instagram](https://www.instagram.com/zagrosian_official/) (@zagrosian_official) und [TikTok](https://www.tiktok.com/@zagrosianofficial) (@zagrosianofficial). zagrosian.com verlinkt lediglich darauf: Die Website bettet keine Beiträge ein und lädt nichts von diesen Plattformen, sodass diese erst dann Daten erhalten, wenn Sie einem Link folgen.
 
 Wenn Sie unsere Profile besuchen, ihnen folgen oder mit ihnen interagieren, verarbeitet die jeweilige Plattform Ihre personenbezogenen Daten nach ihrer eigenen Datenschutzrichtlinie und ist für diese Verarbeitung verantwortlich:
 

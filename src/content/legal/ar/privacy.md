@@ -49,7 +49,7 @@ Zagrosian، ومقرّها هولندا، هي الجهة المسؤولة عن 
 
 ## وسائل التواصل الاجتماعي
 
-لدينا حسابات على [Instagram](https://www.instagram.com/zagrosiano/) (⁦@zagrosiano⁩) و[TikTok](https://www.tiktok.com/@zagrosianofficial) (⁦@zagrosianofficial⁩). يكتفي zagrosian.com بوضع روابط إليها: فهو لا يضمّن منشورات ولا يحمّل أي شيء من هاتين المنصتين، ولذلك لا تتلقى المنصتان أي بيانات من موقعنا إلى أن تنقر على أحد الروابط.
+لدينا حسابات على [Instagram](https://www.instagram.com/zagrosian_official/) (⁦@zagrosian_official⁩) و[TikTok](https://www.tiktok.com/@zagrosianofficial) (⁦@zagrosianofficial⁩). يكتفي zagrosian.com بوضع روابط إليها: فهو لا يضمّن منشورات ولا يحمّل أي شيء من هاتين المنصتين، ولذلك لا تتلقى المنصتان أي بيانات من موقعنا إلى أن تنقر على أحد الروابط.
 
 عند زيارتك حساباتنا أو متابعتها أو التفاعل معها، تعالج المنصة بياناتك الشخصية وفقًا لسياسة الخصوصية الخاصة بها، وتكون هي المسؤولة عن تلك المعالجة:
 
