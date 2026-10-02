@@ -66,7 +66,7 @@ export const es: Messages = {
     comingSoon: 'Próximamente',
     comingSoonTitle: 'Hevalo para iOS y Android.',
     comingSoonNote: 'Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
-    proverb: 'El árbol florece sobre sus propias raíces; la persona, en su propia lengua.',
+    proverb: 'El árbol crece sobre sus propias raíces; la persona, en su propia lengua.',
     proverbSource: 'Proverbio kurdo',
   },
   story: {

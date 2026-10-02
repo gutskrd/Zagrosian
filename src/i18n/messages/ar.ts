@@ -67,7 +67,7 @@ export const ar: Messages = {
     comingSoon: 'قريبًا',
     comingSoonTitle: 'Hevalo على iOS وأندرويد.',
     comingSoonNote: 'التطبيقات الأصلية قيد التطوير، وستكون متاحة على App Store وGoogle Play.',
-    proverb: 'تزهر الشجرة على جذورها، ويزهر الإنسان في لغته.',
+    proverb: 'الشجرة على جذورها، والإنسان على لسانه يزدهر.',
     proverbSource: 'مثل كردي',
   },
   story: {

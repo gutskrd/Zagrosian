@@ -66,7 +66,7 @@ export const nl: Messages = {
     comingSoon: 'Binnenkort',
     comingSoonTitle: 'Hevalo voor iOS en Android.',
     comingSoonNote: 'De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
-    proverb: 'Een boom bloeit op zijn eigen wortels, een mens in zijn eigen taal.',
+    proverb: 'Een boom gedijt op zijn eigen wortels, een mens in zijn eigen taal.',
     proverbSource: 'Koerdisch spreekwoord',
   },
   story: {
