@@ -41,6 +41,8 @@ export const ku: Messages = {
     label: 'Deng',
     on: 'Deng vêxe',
     off: 'Deng vemirîne',
+    prompt: 'Bi deng xweştir e.',
+    dismiss: 'Na, spas',
   },
   language: {
     label: 'Ziman',

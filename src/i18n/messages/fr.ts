@@ -40,6 +40,8 @@ export const fr: Messages = {
     label: 'Son',
     on: 'Activer le son',
     off: 'Couper le son',
+    prompt: 'À découvrir avec le son.',
+    dismiss: 'Non merci',
   },
   language: {
     label: 'Langue',

@@ -87,7 +87,7 @@ src/
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts
-                   (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, smooth.ts, text.ts,
+                   (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
@@ -255,13 +255,13 @@ Rules the code follows:
 ## The studio experience
 
 The site behaves like a design studio's: sound, a custom cursor, magnetic
-buttons, rolling labels, smooth scrolling and cinematic page changes. All of it is original: the
+buttons, rolling labels and cinematic page changes. All of it is original: the
 sounds are synthesised in the browser, and nothing is borrowed from another site. Every piece steps
 back for visitors who prefer reduced motion, and the site works fully without it.
 
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
-  off until the visitor turns it on, from the header (the level meter), the site menu or quick
-  navigation; nothing asks. Everything is synthesised with the Web Audio API, so no
+  off until the visitor turns it on, from the header (the level meter), the site menu, quick
+  navigation, or a small card offered once to first-time visitors. Everything is synthesised with the Web Audio API, so no
   audio files are downloaded and the Content-Security-Policy needs no media sources; the synthesiser
   itself (5 KB) is downloaded only once sound is on:
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
@@ -280,7 +280,7 @@ back for visitors who prefer reduced motion, and the site works fully without it
   never lingers: it disappears when the pointer leaves the window, the window loses focus or the page
   is left (so it is not frozen into the page transition), and returns with the next move. It is a
   manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
-- **Only what the device uses:** smooth scrolling, the cursor and the magnetic buttons
+- **Only what the device uses:** the cursor and the magnetic buttons
   ([`desktop.ts`](src/scripts/desktop.ts)) are loaded separately and only with a mouse or trackpad,
   so phones and tablets never download them (every page's main script is about 8 KB compressed).
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
@@ -302,10 +302,10 @@ back for visitors who prefer reduced motion, and the site works fully without it
 - **Text** ([`text.ts`](src/scripts/text.ts)): paragraphs marked `data-lines` rise line by line from
   behind masks, then are put back as they were; section labels are small monospace capitals that decode
   from random characters as they appear (Latin script). Headlines are set large and fairly light.
-- **Scrolling** ([`smooth.ts`](src/scripts/smooth.ts), [Lenis](https://github.com/darkroomengineering/lenis),
-  MIT): wheel and trackpad scrolling is eased and weighted; touch screens keep their own. The page still
-  scrolls natively, so anchors, the keyboard and assistive technology work as usual. Large type
-  (`data-velocity`: the Hevalo name, the footer wordmark) leans with the speed of the scroll.
+- **Scrolling** is the browser's own, so the page follows the wheel, the trackpad and the finger at
+  once, with no delay. Links to a section glide there (`scroll-behavior: smooth`, not with *reduce
+  motion*) and stop below the header (`scroll-padding-top`). The page holds still while a dialog or
+  the site menu is open.
 - **Page changes:** in browsers with cross-document view transitions, the next page rises over the
   last like a card laid on top while the old one sinks back and darkens.
 

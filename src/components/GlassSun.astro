@@ -5,11 +5,13 @@
  *
  * Every layer is cut to the sun's outline (21 rays, the gaps between them at
  * 51.2% of the rays' length, as in src/lib/sun.ts) with `clip-path`, so the
- * edges are drawn as vectors at any size. A faint back face and twelve
- * fainter layers through its thickness make the body, clear but for its
- * depth, which shows as it turns. At the front, a bright bevel runs round
- * the edge of a clear face, which catches the light at its top left, and a
- * glint slides across it as it turns.
+ * edges are drawn as vectors at any size. A faint back face, set back by
+ * the glass's thickness, makes the body, clear but for its depth, which
+ * shows as it turns. At the front, a bright bevel runs round the edge of a
+ * clear face, which catches the light at its top left, and a glint slides
+ * across it as it turns. (There are no layers in between: each would be cut
+ * to the outline and redrawn as the sun tumbles, and a dozen of them made
+ * the page stutter.)
  *
  * It takes its colour from the text colour around it, so it is clear glass
  * in whatever colours it is set in. Its pose comes from custom properties
@@ -21,13 +23,11 @@ interface Props {
 }
 
 const { class: className } = Astro.props;
-const slices = Array.from({ length: 12 }, (_, index) => index + 1);
 ---
 
 <span class:list={['glass-sun', className]} aria-hidden="true">
   <span class="glass-sun__body">
     <span class="glass-sun__layer glass-sun__back"></span>
-    {slices.map((depth) => <span class="glass-sun__layer glass-sun__slice" data-depth={depth} />)}
     <span class="glass-sun__layer glass-sun__bevel"></span>
     <span class="glass-sun__layer glass-sun__face"></span>
     <span class="glass-sun__layer glass-sun__glint"></span>
@@ -243,16 +243,11 @@ const slices = Array.from({ length: 12 }, (_, index) => index + 1);
     transform: translateZ(calc(var(--thickness) * var(--f) * -1));
   }
 
-  /* The back face, faint, and the layers through the glass, fainter: clear
-     glass, which shows its depth at the edges as it turns. */
+  /* The back face, faint: clear glass, which shows its depth as it turns. */
   .glass-sun__back {
     --f: 1;
 
-    background: color-mix(in srgb, currentColor 12%, transparent);
-  }
-
-  .glass-sun__slice {
-    background: color-mix(in srgb, currentColor 3%, transparent);
+    background: color-mix(in srgb, currentColor 16%, transparent);
   }
 
   /* The front: a bright bevel round the edge, lit from the top left, round
@@ -294,54 +289,6 @@ const slices = Array.from({ length: 12 }, (_, index) => index + 1);
     );
     background-size: 300% 100%;
     background-position: var(--sun-glint, 50%) 0;
-  }
-
-  .glass-sun__slice[data-depth='1'] {
-    --f: 0.077;
-  }
-
-  .glass-sun__slice[data-depth='2'] {
-    --f: 0.154;
-  }
-
-  .glass-sun__slice[data-depth='3'] {
-    --f: 0.231;
-  }
-
-  .glass-sun__slice[data-depth='4'] {
-    --f: 0.308;
-  }
-
-  .glass-sun__slice[data-depth='5'] {
-    --f: 0.385;
-  }
-
-  .glass-sun__slice[data-depth='6'] {
-    --f: 0.462;
-  }
-
-  .glass-sun__slice[data-depth='7'] {
-    --f: 0.538;
-  }
-
-  .glass-sun__slice[data-depth='8'] {
-    --f: 0.615;
-  }
-
-  .glass-sun__slice[data-depth='9'] {
-    --f: 0.692;
-  }
-
-  .glass-sun__slice[data-depth='10'] {
-    --f: 0.769;
-  }
-
-  .glass-sun__slice[data-depth='11'] {
-    --f: 0.846;
-  }
-
-  .glass-sun__slice[data-depth='12'] {
-    --f: 0.923;
   }
 
   @media (forced-colors: active) {

@@ -42,6 +42,8 @@ export const fa: Messages = {
     label: 'صدا',
     on: 'روشن کردن صدا',
     off: 'خاموش کردن صدا',
+    prompt: 'با صدا دلنشین‌تر است.',
+    dismiss: 'نه، ممنون',
   },
   language: {
     label: 'زبان',

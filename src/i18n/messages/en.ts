@@ -46,6 +46,9 @@ export const en = {
     label: 'Sound',
     on: 'Turn sound on',
     off: 'Turn sound off',
+    /** Offered once to first-time visitors, with the `on` and `dismiss` buttons. */
+    prompt: 'Best experienced with sound.',
+    dismiss: 'No thanks',
   },
   language: {
     label: 'Language',

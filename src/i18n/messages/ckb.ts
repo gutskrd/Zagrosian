@@ -42,6 +42,8 @@ export const ckb: Messages = {
     label: 'دەنگ',
     on: 'دەنگ هەڵبکە',
     off: 'دەنگ بکوژێنەوە',
+    prompt: 'بە دەنگەوە خۆشترە.',
+    dismiss: 'نا، سوپاس',
   },
   language: {
     label: 'زمان',

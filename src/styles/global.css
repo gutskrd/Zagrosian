@@ -427,17 +427,18 @@ svg {
     navigation: auto;
   }
 
+  /* Quick, so that the next page is there to use without a wait. */
   ::view-transition-group(root) {
-    animation-duration: 0.8s;
+    animation-duration: 0.45s;
   }
 
   ::view-transition-old(root) {
-    animation: page-sink 0.8s var(--ease-in-out) both;
+    animation: page-sink 0.45s var(--ease-in-out) both;
     transform-origin: 50% 0;
   }
 
   ::view-transition-new(root) {
-    animation: page-rise 0.8s var(--ease-in-out) both;
+    animation: page-rise 0.45s var(--ease-in-out) both;
   }
 }
 
@@ -783,24 +784,13 @@ svg {
 }
 
 /* ==========================================================================
-   Smooth scrolling (Lenis, src/scripts/smooth.ts)
+   Scrolling
    ========================================================================== */
 
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-html.lenis {
-  scroll-behavior: auto;
-}
-
-.lenis.lenis-stopped {
+/* The page holds still while a modal dialog or the site menu is open. */
+html:has(dialog[open]),
+html:has(.site-menu:popover-open) {
   overflow: clip;
-}
-
-.lenis [data-lenis-prevent] {
-  overscroll-behavior: contain;
 }
 
 /* ==========================================================================

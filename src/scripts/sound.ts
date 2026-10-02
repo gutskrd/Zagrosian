@@ -109,11 +109,59 @@ export function setSound(on: boolean) {
 }
 
 /* -------------------------------------------------------------------------- */
+/* The prompt, offered once (src/components/SoundPrompt.astro)                */
+/* -------------------------------------------------------------------------- */
+
+function initPrompt() {
+  const prompt = document.querySelector<HTMLElement>('[data-sound-prompt]');
+  if (!prompt || soundPreference() !== undefined) return;
+
+  const suggestion = document.querySelector<HTMLElement>('[data-language-suggestion]');
+  let visible = false;
+
+  const hide = () => {
+    if (!visible) return;
+    visible = false;
+    prompt.toggleAttribute('data-visible', false);
+    window.setTimeout(() => (prompt.hidden = true), 700);
+  };
+
+  const show = () => {
+    if (visible || soundPreference() !== undefined) return;
+    // The language note uses the same corner: this card waits for it to go.
+    if (suggestion && !suggestion.hidden) {
+      new MutationObserver((_, observer) => {
+        if (!suggestion.hidden) return;
+        observer.disconnect();
+        window.setTimeout(show, 600);
+      }).observe(suggestion, { attributes: true, attributeFilter: ['hidden'] });
+      return;
+    }
+    visible = true;
+    prompt.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => prompt.toggleAttribute('data-visible', true)));
+  };
+
+  // A moment after the page has settled.
+  window.setTimeout(show, 2500);
+
+  for (const button of prompt.querySelectorAll<HTMLElement>('[data-sound-choice]')) {
+    button.addEventListener('click', () => {
+      setSound(button.dataset.soundChoice === 'on');
+      hide();
+    });
+  }
+  // Chosen elsewhere (the header or quick navigation).
+  document.addEventListener('sound:change', hide);
+}
+
+/* -------------------------------------------------------------------------- */
 
 const INTERACTIVE = 'a[href], button:not([disabled]), summary, [role="option"], label[for]';
 
 export function initSound() {
   reflect();
+  initPrompt();
 
   for (const toggle of document.querySelectorAll('[data-sound-toggle]')) {
     toggle.addEventListener('click', () => setSound(!enabled));
@@ -158,7 +206,7 @@ export function initSound() {
   document.addEventListener('click', (event) => {
     const target = (event.target as Element | null)?.closest?.(INTERACTIVE);
     // Toggles and menu buttons have their own sounds.
-    if (!target || target.matches('[data-sound-toggle], [popovertarget], [data-command-open]')) return;
+    if (!target || target.matches('[data-sound-toggle], [data-sound-choice], [popovertarget], [data-command-open]')) return;
     if (target instanceof HTMLAnchorElement && !event.defaultPrevented) {
       const url = new URL(target.href, location.href);
       const samePage = url.pathname === location.pathname && url.search === location.search;

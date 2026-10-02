@@ -10,8 +10,7 @@
  * 2. The values lift away; the logo comes to the middle, faces the reader and
  *    the camera flies into the glass: the front pane slides past and fades,
  *    and the block's layers spread apart in perspective as the camera nears
- *    the logo's ink. The logo grows by its size, not by scaling, so the
- *    browser draws it sharp all the way in.
+ *    the logo's ink.
  * 3. The ink becomes a scene in the other theme's colours, where the Kurdish
  *    sun rises as a thick piece of glass (GlassSun.astro), tumbling and
  *    catching the light, with a glow behind it; it comes to rest facing the
@@ -21,8 +20,19 @@
  *
  * Scrolling back plays it all backwards. Everything is a function of the
  * scroll position: the page is measured on load and resize only, and each
- * frame sets sizes, transforms, opacity, custom properties and a clip path
- * through the CSSOM (which the Content-Security-Policy allows).
+ * frame sets transforms, opacity, custom properties and a clip path through
+ * the CSSOM (which the Content-Security-Policy allows).
+ *
+ * So that nothing lags, the graphics card does the moving: the logo and the
+ * sun are drawn once, at the size they need, then moved and scaled. The logo
+ * is laid out at its size until it faces the reader; beyond that, flying in,
+ * it is scaled, and its perspective shortens as it grows, which gives
+ * exactly the picture a larger logo would (a scene and its camera distance
+ * scaled together look the same). The sun is drawn at its largest and only
+ * ever shrinks, so it stays sharp. And once the logo faces the reader, the
+ * layers that make its edge are not drawn: face on, the edge cannot be seen,
+ * and twenty see-through layers the size of the screen are what would make
+ * the fly-in stutter.
  *
  * theme-init.js makes room for the walkthrough (`data-story`) before the first
  * paint when motion is welcome; this script turns it on. Without JavaScript or
@@ -137,7 +147,9 @@ export function initStory() {
   // place beside the values and the sun's place above the motto.
   let width = 0;
   let stageHeight = 0;
-  let perspective = 1280;
+  // The perspectives as the CSS sets them, read before this script changes them.
+  const perspective = parseFloat(getComputedStyle(art).perspective) || 1280;
+  const sunPerspective = parseFloat(getComputedStyle(sunrise).perspective) || 960;
   let start = { x: 0, y: 0, size: 1 };
   let storyTop = 0;
   let pinned = 1;
@@ -145,6 +157,7 @@ export function initStory() {
   let sunAt = { x: 0, y: 0, size: 1 };
   let dive = 1;
   let cover = 1;
+  let large = 1;
 
   const measure = () => {
     width = root.clientWidth;
@@ -153,7 +166,6 @@ export function initStory() {
     const spot = place(slot);
     const disc = place(sun);
     stageHeight = stage.offsetHeight;
-    perspective = parseFloat(getComputedStyle(art).perspective) || 1280;
     start = { x: hero.x + hero.width / 2, y: hero.y + hero.width / 2, size: hero.width };
     storyTop = place(story).y;
     pinned = Math.max(1, story.offsetHeight - stageHeight);
@@ -164,6 +176,10 @@ export function initStory() {
     // cover the whole stage.
     dive = Math.max(rest.size * 1.15, Math.min(width, stageHeight) * 0.62);
     cover = Math.hypot(Math.max(sunAt.x, width - sunAt.x), Math.max(sunAt.y, stageHeight - sunAt.y)) + 2;
+    // The sun is drawn once at its largest, as it rises, and scaled from there.
+    large = Math.min(width, stageHeight) * 0.44;
+    sunrise.style.width = `${large.toFixed(2)}px`;
+    written.clear();
   };
 
   /** How large the logo must grow for its ink to cover the screen, seen in perspective. */
@@ -223,10 +239,20 @@ export function initStory() {
 
     const inScene = ease(DIVE[2] - 0.04, DIVE[2], q);
     const travelling = inScene < 1;
+    // Laid out at its size up to the dive; flying in, scaled from there, with
+    // a perspective as much shorter as it is larger (see above).
+    const flying = size > dive * 1.001;
+    const box = flying ? dive : size;
     if (travelling) {
-      style(art, 'width', `${size.toFixed(2)}px`, 'art-w');
-      style(art, 'height', `${size.toFixed(2)}px`, 'art-h');
-      style(art, 'transform', `translate3d(${(x - size / 2).toFixed(2)}px, ${(y - size / 2).toFixed(2)}px, 0)`, 'art-t');
+      style(art, 'width', `${box.toFixed(2)}px`, 'art-w');
+      style(art, 'height', `${box.toFixed(2)}px`, 'art-h');
+      style(art, 'perspective', `${((perspective * box) / size).toFixed(1)}px`, 'art-p');
+      style(
+        art,
+        'transform',
+        `translate3d(${(x - box / 2).toFixed(2)}px, ${(y - box / 2).toFixed(2)}px, 0) scale(${(size / box).toFixed(4)})`,
+        'art-t',
+      );
       style(layer, '--tilt', `${(pitch - REST_PITCH).toFixed(2)}deg`);
       style(layer, '--turn', `${(yaw - REST_YAW).toFixed(2)}deg`);
       style(layer, '--lean', (1 - faced).toFixed(3));
@@ -234,8 +260,9 @@ export function initStory() {
       style(layer, '--front', (1 - ease(DIVE[1], DIVE[1] + 0.05, q)).toFixed(3));
     }
     layer.toggleAttribute('data-hidden', !travelling);
-    // Grown past the screen, the block's edge cannot be seen: it is not drawn.
-    layer.toggleAttribute('data-flat', size > Math.max(width, stageHeight) * 1.1);
+    layer.toggleAttribute('data-flying', flying && travelling);
+    // Face on, the block's edge cannot be seen: it is not drawn.
+    layer.toggleAttribute('data-flat', faced > 0.5);
 
     // ---- The values: each flips up from behind its mask; the newest is lit,
     // the others dimmed, until all three are lit together and lift away.
@@ -265,14 +292,18 @@ export function initStory() {
     // scrolls, as the motto's own sun does.
     const up = ease(SUN[0], SUN[1], q);
     const settle = ease(SUN[1], SUN[2], q);
-    const large = Math.min(width, stageHeight) * 0.44;
     const sunSize = zoom(large, sunAt.size, settle);
     const sunX = mix(middleX, sunAt.x, settle);
     const sunY = mix(mix(stageHeight + large / 2, middleY, up), sunAt.y, settle);
     const spin = q * 160;
     const tumble = 1 - settle;
-    style(sunrise, 'width', `${sunSize.toFixed(2)}px`, 'sun-w');
-    style(sunrise, 'transform', `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0)`, 'sun-t');
+    style(sunrise, 'perspective', `${((sunPerspective * large) / sunSize).toFixed(1)}px`, 'sun-p');
+    style(
+      sunrise,
+      'transform',
+      `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${(sunSize / large).toFixed(4)})`,
+      'sun-t',
+    );
     style(sunrise, '--sun-pitch', `${(tumble * mix(48, 14, up)).toFixed(2)}deg`);
     style(sunrise, '--sun-yaw', `${(tumble * mix(-220, -24, up)).toFixed(2)}deg`);
     style(sunrise, '--sun-roll', `${spin.toFixed(2)}deg`);

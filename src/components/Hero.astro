@@ -283,10 +283,15 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     visibility: hidden;
   }
 
-  /* Grown past the screen as the camera flies in, the block's edge cannot
-     be seen, so it is not drawn. */
+  /* Once the block faces the reader, its edge cannot be seen, so it is not
+     drawn (story.ts). Flying in, the logo is drawn once and then only
+     scaled, by the graphics card. */
   .journey[data-flat] :global(.lifted-logo__slice) {
     visibility: hidden;
+  }
+
+  .journey[data-flying] .journey__art {
+    will-change: transform;
   }
 
   .journey__art {

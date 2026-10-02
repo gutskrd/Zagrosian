@@ -39,6 +39,8 @@ export const de: Messages = {
     label: 'Ton',
     on: 'Ton einschalten',
     off: 'Ton ausschalten',
+    prompt: 'Am schönsten mit Ton.',
+    dismiss: 'Nein, danke',
   },
   language: {
     label: 'Sprache',

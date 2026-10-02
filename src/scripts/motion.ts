@@ -81,11 +81,17 @@ function runScrollEffects(effects: ScrollEffect[]) {
   const byTarget = new Map(effects.map((effect) => [effect.target, effect]));
   const active = new Set<ScrollEffect>();
   let queued = false;
+  let measured = false;
+
+  const measure = () => {
+    const viewportHeight = window.innerHeight;
+    for (const effect of active) effect.measure(viewportHeight);
+  };
 
   const frame = () => {
     queued = false;
-    const viewportHeight = window.innerHeight;
-    for (const effect of active) effect.measure(viewportHeight);
+    if (!measured) measure();
+    measured = false;
     for (const effect of active) effect.render();
   };
 
@@ -93,6 +99,16 @@ function runScrollEffects(effects: ScrollEffect[]) {
     if (queued) return;
     queued = true;
     requestAnimationFrame(frame);
+  };
+
+  // On scroll, the layout is read at once: the scroll event comes before the
+  // frame's animation callbacks (the homepage story's among them) write any
+  // styles, so the layout is still clean and reading it costs nothing. Read
+  // after those writes, it would make the browser lay the page out twice.
+  const onScroll = () => {
+    measure();
+    measured = true;
+    request();
   };
 
   const observer = new IntersectionObserver(
@@ -109,7 +125,7 @@ function runScrollEffects(effects: ScrollEffect[]) {
   );
 
   for (const effect of effects) observer.observe(effect.target);
-  window.addEventListener('scroll', request, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', request, { passive: true });
 }
 

@@ -39,6 +39,8 @@ export const tr: Messages = {
     label: 'Ses',
     on: 'Sesi aç',
     off: 'Sesi kapat',
+    prompt: 'Sesle daha güzel.',
+    dismiss: 'Hayır, teşekkürler',
   },
   language: {
     label: 'Dil',

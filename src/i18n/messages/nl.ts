@@ -39,6 +39,8 @@ export const nl: Messages = {
     label: 'Geluid',
     on: 'Geluid aanzetten',
     off: 'Geluid uitzetten',
+    prompt: 'Het mooist met geluid.',
+    dismiss: 'Nee, bedankt',
   },
   language: {
     label: 'Taal',

@@ -40,6 +40,8 @@ export const ar: Messages = {
     label: 'الصوت',
     on: 'تشغيل الصوت',
     off: 'إيقاف الصوت',
+    prompt: 'التجربة أجمل مع الصوت.',
+    dismiss: 'لا، شكرًا',
   },
   language: {
     label: 'اللغة',

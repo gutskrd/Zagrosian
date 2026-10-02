@@ -35,7 +35,7 @@ const label = alt ? { role: 'img' as const, 'aria-label': alt } : { 'aria-hidden
 const light = source.match(/ d="([^"]+)"/)?.[1] ?? '';
 const dark = `M0 0H1290V1290H0Z${light}`;
 
-const slices = Array.from({ length: 20 }, (_, index) => index + 1);
+const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 ---
 
 <span class:list={['lifted-logo', className]} {...label} {...attributes}>
@@ -127,91 +127,51 @@ const slices = Array.from({ length: 20 }, (_, index) => index + 1);
     box-shadow: var(--shadow);
   }
 
-  /* The edge: thin layers through the thickness of the block, seen from both
-     sides. */
+  /* The edge: ten thin layers through the thickness of the block, seen from
+     both sides. */
   .lifted-logo__slice {
     border: 1.5px solid var(--edge);
-    opacity: 0.5;
+    opacity: 0.6;
   }
 
   .lifted-logo__slice[data-depth='1'] {
-    --f: 0.0476;
+    --f: 0.0909;
   }
 
   .lifted-logo__slice[data-depth='2'] {
-    --f: 0.0952;
+    --f: 0.1818;
   }
 
   .lifted-logo__slice[data-depth='3'] {
-    --f: 0.1429;
+    --f: 0.2727;
   }
 
   .lifted-logo__slice[data-depth='4'] {
-    --f: 0.1905;
+    --f: 0.3636;
   }
 
   .lifted-logo__slice[data-depth='5'] {
-    --f: 0.2381;
+    --f: 0.4545;
   }
 
   .lifted-logo__slice[data-depth='6'] {
-    --f: 0.2857;
+    --f: 0.5455;
   }
 
   .lifted-logo__slice[data-depth='7'] {
-    --f: 0.3333;
+    --f: 0.6364;
   }
 
   .lifted-logo__slice[data-depth='8'] {
-    --f: 0.381;
+    --f: 0.7273;
   }
 
   .lifted-logo__slice[data-depth='9'] {
-    --f: 0.4286;
+    --f: 0.8182;
   }
 
   .lifted-logo__slice[data-depth='10'] {
-    --f: 0.4762;
-  }
-
-  .lifted-logo__slice[data-depth='11'] {
-    --f: 0.5238;
-  }
-
-  .lifted-logo__slice[data-depth='12'] {
-    --f: 0.5714;
-  }
-
-  .lifted-logo__slice[data-depth='13'] {
-    --f: 0.619;
-  }
-
-  .lifted-logo__slice[data-depth='14'] {
-    --f: 0.6667;
-  }
-
-  .lifted-logo__slice[data-depth='15'] {
-    --f: 0.7143;
-  }
-
-  .lifted-logo__slice[data-depth='16'] {
-    --f: 0.7619;
-  }
-
-  .lifted-logo__slice[data-depth='17'] {
-    --f: 0.8095;
-  }
-
-  .lifted-logo__slice[data-depth='18'] {
-    --f: 0.8571;
-  }
-
-  .lifted-logo__slice[data-depth='19'] {
-    --f: 0.9048;
-  }
-
-  .lifted-logo__slice[data-depth='20'] {
-    --f: 0.9524;
+    --f: 0.9091;
   }
 
   /* The logo, inside the glass, within a thin frame as in the original (10

@@ -39,6 +39,8 @@ export const es: Messages = {
     label: 'Sonido',
     on: 'Activar el sonido',
     off: 'Desactivar el sonido',
+    prompt: 'Mejor con sonido.',
+    dismiss: 'No, gracias',
   },
   language: {
     label: 'Idioma',

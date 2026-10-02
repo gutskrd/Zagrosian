@@ -281,7 +281,7 @@ const words = kurdish.motto.split(' ');
   }
 
   /* The glass sun keeps the flat sun's place in the layout, and is sized
-     (and so drawn sharp) by the script; a soft light glows behind it. */
+     by the script; a soft light glows behind it. */
   .story__scene .story__sun {
     position: relative;
     width: 1em;
@@ -300,6 +300,12 @@ const words = kurdish.motto.split(' ');
 
   .story__glass-sun > :global(.glass-sun) {
     width: 100%;
+  }
+
+  /* Drawn once at its largest (story.ts sets the width), then only moved and
+     scaled down, by the graphics card. */
+  .story__glass-sun {
+    will-change: transform;
   }
 
   .story__glow {
