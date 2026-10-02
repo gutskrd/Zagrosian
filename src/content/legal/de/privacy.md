@@ -1,7 +1,7 @@
 ---
 title: Datenschutzerklärung
 description: Wie Zagrosian personenbezogene Daten verarbeitet, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen.
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 
 Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen, zu welchem Zweck wir das tun und welche Rechte Sie haben. Da wir nur sehr wenige Daten erheben, ist sie kurz.
@@ -66,7 +66,7 @@ Wenn Sie unsere Beiträge auf diesen Plattformen kommentieren oder uns dort eine
 
 zagrosian.com verwendet keine Analyse-, Werbe- oder Tracking-Cookies.
 
-Wenn Sie ein helles oder dunkles Design oder eine Sprache wählen, den Ton ein- oder ausschalten oder den Hinweis schließen, die Website in Ihrer Sprache zu lesen, speichert Ihr Browser diese Wahl in seinem lokalen Speicher (unter den Namen `theme`, `language-chosen` und `sound`), damit die Website sie bei Ihrem nächsten Besuch berücksichtigen kann. Für die Dauer Ihres Besuchs vermerkt er außerdem in seinem Sitzungsspeicher (unter dem Namen `intro`), dass Sie die Eröffnungsanimation gesehen haben, damit sie nicht erneut abgespielt wird. Diese Information bleibt auf Ihrem Gerät, wird weder an uns noch an Dritte übermittelt und lässt sich jederzeit entfernen, indem Sie die Websitedaten in Ihrem Browser löschen.
+Wenn Sie ein helles oder dunkles Design oder eine Sprache wählen, den Ton ein- oder ausschalten oder den Hinweis schließen, die Website in Ihrer Sprache zu lesen, speichert Ihr Browser diese Wahl in seinem lokalen Speicher (unter den Namen `theme`, `language-chosen` und `sound`), damit die Website sie bei Ihrem nächsten Besuch berücksichtigen kann. Diese Information bleibt auf Ihrem Gerät, wird weder an uns noch an Dritte übermittelt und lässt sich jederzeit entfernen, indem Sie die Websitedaten in Ihrem Browser löschen.
 
 Cloudflare kann ein technisch notwendiges Cookie wie `__cf_bm` oder `cf_clearance` setzen, wenn es Menschen von automatisierten Zugriffen unterscheiden muss oder nachdem Sie eine Sicherheitsprüfung abgeschlossen haben. Diese Cookies sind kurzlebig, dienen ausschließlich dem Schutz der Website und werden nicht dazu verwendet, Sie über andere Websites hinweg zu verfolgen. Da sie für die Sicherheit technisch notwendig sind, ist dafür keine Einwilligung erforderlich.
 

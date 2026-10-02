@@ -187,6 +187,11 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     margin-inline: 0.5rem;
   }
 
+  /* On a narrow screen the reading time moves to the next line whole. */
+  .legal__reading {
+    white-space: nowrap;
+  }
+
   /* Shown only where the script can run, and from the first paint, so it
      never shifts the page. */
   .legal__print {

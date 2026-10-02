@@ -1,7 +1,7 @@
 ---
 title: Gizlilik Politikası
 description: zagrosian.com’u ziyaret ettiğinizde, bizimle iletişime geçtiğinizde veya sosyal medya profillerimizi ziyaret ettiğinizde Zagrosian’ın kişisel verileri nasıl işlediği.
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 
 Bu politika, zagrosian.com’u ziyaret ettiğinizde, bizimle iletişime geçtiğinizde veya sosyal medya profillerimizi ziyaret ettiğinizde hangi kişisel verileri işlediğimizi, bunları neden işlediğimizi ve hangi haklara sahip olduğunuzu açıklar. Çok az veri topladığımız için kısadır.
@@ -66,7 +66,7 @@ Bu platformlarda gönderilerimize yorum yaparsanız veya bize mesaj gönderirsen
 
 zagrosian.com analiz, reklam veya izleme çerezleri kullanmaz.
 
-Açık veya koyu bir tema ya da bir dil seçerseniz, sesi açıp kapatırsanız veya siteyi kendi dilinizde okuma önerisini kapatırsanız tarayıcınız bu tercihi, web sitesinin bir sonraki ziyaretinizde dikkate alabilmesi için yerel depolamasına (`theme`, `language-chosen` ve `sound` adlarıyla) kaydeder. Ziyaretiniz boyunca açılış animasyonunu gördüğünüzü de oturum depolamasına (`intro` adıyla) not eder; böylece animasyon yeniden oynatılmaz. Bu bilgi cihazınızda kalır, hiçbir zaman bize veya başka birine gönderilmez ve tarayıcınızdaki site verilerini temizleyerek istediğiniz zaman silebilirsiniz.
+Açık veya koyu bir tema ya da bir dil seçerseniz, sesi açıp kapatırsanız veya siteyi kendi dilinizde okuma önerisini kapatırsanız tarayıcınız bu tercihi, web sitesinin bir sonraki ziyaretinizde dikkate alabilmesi için yerel depolamasına (`theme`, `language-chosen` ve `sound` adlarıyla) kaydeder. Bu bilgi cihazınızda kalır, hiçbir zaman bize veya başka birine gönderilmez ve tarayıcınızdaki site verilerini temizleyerek istediğiniz zaman silebilirsiniz.
 
 Cloudflare, insanları otomatik trafikten ayırt etmesi gerektiğinde veya bir güvenlik kontrolünü tamamladıktan sonra `__cf_bm` ya da `cf_clearance` gibi kesinlikle gerekli bir çerez yerleştirebilir. Bu çerezler kısa ömürlüdür, yalnızca web sitesini korumak için kullanılır ve sizi başka web sitelerinde izlemek için kullanılmaz. Güvenlik açısından kesinlikle gerekli olduklarından onayınızı gerektirmezler.
 

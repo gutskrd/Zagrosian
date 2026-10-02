@@ -3,9 +3,10 @@
 // break the Content-Security-Policy). The controls are in theme.ts.
 //
 // When motion is welcome, it also makes room before the first paint for the
-// homepage's pinned story (story.ts), so nothing shifts when it starts. And
-// from 1 December to 6 January, Hevalo's icon is its Christmas version
-// (HevaloIcon.astro).
+// homepage's pinned story (story.ts), so nothing shifts when it starts, and
+// notes when a page slides in from another page of the site (global.css), so
+// the homepage does not play its own entrance on top. And from 1 December to
+// 6 January, Hevalo's icon is its Christmas version (HevaloIcon.astro).
 (function () {
   var preference = 'system';
   try {
@@ -26,4 +27,10 @@
 
   var motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
   if (motion) root.dataset.story = 'ready';
+
+  // Fired just before the page is first drawn, also for a page Chrome prepared
+  // in advance.
+  addEventListener('pagereveal', function (event) {
+    if (event.viewTransition) root.dataset.arrival = 'slide';
+  });
 })();

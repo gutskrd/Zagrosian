@@ -9,9 +9,8 @@
  *   maqam Kurd) that breathes in and out, wind as if across the mountains, and
  *   now and then a soft bell, all in a small generated reverb.
  * - Interface sounds: a light tick when the pointer or keyboard reaches a
- *   control, a soft tap on a click, air when a menu opens or closes, a sweep
- *   when leaving for another page, and a rising or falling pair of bells when
- *   sound is switched on or off.
+ *   control, a soft tap on a click, air when a menu opens or closes, and a
+ *   rising or falling pair of bells when sound is switched on or off.
  */
 import type { Cue } from './sound';
 
@@ -90,7 +89,7 @@ export function attach(context: AudioContext) {
 /* Ambient score                                                              */
 /* -------------------------------------------------------------------------- */
 
-let score: { stop(): void } | undefined;
+let score: { stop(release: number): void } | undefined;
 
 /** A slow sine that moves a parameter: value ± depth, `rate` times a second. */
 function lfo(context: AudioContext, param: AudioParam, rate: number, depth: number, stopAt: (() => void)[]) {
@@ -132,7 +131,7 @@ function bell(g: Graph, frequency: number, level: number, when = g.context.curre
   }
 }
 
-/** Starts the ambient score, if it is not already playing. */
+/** Starts the ambient score, if it is not already playing. It swells in over two seconds. */
 export function startScore() {
   if (!graph || score) return;
   const g = graph;
@@ -142,7 +141,7 @@ export function startScore() {
 
   const bus = context.createGain();
   bus.gain.setValueAtTime(0, now);
-  bus.gain.linearRampToValueAtTime(0.75, now + 4);
+  bus.gain.linearRampToValueAtTime(0.75, now + 2);
   bus.connect(g.master);
   const send = context.createGain();
   send.gain.value = 0.5;
@@ -210,12 +209,12 @@ export function startScore() {
   timer = window.setTimeout(ring, 2500);
 
   score = {
-    stop() {
+    stop(release) {
       window.clearTimeout(timer);
       const at = context.currentTime;
       bus.gain.cancelScheduledValues(at);
       bus.gain.setValueAtTime(bus.gain.value, at);
-      bus.gain.linearRampToValueAtTime(0, at + 1.2);
+      bus.gain.linearRampToValueAtTime(0, at + release);
       window.setTimeout(() => {
         for (const stop of stops) {
           try {
@@ -225,14 +224,14 @@ export function startScore() {
           }
         }
         bus.disconnect();
-      }, 1400);
+      }, release * 1000 + 200);
     },
   };
 }
 
-/** Fades the ambient score out. */
-export function stopScore() {
-  score?.stop();
+/** Fades the ambient score out, over `release` seconds. */
+export function stopScore(release = 1.2) {
+  score?.stop(release);
   score = undefined;
 }
 
@@ -320,10 +319,6 @@ export function cue(name: Cue) {
     case 'off':
       bell(g, 587.33, 0.05);
       bell(g, 440, 0.04, g.context.currentTime + 0.12);
-      break;
-    case 'leave':
-      air(g, 180, 1400, 0.55, 0.12);
-      blip(g, 110, 82.41, 0.6, 0.06, 'sine', 0.5);
       break;
   }
 }

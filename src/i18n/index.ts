@@ -85,8 +85,11 @@ export function navigation(locale: Locale) {
 export const format = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? `{${key}}`);
 
-/** Unit wording that the Unicode locale data (CLDR) does not have yet. */
-const minuteFallback: Partial<Record<Locale, string>> = { ckb: '{n} خولەک' };
+/**
+ * Unit wording that the Unicode locale data (CLDR) lacks, or gives in a less
+ * usual form: English data now says "8 mins", where "8 min read" is the norm.
+ */
+const minuteFallback: Partial<Record<Locale, string>> = { en: '{n} min', ckb: '{n} خولەک' };
 
 /** A number of minutes in a language: "6 min", "6 Min.", "6 دقائق", "٦ خولەک". */
 export function formatMinutes(locale: Locale, minutes: number, unitDisplay: 'short' | 'long'): string {

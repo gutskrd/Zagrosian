@@ -193,7 +193,10 @@ Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
 - **Hero:** the headline rises line by line from behind masks on load, and the lifted logo rises
-  into place and comes into focus.
+  into place and comes into focus. Each of these lets go when it ends, so nothing stays animated
+  (and composited) behind the story. Coming from another page of the site, the page slides in as a
+  whole, and that is its entrance: the hero is already in place (`data-arrival`, set by
+  `theme-init.js` when the page is revealed with a view transition).
 - **The story** ([`Story.astro`](src/components/Story.astro), [`story.ts`](src/scripts/story.ts)):
   a walkthrough under the hero, pinned to the screen for four and a half screens of scrolling, in
   four chapters, all in glass and in 3D. It follows what award-winning scroll stories do (Apple's
@@ -267,12 +270,14 @@ back for visitors who prefer reduced motion, and the site works fully without it
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
     soft wind, and now and then a bell, in a generated reverb;
   - interface sounds: a tick when the pointer or keyboard reaches a control, a tap on a click, air
-    when a menu opens or closes, a sweep when leaving for another page, and bells when sound is
-    switched on or off.
+    when a menu opens or closes, and bells when sound is switched on or off.
 
-  The choice is remembered. Browsers only allow audio after an interaction, so on a new page the score
-  resumes at once where the browser allows it (Chrome, within the site) or with the first click or key
-  press. It pauses while the tab is hidden.
+  It is the same on every page: the homepage, the legal pages and the 404 page share the header,
+  the card and the script. The choice is remembered. Browsers only allow audio after an interaction,
+  so on the next page the score swells back in as the page opens where the browser carries that
+  permission over (Chrome and Edge, including pages it prepared in advance), and otherwise with the
+  first click, tap or key press. Following a link, the score fades out rather than being cut off. It
+  pauses while the tab is hidden.
 - **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a ring exactly where the pointer
   is (no lag) that inverts what is under it. Over a link or a plain button it becomes a lens; over an
   external link it adds an arrow; over a magnetic button it steps aside while the button answers. Over
@@ -307,7 +312,8 @@ back for visitors who prefer reduced motion, and the site works fully without it
   motion*) and stop below the header (`scroll-padding-top`). The page holds still while a dialog or
   the site menu is open.
 - **Page changes:** in browsers with cross-document view transitions, the next page rises over the
-  last like a card laid on top while the old one sinks back and darkens.
+  last like a card laid on top while the old one sinks back and darkens. Every page shares the
+  header, footer, menu, theme, sound and cursor, so they behave the same everywhere.
 
 ## Readable by machines
 

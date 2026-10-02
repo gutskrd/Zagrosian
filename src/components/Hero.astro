@@ -359,9 +359,13 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
+  /* The entrance. Each animation holds its first frame through its delay and
+     lets go when it ends (`backwards`), so nothing stays animated: a finished
+     animation that held its last frame would keep the glass logo on a layer
+     of its own, redrawn in every frame of the scroll story below. */
   @media (prefers-reduced-motion: no-preference) {
     .hero__line > span {
-      animation: line-rise 1.1s var(--ease-out) both;
+      animation: line-rise 1.1s var(--ease-out) backwards;
     }
 
     .hero__line:nth-child(2) > span {
@@ -373,7 +377,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
 
     .intro {
-      animation: intro 1.1s var(--ease-out) both;
+      animation: intro 1.1s var(--ease-out) backwards;
     }
 
     .hero__lead {
@@ -386,8 +390,17 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
     .hero__mark,
     .journey__tilt {
-      animation: logo-in 1.4s var(--ease-out) 0.3s both;
+      animation: logo-in 1.4s var(--ease-out) 0.3s backwards;
     }
+  }
+
+  /* Coming from another page of the site, the page slides in as a whole
+     (global.css), and that is its entrance (theme-init.js sets the flag). */
+  :global(:root[data-arrival='slide']) .hero__line > span,
+  :global(:root[data-arrival='slide']) .intro,
+  :global(:root[data-arrival='slide']) .hero__mark,
+  :global(:root[data-arrival='slide']) .journey__tilt {
+    animation: none;
   }
 
   @keyframes line-rise {

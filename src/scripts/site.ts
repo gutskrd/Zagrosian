@@ -1,3 +1,8 @@
+/**
+ * The script every page runs (BaseLayout.astro). The small features are
+ * here; the larger ones (sound, motion, the theme, quick navigation) have
+ * modules of their own. All of them start at the end of this file.
+ */
 import { initCommandMenu } from './command';
 import { initEyes } from './eyes';
 import { initSound } from './sound';
@@ -243,6 +248,13 @@ function initLegalTools() {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/* Every page runs this same script, so the header, the menu, the theme, the  */
+/* sound and the motion behave the same on the homepage, the legal pages and  */
+/* the 404 page. Each part looks for its own elements and does nothing where  */
+/* there are none.                                                            */
+/* -------------------------------------------------------------------------- */
+
 initHeader();
 initMenu();
 initReveal();
@@ -260,8 +272,8 @@ initText();
 initSound();
 initEyes();
 
-// Smooth scrolling, the custom cursor and magnetic buttons are for a mouse or
-// trackpad: loaded separately, so phones and tablets never download them.
+// The custom cursor and the magnetic buttons are for a mouse or trackpad:
+// loaded separately, so phones and tablets never download them.
 if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
   void import('./desktop').then(({ initDesktop }) => initDesktop());
 }

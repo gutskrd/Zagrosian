@@ -1,7 +1,7 @@
 ---
 title: Privacyverklaring
 description: Hoe Zagrosian omgaat met persoonsgegevens wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt.
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 
 Deze verklaring legt uit welke persoonsgegevens wij verwerken wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt, waarom wij dat doen en welke rechten u heeft. Omdat wij heel weinig gegevens verzamelen, is deze verklaring kort.
@@ -66,7 +66,7 @@ Als u op deze platforms reageert op onze berichten of ons een bericht stuurt, zi
 
 zagrosian.com gebruikt geen analytische, advertentie- of trackingcookies.
 
-Als u een licht of donker thema of een taal kiest, het geluid aan- of uitzet, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme`, `language-chosen` en `sound`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Zolang uw bezoek duurt, noteert hij bovendien in zijn sessieopslag (onder de naam `intro`) dat u de openingsanimatie hebt gezien, zodat die niet opnieuw wordt afgespeeld. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
+Als u een licht of donker thema of een taal kiest, het geluid aan- of uitzet, of de suggestie sluit om de site in uw taal te lezen, slaat uw browser die keuze op in zijn lokale opslag (onder de namen `theme`, `language-chosen` en `sound`), zodat de website er bij uw volgende bezoek rekening mee kan houden. Deze informatie blijft op uw apparaat, wordt nooit naar ons of naar iemand anders gestuurd, en u kunt haar op elk moment verwijderen door de sitegegevens in uw browser te wissen.
 
 Cloudflare kan een strikt noodzakelijke cookie plaatsen, zoals `__cf_bm` of `cf_clearance`, als het mensen moet onderscheiden van geautomatiseerd verkeer of nadat u een beveiligingscontrole heeft doorlopen. Deze cookies zijn kortlevend, worden alleen gebruikt om de website te beschermen en worden niet gebruikt om u over andere websites te volgen. Omdat ze strikt noodzakelijk zijn voor de beveiliging, is er geen toestemming voor nodig.
 

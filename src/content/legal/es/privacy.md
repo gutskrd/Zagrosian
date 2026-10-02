@@ -1,7 +1,7 @@
 ---
 title: Política de privacidad
 description: Cómo trata Zagrosian los datos personales cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales.
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 
 Esta política explica qué datos personales tratamos cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales, por qué los tratamos y qué derechos tienes. Como recogemos muy pocos datos, es breve.
@@ -66,7 +66,7 @@ Si comentas nuestras publicaciones o nos envías un mensaje en estas plataformas
 
 zagrosian.com no utiliza cookies analíticas, publicitarias ni de seguimiento.
 
-Si eliges un tema claro u oscuro o un idioma, activas o desactivas el sonido, o cierras la sugerencia de leer el sitio en tu idioma, tu navegador guarda esa elección en su almacenamiento local (con los nombres `theme`, `language-chosen` y `sound`) para que el sitio web pueda respetarla en tu próxima visita. Mientras dura tu visita, también anota en su almacenamiento de sesión (con el nombre `intro`) que ya has visto la animación de apertura, para que no vuelva a reproducirse. Esta información se queda en tu dispositivo, nunca se envía a nosotros ni a nadie más, y puedes eliminarla en cualquier momento borrando los datos del sitio en tu navegador.
+Si eliges un tema claro u oscuro o un idioma, activas o desactivas el sonido, o cierras la sugerencia de leer el sitio en tu idioma, tu navegador guarda esa elección en su almacenamiento local (con los nombres `theme`, `language-chosen` y `sound`) para que el sitio web pueda respetarla en tu próxima visita. Esta información se queda en tu dispositivo, nunca se envía a nosotros ni a nadie más, y puedes eliminarla en cualquier momento borrando los datos del sitio en tu navegador.
 
 Cloudflare puede instalar una cookie estrictamente necesaria, como `__cf_bm` o `cf_clearance`, cuando necesita distinguir a las personas del tráfico automatizado o después de que superes una comprobación de seguridad. Estas cookies son de corta duración, se usan únicamente para proteger el sitio web y no sirven para seguirte en otros sitios web. Como son estrictamente necesarias para la seguridad, no requieren tu consentimiento.
 

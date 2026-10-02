@@ -1,20 +1,23 @@
 /**
  * Sound, for visitors who turn it on.
  *
- * This small module handles the choice (remembered), the header and menu
- * toggles, the card that offers sound once, and when to play what. The
- * synthesiser itself (sound-engine.ts: an ambient score and interface sounds,
- * all generated in the browser, no audio files) is downloaded only once sound
- * is on, so visitors who keep it off never load it.
+ * This module handles the choice (remembered), the toggles in the header and
+ * the menu, the card that offers sound once, and when to play what. It runs
+ * on every page through site.ts, so sound behaves the same on the homepage,
+ * the legal pages and the 404 page. The synthesiser itself (sound-engine.ts:
+ * an ambient score and interface sounds, generated in the browser, no audio
+ * files) is downloaded only once sound is on.
  *
- * Sound is off until the visitor turns it on, from the header, the menu, the
- * card, or quick navigation. Browsers only allow audio after a click or key
- * press, so the AudioContext is created in that moment; on a new page the
- * score resumes with the visitor's first interaction, or at once where the
- * browser allows it. It pauses while the tab is hidden.
+ * Browsers let a page start audio only after a click, tap or key press on it.
+ * So sound starts the moment the visitor turns it on, and on each next page:
+ * - Chrome and Edge carry that permission over from the page the link was on,
+ *   so the score comes back as the page opens;
+ * - other browsers need a click, tap or key press on the new page first.
+ * Following a link, the score fades out instead of being cut off. Sound pauses
+ * while the tab is hidden.
  */
 
-export type Cue = 'hover' | 'tap' | 'open' | 'close' | 'on' | 'off' | 'leave';
+export type Cue = 'hover' | 'tap' | 'open' | 'close' | 'on' | 'off';
 
 type Engine = typeof import('./sound-engine');
 
@@ -55,9 +58,10 @@ function createContext() {
 }
 
 /**
- * Starts the audio, if sound is on. Called from a click or key press where
- * possible, since that is when browsers allow it. Resolves once the score is
- * playing (or cannot).
+ * Starts the audio, if sound is on: creates or resumes the AudioContext, loads
+ * the synthesiser and starts the score. Call it from a click or key press
+ * where possible, since that is when browsers allow it. Resolves once the
+ * score is playing, or cannot.
  */
 function wake(): Promise<void> {
   if (!enabled || document.hidden) return Promise.resolve();
@@ -109,7 +113,55 @@ export function setSound(on: boolean) {
 }
 
 /* -------------------------------------------------------------------------- */
-/* The prompt, offered once (src/components/SoundPrompt.astro)                */
+/* Arriving on a page                                                         */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Runs `callback` once the page is on screen. Chrome may prepare the next
+ * page before the visitor opens it (speculation-rules.json); such a page is
+ * hidden until then, so anything timed or audible waits for that moment.
+ */
+function whenShown(callback: () => void) {
+  if ((document as Document & { prerendering?: boolean }).prerendering) {
+    document.addEventListener('prerenderingchange', callback, { once: true });
+  } else {
+    callback();
+  }
+}
+
+/**
+ * Whether the browser is likely to let this page start audio before the
+ * visitor touches it: they came from another page of the site by following a
+ * link, and the browser does not say it would refuse. A reload or the back
+ * button carries no permission, and trying would only log a warning.
+ */
+function mayStartOnArrival() {
+  const policy = (navigator as Navigator & { getAutoplayPolicy?(type: 'audiocontext'): string }).getAutoplayPolicy?.(
+    'audiocontext',
+  );
+  if (policy) return policy === 'allowed';
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+  if (navigation && navigation.type !== 'navigate') return false;
+  try {
+    return new URL(document.referrer).origin === location.origin;
+  } catch {
+    return false;
+  }
+}
+
+/** Whether a click on this link opens another page of the site in this tab. */
+function leavesForAnotherPage(link: HTMLAnchorElement, event: MouseEvent) {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    return false;
+  }
+  if (link.target || link.hasAttribute('download')) return false;
+  const url = new URL(link.href, location.href);
+  const samePage = url.pathname === location.pathname && url.search === location.search;
+  return url.origin === location.origin && !samePage;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The card, offered once (src/components/SoundPrompt.astro)                  */
 /* -------------------------------------------------------------------------- */
 
 function initPrompt() {
@@ -143,7 +195,7 @@ function initPrompt() {
   };
 
   // A moment after the page has settled.
-  window.setTimeout(show, 2500);
+  whenShown(() => window.setTimeout(show, 2500));
 
   for (const button of prompt.querySelectorAll<HTMLElement>('[data-sound-choice]')) {
     button.addEventListener('click', () => {
@@ -151,44 +203,19 @@ function initPrompt() {
       hide();
     });
   }
-  // Chosen elsewhere (the header or quick navigation).
+  // Chosen elsewhere (the header, the menu or quick navigation).
   document.addEventListener('sound:change', hide);
 }
 
 /* -------------------------------------------------------------------------- */
+/* Interface sounds                                                           */
+/* -------------------------------------------------------------------------- */
 
 const INTERACTIVE = 'a[href], button:not([disabled]), summary, [role="option"], label[for]';
+/** Controls with sounds of their own: the toggles, and buttons that open a menu. */
+const OWN_SOUND = '[data-sound-toggle], [data-sound-choice], [popovertarget], [data-command-open]';
 
-export function initSound() {
-  reflect();
-  initPrompt();
-
-  for (const toggle of document.querySelectorAll('[data-sound-toggle]')) {
-    toggle.addEventListener('click', () => setSound(!enabled));
-  }
-
-  // The first click or key press on a page lets the audio start.
-  const unlock = () => void wake();
-  document.addEventListener('pointerdown', unlock, { capture: true, passive: true });
-  document.addEventListener('keydown', unlock, { capture: true, passive: true });
-
-  // Coming from another page of this site, the browser may allow it at once.
-  if (enabled) {
-    let sameSite = false;
-    try {
-      sameSite = new URL(document.referrer).origin === location.origin;
-    } catch {
-      // No referrer.
-    }
-    if (sameSite) void wake();
-  }
-
-  document.addEventListener('visibilitychange', () => {
-    if (!context) return;
-    if (document.hidden) context.suspend().catch(() => {});
-    else if (enabled) void wake();
-  });
-
+function initInterfaceSounds() {
   // A tick as the pointer or keyboard reaches a control.
   let hovered: Element | null = null;
   document.addEventListener('pointerover', (event) => {
@@ -202,24 +229,52 @@ export function initSound() {
     if (target?.matches?.(':focus-visible') && target.matches(INTERACTIVE)) play('hover');
   });
 
-  // A tap on a click; a sweep when leaving for another page of the site.
+  // A tap on every click. Following a link to another page, the score also
+  // fades out, so the page change never cuts it off mid-note.
   document.addEventListener('click', (event) => {
     const target = (event.target as Element | null)?.closest?.(INTERACTIVE);
-    // Toggles and menu buttons have their own sounds.
-    if (!target || target.matches('[data-sound-toggle], [data-sound-choice], [popovertarget], [data-command-open]')) return;
-    if (target instanceof HTMLAnchorElement && !event.defaultPrevented) {
-      const url = new URL(target.href, location.href);
-      const samePage = url.pathname === location.pathname && url.search === location.search;
-      if (url.origin === location.origin && !samePage && !target.target && !target.hasAttribute('download')) {
-        play('leave');
-        return;
-      }
-    }
+    if (!target || target.matches(OWN_SOUND)) return;
     play('tap');
+    if (target instanceof HTMLAnchorElement && leavesForAnotherPage(target, event)) engine?.stopScore(0.25);
   });
 
   // Menus opening and closing.
   for (const popover of document.querySelectorAll<HTMLElement>('[popover]')) {
     popover.addEventListener('toggle', (event) => play((event as ToggleEvent).newState === 'open' ? 'open' : 'close'));
   }
+}
+
+/* -------------------------------------------------------------------------- */
+
+export function initSound() {
+  reflect();
+  initPrompt();
+  initInterfaceSounds();
+
+  for (const toggle of document.querySelectorAll('[data-sound-toggle]')) {
+    toggle.addEventListener('click', () => setSound(!enabled));
+  }
+
+  // The events browsers accept as permission to start audio: a mouse button
+  // or a key going down, or a finger lifting.
+  const unlock = () => void wake();
+  for (const type of ['pointerdown', 'pointerup', 'touchend', 'keydown']) {
+    document.addEventListener(type, unlock, { capture: true, passive: true });
+  }
+
+  // Coming from another page of the site, the score picks up as the page opens.
+  whenShown(() => {
+    if (enabled && mayStartOnArrival()) void wake();
+  });
+
+  // Silent while the tab is hidden; back with it. Coming back to this page
+  // with the browser's back button, the score picks up again.
+  document.addEventListener('visibilitychange', () => {
+    if (!context) return;
+    if (document.hidden) context.suspend().catch(() => {});
+    else void wake();
+  });
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted && context) void wake();
+  });
 }

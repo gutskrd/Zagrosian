@@ -1,7 +1,7 @@
 ---
 title: Privacy Policy
 description: How Zagrosian handles personal data when you visit zagrosian.com, contact us or visit our social media profiles.
-updated: 2026-09-29
+updated: 2026-10-02
 ---
 
 This policy explains what personal data we process when you visit zagrosian.com, contact us or visit our social media profiles, why we process it, and what rights you have. We collect very little, so it is short.
@@ -66,7 +66,7 @@ If you comment on our posts or send us a message on these platforms, we see your
 
 zagrosian.com does not use analytics, advertising or tracking cookies.
 
-If you choose a light or dark theme or a language, turn sound on or off, or close the suggestion to read the site in your language, your browser saves that choice in its local storage (under the names `theme`, `language-chosen` and `sound`), so the website can respect it on your next visit. For the length of your visit, it also notes in its session storage (under the name `intro`) that you have seen the opening animation, so that it does not play again. This information stays on your device, is never sent to us or to anyone else, and you can remove it at any time by clearing the site data in your browser.
+If you choose a light or dark theme or a language, turn sound on or off, or close the suggestion to read the site in your language, your browser saves that choice in its local storage (under the names `theme`, `language-chosen` and `sound`), so the website can respect it on your next visit. This information stays on your device, is never sent to us or to anyone else, and you can remove it at any time by clearing the site data in your browser.
 
 Cloudflare may set a strictly necessary cookie, such as `__cf_bm` or `cf_clearance`, when it needs to tell people apart from automated traffic or after you complete a security check. These cookies are short-lived, are used only to protect the website, and are not used to follow you across other websites. Because they are strictly necessary for security, they do not require your consent.
 
