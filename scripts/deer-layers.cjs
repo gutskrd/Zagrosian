@@ -1,9 +1,9 @@
 // Takes Hevalo's app icon apart into the layers of the 3D deer in the products
-// section (HevaloDeer.astro), where the icon is a window the deer leans out
-// of: the face (the purple square, the back of the window), the shade the deer
-// casts on it, the neck, the antlers, each ear, the head (with the Christmas
-// scarf) and the nose. Made from the eyeless sources, the pupils being drawn
-// by the page.
+// section (HevaloDeer.astro), where the icon is a hole in the page and the
+// deer climbs out of it from behind: the shade the deer casts on the page, the
+// neck, the antlers, each ear, the head (with the Christmas scarf) and the
+// nose, and at Christmas the snowflakes behind it. (The purple is drawn by the
+// page.) Made from the eyeless sources, the pupils being drawn by the page.
 //
 // Each layer is the deer's own pixels, unmixed from the purple at their edges,
 // and the layers behind the head reach a little under it in their own colour,
@@ -31,10 +31,9 @@ const W = 360;
 // half (measured on the sources, away from the corners and from the deer).
 const SQUARE = { left: 13.72, right: 346.08, top: 0.27, bottom: 358.8 };
 const AXIS = 359.9; // x' = AXIS - x mirrors left and right
-// The icon is a window: a frame this wide around an opening (HevaloDeer.astro
-// draws the frame; the neck goes in under its bottom edge, the sill).
-const FRAME_BAND = 14;
-const SILL = SQUARE.bottom - FRAME_BAND;
+// The icon is a hole in the page (HevaloDeer.astro). The copies of the neck
+// in front of the page stop a little above its bottom edge, the sill.
+const SILL = SQUARE.bottom - 6;
 
 // ---- Outlines, in frame units, traced on the artwork ----
 // creaseL: where the left ear goes under the head; dome: the top of the head;
@@ -569,28 +568,21 @@ async function layersFor({ season, source, height: H }) {
     }
   }
 
-  // The back of the window: the purple square without the deer (its gradient
-  // fitted, so no trace of the deer is left), with the Christmas snowflakes.
-  const face = new Float32Array(N * 4);
-  for (let i = 0; i < N; i++) {
-    const deer = A[i] > 0 || band[i] > 0;
-    let [r0, g0, b0] = [B[i * 3], B[i * 3 + 1], B[i * 3 + 2]];
-    if (!deer && SA[i] > 0.5 && S[i] > 0.99) {
-      // A snowflake: unmix it from the purple as white.
-      const d = Math.hypot(C[i * 3] - r0, C[i * 3 + 1] - g0, C[i * 3 + 2] - b0);
-      if (d > 12) {
-        let num = 0, den = 0;
-        for (let c = 0; c < 3; c++) {
-          num += (C[i * 3 + c] - B[i * 3 + c]) * (255 - B[i * 3 + c]);
-          den += (255 - B[i * 3 + c]) ** 2;
-        }
-        const w = Math.min(1, Math.max(0, num / den));
-        r0 += (255 - r0) * w; g0 += (255 - g0) * w; b0 += (255 - b0) * w;
+  // The Christmas snowflakes, on their own: white, unmixed from the purple.
+  if (season === 'christmas') {
+    const snow = new Float32Array(N * 4);
+    for (let i = 0; i < N; i++) {
+      if (A[i] > 0 || band[i] > 0 || SA[i] <= 0.5 || S[i] <= 0.99) continue;
+      let num = 0, den = 0;
+      for (let c = 0; c < 3; c++) {
+        num += (C[i * 3 + c] - B[i * 3 + c]) * (255 - B[i * 3 + c]);
+        den += (255 - B[i * 3 + c]) ** 2;
       }
+      const w = Math.min(1, Math.max(0, num / den));
+      if (w > 0.05) snow.set([255, 255, 255, w], i * 4);
     }
-    face.set([r0, g0, b0, S[i]], i * 4);
+    layers.snow = snow;
   }
-  layers.face = face;
 
   // The neck (the everyday deer's; at Christmas the scarf hides it), as drawn
   // below the jaw and carried on up under the head. HevaloDeer.astro stacks
@@ -648,24 +640,24 @@ async function layersFor({ season, source, height: H }) {
     layers['neck-back'] = layer((i) => core[i], inner, 0.8);
   }
 
-  // The shade the deer casts on the back of the window: its outline,
-  // softened and moved down.
+  // The shade the deer casts on the page around the hole, once it is out:
+  // its outline, softened and moved down and right, in black.
   const sil = new Float32Array(N);
   for (let i = 0; i < N; i++) sil[i] = A[i] * Math.min(1, head[i] + antlers[i] + earL[i] + earR[i]);
   const silBuf = Buffer.from(Uint8Array.from(sil, (v) => Math.round(v * 255)));
-  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } }).blur(7).extractChannel(0).raw().toBuffer();
+  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } }).blur(6).extractChannel(0).raw().toBuffer();
   if (blurred.length !== N) throw new Error('shade: unexpected channels');
   const shade = new Float32Array(N * 4);
-  const DX = 3, DY = 9;
+  const DX = 4, DY = 10;
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
       const sx = x - DX, sy = y - DY;
       if (sx < 0 || sy < 0) continue;
       const v = blurred[sy * W + sx] / 255;
       const i = y * W + x;
-      const a = 0.34 * v * S[i];
+      const a = 0.3 * v;
       if (a < 0.004) continue;
-      shade.set([40, 12, 78, a], i * 4);
+      shade.set([0, 0, 0, a], i * 4);
     }
   layers.shade = shade;
 
@@ -681,7 +673,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   for (const s of SEASONS) results.push({ ...s, ...(await layersFor(s)) });
 
   // Union box per layer, in frame units, on a 5-unit grid (so x0.8 and x1.6 are whole pixels).
-  const names = ['face', 'shade', 'neck', 'neck-core', 'neck-back', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
+  const names = ['snow', 'shade', 'neck', 'neck-core', 'neck-back', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
   const boxes = {};
   for (const name of names) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -720,7 +712,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
         // info says: passing it on would divide the edges by their alpha again.)
         const res = await sharp(scaled.data, { raw: { width: scaled.info.width, height: scaled.info.height, channels: 4 } })
           .extract({ left: Math.round(box.x * k), top: Math.round(box.y * k), width: Math.round(box.w * k), height: h })
-          .webp({ quality: name === 'shade' ? 70 : 84, alphaQuality: 100, effort: 6, smartSubsample: true })
+          .webp({ quality: name === 'shade' ? 70 : 84, alphaQuality: name === 'snow' ? 80 : 100, effort: 6, smartSubsample: true })
           .toFile(out);
         console.log(path.basename(out), `${res.width}x${res.height}`, res.size, 'B');
       }

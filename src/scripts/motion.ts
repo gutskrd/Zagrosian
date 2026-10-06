@@ -239,8 +239,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
-/* pointer, a soft light follows it across the products band, and the Hevalo  */
-/* icon turns towards it, its frame catching the light.                       */
+/* pointer. (Hevalo's icon follows it in deer.ts.)                            */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
@@ -298,66 +297,6 @@ function initPointerDepth() {
       targetX = 0;
       targetY = 0;
       start();
-    });
-  }
-
-  // A soft light follows the pointer across the products band.
-  for (const surface of document.querySelectorAll<HTMLElement>('[data-spotlight]')) {
-    let queued = false;
-    let x = 0;
-    let y = 0;
-    surface.addEventListener('pointermove', (event) => {
-      if (event.pointerType !== 'mouse') return;
-      x = event.clientX;
-      y = event.clientY;
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        const rect = surface.getBoundingClientRect();
-        surface.style.setProperty('--spot-x', `${(x - rect.left).toFixed(0)}px`);
-        surface.style.setProperty('--spot-y', `${(y - rect.top).toFixed(0)}px`);
-        surface.toggleAttribute('data-spot', true);
-      });
-    });
-    surface.addEventListener('pointerleave', () => surface.removeAttribute('data-spot'));
-  }
-
-  // The Hevalo icon turns towards the pointer anywhere over its band, more the
-  // further the pointer is from it, and its frame catches the light on that
-  // side (HevaloDeer.astro).
-  for (const tilt of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
-    const area = tilt.closest<HTMLElement>('[data-spotlight]') ?? tilt;
-    let queued = false;
-    let inside = false;
-    let x = 0;
-    let y = 0;
-    area.addEventListener('pointermove', (event) => {
-      if (event.pointerType !== 'mouse') return;
-      inside = true;
-      x = event.clientX;
-      y = event.clientY;
-      if (queued) return;
-      queued = true;
-      requestAnimationFrame(() => {
-        queued = false;
-        if (!inside) return;
-        const rect = tilt.getBoundingClientRect();
-        const box = area.getBoundingClientRect();
-        // -1 to 1: from the icon's centre to the band's far edge.
-        const dx = clamp((x - (rect.left + rect.width / 2)) / (box.width / 2), -1, 1);
-        const dy = clamp((y - (rect.top + rect.height / 2)) / (box.height / 2), -1, 1);
-        tilt.style.setProperty('--tilt-x', `${(-dy * 12).toFixed(2)}deg`);
-        tilt.style.setProperty('--tilt-y', `${(dx * 16).toFixed(2)}deg`);
-        tilt.style.setProperty('--glare-x', `${(50 + dx * 50).toFixed(1)}%`);
-        tilt.style.setProperty('--glare-y', `${(50 + dy * 50).toFixed(1)}%`);
-        tilt.toggleAttribute('data-tilting', true);
-      });
-    });
-    area.addEventListener('pointerleave', () => {
-      inside = false;
-      for (const name of ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y']) tilt.style.removeProperty(name);
-      tilt.removeAttribute('data-tilting');
     });
   }
 }

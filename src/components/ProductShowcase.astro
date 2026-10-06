@@ -8,29 +8,22 @@ import SplitText from './SplitText.astro';
 const { t } = i18n(Astro.url);
 ---
 
-<section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight>
+<section id="hevalo" class="showcase" aria-labelledby="hevalo-title">
   <div class="container">
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a window the deer leans out of, in 3D
-          (HevaloDeer.astro). It turns to face the reader as the section
-          scrolls into view, and towards the pointer. Decoration: the name
+      {/* Hevalo's app icon as a hole in the page, the deer climbing out of
+          it from behind the page (HevaloDeer.astro). Decoration: the name
           beside it says what it is. */}
       <div class="showcase__art" aria-hidden="true" data-reveal>
-        <span class="showcase__glow"></span>
-        <span class="showcase__shadow"></span>
-        <div class="showcase__turn">
-          <span class="showcase__tilt" data-tilt>
-            <HevaloDeer
-              widths={[
-                ['(min-width: 64rem)', 21],
-                ['(min-width: 40rem)', 17],
-                [null, 14],
-              ]}
-            />
-          </span>
-        </div>
+        <HevaloDeer
+          widths={[
+            ['(min-width: 64rem)', 21],
+            ['(min-width: 40rem)', 17],
+            [null, 14],
+          ]}
+        />
       </div>
 
       <div class="showcase__text">
@@ -79,31 +72,10 @@ const { t } = i18n(Astro.url);
   .showcase {
     position: relative;
     isolation: isolate;
-    /* The icon's glow may spread past a narrow screen's edge. */
-    overflow-x: clip;
+    /* The page drawn round the hole may reach past the band's edges. */
+    overflow: clip;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
-  }
-
-  /* Under a mouse pointer, a soft light follows it across the band, as if the
-     product were lit from where you look (motion.ts sets --spot-x/--spot-y). */
-  .showcase::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(
-      40rem circle at var(--spot-x, 50%) var(--spot-y, 50%),
-      var(--color-spot),
-      transparent 70%
-    );
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
-  }
-
-  .showcase[data-spot]::before {
-    opacity: 1;
   }
 
   .showcase__body {
@@ -113,111 +85,17 @@ const { t } = i18n(Astro.url);
   }
 
   /* ---- The icon ----
-     A window in the shape of the app icon, with the deer leaning out of it
-     (HevaloDeer.astro): its back is set in 7% of its width, the deer comes
-     out up to 5% in front of it. */
+     A hole in the page in the shape of the app icon, with the deer climbing
+     out of it (HevaloDeer.astro). It is painted under the text beside it,
+     since the page round the hole is drawn with it. */
   .showcase__art {
-    /* In units of the icon's own width (cqi), so it keeps its proportions. */
-    --depth: 7cqi;
-    /* It turns towards the text: leftwards, or rightwards on right-to-left pages. */
-    --side: 1;
-
     position: relative;
+    z-index: -1;
     justify-self: center;
     width: 14rem;
     aspect-ratio: 1;
+    /* In units of the icon's own width (cqi), so it keeps its proportions. */
     container-type: inline-size;
-    perspective: 60rem;
-  }
-
-  .showcase__turn,
-  .showcase__tilt {
-    position: absolute;
-    inset: 0;
-    transform-style: preserve-3d;
-  }
-
-  :global([dir='rtl']) .showcase__art {
-    --side: -1;
-  }
-
-  /* At rest the icon is turned a little, so its depth shows. It turns about
-     a point just behind its frame. */
-  .showcase__turn {
-    transform: rotateX(8deg) rotateY(calc(-18deg * var(--side)));
-    transform-origin: 50% 50% calc(var(--depth) * -0.3);
-  }
-
-  /* Under a mouse it also tilts towards the pointer (motion.ts sets the
-     custom properties), and its frame catches the light (HevaloDeer.astro). */
-  .showcase__tilt {
-    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-    transform-origin: 50% 50% calc(var(--depth) * -0.3);
-    transition: transform 0.7s var(--ease-out);
-  }
-
-  .showcase__tilt[data-tilting] {
-    transition-duration: 0.15s;
-  }
-
-  /* Under the icon, a soft shadow on the floor; behind it, a glow in its
-     purple. Neither turns with it. */
-  .showcase__shadow {
-    position: absolute;
-    inset: auto 8% -18% 8%;
-    height: 16%;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(30 10 60 / 0.32), rgb(30 10 60 / 0));
-  }
-
-  .showcase__glow {
-    position: absolute;
-    inset: -30%;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(176 112 242 / 0.28), rgb(176 112 242 / 0) 70%);
-  }
-
-  :global(:root[data-theme='dark']) .showcase__shadow {
-    background: radial-gradient(closest-side, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0));
-  }
-
-  :global(:root[data-theme='dark']) .showcase__glow {
-    background: radial-gradient(closest-side, rgb(176 112 242 / 0.3), rgb(176 112 242 / 0) 70%);
-  }
-
-  /* As the section scrolls into view, the icon turns from the side to face
-     the reader, still a little turned. The browser runs it on the graphics
-     card, in step with the scroll (no script); where it cannot, the icon
-     simply rests turned. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      /* Separate properties, so the minifier cannot fold the timeline into
-         the `animation` shorthand (which browsers do not accept). */
-      .showcase__turn {
-        animation-name: showcase-turn;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: view();
-        animation-range: entry 10% cover 50%;
-      }
-    }
-  }
-
-  @keyframes showcase-turn {
-    from {
-      transform: rotateX(22deg) rotateY(calc(-48deg * var(--side))) rotateZ(calc(5deg * var(--side))) translateY(10%);
-    }
-
-    to {
-      transform: rotateX(8deg) rotateY(calc(-18deg * var(--side)));
-    }
-  }
-
-  @media (forced-colors: active) {
-    .showcase__glow,
-    .showcase__shadow {
-      display: none;
-    }
   }
 
   /* ---- The name and the text ---- */

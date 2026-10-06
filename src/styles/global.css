@@ -72,8 +72,6 @@
      colour, above the 3:1 minimum for large text. */
   --color-dim: #878785;
   --header-bg: rgb(255 255 255 / 0.84);
-  /* The light that follows the pointer across the products band. */
-  --color-spot: rgb(255 255 255 / 0.95);
 
   --focus-ring: var(--color-ink);
 
@@ -128,7 +126,6 @@
   --color-solid-hover: #d4d4d4;
   --color-dim: #666666;
   --header-bg: rgb(10 10 10 / 0.8);
-  --color-spot: rgb(255 255 255 / 0.05);
 }
 
 /* A part of the page in the other theme's colours: the header while the
@@ -145,7 +142,6 @@
   --color-solid-hover: #d4d4d4;
   --color-dim: #666666;
   --header-bg: rgb(10 10 10 / 0.8);
-  --color-spot: rgb(255 255 255 / 0.05);
 }
 
 :root[data-theme='dark'] [data-inverse] {
@@ -160,7 +156,6 @@
   --color-solid-hover: #2b2b2b;
   --color-dim: #878785;
   --header-bg: rgb(255 255 255 / 0.84);
-  --color-spot: rgb(255 255 255 / 0.95);
 }
 
 /* ==========================================================================
