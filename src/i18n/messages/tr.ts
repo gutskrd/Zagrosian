@@ -65,8 +65,9 @@ export const tr: Messages = {
     visit: 'hevalo.app’i ziyaret et',
     website: 'Web sitesi',
     comingSoon: 'Çok yakında',
-    comingSoonTitle: 'iOS ve Android için Hevalo.',
-    comingSoonNote: 'Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
+    dialectsLabel: 'Lehçeler',
+    dialects: 'Önce Kurmanci, diğerleri planlanıyor',
+    platformsLabel: 'iOS ve Android',
     proverb: 'Ağaç kendi kökünde, insan kendi dilinde yeşerir.',
     proverbSource: 'Kürt atasözü',
   },
@@ -88,6 +89,7 @@ export const tr: Messages = {
     eyebrow: 'SSS',
     title: 'Sıkça sorulan sorular.',
     privacyLink: 'gizlilik politikamıza',
+    more: 'Başka bir sorunuz mu var? {contact} adresine e-posta gönderin.',
     items: [
       {
         question: 'Zagrosian ne yapar?',

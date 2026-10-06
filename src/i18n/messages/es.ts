@@ -65,8 +65,9 @@ export const es: Messages = {
     visit: 'Visitar hevalo.app',
     website: 'Sitio web',
     comingSoon: 'Próximamente',
-    comingSoonTitle: 'Hevalo para iOS y Android.',
-    comingSoonNote: 'Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
+    dialectsLabel: 'Dialectos',
+    dialects: 'Primero kurmanji, más previstos',
+    platformsLabel: 'iOS y Android',
     proverb: 'El árbol crece sobre sus propias raíces; la persona, en su propia lengua.',
     proverbSource: 'Proverbio kurdo',
   },
@@ -88,6 +89,7 @@ export const es: Messages = {
     eyebrow: 'FAQ',
     title: 'Preguntas frecuentes.',
     privacyLink: 'política de privacidad',
+    more: '¿Tienes otra pregunta? Escríbenos a {contact}.',
     items: [
       {
         question: '¿Qué hace Zagrosian?',

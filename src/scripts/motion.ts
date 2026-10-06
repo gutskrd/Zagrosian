@@ -240,7 +240,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
 /* pointer, a soft light follows it across the products band, and the Hevalo  */
-/* icon tilts under it with a highlight.                                      */
+/* tile turns towards it with a highlight.                                    */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
@@ -323,19 +323,39 @@ function initPointerDepth() {
     surface.addEventListener('pointerleave', () => surface.removeAttribute('data-spot'));
   }
 
+  // The Hevalo tile turns towards the pointer anywhere over its band, more the
+  // further the pointer is from it, and catches the light on that side. (The
+  // deer on it turns a little further, HevaloDeer.astro.)
   for (const tilt of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
-    tilt.addEventListener('pointermove', (event) => {
+    const area = tilt.closest<HTMLElement>('[data-spotlight]') ?? tilt;
+    let queued = false;
+    let inside = false;
+    let x = 0;
+    let y = 0;
+    area.addEventListener('pointermove', (event) => {
       if (event.pointerType !== 'mouse') return;
-      const rect = tilt.getBoundingClientRect();
-      const px = clamp((event.clientX - rect.left) / rect.width);
-      const py = clamp((event.clientY - rect.top) / rect.height);
-      tilt.style.setProperty('--tilt-x', `${((0.5 - py) * 18).toFixed(2)}deg`);
-      tilt.style.setProperty('--tilt-y', `${((px - 0.5) * 18).toFixed(2)}deg`);
-      tilt.style.setProperty('--glare-x', `${(px * 100).toFixed(1)}%`);
-      tilt.style.setProperty('--glare-y', `${(py * 100).toFixed(1)}%`);
-      tilt.toggleAttribute('data-tilting', true);
+      inside = true;
+      x = event.clientX;
+      y = event.clientY;
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        if (!inside) return;
+        const rect = tilt.getBoundingClientRect();
+        const box = area.getBoundingClientRect();
+        // -1 to 1: from the tile's centre to the band's far edge.
+        const dx = clamp((x - (rect.left + rect.width / 2)) / (box.width / 2), -1, 1);
+        const dy = clamp((y - (rect.top + rect.height / 2)) / (box.height / 2), -1, 1);
+        tilt.style.setProperty('--tilt-x', `${(-dy * 12).toFixed(2)}deg`);
+        tilt.style.setProperty('--tilt-y', `${(dx * 16).toFixed(2)}deg`);
+        tilt.style.setProperty('--glare-x', `${(50 + dx * 50).toFixed(1)}%`);
+        tilt.style.setProperty('--glare-y', `${(50 + dy * 50).toFixed(1)}%`);
+        tilt.toggleAttribute('data-tilting', true);
+      });
     });
-    tilt.addEventListener('pointerleave', () => {
+    area.addEventListener('pointerleave', () => {
+      inside = false;
       for (const name of ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y']) tilt.style.removeProperty(name);
       tilt.removeAttribute('data-tilting');
     });

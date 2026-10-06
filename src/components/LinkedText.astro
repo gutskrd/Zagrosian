@@ -1,0 +1,22 @@
+---
+/** Text with links in it, as src/lib/faq.ts gives it (the FAQ's answers). */
+import type { FaqPart } from '../lib/faq';
+
+interface Props {
+  parts: FaqPart[];
+}
+
+const { parts } = Astro.props;
+---
+
+{
+  parts.map((part) =>
+    typeof part === 'string' ? (
+      part
+    ) : (
+      <a href={part.href} dir={part.ltr ? 'ltr' : undefined}>
+        {part.text}
+      </a>
+    ),
+  )
+}

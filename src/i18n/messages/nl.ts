@@ -65,8 +65,9 @@ export const nl: Messages = {
     visit: 'Bezoek hevalo.app',
     website: 'Website',
     comingSoon: 'Binnenkort',
-    comingSoonTitle: 'Hevalo voor iOS en Android.',
-    comingSoonNote: 'De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
+    dialectsLabel: 'Dialecten',
+    dialects: 'Eerst Kurmanji, meer volgen',
+    platformsLabel: 'iOS en Android',
     proverb: 'Een boom gedijt op zijn eigen wortels, een mens in zijn eigen taal.',
     proverbSource: 'Koerdisch spreekwoord',
   },
@@ -87,6 +88,7 @@ export const nl: Messages = {
     eyebrow: 'FAQ',
     title: 'Veelgestelde vragen.',
     privacyLink: 'privacyverklaring',
+    more: 'Nog een vraag? Mail ons via {contact}.',
     items: [
       {
         question: 'Wat doet Zagrosian?',

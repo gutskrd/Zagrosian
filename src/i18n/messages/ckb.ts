@@ -68,8 +68,9 @@ export const ckb: Messages = {
     visit: 'سەردانی hevalo.app بکە',
     website: 'ماڵپەڕ',
     comingSoon: 'بەم زووانە',
-    comingSoonTitle: 'Hevalo بۆ iOS و ئەندرۆید.',
-    comingSoonNote: 'ئەپە ڕەسەنەکان لە قۆناغی گەشەپێداندان و لە App Store و Google Play بەردەست دەبن.',
+    dialectsLabel: 'زاراوەکان',
+    dialects: 'سەرەتا کرمانجی، زاراوەکانی تریش لە پلاندان',
+    platformsLabel: 'iOS و ئەندرۆید',
     proverb: 'دار لەسەر ڕەگی خۆی سەوز دەبێت و مرۆڤ لەسەر زمانی خۆی.',
     proverbSource: 'پەندی پێشینانی کوردی',
   },
@@ -91,6 +92,7 @@ export const ckb: Messages = {
     eyebrow: 'پرسیار و وەڵام',
     title: 'پرسیارە باوەکان.',
     privacyLink: 'سیاسەتی تایبەتێتی',
+    more: 'پرسیارێکی ترتان هەیە؟ ئیمەیل بنێرن بۆ {contact}.',
     items: [
       {
         question: 'Zagrosian چی دەکات؟',

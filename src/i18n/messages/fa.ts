@@ -68,8 +68,9 @@ export const fa: Messages = {
     visit: 'بازدید از hevalo.app',
     website: 'وب‌سایت',
     comingSoon: 'به‌زودی',
-    comingSoonTitle: 'Hevalo برای iOS و اندروید.',
-    comingSoonNote: 'اپلیکیشن‌های بومی در حال توسعه‌اند و در App Store و Google Play عرضه خواهند شد.',
+    dialectsLabel: 'گویش‌ها',
+    dialects: 'نخست کرمانجی، گویش‌های دیگر در برنامه است',
+    platformsLabel: 'iOS و اندروید',
     proverb: 'درخت بر ریشهٔ خود سبز می‌شود و انسان در زبان خود.',
     proverbSource: 'ضرب‌المثل کردی',
   },
@@ -91,6 +92,7 @@ export const fa: Messages = {
     eyebrow: 'پرسش و پاسخ',
     title: 'پرسش‌های متداول.',
     privacyLink: 'سیاست حریم خصوصی',
+    more: 'پرسش دیگری دارید؟ به {contact} ایمیل بزنید.',
     items: [
       {
         question: 'Zagrosian چه کار می‌کند؟',

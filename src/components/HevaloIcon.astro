@@ -4,22 +4,22 @@
  * dressed for Christmas. theme-init.js marks the season before the page is
  * drawn, so the icon never swaps in front of the visitor.
  *
- * Each comes as WebP at four sizes, so a screen downloads only the resolution
+ * Each comes as WebP at three sizes, so a screen downloads only the resolution
  * it needs, and only the one in season: both images are lazy, and browsers do
  * not download a lazy image that is not displayed.
  *
- * The deer's pupils are not in the images: they are drawn over them, at the
- * places they have in the artwork, so they can follow the pointer
- * (src/scripts/eyes.ts). The two icons share the same eyes.
+ * The deer's pupils are not in the images: they are drawn over them
+ * (HevaloEyes.astro), at the places they have in the artwork, so they can
+ * follow the pointer (src/scripts/eyes.ts). The two icons share the same eyes.
+ * In the products section the deer is shown in 3D instead (HevaloDeer.astro).
  */
 import christmas96 from '../assets/brand/hevalo-christmas-96.webp';
 import christmas192 from '../assets/brand/hevalo-christmas-192.webp';
 import christmas288 from '../assets/brand/hevalo-christmas-288.webp';
-import christmas576 from '../assets/brand/hevalo-christmas-576.webp';
 import icon96 from '../assets/brand/hevalo-96.webp';
 import icon192 from '../assets/brand/hevalo-192.webp';
 import icon288 from '../assets/brand/hevalo-288.webp';
-import icon576 from '../assets/brand/hevalo-576.webp';
+import HevaloEyes from './HevaloEyes.astro';
 
 interface Props {
   /** Rendered width, as a `sizes` value, e.g. "20px". */
@@ -32,8 +32,8 @@ interface Props {
 const { sizes, alt = '', class: className } = Astro.props;
 
 const variants = [
-  { season: 'everyday', images: [icon96, icon192, icon288, icon576] },
-  { season: 'christmas', images: [christmas96, christmas192, christmas288, christmas576] },
+  { season: 'everyday', images: [icon96, icon192, icon288] },
+  { season: 'christmas', images: [christmas96, christmas192, christmas288] },
 ];
 ---
 
@@ -55,8 +55,7 @@ const variants = [
       />
     ))
   }
-  <span class="hevalo-icon__eye hevalo-icon__eye--left" aria-hidden="true"><span class="hevalo-icon__pupil" data-pupil></span></span>
-  <span class="hevalo-icon__eye hevalo-icon__eye--right" aria-hidden="true"><span class="hevalo-icon__pupil" data-pupil></span></span>
+  <HevaloEyes frame="icon" />
 </span>
 
 <style>
@@ -65,57 +64,6 @@ const variants = [
     display: flow-root;
     flex: none;
     user-select: none;
-  }
-
-  /* The eyes, measured on the 360 px square the images are cut to: the white
-     of each eye (58 × 68 px, which keeps its pupil inside) and its pupil
-     (31 × 48 px), with the highlight that moves with it. At rest the pupils
-     sit as drawn, turned in towards each other. */
-  .hevalo-icon__eye {
-    position: absolute;
-    top: 51.667%;
-    width: 16.111%;
-    height: 18.889%;
-    clip-path: ellipse(50% 50% at 50% 50%);
-    pointer-events: none;
-  }
-
-  .hevalo-icon__eye--left {
-    left: 26.944%;
-  }
-
-  .hevalo-icon__eye--right {
-    left: 56.111%;
-  }
-
-  .hevalo-icon__pupil {
-    position: absolute;
-    top: 17.7%;
-    width: 53.79%;
-    height: 70.59%;
-    border-radius: 50%;
-    background: #532e28;
-    /* Kept in forced colours too: the images have no pupils of their own. */
-    forced-color-adjust: none;
-  }
-
-  .hevalo-icon__eye--left .hevalo-icon__pupil {
-    left: 43.1%;
-  }
-
-  .hevalo-icon__eye--right .hevalo-icon__pupil {
-    left: 6.38%;
-  }
-
-  .hevalo-icon__pupil::after {
-    content: '';
-    position: absolute;
-    top: 8.96%;
-    left: -2.24%;
-    width: 46.15%;
-    height: 30%;
-    border-radius: 50%;
-    background: #fff;
   }
 
   .hevalo-icon__image {

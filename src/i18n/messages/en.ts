@@ -75,8 +75,10 @@ export const en = {
     visit: 'Visit hevalo.app',
     website: 'Website',
     comingSoon: 'Coming soon',
-    comingSoonTitle: 'Hevalo for iOS and Android.',
-    comingSoonNote: 'The native apps are in development and will be available on the App Store and Google Play.',
+    /** The facts under Hevalo's description: its dialects, and its native apps (shown with `comingSoon`). */
+    dialectsLabel: 'Dialects',
+    dialects: 'Kurmanji first, more planned',
+    platformsLabel: 'iOS and Android',
     /** Translation of the Kurmanji proverb shown with Hevalo (`kurdish.proverb` in src/site.ts). Empty in Kurmanji. */
     proverb: 'A tree flourishes on its own roots, a person in their own language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
@@ -108,6 +110,8 @@ export const en = {
     eyebrow: 'FAQ',
     title: 'Common questions.',
     privacyLink: 'privacy policy',
+    /** After the questions; {contact} becomes the email link. */
+    more: 'Still have a question? Email us at {contact}.',
     items: [
       {
         question: 'What does Zagrosian do?',

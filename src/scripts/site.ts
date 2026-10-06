@@ -4,6 +4,7 @@
  * modules of their own. All of them start at the end of this file.
  */
 import { initCommandMenu } from './command';
+import { initDeer } from './deer';
 import { initEyes } from './eyes';
 import { initSound } from './sound';
 import { initText } from './text';
@@ -279,3 +280,4 @@ initMotion();
 initText();
 initSound();
 initEyes();
+initDeer();

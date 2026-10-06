@@ -17,7 +17,7 @@ import {
   type Locale,
 } from '../i18n';
 import { hevalo, kurdish, site, socialProfiles } from '../site';
-import { answerMarkdown, faq } from './faq';
+import { answerMarkdown, faq, faqMore } from './faq';
 
 export interface TextPage {
   locale: Locale;
@@ -70,8 +70,9 @@ ${t.hevalo.category}. ${t.hevalo.description}
 > *${kurdish.proverb}*${t.hevalo.proverb ? ` (${t.hevalo.proverb})` : ''}
 > — ${kurdish.proverbSource}${t.hevalo.proverbSource ? `, ${t.hevalo.proverbSource}` : ''}
 
+- ${t.hevalo.dialectsLabel}: ${t.hevalo.dialects}
 - ${t.hevalo.website}: [${hevalo.domain}](${hevalo.url})
-- ${t.hevalo.comingSoon}: ${t.hevalo.comingSoonTitle} ${t.hevalo.comingSoonNote}
+- ${t.hevalo.platformsLabel}: ${t.hevalo.comingSoon}
 
 ## ${t.about.eyebrow}
 
@@ -85,6 +86,8 @@ ${t.about.approach}
 ## ${t.faq.title.replace(/[.。]$/, '')}
 
 ${questions.join('\n\n')}
+
+${answerMarkdown(faqMore(locale))}
 
 ## ${t.contact.eyebrow}
 
@@ -165,7 +168,7 @@ export async function llmsTxt(): Promise<string> {
 > ${t.meta.description}
 
 - Headquarters: ${t.about.headquarters}
-- Products: ${hevalo.name} (${hevalo.url}): ${t.hevalo.category}. On the web at ${hevalo.domain}; iOS and Android apps coming soon.
+- Products: ${hevalo.name} (${hevalo.url}): ${t.hevalo.category}. Website: ${hevalo.domain}; iOS and Android apps coming soon.
 - Contact: ${site.emails.contact} (general), ${site.emails.press} (press)
 - Social media: ${social}
 - Languages: ${locales.map((locale) => locale.englishName).join(', ')}

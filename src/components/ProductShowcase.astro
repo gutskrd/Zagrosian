@@ -2,7 +2,7 @@
 import { i18n } from '../i18n';
 import { hevalo, kurdish } from '../site';
 import Cta from './Cta.astro';
-import HevaloIcon from './HevaloIcon.astro';
+import HevaloDeer from './HevaloDeer.astro';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
@@ -16,16 +16,23 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a real object: a tile with depth, which turns to
-          face the reader as the section scrolls into view. Decoration: the
-          name beside it says what it is. */}
+      {/* Hevalo's app icon as a real object: a tile with depth, with the deer
+          standing out of it in layers (HevaloDeer.astro). It turns to face the
+          reader as the section scrolls into view, and towards the pointer.
+          Decoration: the name beside it says what it is. */}
       <div class="showcase__art" aria-hidden="true" data-reveal>
         <span class="showcase__glow"></span>
         <span class="showcase__shadow"></span>
         <div class="showcase__turn">
           <span class="showcase__tilt" data-tilt>
             {slices.map((depth) => <span class="showcase__slice" data-depth={depth} />)}
-            <HevaloIcon class="showcase__face" sizes="(min-width: 64rem) 19rem, 11rem" />
+            <HevaloDeer
+              widths={[
+                ['(min-width: 64rem)', 21],
+                ['(min-width: 40rem)', 17],
+                [null, 14],
+              ]}
+            />
           </span>
         </div>
       </div>
@@ -37,6 +44,21 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
           <p class="showcase__description" data-lines>{t.hevalo.description}</p>
           <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
         </div>
+        {/* The facts at a glance, as the FAQ and the hero's notice give them. */}
+        <dl class="showcase__facts rule" data-reveal>
+          <div>
+            <dt>{t.hevalo.dialectsLabel}</dt>
+            <dd>{t.hevalo.dialects}</dd>
+          </div>
+          <div>
+            <dt>{t.hevalo.website}</dt>
+            <dd><a href={hevalo.url} dir="ltr">{hevalo.domain}</a></dd>
+          </div>
+          <div>
+            <dt>{t.hevalo.platformsLabel}</dt>
+            <dd class="showcase__status"><span class="status-dot" aria-hidden="true"></span>{t.hevalo.comingSoon}</dd>
+          </div>
+        </dl>
       </div>
     </div>
 
@@ -52,13 +74,6 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
       </figcaption>
     </figure>
 
-    <div class="showcase__soon rule" data-reveal>
-      <div class="showcase__soon-heading">
-        <p class="showcase__status"><span class="status-dot" aria-hidden="true"></span>{t.hevalo.comingSoon}</p>
-        <h3 class="showcase__soon-title">{t.hevalo.comingSoonTitle}</h3>
-      </div>
-      <p class="showcase__soon-text" data-lines>{t.hevalo.comingSoonNote}</p>
-    </div>
   </div>
 </section>
 
@@ -68,6 +83,8 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
   .showcase {
     position: relative;
     isolation: isolate;
+    /* The tile's glow may spread past a narrow screen's edge. */
+    overflow-x: clip;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
   }
@@ -101,16 +118,19 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 
   /* ---- The tile ----
      The app icon's purple square (the deer's ears reach a little past its
-     sides: 3.9% each side of the 360-unit image, corners 76 units) with a
+     sides: 4.3% each side of the 360-unit image, corners 76 units) with a
      depth of 9% of its width, in ten layers that darken towards the back,
-     as the edge of a lit object does. */
+     as the edge of a lit object does. The deer stands out of its face
+     (HevaloDeer.astro). */
   .showcase__art {
     /* In units of the tile's own width (cqi), so it keeps its proportions. */
     --depth: 9cqi;
+    /* It turns towards the text: leftwards, or rightwards on right-to-left pages. */
+    --side: 1;
 
     position: relative;
     justify-self: center;
-    width: 11rem;
+    width: 14rem;
     aspect-ratio: 1;
     container-type: inline-size;
     perspective: 60rem;
@@ -123,9 +143,13 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     transform-style: preserve-3d;
   }
 
+  :global([dir='rtl']) .showcase__art {
+    --side: -1;
+  }
+
   /* At rest the tile is turned a little, so its depth shows. */
   .showcase__turn {
-    transform: rotateX(8deg) rotateY(-18deg);
+    transform: rotateX(8deg) rotateY(calc(-18deg * var(--side)));
     transform-origin: 50% 50% calc(var(--depth) * -0.5);
   }
 
@@ -143,7 +167,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 
   .showcase__slice {
     position: absolute;
-    inset: 0 3.9%;
+    inset: 0 4.3%;
     border-radius: 23% / 21%;
     transform: translateZ(calc(var(--depth) * var(--z) * -1));
   }
@@ -198,17 +222,11 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     background: #5f309c;
   }
 
-  .showcase__art :global(.showcase__face) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-  }
-
-  /* The highlight covers the purple square, with its corners. */
+  /* The highlight lies on the purple square, under the deer. */
   .showcase__tilt::after {
     content: '';
     position: absolute;
-    inset: 0 3.9%;
+    inset: 0 4.3%;
     border-radius: 23% / 21%;
     background: radial-gradient(
       circle at var(--glare-x, 30%) var(--glare-y, 10%),
@@ -217,7 +235,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     );
     opacity: 0;
     pointer-events: none;
-    transform: translateZ(1px);
+    transform: translateZ(0.2cqi);
     transition: opacity 0.5s ease;
   }
 
@@ -270,11 +288,11 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 
   @keyframes showcase-turn {
     from {
-      transform: rotateX(22deg) rotateY(-48deg) rotateZ(5deg) translateY(10%);
+      transform: rotateX(22deg) rotateY(calc(-48deg * var(--side))) rotateZ(calc(5deg * var(--side))) translateY(10%);
     }
 
     to {
-      transform: rotateX(8deg) rotateY(-18deg);
+      transform: rotateX(8deg) rotateY(calc(-18deg * var(--side)));
     }
   }
 
@@ -377,35 +395,51 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     margin-inline-end: 0.75rem;
   }
 
-  .showcase__soon {
+  /* The facts: small, in three columns under a hairline, as in About. */
+  .showcase__facts {
     display: grid;
-    gap: 1.5rem;
-    margin-top: clamp(5rem, 3rem + 7vw, 9rem);
-    padding-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+    gap: 1.25rem;
+    margin: clamp(2.5rem, 2rem + 2vw, 3.5rem) 0 0;
+    padding-top: 1.5rem;
     --rule-color: var(--color-line-strong);
+    font-size: var(--text-sm);
+  }
+
+  .showcase__facts dt {
+    color: var(--color-muted);
+  }
+
+  .showcase__facts dd {
+    margin: 0.25rem 0 0;
+  }
+
+  .showcase__facts a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    text-decoration-color: var(--color-underline);
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .showcase__facts a:hover {
+    text-decoration-color: currentColor;
   }
 
   .showcase__status {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 0.625rem;
-    font-size: var(--text-sm);
-    font-weight: 500;
-    color: var(--color-muted);
   }
 
-  .showcase__soon-title {
-    margin-top: 0.875rem;
-    font-size: clamp(1.875rem, 1.3rem + 2.4vw, 3.5rem);
-    font-weight: 560;
-    line-height: 1.05;
-    letter-spacing: -0.035em;
-    text-wrap: balance;
-  }
+  @media (min-width: 40rem) {
+    .showcase__art {
+      width: 17rem;
+    }
 
-  .showcase__soon-text {
-    max-width: 28rem;
-    color: var(--color-muted);
+    .showcase__facts {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 2rem;
+    }
   }
 
   @media (min-width: 64rem) {
@@ -423,25 +457,16 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     .showcase__art {
       grid-column: 8 / -1;
       grid-row: 1;
-      width: 19rem;
+      width: 21rem;
     }
 
     .showcase__details {
       --reveal-delay: 0.12s;
     }
 
-    .showcase__soon {
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      column-gap: 2rem;
-      align-items: end;
+    .showcase__facts {
+      --reveal-delay: 0.2s;
     }
 
-    .showcase__soon-heading {
-      grid-column: 1 / span 7;
-    }
-
-    .showcase__soon-text {
-      grid-column: 8 / -1;
-    }
   }
 </style>

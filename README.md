@@ -73,7 +73,7 @@ public/            Favicons, logo, social images (og.png and og/<language>.png),
                    robots.txt and Cloudflare _headers
 src/
   assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
-                   sizes), the 21-ray sun and the Hevalo app icon
+                   sizes), the 21-ray sun, the Hevalo app icon and (deer/) its 3D deer's layers
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, Story, ProductShowcase, About, Faq, Contact, CommandMenu,
                    LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
@@ -87,8 +87,8 @@ src/
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
-                   story.ts (the homepage story), eyes.ts
-                   (Hevalo's eyes), sound.ts, text.ts,
+                   story.ts (the homepage story), eyes.ts and deer.ts
+                   (Hevalo's eyes, and the 3D deer's blinks and twitches), sound.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
@@ -137,18 +137,30 @@ src/
   text above the Kurdish motto ([`Sun.astro`](src/components/Sun.astro)), where it rises in the
   homepage story.
 - **Hevalo icon** (`src/assets/brand/hevalo-source.png` and `hevalo-christmas-source.png`): Hevalo's
-  app icon, the deer, shown above the product name and in the hero's *coming soon* notice. From
+  app icon, the deer, in the hero's *coming soon* notice and, in 3D, in the products section. From
   1 December to 6 January the site shows the Christmas version instead: `theme-init.js` sets
   `data-season="christmas"` before the first paint, and only the icon in season is downloaded. The
   served WebPs (`hevalo-96/192/288.webp`, `hevalo-christmas-96/192/288.webp`) are cropped to the same
   360 px box at (70, 64) in the 500 px sources, so the two line up; the Christmas deer's scarf hangs
   below it. Near-invisible pixels (alpha ≤ 8) are made fully transparent, and the WebPs are quality 80.
   The deer's eyes follow the pointer ([`eyes.ts`](src/scripts/eyes.ts)): the mouse, or on a touch
-  screen the finger, while it touches and for a moment after. The served WebPs have the pupils
+  screen the finger, while it touches and for a moment after. Every served image is made from
+  `hevalo-eyeless-source.png` and `hevalo-christmas-eyeless-source.png`, the sources with the pupils
   painted out (filled from the white around them), and the pupils, with their highlights, are drawn
-  over the images at the places they have in the artwork; each moves within the white of its eye and
-  returns to the artwork's pose, turned in, when there is nothing to follow. The two icons share the
-  same eyes. Not with *reduce motion*; in forced colours the pupils keep their colour.
+  over the images ([`HevaloEyes.astro`](src/components/HevaloEyes.astro)) at the places they have in
+  the artwork; each moves within the white of its eye and returns to the artwork's pose, turned in,
+  when there is nothing to follow. Both seasons, the icon and the 3D deer share the same eyes. Not
+  with *reduce motion*; in forced colours the pupils keep their colour.
+  - **3D deer** ([`HevaloDeer.astro`](src/components/HevaloDeer.astro)): for the products section,
+    [`scripts/deer-layers.cjs`](scripts/deer-layers.cjs) takes the eyeless icon apart into layers
+    (`src/assets/brand/deer/`): the purple face (the everyday deer's neck stays on it), the shade
+    the deer casts on it, the antlers, each ear, the head (with the Christmas scarf) and the nose.
+    Each layer is the deer's own pixels, unmixed from the purple at their edges (the purple is a
+    fitted gradient, so no trace of the deer is left on the face), and the layers behind the head
+    reach a little under it in their own colour, so nothing opens up when they move apart. Laid back
+    together they give the icon again. WebP at 288 and 576 px (the soft shade at 144): about 77 KB
+    for the everyday deer at the larger size, loaded lazily. Run `node scripts/deer-layers.cjs` after
+    changing a source; it prints each layer's box, which `HevaloDeer.astro` positions it by.
 
 - **Fonts:** Latin text is set in Inter and Arabic script (Arabic, Sorani and Persian) in
   [Vazirmatn](https://github.com/rastikerdar/vazirmatn), both self-hosted variable fonts under the OFL.
@@ -250,19 +262,28 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
-- **Products:** Hevalo's app icon is a real object: the icon on a tile with depth (ten layers through
-  its thickness, darkening towards the back like the edge of a lit object), a soft shadow on the floor
-  and a glow in its purple. It turns from the side to face the reader as the section scrolls into
-  view, and under a mouse it tilts towards the pointer with a highlight. Its images go up to 576 px
-  wide, so it stays sharp at its size on high-density screens.
+- **Products:** Hevalo's app icon is a real object: a tile with depth (ten layers through its
+  thickness, darkening towards the back like the edge of a lit object), a soft shadow on the floor and
+  a glow in its purple, and on its face the deer itself in 3D: the shade it casts, then the antlers,
+  the ears, the head with its eyes and the nose, each at its own depth, so they part like a relief as
+  the tile turns. As the section scrolls into view the tile turns from the side to face the reader
+  and the deer rises out of its icon, the layers parting as it turns (scroll-driven, see below).
+  With a mouse anywhere over the band the tile turns towards the pointer with a highlight, the deer's
+  layers parting with it, and its eyes follow the pointer. The deer is alive but never busy
+  ([`deer.ts`](src/scripts/deer.ts)): on screen it blinks every few seconds and now and then twitches
+  an ear or sniffs; when it first comes into view it pricks up its ears, and a tap or click gets
+  all of it at once. Each is a short CSS animation (`transform` only) started by an attribute and
+  removed when it is over, so nothing runs in between, off screen or in a background tab. Under
+  the name, the facts at a glance (dialects, website, iOS and Android coming soon), as the FAQ and
+  the hero's notice say them.
 - **Scroll-driven CSS:** where the browser runs scroll-linked animations itself (CSS
-  `animation-timeline`: Chrome, Edge and Safari 26), the tile's turn, the footer wordmark and the
-  legal pages' reading bar are left to it, so they move on the graphics card in step with the scroll;
-  elsewhere a script does the same (motion.ts). They are written as separate properties, because the
-  build's minifier would otherwise fold the timeline into the `animation` shorthand, which browsers
-  reject.
+  `animation-timeline`: Chrome, Edge and Safari 26), the tile's turn, the deer rising out of it, the
+  footer wordmark and the legal pages' reading bar are left to it, so they move on the graphics card
+  in step with the scroll; elsewhere a script does the same (motion.ts), and the deer simply stands
+  out of its tile. They are written as separate properties, because the build's minifier would
+  otherwise fold the timeline into the `animation` shorthand, which browsers reject.
 - **Pointer depth:** with a mouse, the travelling logo leans towards the pointer in 3D, a soft light
-  follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
+  follows the pointer across the products band (`data-spotlight`), and the Hevalo tile turns towards
   it with a highlight. Touch screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 
@@ -333,16 +354,21 @@ and other tools read directly:
 
 - **Structured data:** every page carries a schema.org JSON-LD graph
   ([`src/lib/structured-data.ts`](src/lib/structured-data.ts)): the WebSite, the Organization (logo,
-  contact points, social profiles, the Hevalo brand), Hevalo itself as a web application
-  (`WebApplication`, educational, in Kurdish) and the page itself, with breadcrumbs and a
+  contact points, social profiles, the Hevalo brand), Hevalo itself as an application
+  (`SoftwareApplication`, educational, in Kurdish; where it runs is left out until the native apps
+  are out) and the page itself, with breadcrumbs and a
   last-modified date on the legal pages, and the homepage's questions and answers (`FAQPage`). Nodes
   refer to each other by `@id`, so they form one description of the company. (Google stopped showing
   FAQ rich results in May 2026; the markup stays because it is accurate and other tools read it.)
 - **Questions and answers** ([`Faq.astro`](src/components/Faq.astro), `faq` in the message files):
-  six short questions before Contact, each a heading with its answer under it, all shown (no
-  accordion), so visitors, search engines and AI assistants read them as they are. Every answer says
-  only what the rest of the site already says. They are in the Markdown version and the structured
-  data too, from one list ([`src/lib/faq.ts`](src/lib/faq.ts)).
+  six short questions before Contact, each opening to its answer (native `details`: keyboard and
+  screen-reader ready, working without JavaScript, and find-in-page opens the answer it finds). The
+  answer slides open to its natural height where the browser can animate it (`::details-content`
+  with `interpolate-size`), and the plus beside the question turns into a minus. A line after the
+  list says where to ask anything else (`faq.more`). The answers are in the page either way, so
+  search engines and AI assistants read them; every answer says only what the rest of the site
+  already says. They are in the Markdown version and the structured data too, from one list
+  ([`src/lib/faq.ts`](src/lib/faq.ts)).
 - **Search previews:** indexable pages allow large image previews and full-length snippets
   (`<meta name="robots" content="… max-image-preview:large, max-snippet:-1 …">`).
 - **Markdown versions:** every page, in every language, is also published as Markdown (`/index.md`,

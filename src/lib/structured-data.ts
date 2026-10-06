@@ -77,16 +77,15 @@ export function structuredData(page: PageData) {
       logo: hevalo.logo,
       description: english.hevalo.description,
     },
-    // Hevalo itself: the app, on the web for now (the native apps are coming).
+    // Hevalo itself: the app. Where it runs is left out: its site is
+    // hevalo.app, and the native apps for iOS and Android are coming.
     {
-      '@type': 'WebApplication',
+      '@type': 'SoftwareApplication',
       '@id': ids.hevaloApp,
       name: hevalo.name,
       url: hevalo.url,
       description: english.hevalo.description,
       applicationCategory: 'EducationalApplication',
-      operatingSystem: 'Web browser',
-      browserRequirements: 'Requires a modern web browser.',
       inLanguage: 'ku',
       brand: { '@id': ids.hevalo },
       publisher: { '@id': ids.organization },

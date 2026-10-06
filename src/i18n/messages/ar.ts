@@ -66,8 +66,9 @@ export const ar: Messages = {
     visit: 'زيارة hevalo.app',
     website: 'الموقع الإلكتروني',
     comingSoon: 'قريبًا',
-    comingSoonTitle: 'Hevalo على iOS وأندرويد.',
-    comingSoonNote: 'التطبيقات الأصلية قيد التطوير، وستكون متاحة على App Store وGoogle Play.',
+    dialectsLabel: 'اللهجات',
+    dialects: 'الكرمانجية أولًا، مع خطط للهجات أخرى',
+    platformsLabel: 'iOS وأندرويد',
     proverb: 'الشجرة على جذورها، والإنسان على لسانه يزدهر.',
     proverbSource: 'مثل كردي',
   },
@@ -88,6 +89,7 @@ export const ar: Messages = {
     eyebrow: 'أسئلة وأجوبة',
     title: 'الأسئلة الشائعة.',
     privacyLink: 'سياسة الخصوصية',
+    more: 'هل لديك سؤال آخر؟ راسلنا على {contact}.',
     items: [
       {
         question: 'ماذا تفعل Zagrosian؟',

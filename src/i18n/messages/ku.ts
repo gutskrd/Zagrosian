@@ -67,8 +67,9 @@ export const ku: Messages = {
     visit: 'Serdana hevalo.app bike',
     website: 'Malper',
     comingSoon: 'Di rê de',
-    comingSoonTitle: 'Hevalo ji bo iOS û Androidê.',
-    comingSoonNote: 'Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
+    dialectsLabel: 'Zarava',
+    dialects: 'Pêşî kurmancî, yên din di plana me de ne',
+    platformsLabel: 'iOS û Android',
     proverb: '',
     proverbSource: '',
   },
@@ -91,6 +92,7 @@ export const ku: Messages = {
     eyebrow: 'Pirs û bersiv',
     title: 'Pirsên ku pir tên pirsîn.',
     privacyLink: 'polîtîkaya me ya nepeniyê',
+    more: 'Pirseke we ya din heye? E-nameyê ji {contact} re bişînin.',
     items: [
       {
         question: 'Zagrosian çi dike?',
