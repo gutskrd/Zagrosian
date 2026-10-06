@@ -153,9 +153,9 @@ src/
   with *reduce motion*; in forced colours the pupils keep their colour.
   - **3D deer** ([`HevaloDeer.astro`](src/components/HevaloDeer.astro)): for the products section,
     [`scripts/deer-layers.cjs`](scripts/deer-layers.cjs) takes the eyeless icon apart into layers
-    (`src/assets/brand/deer/`): the shade the deer casts on the page, the neck (three versions, for
-    stacking), the antlers, each ear, the head (with the Christmas scarf), the nose, and the
-    Christmas snowflakes (the purple itself is drawn in CSS). Each layer is the deer's own pixels,
+    (`src/assets/brand/deer/`): the shade the deer casts on the page, the neck (whole under the chin
+    and carried on below the tile's edge, so the hole never shows its end), the antlers, each ear,
+    the head (with the Christmas scarf), the nose, and the Christmas snowflakes (the purple itself is drawn in CSS). Each layer is the deer's own pixels,
     unmixed from the purple at their edges (the purple is a fitted gradient, so no trace of the deer
     is left on it); the cuts follow the artwork's own outlines (the jaw takes in the shaded
     underside of the chin, the nose is solid inside its outline with a soft edge in its own colour),
@@ -266,34 +266,27 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
-- **Products:** Hevalo's app icon is a hole in the page the deer climbs out of. Nothing stands on
-  the page: the page itself is cut in the icon's shape (a thin cut edge, darker inside), and through
-  it is the purple space behind the page, with the deer in it. As the section scrolls into view the
-  deer comes forward from deep behind the page (faded into the purple there, by three veils of haze
-  at different depths), through the hole, until its head is out in front of the page: the ears and
-  antlers over its edge, the chin over its sill, a soft shade on the page around it. Its neck
-  reaches back into the hole in copies through the depth. What is behind and in front of the page
-  moves as it would behind a real window: the view is drawn from where the reader's eye is
-  (`perspective()` in the scene's transform, about the eye): down, the scroll moves the eye from
-  half a screen above the hole to half a screen below it; across, it is the middle of the screen,
-  and with a mouse it leans towards the pointer ([`deer.ts`](src/scripts/deer.ts)). The page round
-  the hole is drawn in the 3D scene, in the section's colour, so whatever is behind the page is
-  hidden outside the hole from wherever the eye is; the art is therefore painted under the text
-  beside it. The deer is alive but never busy ([`deer.ts`](src/scripts/deer.ts)): on screen it
+- **Products:** Hevalo's app icon is a hole in the page with the deer looking out of it: the page
+  is cut in the icon's shape (its cut edge throws a soft shade inside), through it is the purple
+  space behind the page, and the deer's head is out in front of the page, ears and antlers over the
+  hole's edge, a soft shade on the page around it. Depth is parallax only, as through a window
+  you walk past: as the page scrolls, the purple slides behind and the deer moves a touch the
+  other way, its nearer parts a little more. The neck moves with the head, so the two never part,
+  and nothing in front is ever clipped by the hole. Seven layers, each moved with `translate` only
+  (no 3D, no masks, no script), so it costs the graphics card next to nothing. The deer is alive but never busy ([`deer.ts`](src/scripts/deer.ts)): on screen it
   blinks every few seconds and now and then twitches an ear or sniffs; when it first comes into view
   it pricks up its ears, and a tap or click gets all of it at once. Each is a short CSS animation
   (`transform` only) started by an attribute and removed when it is over, so nothing runs in
   between, off screen or in a background tab. Under the name, the facts at a glance (dialects,
   website, iOS and Android coming soon), as the FAQ and the hero's notice say them.
 - **Scroll-driven CSS:** where the browser runs scroll-linked animations itself (CSS
-  `animation-timeline`: Chrome, Edge and Safari 26), the view into the Hevalo hole and the deer
-  climbing out of it, the footer wordmark and the legal pages' reading bar are left to it, so they
-  move on the graphics card in step with the scroll; elsewhere a script does the same (motion.ts),
-  and the deer is simply out of its hole, seen from just above. They are written as separate properties, because the build's minifier would
+  `animation-timeline`: Chrome, Edge and Safari 26), the depth in the Hevalo hole, the footer
+  wordmark and the legal pages' reading bar are left to it, so they move on the graphics card in
+  step with the scroll; elsewhere a script does the same (motion.ts), and the deer simply looks
+  out of its hole, seen from just above. They are written as separate properties, because the build's minifier would
   otherwise fold the timeline into the `animation` shorthand, which browsers reject.
-- **Pointer depth:** with a mouse, the travelling logo leans towards the pointer in 3D, and the view
-  into the Hevalo hole follows the pointer as if the reader leaned to look. Touch screens and
-  *reduce motion* get none of this.
+- **Pointer depth:** with a mouse, the travelling logo leans towards the pointer in 3D. Touch
+  screens and *reduce motion* get none of this.
 - **Legal pages:** a reading-progress bar and the current section highlighted in the contents.
 
 Rules the code follows:

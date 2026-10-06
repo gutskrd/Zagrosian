@@ -239,7 +239,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
-/* pointer. (Hevalo's icon follows it in deer.ts.)                            */
+/* pointer.                                                                   */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {

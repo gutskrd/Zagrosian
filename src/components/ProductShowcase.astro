@@ -13,9 +13,8 @@ const { t } = i18n(Astro.url);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a hole in the page, the deer climbing out of
-          it from behind the page (HevaloDeer.astro). Decoration: the name
-          beside it says what it is. */}
+      {/* Hevalo's app icon as a hole in the page, the deer looking out of it
+          (HevaloDeer.astro). Decoration: the name beside it says what it is. */}
       <div class="showcase__art" aria-hidden="true" data-reveal>
         <HevaloDeer
           widths={[
@@ -72,8 +71,8 @@ const { t } = i18n(Astro.url);
   .showcase {
     position: relative;
     isolation: isolate;
-    /* The page drawn round the hole may reach past the band's edges. */
-    overflow: clip;
+    /* The icon's glow may spread past a narrow screen's edge. */
+    overflow-x: clip;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
   }
@@ -85,12 +84,10 @@ const { t } = i18n(Astro.url);
   }
 
   /* ---- The icon ----
-     A hole in the page in the shape of the app icon, with the deer climbing
-     out of it (HevaloDeer.astro). It is painted under the text beside it,
-     since the page round the hole is drawn with it. */
+     A hole in the page in the shape of the app icon, with the deer looking
+     out of it (HevaloDeer.astro). */
   .showcase__art {
     position: relative;
-    z-index: -1;
     justify-self: center;
     width: 14rem;
     aspect-ratio: 1;

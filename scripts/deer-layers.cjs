@@ -1,7 +1,7 @@
 // Takes Hevalo's app icon apart into the layers of the 3D deer in the products
-// section (HevaloDeer.astro), where the icon is a hole in the page and the
-// deer climbs out of it from behind: the shade the deer casts on the page, the
-// neck, the antlers, each ear, the head (with the Christmas scarf) and the
+// section (HevaloDeer.astro), where the icon is a hole in the page with the
+// deer looking out of it: the shade the deer casts, the neck (inside the
+// hole), the antlers, each ear, the head (with the Christmas scarf) and the
 // nose, and at Christmas the snowflakes behind it. (The purple is drawn by the
 // page.) Made from the eyeless sources, the pupils being drawn by the page.
 //
@@ -31,9 +31,6 @@ const W = 360;
 // half (measured on the sources, away from the corners and from the deer).
 const SQUARE = { left: 13.72, right: 346.08, top: 0.27, bottom: 358.8 };
 const AXIS = 359.9; // x' = AXIS - x mirrors left and right
-// The icon is a hole in the page (HevaloDeer.astro). The copies of the neck
-// in front of the page stop a little above its bottom edge, the sill.
-const SILL = SQUARE.bottom - 6;
 
 // ---- Outlines, in frame units, traced on the artwork ----
 // creaseL: where the left ear goes under the head; dome: the top of the head;
@@ -585,63 +582,51 @@ async function layersFor({ season, source, height: H }) {
   }
 
   // The neck (the everyday deer's; at Christmas the scarf hides it), as drawn
-  // below the jaw and carried on up under the head. HevaloDeer.astro stacks
-  // it from the back of the window to just behind the head, so it reads as
-  // one neck reaching out through the window: the copy nearest the head keeps
-  // the artwork's soft edge ('neck'); the others are drawn 1 px smaller and
-  // solid, so they never thicken that edge ('neck-core' stops at the sill,
-  // like 'neck', for the copies in front of the frame; 'neck-back' goes on
-  // down behind it).
+  // below the jaw and carried on up under the head. HevaloDeer.astro draws it
+  // inside the hole, moving with the head, so it must be whole wherever the
+  // hole can show it as the two move: under the chin, where the artwork has
+  // none (each row is filled across from the neck either side), and below the
+  // tile's edge (it carries straight on down, so the layer is taller than the
+  // artwork; the hole hides that part).
   if (season === 'everyday') {
-    const soft = new Float32Array(N), colour = new Float32Array(N * 3);
+    const NH = H + 20;
+    const neckLayer = new Float32Array(W * NH * 4);
     for (let i = 0; i < N; i++) {
       const a = A[i] * neck[i];
       const e = extensions.neck.alpha[i] * (1 - neck[i]);
-      if (e > a) {
-        soft[i] = e;
-        colour.set(extensions.neck.colour.subarray(i * 3, i * 3 + 3), i * 3);
-      } else {
-        soft[i] = a;
-        colour.set(F.subarray(i * 3, i * 3 + 3), i * 3);
+      if (e > a) neckLayer.set([...extensions.neck.colour.subarray(i * 3, i * 3 + 3), e], i * 4);
+      else if (a > 0.004) neckLayer.set([F[i * 3], F[i * 3 + 1], F[i * 3 + 2], a], i * 4);
+    }
+    // The last row the artwork draws whole.
+    const edge = Math.floor(SQUARE.bottom) - 3;
+    for (let y = 280; y <= edge; y++) {
+      const under = (x) => head[y * W + x] >= 0.3;
+      const drawn = (x) => x >= 0 && x < W && !under(x) && neckLayer[(y * W + x) * 4 + 3] >= 0.9;
+      for (let x = 1; x < W; x++) {
+        if (!under(x) || !drawn(x - 1)) continue;
+        let end = x;
+        while (end < W && under(end)) end++;
+        if (drawn(end)) {
+          // From a little way into the neck either side, past the jaw's edge.
+          const a = drawn(x - 3) ? x - 3 : x - 1;
+          const b = drawn(end + 2) ? end + 2 : end;
+          const l = (y * W + a) * 4, r = (y * W + b) * 4;
+          for (let g = x; g < end; g++) {
+            const t = (g - a) / (b - a);
+            const m = (y * W + g) * 4;
+            for (let c = 0; c < 3; c++) neckLayer[m + c] = neckLayer[l + c] + (neckLayer[r + c] - neckLayer[l + c]) * t;
+            neckLayer[m + 3] = 1;
+          }
+        }
+        x = end;
       }
     }
-    const solid = Float32Array.from(soft, (a) => (a >= 0.5 ? 1 : 0));
-    // Erode by 1 px: a pixel stays if its four neighbours are neck too.
-    const core = new Float32Array(N);
-    for (let y = 1; y < H - 1; y++)
-      for (let x = 1; x < W - 1; x++) {
-        const i = y * W + x;
-        core[i] = solid[i] && solid[i - 1] && solid[i + 1] && solid[i - W] && solid[i + W] ? 1 : 0;
-      }
-    // The copies' colour at their sides comes from 3 px in, not from the
-    // edge itself (which carries a trace of the purple); deeper copies are a
-    // little darker, so the side of the neck reads as in shade.
-    const inner = new Float32Array(N * 3);
-    for (let y = 0; y < H; y++) {
-      let x0 = -1, x1 = -1;
-      for (let x = 0; x < W; x++) if (core[y * W + x]) { if (x0 < 0) x0 = x; x1 = x; }
-      if (x0 < 0) continue;
-      for (let x = x0; x <= x1; x++) {
-        const sx = Math.min(Math.max(x, x0 + 3), x1 - 3);
-        inner.set(colour.subarray((y * W + sx) * 3, (y * W + sx) * 3 + 3), (y * W + x) * 3);
-      }
-    }
-    const sill = (y) => 1 - smooth(SILL - 0.5, SILL + 0.5, y + 0.5);
-    const layer = (alphaAt, rgb, shade = 1) => {
-      const out = new Float32Array(N * 4);
-      for (let i = 0; i < N; i++) {
-        const a = alphaAt(i, (i / W) | 0);
-        if (a > 0.004) out.set([rgb[i * 3] * shade, rgb[i * 3 + 1] * shade, rgb[i * 3 + 2] * shade, a], i * 4);
-      }
-      return out;
-    };
-    layers.neck = layer((i, y) => soft[i] * sill(y), colour);
-    layers['neck-core'] = layer((i, y) => core[i] * (y + 0.5 < SILL ? 1 : 0), inner, 0.93);
-    layers['neck-back'] = layer((i) => core[i], inner, 0.8);
+    for (let y = edge + 1; y < NH; y++) neckLayer.copyWithin(y * W * 4, edge * W * 4, (edge + 1) * W * 4);
+    layers.neck = neckLayer;
   }
 
-  // The shade the deer casts on the page around the hole, once it is out:
-  // its outline, softened and moved down and right, in black.
+  // The shade the deer casts behind it: its outline, softened and moved down
+  // and right, in black.
   const sil = new Float32Array(N);
   for (let i = 0; i < N; i++) sil[i] = A[i] * Math.min(1, head[i] + antlers[i] + earL[i] + earR[i]);
   const silBuf = Buffer.from(Uint8Array.from(sil, (v) => Math.round(v * 255)));
@@ -673,14 +658,14 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   for (const s of SEASONS) results.push({ ...s, ...(await layersFor(s)) });
 
   // Union box per layer, in frame units, on a 5-unit grid (so x0.8 and x1.6 are whole pixels).
-  const names = ['snow', 'shade', 'neck', 'neck-core', 'neck-back', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
+  const names = ['snow', 'shade', 'neck', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
   const boxes = {};
   for (const name of names) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const { layers, H } of results) {
+    for (const { layers } of results) {
       const L = layers[name];
       if (!L) continue;
-      for (let y = 0; y < H; y++)
+      for (let y = 0; y < L.length / 4 / W; y++)
         for (let x = 0; x < W; x++)
           if (L[(y * W + x) * 4 + 3] > 0.004) {
             x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + 1); y1 = Math.max(y1, y + 1);
@@ -695,10 +680,10 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   // Every season on the same canvas, so a layer has the same box in both.
   // (The neck is the everyday deer's only, and serves both.)
   const HMAX = Math.max(...results.map((r) => r.H)) + 8;
-  for (const { season, file, H, layers } of results) {
+  for (const { season, file, layers } of results) {
     for (const [name, L] of Object.entries(layers)) {
       const box = boxes[name];
-      const prefix = name.startsWith('neck') ? 'hevalo' : file;
+      const prefix = name === 'neck' ? 'hevalo' : file;
       const padded = Buffer.alloc(W * HMAX * 4);
       toBuffer(L).copy(padded);
       const full = sharp(padded, { raw: { width: W, height: HMAX, channels: 4 } });
@@ -716,7 +701,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
           .toFile(out);
         console.log(path.basename(out), `${res.width}x${res.height}`, res.size, 'B');
       }
-      if (DEBUG) await sharp(toBuffer(L), { raw: { width: W, height: H, channels: 4 } }).png().toFile(path.join(DEBUG, `${season}-${name}.png`));
+      if (DEBUG) await sharp(toBuffer(L), { raw: { width: W, height: L.length / 4 / W, channels: 4 } }).png().toFile(path.join(DEBUG, `${season}-${name}.png`));
     }
   }
   console.log(JSON.stringify(boxes));
