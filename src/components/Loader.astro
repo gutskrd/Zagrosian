@@ -1,0 +1,75 @@
+---
+/**
+ * The loading screen: Zagrosian's Z, its hands melting into the Kurdish sun
+ * and back (src/assets/brand/zagrosian-loader.gif), on the page's own colour,
+ * while a visit's first page loads (src/scripts/loader.ts).
+ *
+ * theme-init.js decides before the first paint (`data-loading` on <html>):
+ * when a visit starts or the page is reloaded, not on the way from one page of
+ * the site to another, and only when motion is welcome. Without JavaScript it
+ * never appears, and should the script not start, it lifts by itself after
+ * eight seconds. The image is lazy, so where the screen does not show, it is
+ * not downloaded. It is decoration, hidden from screen readers, which read the
+ * page underneath.
+ */
+import loader from '../assets/brand/zagrosian-loader.gif';
+---
+
+<div class="loader" data-loader aria-hidden="true">
+  <img class="loader__image" src={loader.src} width={loader.width} height={loader.height} alt="" loading="lazy" decoding="async" draggable="false" />
+</div>
+
+<style>
+  .loader {
+    display: none;
+  }
+
+  :global(:root[data-loading]) .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    background: var(--color-paper);
+    /* It is artwork: forced colours keep its colours. */
+    forced-color-adjust: none;
+    animation: loader-out 0.5s ease 8s forwards;
+  }
+
+  /* Then it fades away, letting clicks through at once. */
+  :global(:root[data-loading='done']) .loader {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease-out);
+  }
+
+  /* 256 px: the animation's own pixels on a high-density screen. Its ground
+     is a shade under white (254), lifted to white and blended into the
+     page's own colour, so no square shows round it. */
+  .loader__image {
+    width: min(16rem, 64vw);
+    height: auto;
+    user-select: none;
+    filter: brightness(1.01);
+    mix-blend-mode: multiply;
+  }
+
+  /* On the dark page, white on black: the same, inverted. */
+  :global(:root[data-theme='dark']) .loader__image {
+    filter: brightness(1.01) invert(1);
+    mix-blend-mode: screen;
+  }
+
+  @keyframes loader-out {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  @media print {
+    :global(:root[data-loading]) .loader {
+      display: none;
+    }
+  }
+</style>

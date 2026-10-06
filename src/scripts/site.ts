@@ -9,6 +9,7 @@ import { initEyes } from './eyes';
 import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
+import { initLoader } from './loader';
 import { enteredFromAbove, initMotion } from './motion';
 import { initTheme } from './theme';
 
@@ -264,6 +265,7 @@ function initLegalTools() {
 /* there are none.                                                            */
 /* -------------------------------------------------------------------------- */
 
+initLoader();
 initHeader();
 initMenu();
 initReveal();
