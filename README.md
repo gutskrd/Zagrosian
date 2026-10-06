@@ -250,7 +250,17 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
   (`data-rise`).
-- **Products:** the Hevalo icon turns to face the reader as it comes into view.
+- **Products:** Hevalo's app icon is a real object: the icon on a tile with depth (ten layers through
+  its thickness, darkening towards the back like the edge of a lit object), a soft shadow on the floor
+  and a glow in its purple. It turns from the side to face the reader as the section scrolls into
+  view, and under a mouse it tilts towards the pointer with a highlight. Its images go up to 576 px
+  wide, so it stays sharp at its size on high-density screens.
+- **Scroll-driven CSS:** where the browser runs scroll-linked animations itself (CSS
+  `animation-timeline`: Chrome, Edge and Safari 26), the tile's turn, the footer wordmark and the
+  legal pages' reading bar are left to it, so they move on the graphics card in step with the scroll;
+  elsewhere a script does the same (motion.ts). They are written as separate properties, because the
+  build's minifier would otherwise fold the timeline into the `animation` shorthand, which browsers
+  reject.
 - **Pointer depth:** with a mouse, the travelling logo leans towards the pointer in 3D, a soft light
   follows the pointer across the products band (`data-spotlight`), and the Hevalo icon tilts under
   it with a highlight. Touch screens and *reduce motion* get none of this.
@@ -441,7 +451,7 @@ is missing.
 
 ## Browser features
 
-- **Quick navigation:** Ctrl K (⌘K on Apple devices), the `/` key or the search button in the header
+- **Quick navigation:** Ctrl K (⌘K on Apple devices), the `/` key or the round search button in the header
   opens a searchable list of every page, section, language and theme, with a few actions (visit
   Hevalo, copy the email address). It is keyboard-first (arrow keys, Enter, Escape), follows the ARIA
   combobox pattern for screen readers, and finds entries by their English name too, so *privacy*

@@ -27,6 +27,15 @@ const isBelowFold = (element: Element) => element.getBoundingClientRect().top > 
 export const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
+ * Whether the browser runs scroll-linked animations itself (CSS
+ * `animation-timeline`), on the graphics card and in step with the scroll.
+ * Where it does, the effects that have a CSS version (the footer wordmark,
+ * the reading progress) are left to it, and this script only fills in
+ * elsewhere.
+ */
+const cssScrollTimelines = () => typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()');
+
+/**
  * Whether an element came into view from above, as the page scrolls back up
  * (after a reload or a link part-way down the page). Entrances only play for
  * what comes up from below; anything met on the way back up is shown as it is.
@@ -139,7 +148,8 @@ function runScrollEffects(effects: ScrollEffect[]) {
 
 /**
  * The footer wordmark rises out of its baseline as the footer comes into view,
- * standing up in 3D from lying back on it (transform-origin: bottom).
+ * standing up in 3D from lying back on it (transform-origin: bottom). The
+ * script version, for browsers without CSS scroll timelines (Footer.astro).
  */
 function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
   let rest = 0;
@@ -186,6 +196,7 @@ function highlight(heading: HTMLElement): ScrollEffect {
 /* when reduced motion is preferred.                                          */
 /* -------------------------------------------------------------------------- */
 
+/** The script version, for browsers without CSS scroll timelines (LegalLayout.astro). */
 function readingProgress(track: HTMLElement, bar: HTMLElement): ScrollEffect {
   let progress = 0;
   return {
@@ -338,7 +349,9 @@ export function initMotion() {
 
   const track = document.querySelector<HTMLElement>('[data-reading-progress]');
   const bar = track?.firstElementChild;
-  if (track && bar instanceof HTMLElement) effects.push(readingProgress(track, bar));
+  if (track && bar instanceof HTMLElement && (prefersReducedMotion() || !cssScrollTimelines())) {
+    effects.push(readingProgress(track, bar));
+  }
 
   const content = document.querySelector<HTMLElement>('[data-legal-content]');
   const contentsLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc] a')];
@@ -347,9 +360,11 @@ export function initMotion() {
   if (!prefersReducedMotion() && 'IntersectionObserver' in window) {
     initSplitHeadings();
 
-    for (const frame of document.querySelectorAll<HTMLElement>('[data-rise]')) {
-      const layer = frame.firstElementChild;
-      if (layer instanceof HTMLElement) effects.push(rise(frame, layer));
+    if (!cssScrollTimelines()) {
+      for (const frame of document.querySelectorAll<HTMLElement>('[data-rise]')) {
+        const layer = frame.firstElementChild;
+        if (layer instanceof HTMLElement) effects.push(rise(frame, layer));
+      }
     }
 
     for (const heading of document.querySelectorAll<HTMLElement>('[data-highlight]')) {

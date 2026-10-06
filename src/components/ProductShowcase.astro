@@ -6,6 +6,9 @@ import HevaloIcon from './HevaloIcon.astro';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
+
+// The tile's edge: ten thin layers through its depth.
+const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 ---
 
 <section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight>
@@ -13,19 +16,27 @@ const { t } = i18n(Astro.url);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      <div class="showcase__identity">
-        <div class="showcase__icon" data-reveal>
+      {/* Hevalo's app icon as a real object: a tile with depth, which turns to
+          face the reader as the section scrolls into view. Decoration: the
+          name beside it says what it is. */}
+      <div class="showcase__art" aria-hidden="true" data-reveal>
+        <span class="showcase__glow"></span>
+        <span class="showcase__shadow"></span>
+        <div class="showcase__turn">
           <span class="showcase__tilt" data-tilt>
-            <HevaloIcon sizes="(min-width: 64rem) 96px, 72px" />
+            {slices.map((depth) => <span class="showcase__slice" data-depth={depth} />)}
+            <HevaloIcon class="showcase__face" sizes="(min-width: 64rem) 19rem, 11rem" />
           </span>
         </div>
-        <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
-        <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
       </div>
 
-      <div class="showcase__details" data-reveal>
-        <p class="showcase__description" data-lines>{t.hevalo.description}</p>
-        <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
+      <div class="showcase__text">
+        <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
+        <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
+        <div class="showcase__details" data-reveal>
+          <p class="showcase__description" data-lines>{t.hevalo.description}</p>
+          <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
+        </div>
       </div>
     </div>
 
@@ -88,58 +99,125 @@ const { t } = i18n(Astro.url);
     margin-top: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
-  /* The app icon, with a soft glow in its own colour. */
-  .showcase__icon {
-    width: clamp(4.5rem, 3.5rem + 2.5vw, 6rem);
-    margin-bottom: clamp(1.75rem, 1rem + 2vw, 2.75rem);
-  }
+  /* ---- The tile ----
+     The app icon's purple square (the deer's ears reach a little past its
+     sides: 3.9% each side of the 360-unit image, corners 76 units) with a
+     depth of 9% of its width, in ten layers that darken towards the back,
+     as the edge of a lit object does. */
+  .showcase__art {
+    /* In units of the tile's own width (cqi), so it keeps its proportions. */
+    --depth: 9cqi;
 
-  .showcase__icon :global(.hevalo-icon) {
-    width: 100%;
-    filter: drop-shadow(0 0.75rem 2rem rgb(176 112 242 / 0.35));
-  }
-
-  /* Under a mouse pointer the icon tilts towards it, with a soft highlight
-     where the light would catch it (motion.ts sets the custom properties). */
-  .showcase__icon {
-    perspective: 32rem;
-  }
-
-  .showcase__tilt {
     position: relative;
-    display: block;
+    justify-self: center;
+    width: 11rem;
+    aspect-ratio: 1;
+    container-type: inline-size;
+    perspective: 60rem;
+  }
+
+  .showcase__turn,
+  .showcase__tilt {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  /* At rest the tile is turned a little, so its depth shows. */
+  .showcase__turn {
+    transform: rotateX(8deg) rotateY(-18deg);
+    transform-origin: 50% 50% calc(var(--depth) * -0.5);
+  }
+
+  /* Under a mouse it also tilts towards the pointer (motion.ts sets the
+     custom properties), with a soft highlight where the light would catch it. */
+  .showcase__tilt {
     transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transform-origin: 50% 50% calc(var(--depth) * -0.5);
     transition: transform 0.7s var(--ease-out);
   }
 
-  /* On arrival the icon turns to face the reader (site.ts sets data-reveal). */
-  .showcase__icon[data-reveal='pending'] .showcase__tilt {
-    --tilt-x: 10deg;
-    --tilt-y: -65deg;
-  }
-
-  .showcase__icon[data-reveal='done'] .showcase__tilt {
-    transition-duration: 1.4s;
-  }
-
-  .showcase__icon .showcase__tilt[data-tilting] {
+  .showcase__tilt[data-tilting] {
     transition-duration: 0.15s;
   }
 
-  /* The highlight covers the purple square, whose sides sit 3.9% in from the
-     ears, with its corners (76 px of 332 × 360 in the source). */
+  .showcase__slice {
+    position: absolute;
+    inset: 0 3.9%;
+    border-radius: 23% / 21%;
+    transform: translateZ(calc(var(--depth) * var(--z) * -1));
+  }
+
+  .showcase__slice[data-depth='1'] {
+    --z: 0.1;
+    background: #a865ea;
+  }
+
+  .showcase__slice[data-depth='2'] {
+    --z: 0.2;
+    background: #a160e3;
+  }
+
+  .showcase__slice[data-depth='3'] {
+    --z: 0.3;
+    background: #995adb;
+  }
+
+  .showcase__slice[data-depth='4'] {
+    --z: 0.4;
+    background: #9154d3;
+  }
+
+  .showcase__slice[data-depth='5'] {
+    --z: 0.5;
+    background: #894ecb;
+  }
+
+  .showcase__slice[data-depth='6'] {
+    --z: 0.6;
+    background: #8148c2;
+  }
+
+  .showcase__slice[data-depth='7'] {
+    --z: 0.7;
+    background: #7942b9;
+  }
+
+  .showcase__slice[data-depth='8'] {
+    --z: 0.8;
+    background: #703cb0;
+  }
+
+  .showcase__slice[data-depth='9'] {
+    --z: 0.9;
+    background: #6836a6;
+  }
+
+  .showcase__slice[data-depth='10'] {
+    --z: 1.0;
+    background: #5f309c;
+  }
+
+  .showcase__art :global(.showcase__face) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+  }
+
+  /* The highlight covers the purple square, with its corners. */
   .showcase__tilt::after {
     content: '';
     position: absolute;
     inset: 0 3.9%;
     border-radius: 23% / 21%;
     background: radial-gradient(
-      circle at var(--glare-x, 50%) var(--glare-y, 0%),
-      rgb(255 255 255 / 0.5),
+      circle at var(--glare-x, 30%) var(--glare-y, 10%),
+      rgb(255 255 255 / 0.45),
       rgb(255 255 255 / 0) 60%
     );
     opacity: 0;
     pointer-events: none;
+    transform: translateZ(1px);
     transition: opacity 0.5s ease;
   }
 
@@ -147,8 +225,70 @@ const { t } = i18n(Astro.url);
     opacity: 1;
   }
 
+  /* Under the tile, a soft shadow on the floor; behind it, a glow in the
+     icon's purple. Neither turns with it. */
+  .showcase__shadow {
+    position: absolute;
+    inset: auto 8% -18% 8%;
+    height: 16%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(30 10 60 / 0.32), rgb(30 10 60 / 0));
+  }
+
+  .showcase__glow {
+    position: absolute;
+    inset: -30%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(176 112 242 / 0.28), rgb(176 112 242 / 0) 70%);
+  }
+
+  :global(:root[data-theme='dark']) .showcase__shadow {
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.6), rgb(0 0 0 / 0));
+  }
+
+  :global(:root[data-theme='dark']) .showcase__glow {
+    background: radial-gradient(closest-side, rgb(176 112 242 / 0.3), rgb(176 112 242 / 0) 70%);
+  }
+
+  /* As the section scrolls into view, the tile turns from the side to face
+     the reader, still a little turned. The browser runs it on the graphics
+     card, in step with the scroll (no script); where it cannot, the tile
+     simply rests turned. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Separate properties, so the minifier cannot fold the timeline into
+         the `animation` shorthand (which browsers do not accept). */
+      .showcase__turn {
+        animation-name: showcase-turn;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 50%;
+      }
+    }
+  }
+
+  @keyframes showcase-turn {
+    from {
+      transform: rotateX(22deg) rotateY(-48deg) rotateZ(5deg) translateY(10%);
+    }
+
+    to {
+      transform: rotateX(8deg) rotateY(-18deg);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .showcase__slice,
+    .showcase__glow,
+    .showcase__shadow {
+      display: none;
+    }
+  }
+
+  /* ---- The name and the text ---- */
   .showcase__name {
-    font-size: clamp(4.5rem, 1.75rem + 13vw, 13.5rem);
+    font-size: clamp(4.5rem, 1.75rem + 13vw, 9.5rem);
     font-weight: 600;
     line-height: 0.86;
     letter-spacing: -0.055em;
@@ -173,10 +313,11 @@ const { t } = i18n(Astro.url);
     display: grid;
     justify-items: start;
     gap: 2rem;
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
   }
 
   .showcase__description {
-    max-width: 28rem;
+    max-width: 30rem;
     font-size: var(--text-lead);
     line-height: 1.45;
     letter-spacing: -0.011em;
@@ -270,18 +411,23 @@ const { t } = i18n(Astro.url);
   @media (min-width: 64rem) {
     .showcase__body {
       grid-template-columns: repeat(12, minmax(0, 1fr));
-      align-items: end;
+      align-items: center;
       column-gap: 2rem;
     }
 
-    .showcase__identity {
+    .showcase__text {
       grid-column: 1 / span 7;
+      grid-row: 1;
+    }
+
+    .showcase__art {
+      grid-column: 8 / -1;
+      grid-row: 1;
+      width: 19rem;
     }
 
     .showcase__details {
       --reveal-delay: 0.12s;
-      grid-column: 8 / -1;
-      padding-bottom: 0.25rem;
     }
 
     .showcase__soon {

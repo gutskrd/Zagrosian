@@ -128,6 +128,27 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     transform-origin: var(--start);
   }
 
+  /* Where the browser can, it fills the bar itself, in step with the scroll;
+     elsewhere (and with reduced motion) motion.ts does it with a script.
+     Written as separate properties: the build's minifier would otherwise fold
+     the timeline into the `animation` shorthand, which browsers do not accept. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reading-progress span {
+        animation-name: reading-progress;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+
+  @keyframes reading-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
   .legal {
     padding-block: clamp(4.5rem, 2.5rem + 7vw, 8rem) var(--section-space);
   }

@@ -4,7 +4,7 @@
  * dressed for Christmas. theme-init.js marks the season before the page is
  * drawn, so the icon never swaps in front of the visitor.
  *
- * Each comes as WebP at three sizes, so a screen downloads only the resolution
+ * Each comes as WebP at four sizes, so a screen downloads only the resolution
  * it needs, and only the one in season: both images are lazy, and browsers do
  * not download a lazy image that is not displayed.
  *
@@ -15,9 +15,11 @@
 import christmas96 from '../assets/brand/hevalo-christmas-96.webp';
 import christmas192 from '../assets/brand/hevalo-christmas-192.webp';
 import christmas288 from '../assets/brand/hevalo-christmas-288.webp';
+import christmas576 from '../assets/brand/hevalo-christmas-576.webp';
 import icon96 from '../assets/brand/hevalo-96.webp';
 import icon192 from '../assets/brand/hevalo-192.webp';
 import icon288 from '../assets/brand/hevalo-288.webp';
+import icon576 from '../assets/brand/hevalo-576.webp';
 
 interface Props {
   /** Rendered width, as a `sizes` value, e.g. "20px". */
@@ -30,8 +32,8 @@ interface Props {
 const { sizes, alt = '', class: className } = Astro.props;
 
 const variants = [
-  { season: 'everyday', images: [icon96, icon192, icon288] },
-  { season: 'christmas', images: [christmas96, christmas192, christmas288] },
+  { season: 'everyday', images: [icon96, icon192, icon288, icon576] },
+  { season: 'christmas', images: [christmas96, christmas192, christmas288, christmas576] },
 ];
 ---
 

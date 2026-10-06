@@ -22,8 +22,6 @@ const normalise = (text: string) =>
     .toLowerCase()
     .trim();
 
-const isApple = () => /mac|iphone|ipad|ipod/i.test(navigator.platform || navigator.userAgent);
-
 /** True while the visitor is typing somewhere, so "/" is left alone. */
 function isEditing(target: EventTarget | null) {
   return (
@@ -44,11 +42,6 @@ export function initCommandMenu() {
   const groups = [...dialog.querySelectorAll<HTMLElement>('[data-command-group]')];
   const searchText = new Map(options.map((option) => [option, option.dataset.search ?? '']));
   let active: HTMLElement | undefined;
-
-  // The shortcut shown on the header button, for this platform.
-  for (const keys of document.querySelectorAll<HTMLElement>('[data-command-shortcut]')) {
-    keys.textContent = isApple() ? '⌘K' : 'Ctrl K';
-  }
 
   const visibleOptions = () => options.filter((option) => !option.hidden);
 

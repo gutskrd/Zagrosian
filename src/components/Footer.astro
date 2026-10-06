@@ -190,6 +190,38 @@ const year = new Date().getFullYear();
     transform-origin: 50% 100%;
   }
 
+  /* Where the browser runs scroll-linked animations itself, it stands the
+     wordmark up on the graphics card, in step with the scroll; elsewhere
+     motion.ts does the same with a script. From lying back on its baseline
+     to upright, while the wordmark comes into view (as it enters, easing out). */
+  .site-footer__mark {
+    view-timeline-name: --wordmark;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Separate properties, so the minifier cannot fold the timeline into
+         the `animation` shorthand (which browsers do not accept). */
+      .site-footer__mark span {
+        animation-name: wordmark-rise;
+        animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+        animation-fill-mode: both;
+        animation-timeline: --wordmark;
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+
+  @keyframes wordmark-rise {
+    from {
+      transform: perspective(max(600px, 90cqi)) rotateX(70deg) translate3d(0, 40%, 0);
+    }
+
+    to {
+      transform: perspective(max(600px, 90cqi)) rotateX(0deg) translate3d(0, 0, 0);
+    }
+  }
+
   .site-footer__bottom {
     display: flex;
     flex-wrap: wrap;
