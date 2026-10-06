@@ -22,6 +22,7 @@ export const nl: Messages = {
     home: 'Home',
     hevalo: 'Hevalo',
     about: 'Over ons',
+    faq: 'FAQ',
     contact: 'Contact',
     visitHevalo: 'Bezoek Hevalo',
     privacy: 'Privacy',
@@ -81,6 +82,43 @@ export const nl: Messages = {
     headquarters: 'Nederland',
     productsLabel: 'Producten',
     localTime: '{time} lokale tijd',
+  },
+  faq: {
+    eyebrow: 'FAQ',
+    title: 'Veelgestelde vragen.',
+    privacyLink: 'privacyverklaring',
+    items: [
+      {
+        question: 'Wat doet Zagrosian?',
+        answer:
+          'Zagrosian is een onafhankelijk technologiebedrijf uit Nederland, in particuliere handen. We ontwerpen en bouwen producten voor consumenten, helemaal zelf. Ons eerste product is Hevalo, een app om Koerdisch te leren.',
+      },
+      {
+        question: 'Wat is Hevalo?',
+        answer:
+          'Hevalo is een app om Koerdisch te leren met korte lessen en spelletjes die je samen met vrienden speelt. U vindt de app op {hevalo}.',
+      },
+      {
+        question: 'Welke Koerdische dialecten leert u met Hevalo?',
+        answer:
+          'Hevalo begint met het Kurmanji. Meer dialecten volgen.',
+      },
+      {
+        question: 'Is Hevalo beschikbaar voor iOS en Android?',
+        answer:
+          'Nog niet. De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
+      },
+      {
+        question: 'Verzamelt zagrosian.com persoonsgegevens?',
+        answer:
+          'Heel weinig. De website heeft geen accounts, formulieren, advertenties, analysediensten of tracking. Uw keuze voor thema, taal en geluid wordt alleen in uw browser bewaard. Meer leest u in onze {privacy}.',
+      },
+      {
+        question: 'Hoe neem ik contact op met Zagrosian?',
+        answer:
+          'Mail naar {contact} voor algemene vragen en samenwerkingen, of naar {press} voor persvragen. Wilt u een beveiligingsprobleem melden? Lees dan ons {security}.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'Contact',

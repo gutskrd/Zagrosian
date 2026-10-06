@@ -70,13 +70,20 @@ export interface NavLink {
   href: string;
 }
 
+/** A section of the homepage, with the key of its label in `nav`. */
+export interface SectionLink extends NavLink {
+  key: 'hevalo' | 'about' | 'faq' | 'contact';
+}
+
 /** The site's links in a language: the homepage sections and the legal pages. */
 export function navigation(locale: Locale) {
   const t = messages(locale);
   const link = (label: string, path: string): NavLink => ({ label, href: localizePath(locale, path) });
   return {
     home: link(t.nav.home, '/'),
-    sections: [link(t.nav.hevalo, '/#hevalo'), link(t.nav.about, '/#about'), link(t.nav.contact, '/#contact')],
+    sections: (['hevalo', 'about', 'faq', 'contact'] as const).map(
+      (key): SectionLink => ({ key, ...link(t.nav[key], `/#${key}`) }),
+    ),
     legal: legalSlugs.map((slug) => link(t.nav[slug], `/${slug}`)),
   };
 }

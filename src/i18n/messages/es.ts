@@ -22,6 +22,7 @@ export const es: Messages = {
     home: 'Inicio',
     hevalo: 'Hevalo',
     about: 'Nosotros',
+    faq: 'Preguntas frecuentes',
     contact: 'Contacto',
     visitHevalo: 'Visitar Hevalo',
     privacy: 'Privacidad',
@@ -82,6 +83,43 @@ export const es: Messages = {
     headquarters: 'Países Bajos',
     productsLabel: 'Productos',
     localTime: '{time}, hora local',
+  },
+  faq: {
+    eyebrow: 'FAQ',
+    title: 'Preguntas frecuentes.',
+    privacyLink: 'política de privacidad',
+    items: [
+      {
+        question: '¿Qué hace Zagrosian?',
+        answer:
+          'Zagrosian es una empresa tecnológica independiente y de propiedad privada con sede en los Países Bajos. Diseñamos y desarrollamos productos de consumo con un equipo propio. Nuestro primer producto es Hevalo, una aplicación para aprender kurdo.',
+      },
+      {
+        question: '¿Qué es Hevalo?',
+        answer:
+          'Hevalo es una aplicación para aprender kurdo con lecciones breves y juegos para compartir con amigos. La encontrarás en {hevalo}.',
+      },
+      {
+        question: '¿Qué dialectos del kurdo enseña Hevalo?',
+        answer:
+          'Hevalo empieza por el kurmanji. Hay más dialectos previstos.',
+      },
+      {
+        question: '¿Está Hevalo disponible para iOS y Android?',
+        answer:
+          'Todavía no. Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
+      },
+      {
+        question: '¿Recoge zagrosian.com datos personales?',
+        answer:
+          'Muy pocos. El sitio web no tiene cuentas de usuario, formularios, publicidad, analítica ni seguimiento. Tu elección de tema, idioma y sonido se guarda solo en tu navegador. Encontrarás los detalles en nuestra {privacy}.',
+      },
+      {
+        question: '¿Cómo puedo contactar con Zagrosian?',
+        answer:
+          'Escribe a {contact} para consultas generales y colaboraciones, o a {press} para consultas de prensa. Para informar de un problema de seguridad, consulta nuestra {security}.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'Contacto',

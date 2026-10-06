@@ -676,114 +676,6 @@ svg {
 }
 
 /* ==========================================================================
-   Custom cursor (src/scripts/cursor.ts)
-   A ring, exactly where the pointer is. It inverts what is under it, so it
-   shows on light and dark alike. Only with a mouse or trackpad, and not when
-   reduced motion or forced colours are on.
-   ========================================================================== */
-
-:root.has-cursor,
-:root.has-cursor * {
-  cursor: none !important;
-}
-
-:root.has-cursor :is(input, textarea, select, [contenteditable]) {
-  cursor: text !important;
-}
-
-/* The cursor is a manual popover, so it can sit in the top layer above
-   dialogs and the menu; these undo the browser's popover styles. */
-.cursor {
-  position: fixed;
-  inset: 0 auto auto 0;
-  z-index: 300;
-  width: 0;
-  height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: visible;
-  border: 0;
-  background: none;
-  pointer-events: none;
-  mix-blend-mode: difference;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.cursor[data-visible] {
-  opacity: 1;
-}
-
-.cursor__ring {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
-  border-radius: 50%;
-  will-change: transform;
-}
-
-/* The ring's look lives on an inner layer, so it can grow without fighting
-   the position set on the ring itself. */
-.cursor__shape {
-  grid-area: 1 / 1;
-  width: 100%;
-  height: 100%;
-  border: 1px solid #fff;
-  border-radius: 50%;
-  background: transparent;
-  transition:
-    scale 0.45s var(--ease-out),
-    background-color 0.3s ease,
-    border-color 0.3s ease;
-}
-
-.cursor__label {
-  grid-area: 1 / 1;
-  width: 1rem;
-  height: 1rem;
-  color: #000;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-/* Over a link: the ring fills, and becomes a lens that inverts the text. */
-.cursor[data-state='link'] .cursor__shape {
-  scale: 2.2;
-  background: #fff;
-}
-
-/* An external link: the same lens, with an arrow out. */
-.cursor[data-state='external'] .cursor__shape {
-  scale: 2.6;
-  background: #fff;
-}
-
-.cursor[data-state='external'] .cursor__label {
-  opacity: 1;
-}
-
-/* Over a button, the button itself answers (it is magnetic), and the
-   cursor steps aside. */
-.cursor[data-state='button'] .cursor__shape,
-.cursor[data-state='text'] .cursor__shape {
-  scale: 0;
-}
-
-.cursor[data-pressed] .cursor__shape {
-  scale: 0.7;
-}
-
-.cursor[data-pressed][data-state='link'] .cursor__shape,
-.cursor[data-pressed][data-state='external'] .cursor__shape {
-  scale: 1.8;
-}
-
-/* ==========================================================================
    Scrolling
    ========================================================================== */
 
@@ -843,7 +735,6 @@ html:has(.site-menu:popover-open) {
   .reading-progress,
   .cta,
   .menu-button,
-  .cursor,
   .sound-prompt {
     display: none !important;
   }

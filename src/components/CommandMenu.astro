@@ -38,7 +38,13 @@ interface Entry {
 const [home, ...legal] = [nav.home, ...nav.legal];
 const currentPath = localizePath(locale, base);
 const legalKeys = ['privacy', 'terms', 'security'] as const;
-const sectionKeys = ['hevalo', 'about', 'contact'] as const;
+/** Extra English words each section can be found by, in any language. */
+const sectionKeywords = {
+  hevalo: 'app product kurdish',
+  about: 'company mission',
+  faq: 'questions answers help',
+  contact: 'email press',
+};
 
 const groups: { id: string; label: string; entries: Entry[] }[] = [
   {
@@ -58,9 +64,9 @@ const groups: { id: string; label: string; entries: Entry[] }[] = [
   {
     id: 'sections',
     label: t.command.sections,
-    entries: nav.sections.map((link, index) => ({
+    entries: nav.sections.map((link) => ({
       label: link.label,
-      keywords: [en.nav[sectionKeys[index]], index === 0 ? 'app product kurdish' : index === 2 ? 'email press' : 'company mission'],
+      keywords: [en.nav[link.key], sectionKeywords[link.key]],
       icon: 'section' as const,
       href: link.href,
     })),

@@ -24,6 +24,7 @@ export const ku: Messages = {
     home: 'Rûpela sereke',
     hevalo: 'Hevalo',
     about: 'Derbarê me de',
+    faq: 'Pirs û bersiv',
     contact: 'Têkilî',
     visitHevalo: 'Serdana Hevalo bike',
     privacy: 'Nepenî',
@@ -85,6 +86,43 @@ export const ku: Messages = {
     headquarters: 'Holenda',
     productsLabel: 'Berhem',
     localTime: 'Demjimêra herêmî: {time}',
+  },
+  faq: {
+    eyebrow: 'Pirs û bersiv',
+    title: 'Pirsên ku pir tên pirsîn.',
+    privacyLink: 'polîtîkaya me ya nepeniyê',
+    items: [
+      {
+        question: 'Zagrosian çi dike?',
+        answer:
+          'Zagrosian şirketeke teknolojiyê ya serbixwe û taybet e, û navenda wê li Holendayê ye. Em berhemên ji bo bikarhêneran bi xwe disêwirînin û çêdikin. Berhema me ya yekem Hevalo ye, sepaneke ji bo fêrbûna kurdî.',
+      },
+      {
+        question: 'Hevalo çi ye?',
+        answer:
+          'Hevalo sepaneke ji bo fêrbûna kurdî ye, bi dersên kurt û lîstikên ku bi hevalan re tên lîstin. Hûn dikarin wê li {hevalo} bibînin.',
+      },
+      {
+        question: 'Hevalo kîjan zaravayên kurdî hîn dike?',
+        answer:
+          'Hevalo bi kurmancî dest pê dike. Zaravayên din jî di plana me de ne.',
+      },
+      {
+        question: 'Gelo Hevalo li ser iOS û Androidê heye?',
+        answer:
+          'Hêj na. Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
+      },
+      {
+        question: 'Gelo zagrosian.com daneyên kesane berhev dike?',
+        answer:
+          'Pir kêm. Li ser malperê hesab, form, reklam, analîtîk an şopandin tune ne. Bijartina we ya temayê, ziman û deng tenê di geroka we de tê tomarkirin. Ji bo hûrguliyan, li {privacy} binêrin.',
+      },
+      {
+        question: 'Ez çawa dikarim bi Zagrosian re têkilî daynim?',
+        answer:
+          'Ji bo pirsên giştî û hevkariyan e-nameyê ji {contact} re bişînin, ji bo pirsên çapemeniyê jî ji {press} re. Ji bo ragihandina pirsgirêkeke ewlekariyê, ji kerema xwe li {security} binêrin.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'Têkilî',

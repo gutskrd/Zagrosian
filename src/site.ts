@@ -19,7 +19,7 @@ export const site = {
    * Date of the homepage's last material change (YYYY-MM-DD), for the sitemap.
    * Update it when the homepage's text changes.
    */
-  updated: '2026-10-01',
+  updated: '2026-10-05',
   /**
    * IndexNow key, which lets the site tell search engines about changed pages
    * (`npm run indexnow`). It is public by design: public/<key>.txt holds it, to

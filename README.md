@@ -75,19 +75,20 @@ src/
   assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
                    sizes), the 21-ray sun and the Hevalo app icon
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
-  components/      Header, Footer, Hero, Story, ProductShowcase, About, Contact, CommandMenu,
+  components/      Header, Footer, Hero, Story, ProductShowcase, About, Faq, Contact, CommandMenu,
                    LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
   content/legal/   Legal pages in Markdown, one folder per language
   i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
                    NoticeLayout (404)
-  lib/             structured-data.ts (JSON-LD) and pages.ts (Markdown versions and llms.txt)
+  lib/             structured-data.ts (JSON-LD), pages.ts (Markdown versions and llms.txt) and
+                   faq.ts (the questions and answers, with their links)
   pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts
-                   (Hevalo's eyes), sound.ts, cursor.ts, magnetic.ts, text.ts,
+                   (Hevalo's eyes), sound.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
@@ -244,7 +245,7 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   time. `effect="rise"` makes the words rise one after another as it enters the viewport;
   `effect="highlight"` brightens them as the reader scrolls past (the About statement).
 - **Sections:** blocks marked `data-reveal` fade up; elements with the `rule` class draw their top
-  hairline across. Entrances (these, the rising headings, lines and decoding labels) only play for
+  hairline across. Entrances (these, the rising headings and lines) only play for
   what comes up from below: opened part-way down the page (a link to Contact, a reload) and
   scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
@@ -267,10 +268,11 @@ Rules the code follows:
 
 ## The studio experience
 
-The site behaves like a design studio's: sound, a custom cursor, magnetic
-buttons, rolling labels and cinematic page changes. All of it is original: the
-sounds are synthesised in the browser, and nothing is borrowed from another site. Every piece steps
-back for visitors who prefer reduced motion, and the site works fully without it.
+The site has a few touches of a design studio's: sound, rolling labels and cinematic page changes.
+The pointer stays the visitor's own (no custom cursor, nothing that moves away from it), so the site
+is as easy to use as it is to look at. All of it is original: the sounds are synthesised in the
+browser, and nothing is borrowed from another site. Every piece steps back for visitors who prefer
+reduced motion, and the site works fully without it.
 
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
   off until the visitor turns it on, from the header (the level meter), the site menu, quick
@@ -288,16 +290,6 @@ back for visitors who prefer reduced motion, and the site works fully without it
   permission over (Chrome and Edge, including pages it prepared in advance), and otherwise with the
   first click, tap or key press. Following a link, the score fades out rather than being cut off. It
   pauses while the tab is hidden.
-- **Cursor** ([`cursor.ts`](src/scripts/cursor.ts)): with a mouse, a ring exactly where the pointer
-  is (no lag) that inverts what is under it. Over a link or a plain button it becomes a lens; over an
-  external link it adds an arrow; over a magnetic button it steps aside while the button answers. Over
-  text fields the system cursor returns. It
-  never lingers: it disappears when the pointer leaves the window, the window loses focus or the page
-  is left (so it is not frozen into the page transition), and returns with the next move. It is a
-  manual popover, so it lives in the browser's top layer and stays above the menu and dialogs.
-- **Only what the device uses:** the cursor and the magnetic buttons
-  ([`desktop.ts`](src/scripts/desktop.ts)) are loaded separately and only with a mouse or trackpad,
-  so phones and tablets never download them (every page's main script is about 8 KB compressed).
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
   the header is the same at every size: the logo, then Visit Hevalo (from 768px), quick navigation
@@ -309,21 +301,20 @@ back for visitors who prefer reduced motion, and the site works fully without it
   contact, social media, every language, sound, the legal pages and the time at headquarters. It is a
   native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
   does not scroll while it is open.
-- **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`magnetic.ts`](src/scripts/magnetic.ts),
-  [`RollText.astro`](src/components/RollText.astro)): magnetic (they lean towards the pointer on a
-  spring), their colour pours in from where the pointer entered, labels roll letter by letter (Arabic
-  script, whose letters join, rolls as one piece) and arrows slide out as a copy slides in. The menu's
-  links roll too.
+- **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`RollText.astro`](src/components/RollText.astro)):
+  under a mouse their colour fills in from the middle, labels roll letter by letter (Arabic script,
+  whose letters join, rolls as one piece) and arrows slide out as a copy slides in. The menu's links
+  roll too.
 - **Text** ([`text.ts`](src/scripts/text.ts)): paragraphs marked `data-lines` rise line by line from
-  behind masks, then are put back as they were; section labels are small monospace capitals that decode
-  from random characters as they appear (Latin script). Headlines are set large and fairly light.
+  behind masks, then are put back as they were. Section labels are small monospace capitals.
+  Headlines are set large and fairly light.
 - **Scrolling** is the browser's own, so the page follows the wheel, the trackpad and the finger at
   once, with no delay. Links to a section glide there (`scroll-behavior: smooth`, not with *reduce
   motion*) and stop below the header (`scroll-padding-top`). The page holds still while a dialog or
   the site menu is open.
 - **Page changes:** in browsers with cross-document view transitions, the next page rises over the
   last like a card laid on top while the old one sinks back and darkens. Every page shares the
-  header, footer, menu, theme, sound and cursor, so they behave the same everywhere.
+  header, footer, menu, theme and sound, so they behave the same everywhere.
 
 ## Readable by machines
 
@@ -334,8 +325,14 @@ and other tools read directly:
   ([`src/lib/structured-data.ts`](src/lib/structured-data.ts)): the WebSite, the Organization (logo,
   contact points, social profiles, the Hevalo brand), Hevalo itself as a web application
   (`WebApplication`, educational, in Kurdish) and the page itself, with breadcrumbs and a
-  last-modified date on the legal pages. Nodes refer to each other by `@id`, so they form one
-  description of the company.
+  last-modified date on the legal pages, and the homepage's questions and answers (`FAQPage`). Nodes
+  refer to each other by `@id`, so they form one description of the company. (Google stopped showing
+  FAQ rich results in May 2026; the markup stays because it is accurate and other tools read it.)
+- **Questions and answers** ([`Faq.astro`](src/components/Faq.astro), `faq` in the message files):
+  six short questions before Contact, each a heading with its answer under it, all shown (no
+  accordion), so visitors, search engines and AI assistants read them as they are. Every answer says
+  only what the rest of the site already says. They are in the Markdown version and the structured
+  data too, from one list ([`src/lib/faq.ts`](src/lib/faq.ts)).
 - **Search previews:** indexable pages allow large image previews and full-length snippets
   (`<meta name="robots" content="… max-image-preview:large, max-snippet:-1 …">`).
 - **Markdown versions:** every page, in every language, is also published as Markdown (`/index.md`,

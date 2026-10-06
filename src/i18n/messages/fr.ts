@@ -23,6 +23,7 @@ export const fr: Messages = {
     home: 'Accueil',
     hevalo: 'Hevalo',
     about: 'À propos',
+    faq: 'FAQ',
     contact: 'Contact',
     visitHevalo: 'Découvrir Hevalo',
     privacy: 'Confidentialité',
@@ -84,6 +85,43 @@ export const fr: Messages = {
     headquarters: 'Pays-Bas',
     productsLabel: 'Produits',
     localTime: '{time}, heure locale',
+  },
+  faq: {
+    eyebrow: 'FAQ',
+    title: 'Questions fréquentes.',
+    privacyLink: 'politique de confidentialité',
+    items: [
+      {
+        question: 'Que fait Zagrosian ?',
+        answer:
+          'Zagrosian est une entreprise technologique indépendante et privée, basée aux Pays-Bas. Nous concevons et développons des produits grand public en interne. Notre premier produit est Hevalo, une application pour apprendre le kurde.',
+      },
+      {
+        question: 'Qu’est-ce que Hevalo ?',
+        answer:
+          'Hevalo est une application pour apprendre le kurde grâce à de courtes leçons et à des jeux à partager entre amis. Vous la trouverez sur {hevalo}.',
+      },
+      {
+        question: 'Quels dialectes kurdes Hevalo enseigne-t-il ?',
+        answer:
+          'Hevalo commence par le kurmandji. D’autres dialectes sont prévus.',
+      },
+      {
+        question: 'Hevalo est-il disponible sur iOS et Android ?',
+        answer:
+          'Pas encore. Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
+      },
+      {
+        question: 'zagrosian.com collecte-t-il des données personnelles ?',
+        answer:
+          'Très peu. Le site ne comporte ni comptes, ni formulaires, ni publicité, ni outils de mesure d’audience, ni pistage. Votre choix de thème, de langue et de son n’est enregistré que dans votre navigateur. Pour en savoir plus, consultez notre {privacy}.',
+      },
+      {
+        question: 'Comment contacter Zagrosian ?',
+        answer:
+          'Écrivez à {contact} pour toute demande générale ou proposition de partenariat, ou à {press} pour les demandes de la presse. Pour signaler un problème de sécurité, consultez notre {security}.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'Contact',

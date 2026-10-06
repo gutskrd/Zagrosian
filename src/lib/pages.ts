@@ -17,6 +17,7 @@ import {
   type Locale,
 } from '../i18n';
 import { hevalo, kurdish, site, socialProfiles } from '../site';
+import { answerMarkdown, faq } from './faq';
 
 export interface TextPage {
   locale: Locale;
@@ -48,6 +49,7 @@ function homeMarkdown(locale: Locale): string {
   const social = socialProfiles.map((profile) => `- ${profile.label}: [@${profile.handle}](${profile.url})`);
   const legal = nav.legal.map((link) => `- [${link.label}](${absolute(link.href)})`);
   const { security } = t.contact;
+  const questions = faq(locale).map((item) => `### ${item.question}\n\n${answerMarkdown(item.answer)}`);
 
   return `# ${site.name}
 
@@ -79,6 +81,10 @@ ${t.about.approach}
 
 - ${t.about.headquartersLabel}: ${t.about.headquarters}
 - ${t.about.productsLabel}: [${hevalo.name}](${hevalo.url})
+
+## ${t.faq.title.replace(/[.。]$/, '')}
+
+${questions.join('\n\n')}
 
 ## ${t.contact.eyebrow}
 
@@ -145,7 +151,7 @@ export async function llmsTxt(): Promise<string> {
   const english = (await textPages()).filter((page) => page.locale === defaultLocale);
   const pages = english.map((page) =>
     page.slug === 'index'
-      ? `- [Homepage](${page.markdownUrl}): what ${site.name} does, its products, mission and contact details`
+      ? `- [Homepage](${page.markdownUrl}): what ${site.name} does, its products, mission, common questions and contact details`
       : `- [${page.title}](${page.markdownUrl}): ${page.description}`,
   );
   const languages = locales.map(

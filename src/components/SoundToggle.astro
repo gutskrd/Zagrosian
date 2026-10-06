@@ -22,7 +22,6 @@ const { t } = i18n(Astro.url);
   type="button"
   aria-pressed="false"
   data-sound-toggle
-  data-magnetic
 >
   <span class:list={[!labelled && 'visually-hidden']}>{t.sound.label}</span>
   <span class="sound-toggle__bars" aria-hidden="true">

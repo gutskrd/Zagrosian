@@ -28,6 +28,7 @@ export const en = {
     home: 'Home',
     hevalo: 'Hevalo',
     about: 'About',
+    faq: 'FAQ',
     contact: 'Contact',
     visitHevalo: 'Visit Hevalo',
     privacy: 'Privacy',
@@ -96,6 +97,49 @@ export const en = {
     productsLabel: 'Products',
     /** Shown with the headquarters: the current time there. */
     localTime: '{time} local time',
+  },
+  /**
+   * Questions and answers, before Contact (Faq.astro), also in the Markdown
+   * version and as FAQPage structured data. Answers may contain {hevalo},
+   * {privacy}, {contact}, {press} and {security}, which become links:
+   * {privacy} reads `privacyLink`, {security} reads `contact.security.link`.
+   */
+  faq: {
+    eyebrow: 'FAQ',
+    title: 'Common questions.',
+    privacyLink: 'privacy policy',
+    items: [
+      {
+        question: 'What does Zagrosian do?',
+        answer:
+          'Zagrosian is an independent, privately owned technology company based in the Netherlands. We design and build consumer products in-house. Our first product is Hevalo, an app for learning Kurdish.',
+      },
+      {
+        question: 'What is Hevalo?',
+        answer:
+          'Hevalo is an app for learning Kurdish through short lessons and games played with friends. You can find it at {hevalo}.',
+      },
+      {
+        question: 'Which Kurdish dialects does Hevalo teach?',
+        answer:
+          'Hevalo starts with Kurmanji. More dialects are planned.',
+      },
+      {
+        question: 'Is Hevalo available on iOS and Android?',
+        answer:
+          'Not yet. The native apps are in development and will be available on the App Store and Google Play.',
+      },
+      {
+        question: 'Does zagrosian.com collect personal data?',
+        answer:
+          'Very little. The website has no accounts, forms, advertising, analytics or tracking. Your choice of theme, language and sound is saved only in your browser. Our {privacy} has the details.',
+      },
+      {
+        question: 'How can I contact Zagrosian?',
+        answer:
+          'Email {contact} for general enquiries and partnerships, or {press} for press enquiries. To report a security issue, please see our {security}.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'Contact',

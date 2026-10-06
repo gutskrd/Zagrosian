@@ -32,9 +32,9 @@ const { t, localize } = i18n(Astro.url);
     </a>
 
     <div class="site-header__end">
-      <a class="site-header__cta" href={hevalo.url} data-magnetic data-pour>
+      <a class="site-header__cta" href={hevalo.url}>
         <span class="site-header__cta-pour" aria-hidden="true"></span>
-        <span class="site-header__cta-content" data-magnetic-inner>
+        <span class="site-header__cta-content">
           <RollText text={t.nav.visitHevalo} />
           <Arrow direction="up-right" />
         </span>
@@ -42,7 +42,6 @@ const { t, localize } = i18n(Astro.url);
 
       <button
         class="command-trigger"
-        data-magnetic
         type="button"
         aria-haspopup="dialog"
         aria-keyshortcuts="Control+K Meta+K"
@@ -135,8 +134,8 @@ const { t, localize } = i18n(Astro.url);
     white-space: nowrap;
   }
 
-  /* Visit Hevalo, like the page's buttons (Cta.astro): magnetic, with the
-     paper colour pouring in from the pointer and the label rolling. */
+  /* Visit Hevalo, like the page's buttons (Cta.astro): the paper colour fills
+     in from the middle and the label rolls. */
   .site-header__cta {
     position: relative;
     isolation: isolate;
@@ -171,8 +170,8 @@ const { t, localize } = i18n(Astro.url);
   .site-header__cta-pour {
     position: absolute;
     z-index: -1;
-    top: var(--pour-y, 50%);
-    left: var(--pour-x, 50%);
+    top: 50%;
+    left: 50%;
     width: 260%;
     aspect-ratio: 1;
     border-radius: 50%;

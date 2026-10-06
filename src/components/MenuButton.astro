@@ -30,7 +30,6 @@ const { t } = i18n(Astro.url);
   popovertargetaction={action === 'close' ? 'hide' : 'show'}
   aria-controls="site-menu"
   autofocus={action === 'close'}
-  data-magnetic
 >
   <span class="menu-button__label"><RollText text={action === 'close' ? t.common.close : t.common.menu} /></span>
   <span class="menu-button__icon" aria-hidden="true">

@@ -22,6 +22,7 @@ export const tr: Messages = {
     home: 'Ana sayfa',
     hevalo: 'Hevalo',
     about: 'Hakkımızda',
+    faq: 'SSS',
     contact: 'İletişim',
     visitHevalo: 'Hevalo’yu ziyaret et',
     privacy: 'Gizlilik',
@@ -82,6 +83,43 @@ export const tr: Messages = {
     headquarters: 'Hollanda',
     productsLabel: 'Ürünler',
     localTime: 'Yerel saat {time}',
+  },
+  faq: {
+    eyebrow: 'SSS',
+    title: 'Sıkça sorulan sorular.',
+    privacyLink: 'gizlilik politikamıza',
+    items: [
+      {
+        question: 'Zagrosian ne yapar?',
+        answer:
+          'Zagrosian, Hollanda merkezli, bağımsız ve özel bir teknoloji şirketidir. Tüketicilere yönelik ürünleri kendi bünyemizde tasarlıyor ve geliştiriyoruz. İlk ürünümüz, Kürtçe öğrenme uygulaması Hevalo’dur.',
+      },
+      {
+        question: 'Hevalo nedir?',
+        answer:
+          'Hevalo, kısa dersler ve arkadaşlarla oynanan oyunlarla Kürtçe öğreten bir uygulamadır. Hevalo’yu {hevalo} adresinde bulabilirsiniz.',
+      },
+      {
+        question: 'Hevalo hangi Kürtçe lehçelerini öğretiyor?',
+        answer:
+          'Hevalo, Kurmanci ile başlıyor. Diğer lehçeler de planlanıyor.',
+      },
+      {
+        question: 'Hevalo iOS ve Android’de var mı?',
+        answer:
+          'Henüz değil. Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
+      },
+      {
+        question: 'zagrosian.com kişisel veri topluyor mu?',
+        answer:
+          'Çok az. Web sitesinde hesap, form, reklam, analiz veya izleme yoktur. Tema, dil ve ses tercihiniz yalnızca tarayıcınızda saklanır. Ayrıntılar için {privacy} göz atın.',
+      },
+      {
+        question: 'Zagrosian ile nasıl iletişime geçebilirim?',
+        answer:
+          'Genel sorular ve iş birlikleri için {contact}, basın talepleri için {press} adresine e-posta gönderin. Bir güvenlik sorununu bildirmek için lütfen {security} bakın.',
+      },
+    ],
   },
   contact: {
     eyebrow: 'İletişim',

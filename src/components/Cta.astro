@@ -2,9 +2,8 @@
 /**
  * A pill-shaped button link.
  *
- * Under a mouse it is magnetic (it leans towards the pointer; magnetic.ts), its
- * colour pours in from where the pointer entered, the label rolls letter by
- * letter (RollText) and the arrow slides out as a copy slides in behind it.
+ * Under a mouse its colour fills in from the middle, the label rolls letter
+ * by letter (RollText) and the arrow slides out as a copy slides in behind it.
  */
 import type { HTMLAttributes } from 'astro/types';
 import Arrow, { type ArrowDirection } from './Arrow.astro';
@@ -21,9 +20,9 @@ interface Props extends HTMLAttributes<'a'> {
 const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro.props;
 ---
 
-<a class:list={['cta', `cta--${variant}`, `cta--${arrow}`, className]} data-magnetic data-pour {...attrs}>
+<a class:list={['cta', `cta--${variant}`, `cta--${arrow}`, className]} {...attrs}>
   <span class="cta__pour" aria-hidden="true"></span>
-  <span class="cta__content" data-magnetic-inner>
+  <span class="cta__content">
     <RollText text={label} />
     <span class="cta__arrows" aria-hidden="true">
       <Arrow direction={arrow} class="cta__arrow" />
@@ -75,12 +74,12 @@ const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } 
     gap: 0.75rem;
   }
 
-  /* The colour that pours in from the pointer (magnetic.ts sets --pour-x/y). */
+  /* The hover colour, filling in from the middle. */
   .cta__pour {
     position: absolute;
     z-index: -1;
-    top: var(--pour-y, 50%);
-    left: var(--pour-x, 50%);
+    top: 50%;
+    left: 50%;
     width: 260%;
     aspect-ratio: 1;
     border-radius: 50%;

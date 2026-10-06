@@ -1,0 +1,115 @@
+---
+/**
+ * Questions and answers, before Contact. The answers are short, so they are
+ * all shown, each under its question: quicker to scan than a list to open one
+ * by one, readable without JavaScript, and found by search engines and AI
+ * assistants as they are. The same list is in the Markdown version of the page
+ * and in its structured data (src/lib/faq.ts).
+ */
+import { i18n } from '../i18n';
+import { faq } from '../lib/faq';
+import SplitText from './SplitText.astro';
+
+const { locale, t } = i18n(Astro.url);
+const items = faq(locale);
+---
+
+<section id="faq" class="faq section" aria-labelledby="faq-title">
+  <div class="container faq__grid">
+    <div class="faq__intro">
+      <p class="eyebrow" data-reveal>{t.faq.eyebrow}</p>
+      <SplitText id="faq-title" class="heading-2 faq__title" text={t.faq.title} />
+    </div>
+
+    <div class="faq__list">
+      {
+        items.map((item) => (
+          <div class="faq__item" data-reveal>
+            <h3 class="faq__question">{item.question}</h3>
+            <p class="faq__answer">
+              {item.answer.map((part) =>
+                typeof part === 'string' ? (
+                  part
+                ) : (
+                  <a href={part.href} dir={part.ltr ? 'ltr' : undefined}>
+                    {part.text}
+                  </a>
+                ),
+              )}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .faq__title {
+    margin-top: 1.25rem;
+  }
+
+  .faq__list {
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .faq__item {
+    display: grid;
+    gap: 0.625rem;
+    padding-block: 1.5rem 1.75rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .faq__question {
+    font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .faq__answer {
+    max-width: 38rem;
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+    text-wrap: pretty;
+  }
+
+  /* The padding enlarges the tap area to 24px without moving the text. */
+  .faq__answer a {
+    padding-block: 0.125rem;
+    color: var(--color-ink);
+    text-decoration-color: var(--color-underline);
+    text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .faq__answer a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* Wide screens: the heading stays in view beside the questions. */
+  @media (min-width: 64rem) {
+    .faq__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: start;
+    }
+
+    .faq__intro {
+      grid-column: 1 / span 4;
+      position: sticky;
+      top: calc(var(--header-height) + 2rem);
+    }
+
+    .faq__list {
+      grid-column: 5 / -1;
+    }
+  }
+</style>

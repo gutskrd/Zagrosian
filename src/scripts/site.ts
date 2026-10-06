@@ -279,9 +279,3 @@ initMotion();
 initText();
 initSound();
 initEyes();
-
-// The custom cursor and the magnetic buttons are for a mouse or trackpad:
-// loaded separately, so phones and tablets never download them.
-if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  void import('./desktop').then(({ initDesktop }) => initDesktop());
-}

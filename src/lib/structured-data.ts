@@ -8,6 +8,7 @@
  */
 import { locales, messages, type Locale } from '../i18n';
 import { hevalo, site, socialProfiles } from '../site';
+import { answerText, faq } from './faq';
 
 const english = messages('en');
 
@@ -113,6 +114,22 @@ export function structuredData(page: PageData) {
       ...(page.breadcrumb && { breadcrumb: { '@id': breadcrumbId } }),
     },
   ];
+
+  // The homepage's questions and answers (Faq.astro), in its language.
+  if (isHome) {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': `${page.url}#faq`,
+      url: `${page.url}#faq`,
+      inLanguage: page.locale,
+      isPartOf: { '@id': `${page.url}#webpage` },
+      mainEntity: faq(page.locale).map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: answerText(item.answer) },
+      })),
+    });
+  }
 
   if (page.breadcrumb) {
     graph.push({
