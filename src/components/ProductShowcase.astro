@@ -6,9 +6,6 @@ import HevaloDeer from './HevaloDeer.astro';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
-
-// The tile's edge: ten thin layers through its depth.
-const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 ---
 
 <section id="hevalo" class="showcase" aria-labelledby="hevalo-title" data-spotlight>
@@ -16,16 +13,15 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a real object: a tile with depth, with the deer
-          standing out of it in layers (HevaloDeer.astro). It turns to face the
-          reader as the section scrolls into view, and towards the pointer.
-          Decoration: the name beside it says what it is. */}
+      {/* Hevalo's app icon as a window the deer leans out of, in 3D
+          (HevaloDeer.astro). It turns to face the reader as the section
+          scrolls into view, and towards the pointer. Decoration: the name
+          beside it says what it is. */}
       <div class="showcase__art" aria-hidden="true" data-reveal>
         <span class="showcase__glow"></span>
         <span class="showcase__shadow"></span>
         <div class="showcase__turn">
           <span class="showcase__tilt" data-tilt>
-            {slices.map((depth) => <span class="showcase__slice" data-depth={depth} />)}
             <HevaloDeer
               widths={[
                 ['(min-width: 64rem)', 21],
@@ -83,7 +79,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
   .showcase {
     position: relative;
     isolation: isolate;
-    /* The tile's glow may spread past a narrow screen's edge. */
+    /* The icon's glow may spread past a narrow screen's edge. */
     overflow-x: clip;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
@@ -116,15 +112,13 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     margin-top: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
-  /* ---- The tile ----
-     The app icon's purple square (the deer's ears reach a little past its
-     sides: 4.3% each side of the 360-unit image, corners 76 units) with a
-     depth of 9% of its width, in ten layers that darken towards the back,
-     as the edge of a lit object does. The deer stands out of its face
-     (HevaloDeer.astro). */
+  /* ---- The icon ----
+     A window in the shape of the app icon, with the deer leaning out of it
+     (HevaloDeer.astro): its back is set in 7% of its width, the deer comes
+     out up to 5% in front of it. */
   .showcase__art {
-    /* In units of the tile's own width (cqi), so it keeps its proportions. */
-    --depth: 9cqi;
+    /* In units of the icon's own width (cqi), so it keeps its proportions. */
+    --depth: 7cqi;
     /* It turns towards the text: leftwards, or rightwards on right-to-left pages. */
     --side: 1;
 
@@ -147,17 +141,18 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     --side: -1;
   }
 
-  /* At rest the tile is turned a little, so its depth shows. */
+  /* At rest the icon is turned a little, so its depth shows. It turns about
+     a point just behind its frame. */
   .showcase__turn {
     transform: rotateX(8deg) rotateY(calc(-18deg * var(--side)));
-    transform-origin: 50% 50% calc(var(--depth) * -0.5);
+    transform-origin: 50% 50% calc(var(--depth) * -0.3);
   }
 
   /* Under a mouse it also tilts towards the pointer (motion.ts sets the
-     custom properties), with a soft highlight where the light would catch it. */
+     custom properties), and its frame catches the light (HevaloDeer.astro). */
   .showcase__tilt {
     transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
-    transform-origin: 50% 50% calc(var(--depth) * -0.5);
+    transform-origin: 50% 50% calc(var(--depth) * -0.3);
     transition: transform 0.7s var(--ease-out);
   }
 
@@ -165,86 +160,8 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     transition-duration: 0.15s;
   }
 
-  .showcase__slice {
-    position: absolute;
-    inset: 0 4.3%;
-    border-radius: 23% / 21%;
-    transform: translateZ(calc(var(--depth) * var(--z) * -1));
-  }
-
-  .showcase__slice[data-depth='1'] {
-    --z: 0.1;
-    background: #a865ea;
-  }
-
-  .showcase__slice[data-depth='2'] {
-    --z: 0.2;
-    background: #a160e3;
-  }
-
-  .showcase__slice[data-depth='3'] {
-    --z: 0.3;
-    background: #995adb;
-  }
-
-  .showcase__slice[data-depth='4'] {
-    --z: 0.4;
-    background: #9154d3;
-  }
-
-  .showcase__slice[data-depth='5'] {
-    --z: 0.5;
-    background: #894ecb;
-  }
-
-  .showcase__slice[data-depth='6'] {
-    --z: 0.6;
-    background: #8148c2;
-  }
-
-  .showcase__slice[data-depth='7'] {
-    --z: 0.7;
-    background: #7942b9;
-  }
-
-  .showcase__slice[data-depth='8'] {
-    --z: 0.8;
-    background: #703cb0;
-  }
-
-  .showcase__slice[data-depth='9'] {
-    --z: 0.9;
-    background: #6836a6;
-  }
-
-  .showcase__slice[data-depth='10'] {
-    --z: 1.0;
-    background: #5f309c;
-  }
-
-  /* The highlight lies on the purple square, under the deer. */
-  .showcase__tilt::after {
-    content: '';
-    position: absolute;
-    inset: 0 4.3%;
-    border-radius: 23% / 21%;
-    background: radial-gradient(
-      circle at var(--glare-x, 30%) var(--glare-y, 10%),
-      rgb(255 255 255 / 0.45),
-      rgb(255 255 255 / 0) 60%
-    );
-    opacity: 0;
-    pointer-events: none;
-    transform: translateZ(0.2cqi);
-    transition: opacity 0.5s ease;
-  }
-
-  .showcase__tilt[data-tilting]::after {
-    opacity: 1;
-  }
-
-  /* Under the tile, a soft shadow on the floor; behind it, a glow in the
-     icon's purple. Neither turns with it. */
+  /* Under the icon, a soft shadow on the floor; behind it, a glow in its
+     purple. Neither turns with it. */
   .showcase__shadow {
     position: absolute;
     inset: auto 8% -18% 8%;
@@ -268,9 +185,9 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     background: radial-gradient(closest-side, rgb(176 112 242 / 0.3), rgb(176 112 242 / 0) 70%);
   }
 
-  /* As the section scrolls into view, the tile turns from the side to face
+  /* As the section scrolls into view, the icon turns from the side to face
      the reader, still a little turned. The browser runs it on the graphics
-     card, in step with the scroll (no script); where it cannot, the tile
+     card, in step with the scroll (no script); where it cannot, the icon
      simply rests turned. */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
@@ -297,7 +214,6 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
   }
 
   @media (forced-colors: active) {
-    .showcase__slice,
     .showcase__glow,
     .showcase__shadow {
       display: none;

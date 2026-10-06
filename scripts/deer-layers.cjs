@@ -1,8 +1,9 @@
 // Takes Hevalo's app icon apart into the layers of the 3D deer in the products
-// section (HevaloDeer.astro): the face (the purple square, with the everyday
-// deer's neck), the shade the deer casts on it, the antlers, each ear, the head
-// (with the Christmas scarf) and the nose. Made from the eyeless sources, the
-// pupils being drawn by the page.
+// section (HevaloDeer.astro), where the icon is a window the deer leans out
+// of: the face (the purple square, the back of the window), the shade the deer
+// casts on it, the neck, the antlers, each ear, the head (with the Christmas
+// scarf) and the nose. Made from the eyeless sources, the pupils being drawn
+// by the page.
 //
 // Each layer is the deer's own pixels, unmixed from the purple at their edges,
 // and the layers behind the head reach a little under it in their own colour,
@@ -26,27 +27,35 @@ const SEASONS = [
 ];
 const SRC_DIR = path.join(__dirname, '../src/assets/brand/');
 const W = 360;
-// The purple square's straight edges in the frame (measured on the source's alpha).
-const SQUARE = { left: 15.6, right: 344.3, top: 0.35, bottom: 358.6 };
+// The purple square's straight sides in the frame, where its alpha crosses
+// half (measured on the sources, away from the corners and from the deer).
+const SQUARE = { left: 13.72, right: 346.08, top: 0.27, bottom: 358.8 };
 const AXIS = 359.9; // x' = AXIS - x mirrors left and right
+// The icon is a window: a frame this wide around an opening (HevaloDeer.astro
+// draws the frame; the neck goes in under its bottom edge, the sill).
+const FRAME_BAND = 14;
+const SILL = SQUARE.bottom - FRAME_BAND;
 
 // ---- Outlines, in frame units, traced on the artwork ----
 // creaseL: where the left ear goes under the head; dome: the top of the head;
-// jaw: the chin and cheeks, above the neck; notchL: through the purple gap
+// jaw: the outline of the cheeks and chin over the neck (the shaded underside
+// of the chin is the head's); notchL: through the purple gap
 // between the left ear and antler. The right side mirrors the left.
 const creaseL = [[69, 203], [72, 196], [75, 186], [79, 174], [84, 162], [91, 151], [100, 143]];
 const dome = [[100, 143], [105, 140], [110, 135.5], [120, 130.5], [130, 127], [140, 124], [150, 122], [160, 120.5], [170, 119.5], [180, 119], [190, 119.5], [200, 120.5], [210, 122], [220, 124], [230, 127], [240, 131], [250, 136], [255, 139.5], [259.9, 143]];
 const mirror = (points) => points.map(([x, y]) => [AXIS - x, y]);
 const creaseR = mirror(creaseL).reverse(); // from the top down
-const jaw = [[259, 305], [247, 320], [235, 333], [220, 343], [200, 350], [180, 353], [160, 350], [140, 343], [125, 333], [112, 320], [100, 305]];
+const jaw = [[262, 321], [247, 320.5], [238, 329], [228, 336.5], [220, 343], [210, 349], [200, 354], [190, 357], [180, 358.6], [170, 357], [160, 354], [150, 349], [140, 343], [132, 336.5], [122, 329], [113, 320.5], [98, 321]];
 const notchL = [[-20, 85], [40, 90], [60, 98], [75, 106], [90, 117], [98, 127], [101, 135], [100, 143]];
 
 const poly = (points) => points.map(([x, y]) => `${x},${y}`).join(' ');
 
 function regions(domeLift) {
   const d = dome.map(([x, y], i) => [x, i === 0 || i === dome.length - 1 ? y : y - domeLift]);
-  const head = [[-20, 203], ...creaseL, ...d.slice(1, -1), ...creaseR, [380, 203], [380, 305], ...jaw, [-20, 305]];
-  const neck = [[-20, 305], ...jaw.slice().reverse(), [380, 305], [380, 440], [-20, 440]];
+  // The jaw's ends lie out in the purple beside the neck, so the whole cheek
+  // is head.
+  const head = [[-20, 203], ...creaseL, ...d.slice(1, -1), ...creaseR, [380, 203], [380, 321], ...jaw, [-20, 321]];
+  const neck = [[-20, 321], ...jaw.slice().reverse(), [380, 321], [380, 440], [-20, 440]];
   const earL = [...notchL, ...creaseL.slice().reverse(), [-20, 203]];
   const earR = mirror(earL);
   return { head, neck, earL, earR, dome: d };
@@ -114,11 +123,36 @@ function fitQuadratic(samples) {
   };
 }
 
-const coverage = (x, y) => {
-  const cx = Math.min(1, Math.max(0, x + 1 - SQUARE.left)) * Math.min(1, Math.max(0, SQUARE.right - x));
-  const cy = Math.min(1, Math.max(0, y + 1 - SQUARE.top)) * Math.min(1, Math.max(0, SQUARE.bottom - y));
-  return cx * cy;
-};
+// How much of a pixel the purple square covers: along its straight sides, the
+// source's own edge profile (measured where nothing covers it, so the edge is
+// the same under the deer as beside it); in the corners, the source's alpha.
+function squareCoverage(SA, H) {
+  const at = (x, y) => SA[y * W + x];
+  const mean = (values) => values.reduce((a, b) => a + b, 0) / values.length;
+  const rows = Array.from({ length: 51 }, (_, k) => 220 + k);
+  const left = Array.from({ length: 40 }, (_, x) => mean(rows.map((y) => at(x, y))));
+  const right = Array.from({ length: 40 }, (_, k) => mean(rows.map((y) => at(W - 40 + k, y))));
+  const cols = [...Array.from({ length: 11 }, (_, k) => 90 + k), ...Array.from({ length: 11 }, (_, k) => 260 + k)];
+  const top = Array.from({ length: 10 }, (_, y) => mean(Array.from({ length: 61 }, (_, k) => at(150 + k, y))));
+  const bottom = Array.from({ length: 20 }, (_, k) => mean(cols.map((x) => at(x, 340 + k))));
+  const S = new Float32Array(W * H);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const sideRows = y >= 70 && y <= 285;
+      const sideCols = x >= 85 && x <= 275;
+      if (!sideRows && !sideCols) {
+        S[y * W + x] = at(x, y);
+        continue;
+      }
+      let c = 1;
+      if (sideRows && x < 40) c *= left[x];
+      if (sideRows && x >= W - 40) c *= right[x - (W - 40)];
+      if (sideCols && y < 10) c *= top[y];
+      if (sideCols && y >= 340) c *= y < 360 ? bottom[y - 340] : 0;
+      S[y * W + x] = c;
+    }
+  return S;
+}
 
 async function layersFor({ season, source, height: H }) {
   const { data: raw, info } = await sharp(path.join(SRC_DIR, source)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -158,15 +192,16 @@ async function layersFor({ season, source, height: H }) {
     residual += Math.hypot(r - br, g - bg, b - bb);
   }
   console.log(season, 'background fit on', samples.length, 'px, mean residual', (residual / samples.length).toFixed(2));
+  const hex = (rgb) => '#' + rgb.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('');
+  console.log(season, 'purple: top left', hex(bgAt(14, 1)), 'top right', hex(bgAt(346, 1)), 'bottom left', hex(bgAt(14, 358)), 'bottom right', hex(bgAt(346, 358)), 'centre', hex(bgAt(180, 180)));
 
   // A first, hard deer mask: far from the purple inside the square, or opaque
   // outside it.
-  const S = new Float32Array(N);
+  const S = squareCoverage(SA, H);
   const core = new Uint8Array(N);
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
       const i = y * W + x;
-      S[i] = coverage(x, y);
       const d = Math.hypot(C[i * 3] - B[i * 3], C[i * 3 + 1] - B[i * 3 + 1], C[i * 3 + 2] - B[i * 3 + 2]);
       if (SA[i] > 0.5 && (S[i] < 0.5 || d > 75)) core[i] = 1;
     }
@@ -292,7 +327,7 @@ async function layersFor({ season, source, height: H }) {
   const neck = await rasterise(r.neck, H);
   const earL = await rasterise(r.earL, H);
   const earR = await rasterise(r.earR, H);
-  const lumAt = (i) => (0.2126 * C[i * 3] + 0.7152 * C[i * 3 + 1] + 0.0722 * C[i * 3 + 2]) / 255;
+  const lumAt = (i) => (0.2126 * F[i * 3] + 0.7152 * F[i * 3 + 1] + 0.0722 * F[i * 3 + 2]) / 255;
   for (let i = 0; i < N; i++) {
     const dark = smooth(0.36, 0.28, lumAt(i));
     earL[i] *= 1 - dark;
@@ -313,12 +348,13 @@ async function layersFor({ season, source, height: H }) {
       const i = y * W + x;
       let h = head0[i];
       if (x > 100 && x < 260 && Math.abs(y + 0.5 - domeY(x + 0.5)) < 4 + lift) {
-        const lum = (0.2126 * C[i * 3] + 0.7152 * C[i * 3 + 1] + 0.0722 * C[i * 3 + 2]) / 255;
+        // The deer's own colour (unmixed from the purple at the edges).
+        const lum = (0.2126 * F[i * 3] + 0.7152 * F[i * 3 + 1] + 0.0722 * F[i * 3 + 2]) / 255;
         h = 1 - smooth(0.42, 0.3, lum);
         if (season === 'christmas') {
           // Snow (light, grey-white) and fur (orange) are head; antler,
           // wire and the coloured bulbs are antler.
-          const [cr, cg, cb] = [C[i * 3], C[i * 3 + 1], C[i * 3 + 2]];
+          const [cr, cg, cb] = [F[i * 3], F[i * 3 + 1], F[i * 3 + 2]];
           const max = Math.max(cr, cg, cb), min = Math.min(cr, cg, cb);
           const snow = min > 165 && max - min < 70;
           const fur = cr > cg && cg > cb && cr > 150 && (cg - cb) / Math.max(1, cr - cb) > 0.25 && (cg - cb) / Math.max(1, cr - cb) < 0.75;
@@ -344,9 +380,46 @@ async function layersFor({ season, source, height: H }) {
       for (let x = 140; x < 222; x++) {
         const i = y * W + x;
         const lum = (0.2126 * C[i * 3] + 0.7152 * C[i * 3 + 1] + 0.0722 * C[i * 3 + 2]) / 255;
-        nose0[i] = smooth(0.5, 0.3, lum) * (1 - smooth(316, 322, y));
+        // How much of the pixel is nose: between the nose's dark brown
+        // (luminance about 0.25) and the muzzle's light tan (about 0.75).
+        nose0[i] = Math.min(1, Math.max(0, (0.75 - lum) / 0.5)) * (1 - smooth(316, 322, y));
+      }
+    // Solid inside its outline: the shine on top is nose too, not a hole that
+    // would show the face's own nose through it once the nose stands off.
+    const outside = new Uint8Array(N);
+    const stack = [];
+    for (let y = 266; y < 326; y++)
+      for (let x = 138; x < 224; x++)
+        if ((y === 266 || y === 325 || x === 138 || x === 223) && nose0[y * W + x] < 0.5) {
+          outside[y * W + x] = 1;
+          stack.push(y * W + x);
+        }
+    while (stack.length) {
+      const k = stack.pop();
+      const x = k % W, y = (k / W) | 0;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx, ny = y + dy;
+        if (nx < 138 || nx > 223 || ny < 266 || ny > 325) continue;
+        const n = ny * W + nx;
+        if (!outside[n] && nose0[n] < 0.5) {
+          outside[n] = 1;
+          stack.push(n);
+        }
+      }
+    }
+    const deep = new Uint8Array(N);
+    for (let y = 267; y < 325; y++)
+      for (let x = 139; x < 223; x++) {
+        const i = y * W + x;
+        if (outside[i]) continue;
+        const edge = outside[i - 1] || outside[i + 1] || outside[i - W] || outside[i + W];
+        if (!edge) {
+          nose0[i] = 1;
+          deep[i] = 1;
+        }
       }
     layersFor.nose = nose0;
+    layersFor.noseDeep = deep;
   } else nose0.set(everydayNose);
   let nose = nose0;
   if (season === 'christmas') {
@@ -355,28 +428,39 @@ async function layersFor({ season, source, height: H }) {
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) nose[y * W + x] = Math.max(...[0, 1, 2, 3, 4, 5, 6].map((k) => (y + k < H ? nose0[(y + k) * W + x] : 0)));
   }
 
-  // Layers behind reach a little under the head, continuing their own colour
-  // in the direction they go under it, so no gap opens when they move apart.
-  const ext = (weight, dir, reach, from, flat) => {
+  // Layers behind reach a little under the head, so nothing opens up when
+  // they move apart: the antlers and ears carry on in their own colour (each
+  // edge pixel's colour, averaged with its neighbours along the edge so it
+  // does not streak), the neck carries straight on up behind the chin.
+  const ext = (weight, dir, reach, flat) => {
     const colour = new Float32Array(N * 3);
     const alpha = new Float32Array(N);
     const [dx, dy] = dir;
+    const inside = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+    const solid = (x, y) => inside(x, y) && A[y * W + x] * weight[y * W + x] >= 0.5;
     for (let i = 0; i < N; i++) {
-      if (A[i] * weight[i] < 0.5) continue;
       const x = i % W, y = (i / W) | 0;
-      const nx = x + dx, ny = y + dy;
-      if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
-      const n = ny * W + nx;
-      if (A[n] * weight[n] >= 0.5 || head[n] < 0.5) continue;
-      // The edge: copy a pixel a little inside it onwards under the head.
-      const sx = x - dx * from, sy = y - dy * from;
-      const s0 = sy * W + sx;
-      const fill = flat ?? [F[s0 * 3], F[s0 * 3 + 1], F[s0 * 3 + 2]];
+      if (!solid(x, y) || solid(x + dx, y + dy)) continue;
+      const n = (y + dy) * W + (x + dx);
+      if (!inside(x + dx, y + dy) || head[n] < 0.5) continue;
+      // The colour 2 to 4 px inside the edge, over 5 px along it.
+      let fill = flat;
+      if (!fill) {
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let along = -2; along <= 2; along++)
+          for (let depth = 2; depth <= 4; depth++) {
+            const sx = x - dx * depth + dy * along, sy = y - dy * depth + dx * along;
+            if (!solid(sx, sy)) continue;
+            const k = sy * W + sx;
+            r += F[k * 3]; g += F[k * 3 + 1]; b += F[k * 3 + 2]; count++;
+          }
+        fill = count ? [r / count, g / count, b / count] : [F[i * 3], F[i * 3 + 1], F[i * 3 + 2]];
+      }
       for (let k = 1; k <= reach; k++) {
         const tx = x + dx * k, ty = y + dy * k;
-        if (tx < 0 || ty < 0 || tx >= W || ty >= H) break;
+        if (!inside(tx, ty)) break;
         const t = ty * W + tx;
-        if (head[t] < 0.5 || A[t] < 0.5) break;
+        if (head[t] < 0.3 || A[t] < 0.5) break;
         if (alpha[t] >= 1) continue;
         alpha[t] = 1;
         colour.set(fill, t * 3);
@@ -384,11 +468,59 @@ async function layersFor({ season, source, height: H }) {
     }
     return { colour, alpha };
   };
+
+  // The neck behind the chin: each column of the neck carried straight up from
+  // just below the jaw, its colours smoothed across, as far under the head as
+  // the head can ever move.
+  const neckUnder = () => {
+    const colour = new Float32Array(N * 3);
+    const alpha = new Float32Array(N);
+    const columns = [];
+    for (let x = 0; x < W; x++) {
+      let y0 = -1;
+      for (let y = 280; y < H - 1; y++) if (A[y * W + x] * neck[y * W + x] >= 0.5) { y0 = y; break; }
+      if (y0 < 0) continue;
+      const sy = Math.min(y0 + 2, Math.floor(SQUARE.bottom) - 1);
+      const k = sy * W + x;
+      columns.push({ x, y0, rgb: A[k] * neck[k] >= 0.5 ? [F[k * 3], F[k * 3 + 1], F[k * 3 + 2]] : null, a: A[y0 * W + x] * neck[y0 * W + x] });
+    }
+    // Columns without a neck pixel below the jaw (the chin reaches the tile's
+    // edge) take their neighbours' colour; then a light blur across.
+    const known = columns.filter((c) => c.rgb);
+    for (const c of columns) {
+      if (c.rgb) continue;
+      const left = [...known].reverse().find((k) => k.x < c.x), right = known.find((k) => k.x > c.x);
+      const a = left ?? right, b = right ?? left;
+      const t = a === b ? 0 : (c.x - a.x) / (b.x - a.x);
+      c.rgb = a.rgb.map((v, ch) => v + (b.rgb[ch] - v) * t);
+    }
+    const smoothRgb = columns.map((c, index) => {
+      let sum = [0, 0, 0], weight = 0;
+      for (let d = -3; d <= 3; d++) {
+        const o = columns[index + d];
+        if (!o || Math.abs(o.x - c.x) > 3) continue;
+        const w = Math.exp(-(d * d) / 4.5);
+        sum = sum.map((v, ch) => v + o.rgb[ch] * w);
+        weight += w;
+      }
+      return sum.map((v) => v / weight);
+    });
+    columns.forEach((c, index) => {
+      for (let y = c.y0 - 1; y >= c.y0 - 30; y--) {
+        const t = y * W + c.x;
+        if (y < 0 || head[t] < 0.3 || A[t] < 0.5) break;
+        alpha[t] = Math.min(1, c.a);
+        colour.set(smoothRgb[index], t * 3);
+      }
+    });
+    return { colour, alpha };
+  };
+
   const extensions = {
-    antlers: ext(antlers, [0, 1], 10, 2, [74, 45, 39]),
-    'ear-left': ext(earL, [1, 0], 10, 2),
-    'ear-right': ext(earR, [-1, 0], 10, 2),
-    neck: ext(neck, [0, -1], 16, 3),
+    antlers: ext(antlers, [0, 1], 10, [74, 45, 39]),
+    'ear-left': ext(earL, [1, 0], 10),
+    'ear-right': ext(earR, [-1, 0], 10),
+    neck: neckUnder(),
   };
 
   const layers = {};
@@ -396,8 +528,8 @@ async function layersFor({ season, source, height: H }) {
     const out = new Float32Array(N * 4);
     for (let i = 0; i < N; i++) {
       const a = A[i] * Math.min(1, weight[i]);
-      if (extension && extension.alpha[i] > 0 && a < 0.5) {
-        out.set([extension.colour[i * 3], extension.colour[i * 3 + 1], extension.colour[i * 3 + 2], 1], i * 4);
+      if (extension && extension.alpha[i] > a) {
+        out.set([extension.colour[i * 3], extension.colour[i * 3 + 1], extension.colour[i * 3 + 2], extension.alpha[i]], i * 4);
         continue;
       }
       if (a <= 0.004) continue;
@@ -416,15 +548,33 @@ async function layersFor({ season, source, height: H }) {
   make('ear-right', earR, extensions['ear-right']);
   make('head', head);
   make('nose', nose);
+  // The nose's soft rim carries the nose's own dark colour (in the artwork it
+  // is half muzzle, which would show as a light ring once the nose stands
+  // off the face); the Christmas snow on top keeps its own.
+  {
+    const out = layers.nose;
+    const deep = layersFor.noseDeep;
+    for (let i = 0; i < N; i++) {
+      if (out[i * 4 + 3] === 0 || deep[i]) continue;
+      const lum = (0.2126 * F[i * 3] + 0.7152 * F[i * 3 + 1] + 0.0722 * F[i * 3 + 2]) / 255;
+      if (season === 'christmas' && lum > 0.6 && nose0[i] < 0.5) continue;
+      const x = i % W, y = (i / W) | 0;
+      let r = 0, g = 0, b = 0, count = 0;
+      for (let dy = -3; dy <= 3; dy++)
+        for (let dx = -3; dx <= 3; dx++) {
+          const k = (y + dy) * W + (x + dx);
+          if (deep[k]) { r += F[k * 3]; g += F[k * 3 + 1]; b += F[k * 3 + 2]; count++; }
+        }
+      if (count) out.set([r / count, g / count, b / count], i * 4);
+    }
+  }
 
-  // The face: the purple square without the deer (its gradient fitted, so no
-  // trace of the deer is left), the Christmas snowflakes on it. The everyday
-  // neck stays on it, so the deer rises out of the tile.
+  // The back of the window: the purple square without the deer (its gradient
+  // fitted, so no trace of the deer is left), with the Christmas snowflakes.
   const face = new Float32Array(N * 4);
   for (let i = 0; i < N; i++) {
     const deer = A[i] > 0 || band[i] > 0;
     let [r0, g0, b0] = [B[i * 3], B[i * 3 + 1], B[i * 3 + 2]];
-    let a0 = deer ? S[i] : Math.min(SA[i], S[i] > 0 ? 1 : 0);
     if (!deer && SA[i] > 0.5 && S[i] > 0.99) {
       // A snowflake: unmix it from the purple as white.
       const d = Math.hypot(C[i * 3] - r0, C[i * 3 + 1] - g0, C[i * 3 + 2] - b0);
@@ -438,51 +588,82 @@ async function layersFor({ season, source, height: H }) {
         r0 += (255 - r0) * w; g0 += (255 - g0) * w; b0 += (255 - b0) * w;
       }
     }
-    // The neck, and its continuation under the head.
-    let n = A[i] * neck[i], nc = [F[i * 3], F[i * 3 + 1], F[i * 3 + 2]];
-    if (extensions.neck.alpha[i] > 0 && n < 0.5) {
-      n = 1;
-      nc = [extensions.neck.colour[i * 3], extensions.neck.colour[i * 3 + 1], extensions.neck.colour[i * 3 + 2]];
-    }
-    if (season === 'everyday' && n > 0) {
-      const a = n + a0 * (1 - n);
-      r0 = (nc[0] * n + r0 * a0 * (1 - n)) / a;
-      g0 = (nc[1] * n + g0 * a0 * (1 - n)) / a;
-      b0 = (nc[2] * n + b0 * a0 * (1 - n)) / a;
-      a0 = a;
-    }
-    // Below the jaw the everyday face is the original artwork: the neck as
-    // drawn, down to the square's edge.
-    if (season === 'everyday' && neck[i] > 0) {
-      const w = neck[i];
-      const pa = SA[i];
-      const a = a0 * (1 - w) + pa * w;
-      if (a > 0) {
-        r0 = (r0 * a0 * (1 - w) + C[i * 3] * pa * w) / a;
-        g0 = (g0 * a0 * (1 - w) + C[i * 3 + 1] * pa * w) / a;
-        b0 = (b0 * a0 * (1 - w) + C[i * 3 + 2] * pa * w) / a;
-      }
-      a0 = a;
-    }
-    face.set([r0, g0, b0, a0], i * 4);
+    face.set([r0, g0, b0, S[i]], i * 4);
   }
   layers.face = face;
 
-  // The shade the deer casts on the face: its outline, softened and moved down.
+  // The neck (the everyday deer's; at Christmas the scarf hides it), as drawn
+  // below the jaw and carried on up under the head. HevaloDeer.astro stacks
+  // it from the back of the window to just behind the head, so it reads as
+  // one neck reaching out through the window: the copy nearest the head keeps
+  // the artwork's soft edge ('neck'); the others are drawn 1 px smaller and
+  // solid, so they never thicken that edge ('neck-core' stops at the sill,
+  // like 'neck', for the copies in front of the frame; 'neck-back' goes on
+  // down behind it).
+  if (season === 'everyday') {
+    const soft = new Float32Array(N), colour = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const a = A[i] * neck[i];
+      const e = extensions.neck.alpha[i] * (1 - neck[i]);
+      if (e > a) {
+        soft[i] = e;
+        colour.set(extensions.neck.colour.subarray(i * 3, i * 3 + 3), i * 3);
+      } else {
+        soft[i] = a;
+        colour.set(F.subarray(i * 3, i * 3 + 3), i * 3);
+      }
+    }
+    const solid = Float32Array.from(soft, (a) => (a >= 0.5 ? 1 : 0));
+    // Erode by 1 px: a pixel stays if its four neighbours are neck too.
+    const core = new Float32Array(N);
+    for (let y = 1; y < H - 1; y++)
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        core[i] = solid[i] && solid[i - 1] && solid[i + 1] && solid[i - W] && solid[i + W] ? 1 : 0;
+      }
+    // The copies' colour at their sides comes from 3 px in, not from the
+    // edge itself (which carries a trace of the purple); deeper copies are a
+    // little darker, so the side of the neck reads as in shade.
+    const inner = new Float32Array(N * 3);
+    for (let y = 0; y < H; y++) {
+      let x0 = -1, x1 = -1;
+      for (let x = 0; x < W; x++) if (core[y * W + x]) { if (x0 < 0) x0 = x; x1 = x; }
+      if (x0 < 0) continue;
+      for (let x = x0; x <= x1; x++) {
+        const sx = Math.min(Math.max(x, x0 + 3), x1 - 3);
+        inner.set(colour.subarray((y * W + sx) * 3, (y * W + sx) * 3 + 3), (y * W + x) * 3);
+      }
+    }
+    const sill = (y) => 1 - smooth(SILL - 0.5, SILL + 0.5, y + 0.5);
+    const layer = (alphaAt, rgb, shade = 1) => {
+      const out = new Float32Array(N * 4);
+      for (let i = 0; i < N; i++) {
+        const a = alphaAt(i, (i / W) | 0);
+        if (a > 0.004) out.set([rgb[i * 3] * shade, rgb[i * 3 + 1] * shade, rgb[i * 3 + 2] * shade, a], i * 4);
+      }
+      return out;
+    };
+    layers.neck = layer((i, y) => soft[i] * sill(y), colour);
+    layers['neck-core'] = layer((i, y) => core[i] * (y + 0.5 < SILL ? 1 : 0), inner, 0.93);
+    layers['neck-back'] = layer((i) => core[i], inner, 0.8);
+  }
+
+  // The shade the deer casts on the back of the window: its outline,
+  // softened and moved down.
   const sil = new Float32Array(N);
   for (let i = 0; i < N; i++) sil[i] = A[i] * Math.min(1, head[i] + antlers[i] + earL[i] + earR[i]);
   const silBuf = Buffer.from(Uint8Array.from(sil, (v) => Math.round(v * 255)));
-  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } }).blur(5).extractChannel(0).raw().toBuffer();
+  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } }).blur(7).extractChannel(0).raw().toBuffer();
   if (blurred.length !== N) throw new Error('shade: unexpected channels');
   const shade = new Float32Array(N * 4);
-  const DX = 2, DY = 6;
+  const DX = 3, DY = 9;
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
       const sx = x - DX, sy = y - DY;
       if (sx < 0 || sy < 0) continue;
       const v = blurred[sy * W + sx] / 255;
       const i = y * W + x;
-      const a = 0.32 * v * (face[i * 4 + 3] > 0.5 ? 1 : face[i * 4 + 3]) * S[i];
+      const a = 0.34 * v * S[i];
       if (a < 0.004) continue;
       shade.set([40, 12, 78, a], i * 4);
     }
@@ -500,7 +681,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   for (const s of SEASONS) results.push({ ...s, ...(await layersFor(s)) });
 
   // Union box per layer, in frame units, on a 5-unit grid (so x0.8 and x1.6 are whole pixels).
-  const names = ['face', 'shade', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
+  const names = ['face', 'shade', 'neck', 'neck-core', 'neck-back', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
   const boxes = {};
   for (const name of names) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -520,10 +701,12 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   }
 
   // Every season on the same canvas, so a layer has the same box in both.
+  // (The neck is the everyday deer's only, and serves both.)
   const HMAX = Math.max(...results.map((r) => r.H)) + 8;
   for (const { season, file, H, layers } of results) {
     for (const [name, L] of Object.entries(layers)) {
       const box = boxes[name];
+      const prefix = name.startsWith('neck') ? 'hevalo' : file;
       const padded = Buffer.alloc(W * HMAX * 4);
       toBuffer(L).copy(padded);
       const full = sharp(padded, { raw: { width: W, height: HMAX, channels: 4 } });
@@ -532,7 +715,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
         const k = frame / W;
         const scaled = await sharp(png).resize({ width: frame, height: Math.round(HMAX * k), kernel: 'mitchell' }).raw().toBuffer({ resolveWithObject: true });
         const h = Math.round(box.h * k);
-        const out = path.join(OUT, `${file}-${name}-${frame}.webp`);
+        const out = path.join(OUT, `${prefix}-${name}-${frame}.webp`);
         // (The resized pixels are straight, not premultiplied, whatever the
         // info says: passing it on would divide the edges by their alpha again.)
         const res = await sharp(scaled.data, { raw: { width: scaled.info.width, height: scaled.info.height, channels: 4 } })

@@ -240,7 +240,7 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
 /* -------------------------------------------------------------------------- */
 /* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
 /* pointer, a soft light follows it across the products band, and the Hevalo  */
-/* tile turns towards it with a highlight.                                    */
+/* icon turns towards it, its frame catching the light.                       */
 /* -------------------------------------------------------------------------- */
 
 function initPointerDepth() {
@@ -323,9 +323,9 @@ function initPointerDepth() {
     surface.addEventListener('pointerleave', () => surface.removeAttribute('data-spot'));
   }
 
-  // The Hevalo tile turns towards the pointer anywhere over its band, more the
-  // further the pointer is from it, and catches the light on that side. (The
-  // deer on it turns a little further, HevaloDeer.astro.)
+  // The Hevalo icon turns towards the pointer anywhere over its band, more the
+  // further the pointer is from it, and its frame catches the light on that
+  // side (HevaloDeer.astro).
   for (const tilt of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
     const area = tilt.closest<HTMLElement>('[data-spotlight]') ?? tilt;
     let queued = false;
@@ -344,7 +344,7 @@ function initPointerDepth() {
         if (!inside) return;
         const rect = tilt.getBoundingClientRect();
         const box = area.getBoundingClientRect();
-        // -1 to 1: from the tile's centre to the band's far edge.
+        // -1 to 1: from the icon's centre to the band's far edge.
         const dx = clamp((x - (rect.left + rect.width / 2)) / (box.width / 2), -1, 1);
         const dy = clamp((y - (rect.top + rect.height / 2)) / (box.height / 2), -1, 1);
         tilt.style.setProperty('--tilt-x', `${(-dy * 12).toFixed(2)}deg`);
