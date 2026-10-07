@@ -266,6 +266,12 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
      (motion.ts). */
   .journey {
     display: none;
+    /* Laid out left to right in every language: while the logo turns, it is
+       laid out at the size it is seen at, growing from its top left corner,
+       and in a right-to-left page the browser would measure it from its top
+       right corner, which then moves, and count that as the page shifting. It
+       is artwork, placed from the left by story.ts. */
+    direction: ltr;
   }
 
   :global(:root[data-story='on']) .journey {
