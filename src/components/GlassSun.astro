@@ -3,220 +3,92 @@
  * The Kurdish sun as a thick piece of glass, in 3D, for the homepage story
  * (Story.astro, src/scripts/story.ts).
  *
- * Every layer is cut to the sun's outline (21 rays, the gaps between them at
- * 51.2% of the rays' length, as in src/lib/sun.ts) with `clip-path`, so the
- * edges are drawn as vectors at any size. A faint back face, set back by
- * the glass's thickness, makes the body, clear but for its depth, which
- * shows as it turns. At the front, a bright bevel runs round the edge of a
- * clear face, which catches the light at its top left, and a glint slides
- * across it as it turns. (There are no layers in between: each would be cut
- * to the outline and redrawn as the sun tumbles, and a dozen of them made
- * the page stutter.)
+ * Every layer is drawn in the sun's outline (21 rays, the gaps between them at
+ * 51.2% of the rays' length, from src/lib/sun.ts), as vector shapes, sharp at
+ * any size. A faint back face, set back by the glass's thickness, makes the
+ * body, clear but for its depth, which shows as it turns. At the front, a
+ * bright bevel runs round the edge of a clear face, which catches the light at
+ * its top left, and a glint slides across it as it turns. (There are no layers
+ * in between: a dozen of them made the page stutter.) The layers are drawn as
+ * shapes rather than cut out with `clip-path`: a cut-out layer that turns in
+ * 3D is cut out anew on every frame.
  *
  * It takes its colour from the text colour around it, so it is clear glass
- * in whatever colours it is set in. Its pose comes from custom properties
- * (--sun-pitch, --sun-yaw, --sun-roll, --sun-glint); without them it faces
- * forward. Decorative, so it is hidden from screen readers.
+ * in whatever colours it is set in. story.ts turns it by setting the
+ * transform of its body (`.glass-sun__body`) and slides the glint by setting
+ * that of its band (`.glass-sun__band`), directly: custom properties set round
+ * it would be inherited by the vector layers, which the browser then draws
+ * again on every frame. Without them it faces forward, the glint in the
+ * middle. Decorative, so it is hidden from screen readers.
  */
+import { sunOutline } from '../lib/sun';
+
 interface Props {
   class?: string;
 }
 
 const { class: className } = Astro.props;
+
+// The outline, and the face inside the rim: the same outline 88% as large.
+const outline = sunOutline();
+const face = sunOutline(0.88);
+// Gradients are named per page; there is one sun.
+const id = 'glass-sun';
 ---
 
 <span class:list={['glass-sun', className]} aria-hidden="true">
   <span class="glass-sun__body">
-    <span class="glass-sun__layer glass-sun__back"></span>
-    <span class="glass-sun__layer glass-sun__bevel"></span>
-    <span class="glass-sun__layer glass-sun__face"></span>
-    <span class="glass-sun__layer glass-sun__glint"></span>
+    <svg class="glass-sun__layer glass-sun__back" viewBox="-100 -100 200 200" focusable="false">
+      <path d={outline} fill="currentColor" fill-opacity="0.16"></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__bevel" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        {/* As linear-gradient(150deg, …) across the box. */}
+        <linearGradient id={`${id}-bevel`} gradientUnits="userSpaceOnUse" x1="-68.3" y1="-118.3" x2="68.3" y2="118.3">
+          <stop offset="0" stop-color="currentColor"></stop>
+          <stop offset="0.55" stop-color="currentColor" stop-opacity="0.4"></stop>
+          <stop offset="1" stop-color="currentColor" stop-opacity="0.8"></stop>
+        </linearGradient>
+      </defs>
+      <path d={`${outline}${face}`} fill-rule="evenodd" fill={`url(#${id}-bevel)`}></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__face" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        <linearGradient id={`${id}-face`} gradientUnits="userSpaceOnUse" x1="-68.3" y1="-118.3" x2="68.3" y2="118.3">
+          <stop offset="0" stop-color="currentColor" stop-opacity="0.24"></stop>
+          <stop offset="0.55" stop-color="currentColor" stop-opacity="0.06"></stop>
+          <stop offset="1" stop-color="currentColor" stop-opacity="0.16"></stop>
+        </linearGradient>
+        {/* As radial-gradient(circle at 34% 28%, …): to the farthest corner. */}
+        <radialGradient id={`${id}-light`} gradientUnits="userSpaceOnUse" cx="-32" cy="-44" r="195.34">
+          <stop offset="0" stop-color="currentColor" stop-opacity="0.46"></stop>
+          <stop offset="0.42" stop-color="currentColor" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <path d={face} fill={`url(#${id}-face)`}></path>
+      <path d={face} fill={`url(#${id}-light)`}></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__glint" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        <clipPath id={`${id}-face-clip`}>
+          <path d={face}></path>
+        </clipPath>
+        {/* A band at 118deg across a strip three times as wide as the sun. */}
+        <linearGradient id={`${id}-glint`} gradientUnits="userSpaceOnUse" x1="-75.3" y1="-146.4" x2="475.3" y2="146.4">
+          <stop offset="0.42" stop-color="currentColor" stop-opacity="0"></stop>
+          <stop offset="0.5" stop-color="currentColor" stop-opacity="0.65"></stop>
+          <stop offset="0.58" stop-color="currentColor" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <g clip-path={`url(#${id}-face-clip)`}>
+        <rect class="glass-sun__band" x="-100" y="-100" width="600" height="200" fill={`url(#${id}-glint)`}></rect>
+      </g>
+    </svg>
   </span>
 </span>
 
 <style>
   .glass-sun {
-    /* The sun's outline: the rays' tips on a circle filling the box, the gaps
-       between them on one 51.2% as large. */
-    --shape: polygon(
-      50% 0%,
-      53.82% 24.69%,
-      64.74% 2.22%,
-      61.11% 26.94%,
-      78.17% 8.69%,
-      67.41% 31.23%,
-      89.09% 18.83%,
-      72.17% 37.2%,
-      96.54% 31.73%,
-      74.96% 44.3%,
-      99.86% 46.26%,
-      75.53% 51.91%,
-      98.75% 61.13%,
-      73.83% 59.35%,
-      93.3% 75%,
-      70.01% 65.96%,
-      84.01% 86.65%,
-      64.42% 71.15%,
-      71.69% 95.05%,
-      57.55% 74.46%,
-      57.45% 99.44%,
-      50% 75.6%,
-      42.55% 99.44%,
-      42.45% 74.46%,
-      28.31% 95.05%,
-      35.58% 71.15%,
-      15.99% 86.65%,
-      29.99% 65.96%,
-      6.7% 75%,
-      26.17% 59.35%,
-      1.25% 61.13%,
-      24.47% 51.91%,
-      0.14% 46.26%,
-      25.04% 44.3%,
-      3.46% 31.73%,
-      27.83% 37.2%,
-      10.91% 18.83%,
-      32.59% 31.23%,
-      21.83% 8.69%,
-      38.89% 26.94%,
-      35.26% 2.22%,
-      46.18% 24.69%
-    );
-    /* The rim: the outline less the same outline 88% as large, round the
-       same middle; and that smaller outline, the face inside the rim. */
-    --rim: polygon(
-      evenodd,
-      50% 0%,
-      53.82% 24.69%,
-      64.74% 2.22%,
-      61.11% 26.94%,
-      78.17% 8.69%,
-      67.41% 31.23%,
-      89.09% 18.83%,
-      72.17% 37.2%,
-      96.54% 31.73%,
-      74.96% 44.3%,
-      99.86% 46.26%,
-      75.53% 51.91%,
-      98.75% 61.13%,
-      73.83% 59.35%,
-      93.3% 75%,
-      70.01% 65.96%,
-      84.01% 86.65%,
-      64.42% 71.15%,
-      71.69% 95.05%,
-      57.55% 74.46%,
-      57.45% 99.44%,
-      50% 75.6%,
-      42.55% 99.44%,
-      42.45% 74.46%,
-      28.31% 95.05%,
-      35.58% 71.15%,
-      15.99% 86.65%,
-      29.99% 65.96%,
-      6.7% 75%,
-      26.17% 59.35%,
-      1.25% 61.13%,
-      24.47% 51.91%,
-      0.14% 46.26%,
-      25.04% 44.3%,
-      3.46% 31.73%,
-      27.83% 37.2%,
-      10.91% 18.83%,
-      32.59% 31.23%,
-      21.83% 8.69%,
-      38.89% 26.94%,
-      35.26% 2.22%,
-      46.18% 24.69%,
-      50% 0%,
-      50% 6%,
-      46.64% 27.72%,
-      37.03% 7.95%,
-      40.23% 29.7%,
-      25.21% 13.65%,
-      34.68% 33.49%,
-      15.6% 22.57%,
-      30.49% 38.74%,
-      9.04% 33.92%,
-      28.04% 44.99%,
-      6.12% 46.71%,
-      27.53% 51.68%,
-      7.1% 59.79%,
-      29.03% 58.23%,
-      11.89% 72%,
-      32.39% 64.05%,
-      20.07% 82.25%,
-      37.31% 68.61%,
-      30.91% 89.64%,
-      43.36% 71.53%,
-      43.44% 93.51%,
-      50% 72.53%,
-      56.56% 93.51%,
-      56.64% 71.53%,
-      69.09% 89.64%,
-      62.69% 68.61%,
-      79.93% 82.25%,
-      67.61% 64.05%,
-      88.11% 72%,
-      70.97% 58.23%,
-      92.9% 59.79%,
-      72.47% 51.68%,
-      93.88% 46.71%,
-      71.96% 44.99%,
-      90.96% 33.92%,
-      69.51% 38.74%,
-      84.4% 22.57%,
-      65.32% 33.49%,
-      74.79% 13.65%,
-      59.77% 29.7%,
-      62.97% 7.95%,
-      53.36% 27.72%,
-      50% 6%
-    );
-    --face: polygon(
-      50% 6%,
-      53.36% 27.72%,
-      62.97% 7.95%,
-      59.77% 29.7%,
-      74.79% 13.65%,
-      65.32% 33.49%,
-      84.4% 22.57%,
-      69.51% 38.74%,
-      90.96% 33.92%,
-      71.96% 44.99%,
-      93.88% 46.71%,
-      72.47% 51.68%,
-      92.9% 59.79%,
-      70.97% 58.23%,
-      88.11% 72%,
-      67.61% 64.05%,
-      79.93% 82.25%,
-      62.69% 68.61%,
-      69.09% 89.64%,
-      56.64% 71.53%,
-      56.56% 93.51%,
-      50% 72.53%,
-      43.44% 93.51%,
-      43.36% 71.53%,
-      30.91% 89.64%,
-      37.31% 68.61%,
-      20.07% 82.25%,
-      32.39% 64.05%,
-      11.89% 72%,
-      29.03% 58.23%,
-      7.1% 59.79%,
-      27.53% 51.68%,
-      6.12% 46.71%,
-      28.04% 44.99%,
-      9.04% 33.92%,
-      30.49% 38.74%,
-      15.6% 22.57%,
-      34.68% 33.49%,
-      25.21% 13.65%,
-      40.23% 29.7%,
-      37.03% 7.95%,
-      46.64% 27.72%
-    );
     --thickness: 10cqi;
 
     position: relative;
@@ -229,7 +101,6 @@ const { class: className } = Astro.props;
   .glass-sun__body {
     position: absolute;
     inset: 0;
-    transform: rotateX(var(--sun-pitch, 0deg)) rotateY(var(--sun-yaw, 0deg)) rotateZ(var(--sun-roll, 0deg));
     transform-origin: 50% 50% calc(var(--thickness) * -0.5);
     transform-style: preserve-3d;
   }
@@ -239,56 +110,27 @@ const { class: className } = Astro.props;
 
     position: absolute;
     inset: 0;
-    clip-path: var(--shape);
+    width: 100%;
+    height: 100%;
+    overflow: visible;
     transform: translateZ(calc(var(--thickness) * var(--f) * -1));
   }
 
-  /* The back face, faint: clear glass, which shows its depth as it turns. */
+  /* The back face, set back by the glass's thickness. */
   .glass-sun__back {
     --f: 1;
-
-    background: color-mix(in srgb, currentColor 16%, transparent);
   }
 
-  /* The front: a bright bevel round the edge, lit from the top left, round
-     a clear face with a highlight at its top left. */
-  .glass-sun__bevel {
-    clip-path: var(--rim);
-    background: linear-gradient(
-      150deg,
-      currentColor,
-      color-mix(in srgb, currentColor 40%, transparent) 55%,
-      color-mix(in srgb, currentColor 80%, transparent)
-    );
-  }
-
+  /* The face and its glint, just in front of the bevel round them. */
   .glass-sun__face,
   .glass-sun__glint {
-    clip-path: var(--face);
     transform: translateZ(0.5px);
   }
 
-  .glass-sun__face {
-    background:
-      radial-gradient(circle at 34% 28%, color-mix(in srgb, currentColor 46%, transparent), transparent 42%),
-      linear-gradient(
-        150deg,
-        color-mix(in srgb, currentColor 24%, transparent),
-        color-mix(in srgb, currentColor 6%, transparent) 55%,
-        color-mix(in srgb, currentColor 16%, transparent)
-      );
-  }
-
-  /* A band of light across the face, which slides as the sun turns. */
-  .glass-sun__glint {
-    background: linear-gradient(
-      118deg,
-      transparent 42%,
-      color-mix(in srgb, currentColor 65%, transparent) 50%,
-      transparent 58%
-    );
-    background-size: 300% 100%;
-    background-position: var(--sun-glint, 50%) 0;
+  /* The band of light across the face: the strip it lies on is three times
+     as wide as the sun, here with its middle over the sun's middle. */
+  .glass-sun__band {
+    transform: translateX(-200px);
   }
 
   @media (forced-colors: active) {
@@ -296,8 +138,8 @@ const { class: className } = Astro.props;
       display: none;
     }
 
-    .glass-sun__bevel {
-      background: CanvasText;
+    .glass-sun__bevel path {
+      fill: CanvasText;
     }
   }
 </style>

@@ -101,7 +101,10 @@ function runScrollEffects(effects: ScrollEffect[]) {
   let measured = false;
 
   const measure = () => {
-    const viewportHeight = window.innerHeight;
+    // The height of the screen without a phone's address bar, which stays put
+    // as the bar slides away and back (innerHeight follows it, so the effects
+    // would jump each time the reader turned round).
+    const viewportHeight = document.documentElement.clientHeight;
     for (const effect of active) effect.measure(viewportHeight);
   };
 

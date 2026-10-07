@@ -124,7 +124,7 @@ src/
     than shown as an image, so it is sharp at any size: the light shapes are traced from the lifted
     logo (the light regions inside its frame, 6× upscale, lightly blurred, potrace, SVGO:
     `zagrosian-logo-lifted.svg`, 2 KB; the dark parts are the tile less those), and the block is
-    built in CSS 3D: a back face that tints the glass and casts its shadow, twenty thin layers that
+    built in CSS 3D: a back face that tints the glass and casts its shadow, ten thin layers that
     make its edge, the logo floating between the faces within a thin frame as in the original, and
     a front face that only catches the light (a bevel, a glare and a streak), so the logo stays
     crisp. It rests turned a little, so its depth shows, and in the hero it turns further towards
@@ -134,7 +134,13 @@ src/
     On the homepage it travels into the story under the hero (see Motion). The glass does not blur
     what is behind it (`backdrop-filter`): the lights behind it are soft already, and a backdrop
     blur is costly to redraw while the block moves; a faint haze inside the glass on the dark page
-    stands in for it.
+    stands in for it. For the same reason its soft parts, the shadow it casts (one for each theme)
+    and the shading inside its front face, are images (`lifted-logo-shadow-light.webp`,
+    `lifted-logo-shadow-dark.webp`, `lifted-logo-shading.webp`, 10 to 16 KB each): the CSS box
+    shadows they were, drawn once by
+    [`scripts/logo-shadows.mjs`](scripts/logo-shadows.mjs) (`node scripts/logo-shadows.mjs`), so
+    they look the same. A blurred shadow is worked out anew each time the logo is drawn at a new
+    size, which made the story stutter as it flew into the logo; an image is only stretched.
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
@@ -216,10 +222,14 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
-- **Long pages:** the homepage's last sections (About, FAQ, Contact) and every page's footer are
-  not laid out or drawn until the reader nears them (`content-visibility: auto`), so the first
-  screen is ready sooner; their text is in the page all the while, for search engines, screen
-  readers and find-in-page.
+- **Steady scrolling, both ways:** nothing on a page changes size as it scrolls, so the page never
+  moves under the reader when they turn round. The sections further down are laid out with the
+  page (they are not drawn only as the reader nears them, with `content-visibility`: their size
+  until then is a guess, the page's length changed as they were drawn, and Safari, which does not
+  keep the reader's place when content above it changes size, would jump). And on a phone, where
+  the address bar slides away as the page scrolls down and back as it scrolls up, nothing is
+  measured against it: the story keeps its drawings (story.ts), and the scroll effects measure
+  the screen without the bar (`document.documentElement.clientHeight`, motion.ts).
 - **No loading screen:** every page shows its own content from the first paint, as apple.com and
   meta.com do. A splash screen in front of a page that is already there only makes visitors wait.
 - **Hero:** the headline rises line by line from behind masks on load, and the lifted logo rises
@@ -251,13 +261,19 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
      at, or less, scrolling down or up. (Drawn once and scaled thirty times, it had to be redrawn
      at a size no graphics memory holds when the page scrolled back up into it, and parts of it
      went missing.) Before that, turned in 3D, it is laid out at the size it is seen at, as a
-     drawing in perspective is drawn at its layout's size. Face on, its edge layers are not drawn. Where
-     it flies in was found with a distance transform of the logo's shapes: the point deepest inside
-     the ink.
+     drawing in perspective is drawn at its layout's size; everything in the block is laid out from
+     its top left corner (and moved into place with `translate`), so it grows from there and nothing
+     shifts. Face on, its edge layers are not drawn, nor, once the camera is through it, the front
+     pane. Each drawing is cheap: the soft shadow and shading are images (see Brand assets), so
+     every new size is drawn in a fraction of the time a blurred box shadow took. Where it flies in
+     was found with a distance transform of the logo's shapes: the point deepest inside the ink.
   3. **The sun.** The ink becomes a scene in the other theme's colours (`.story__scene`). The
      Kurdish sun rises as a thick piece of glass ([`GlassSun.astro`](src/components/GlassSun.astro):
-     a back face and a bevelled front with a glint, each cut to the sun's outline with
-     `clip-path`), tumbling and catching the light, with a soft glow behind it; it
+     a back face and a bevelled front with a glint, each drawn as a vector shape in the sun's
+     outline: a layer cut out with `clip-path` is cut out anew on every frame it turns in 3D),
+     tumbling and catching the light, with a soft glow behind it (which the graphics card only
+     scales); story.ts turns it by its body's transform, not custom properties round it, which the
+     vector layers would inherit and be drawn again for on every frame; it
      comes to rest facing the reader above the motto, which rises word by word with its
      translation. The header switches to the scene's colours while the scene is behind it
      (`data-inverse`, global.css).

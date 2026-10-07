@@ -295,6 +295,11 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     visibility: hidden;
   }
 
+  /* Once the camera has gone through the front pane, it is not drawn. */
+  .journey[data-through] :global(.lifted-logo__front) {
+    visibility: hidden;
+  }
+
   /* Facing the reader, laid out once and only moved and scaled by the
      graphics card, which keeps its drawing while it moves; story.ts has it
      drawn again, sharp, when its size has grown or shrunk by half a

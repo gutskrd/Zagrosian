@@ -1,8 +1,10 @@
 /**
  * Nothing jumps: no layout shift while the homepage loads (as on a first
- * visit), and none while it is scrolled all the way down
- * with a mouse wheel and back up again, through the story and the deer, left
- * to right and right to left (where the browser measures from the right).
+ * visit), and none while it is scrolled all the way down with a mouse wheel
+ * and back up again, through the story and the deer, left to right and right
+ * to left (where the browser measures from the right); and the page keeps its
+ * length all the while, so the reader's place never moves when they turn
+ * round (Safari does not keep it when content above changes size).
  */
 import { type Page, expect, test } from '@playwright/test';
 import { settled } from './support';
@@ -64,18 +66,23 @@ for (const { width, height, path } of [
     await page.goto(path, { waitUntil: 'networkidle' });
     await page.waitForTimeout(2000);
     await page.mouse.move(width / 2, height / 2);
-    const end = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+    const length = () => page.evaluate(() => document.documentElement.scrollHeight);
+    const lengths = new Set([await length()]);
+    const end = (await length()) - height;
     for (let y = 0; y < end + 200; y += 120) {
       await page.mouse.wheel(0, 120);
       await page.waitForTimeout(25);
+      if ((y / 120) % 5 === 0) lengths.add(await length());
     }
     await page.waitForTimeout(800);
     for (let y = end; y > -200; y -= 120) {
       await page.mouse.wheel(0, -120);
       await page.waitForTimeout(25);
+      if ((y / 120) % 5 === 0) lengths.add(await length());
     }
     await page.waitForTimeout(800);
     const { total, where } = await shifts();
     expect(total, where.join('\n')).toBeLessThan(0.01);
+    expect([...lengths], 'the page length while scrolling').toHaveLength(1);
   });
 }

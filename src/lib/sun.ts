@@ -5,8 +5,11 @@
  * traced, so its points are exact. A path in a box from -100 to 100, which the
  * rays' tips touch.
  */
-export const sunPath = `M${Array.from({ length: 42 }, (_, index) => {
-  const angle = (index * Math.PI) / 21;
-  const radius = index % 2 ? 51.2 : 100;
-  return `${(Math.sin(angle) * radius).toFixed(2)} ${(-Math.cos(angle) * radius).toFixed(2)}`;
-}).join('L')}Z`;
+export const sunOutline = (scale = 1) =>
+  `M${Array.from({ length: 42 }, (_, index) => {
+    const angle = (index * Math.PI) / 21;
+    const radius = (index % 2 ? 51.2 : 100) * scale;
+    return `${(Math.sin(angle) * radius).toFixed(2)} ${(-Math.cos(angle) * radius).toFixed(2)}`;
+  }).join('L')}Z`;
+
+export const sunPath = sunOutline();

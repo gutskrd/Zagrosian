@@ -144,12 +144,15 @@ export function initStory() {
   const sun = find('[data-story-sun]');
   const scene = find('[data-story-scene]');
   const sunrise = find('[data-story-sunrise]');
+  // The glass sun's body, which turns, and the band of light across its face.
+  const sunBody = sunrise?.querySelector<HTMLElement>('.glass-sun__body');
+  const band = sunrise?.querySelector<SVGElement>('.glass-sun__band');
   const glow = find('[data-story-glow]');
   const words = [...story.querySelectorAll<HTMLElement>('[data-story-word]')];
   const translation = find('[data-story-translation]');
   const progress = find('[data-story-progress]');
   const header = document.querySelector<HTMLElement>('[data-site-header]');
-  if (!slot || !heading || !motto || !sun || !scene || !sunrise || !glow || !progress) return;
+  if (!slot || !heading || !motto || !sun || !scene || !sunrise || !sunBody || !band || !glow || !progress) return;
 
   // The copy of the logo that travels: decoration, as the original keeps the label.
   const copy = logo.cloneNode(true) as HTMLElement;
@@ -177,6 +180,8 @@ export function initStory() {
   let dive = 1;
   let cover = 1;
   let large = 1;
+  // What the story was last laid out by, to tell a resize that changes it.
+  let measuredAs = '';
 
   const measure = () => {
     width = root.clientWidth;
@@ -198,6 +203,15 @@ export function initStory() {
     cover = Math.hypot(Math.max(sunAt.x, width - sunAt.x), Math.max(sunAt.y, stageHeight - sunAt.y)) + 2;
     // The sun at its largest, as it rises.
     large = Math.min(width, view) * 0.44;
+    // A phone's address bar, sliding away as the page scrolls down and back
+    // as it scrolls up, resizes the window without changing any of this (the
+    // stage is sized to stay put): then the drawings are kept, as they are,
+    // rather than drawn again just as the reader turns round.
+    const as = [width, stageHeight, view, storyTop, pinned, start.x, start.y, start.size, rest.x, rest.y, rest.size, sunAt.x, sunAt.y, sunAt.size]
+      .map((value) => value.toFixed(1))
+      .join();
+    if (as === measuredAs) return;
+    measuredAs = as;
     written.clear();
     // The sun is laid out once, at its largest, and only moved and scaled.
     style(sunrise, 'width', `${large.toFixed(2)}px`, 'sun-w');
@@ -212,7 +226,7 @@ export function initStory() {
   };
 
   const written = new Map<string, string>();
-  const style = (element: HTMLElement, name: string, value: string, key = name) => {
+  const style = (element: HTMLElement | SVGElement, name: string, value: string, key = name) => {
     if (written.get(key) === value) return;
     written.set(key, value);
     element.style.setProperty(name, value);
@@ -271,6 +285,8 @@ export function initStory() {
       y = middleY - seen * (aimY - 0.5) * size;
     }
 
+    // How far the camera has gone through the front pane, which slides past.
+    const through = ease(DIVE[1], DIVE[1] + 0.05, q);
     const inScene = ease(DIVE[2] - 0.04, DIVE[2], q);
     const travelling = inScene < 1;
     // Laid out at its size while it is turned; from when it turns to face the
@@ -297,12 +313,14 @@ export function initStory() {
       style(layer, '--turn', `${(yaw - REST_YAW).toFixed(2)}deg`);
       style(layer, '--lean', (1 - faced).toFixed(3));
       // The front pane slides past as the camera goes through it.
-      style(layer, '--front', (1 - ease(DIVE[1], DIVE[1] + 0.05, q)).toFixed(3));
+      style(layer, '--front', (1 - through).toFixed(3));
     }
     layer.toggleAttribute('data-hidden', !travelling);
     layer.toggleAttribute('data-facing', facing && travelling);
-    // Face on, the block's edge cannot be seen: it is not drawn.
+    // Face on, the block's edge cannot be seen: it is not drawn; nor is the
+    // front pane, once the camera is through it.
     layer.toggleAttribute('data-flat', faced > 0.5);
+    layer.toggleAttribute('data-through', through === 1);
 
     // ---- The values: each flips up from behind its mask; the newest is lit,
     // the others dimmed, until all three are lit together and lift away.
@@ -346,10 +364,18 @@ export function initStory() {
       `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${(sunSize / sunBox).toFixed(4)})`,
       'sun-t',
     );
-    style(sunrise, '--sun-pitch', `${(tumble * mix(48, 14, up)).toFixed(2)}deg`);
-    style(sunrise, '--sun-yaw', `${(tumble * mix(-220, -24, up)).toFixed(2)}deg`);
-    style(sunrise, '--sun-roll', `${spin.toFixed(2)}deg`);
-    style(sunrise, '--sun-glint', `${mix(110, -10, ease(SUN[0], SUN[2], q)).toFixed(1)}%`);
+    // Set on the parts that move, not as custom properties round them: the
+    // sun's vector layers would inherit those, and be drawn again every frame.
+    style(
+      sunBody,
+      'transform',
+      `rotateX(${(tumble * mix(48, 14, up)).toFixed(2)}deg) rotateY(${(tumble * mix(-220, -24, up)).toFixed(2)}deg) rotateZ(${spin.toFixed(2)}deg)`,
+      'sun-pose',
+    );
+    // The glint slides across the face as the sun comes to rest: its strip,
+    // three times the sun's width, moves by twice the sun's width (400 units of
+    // the sun's 200), from just past the face on one side to the other.
+    style(band, 'transform', `translateX(${(mix(1.1, -0.1, ease(SUN[0], SUN[2], q)) * -400).toFixed(2)}px)`, 'sun-glint');
     style(sun, 'transform', `rotate(${spin.toFixed(2)}deg)`, 'sun');
 
     // A soft light behind the sun, brightest as it reaches the middle.

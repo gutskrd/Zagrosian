@@ -318,10 +318,13 @@ const words = kurdish.motto.split(' ');
     will-change: transform;
   }
 
+  /* Soft, so the graphics card can scale its drawing as the sun settles, never
+     drawing it again. */
   .story__glow {
     width: 6em;
     aspect-ratio: 1;
     border-radius: 50%;
+    will-change: transform;
     background: radial-gradient(
       closest-side,
       color-mix(in srgb, currentColor 22%, transparent),

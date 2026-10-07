@@ -293,18 +293,6 @@ svg {
   padding-block: var(--section-space);
 }
 
-/* The homepage's last sections and every page's footer are not laid out or
-   drawn until the reader nears them, so the first screen is ready sooner;
-   once drawn, the browser remembers their size. Their text is in the page
-   all the while, for search engines, screen readers and find-in-page. */
-section#about,
-section#faq,
-section#contact,
-.site-footer {
-  content-visibility: auto;
-  contain-intrinsic-block-size: auto 56rem;
-}
-
 /* Section labels: small monospace capitals after a dot, like a studio's
    index. Arabic script has no capitals and keeps its own face and size. */
 .eyebrow {
