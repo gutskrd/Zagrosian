@@ -9,8 +9,9 @@
  *
  * It is a popover (`#site-menu`), so it opens, closes on Escape and returns
  * focus by itself, without JavaScript. Its top bar mirrors the header, with
- * its own menu button in the same place to close it. It is always dark, in
- * both themes: the colour tokens are redefined inside it.
+ * its own menu button in the same place to close it. It is in the page's own
+ * colours, light or dark as the theme is (even when the header behind it is
+ * in the other theme's, over the homepage story's scene: global.css).
  */
 import { i18n, localizePath, locales, navigation } from '../i18n';
 import { hevalo, site, socialProfiles } from '../site';
@@ -33,7 +34,7 @@ const year = new Date().getFullYear();
 <nav id="site-menu" class="site-menu" popover aria-label={t.common.menu} data-site-menu>
   <div class="container site-menu__bar">
     <a class="site-menu__home" href={localize('/')} aria-label={t.common.homeLink}>
-      <Logo class="site-menu__mark" tone="light" />
+      <Logo class="site-menu__mark" />
       <Wordmark />
     </a>
     <MenuButton action="close" />
@@ -137,18 +138,6 @@ const year = new Date().getFullYear();
   /* ------------------------------------------------------------------------ */
 
   .site-menu {
-    /* Always dark: the page's colour tokens, as in the dark theme. */
-    --color-paper: #0a0a0a;
-    --color-ink: #f2f2f2;
-    --color-ink-soft: #bdbdbd;
-    --color-muted: #8f8f8f;
-    --color-line: #262626;
-    --color-line-strong: #3a3a3a;
-    --color-surface: #141414;
-    --color-solid-hover: #d4d4d4;
-    --focus-ring: #f2f2f2;
-    color-scheme: dark;
-
     position: fixed;
     inset: 0;
     width: 100%;

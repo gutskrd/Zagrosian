@@ -1,20 +1,26 @@
 /**
  * The loading screen (Loader.astro). theme-init.js has decided before the
- * first paint whether it shows (`data-loading`); here it plays once through,
- * from the Z, through the sun, until the hands are back on the Z (and on, for
- * as long as the page is still loading), then fades away. A click, a tap, a
- * key or a scroll lets the visitor straight in.
+ * first paint whether it shows (`data-loading`); here the animation is
+ * fetched once the page itself has loaded and been drawn (until it comes, its
+ * first frame shows), and it plays once through, from the Z, through the sun, until the
+ * hands are back on the Z (and on, for as long as the page is still loading),
+ * then fades away. Should the
+ * animation come late (a slow connection), it does not hold up a page that
+ * is ready: it lifts four seconds after the page started, at the latest. A
+ * click, a tap, a key or a scroll lets the visitor straight in.
  */
 
 /** From the animation's first frame until the hands are back on the Z (ms). */
 const ONCE = 3000;
 /** The fade, as in Loader.astro. */
 const FADE = 500;
+/** At the latest, once the page has loaded: this long after it started (ms). */
+const LATEST = 4000;
 
 export function initLoader() {
   const root = document.documentElement;
   if (!root.dataset.loading) return;
-  const image = document.querySelector<HTMLImageElement>('[data-loader] img');
+  const image = document.querySelector<HTMLImageElement>('[data-loader-animation]');
   if (!image) {
     delete root.dataset.loading;
     return;
@@ -36,14 +42,31 @@ export function initLoader() {
     if (document.readyState === 'complete') resolve();
     else window.addEventListener('load', () => resolve(), { once: true });
   });
-  // The animation starts when its image has loaded; without it, nothing is shown.
+  // The animation starts when its image has loaded (until then its first frame
+  // shows); should it fail, it is as if it had played.
   const played = new Promise<void>((resolve) => {
-    const start = () => window.setTimeout(resolve, ONCE);
-    if (image.complete && image.naturalWidth) start();
-    else {
-      image.addEventListener('load', start, { once: true });
-      image.addEventListener('error', () => resolve(), { once: true });
-    }
+    image.addEventListener('load', () => window.setTimeout(resolve, ONCE), { once: true });
+    image.addEventListener('error', () => resolve(), { once: true });
   });
-  void Promise.all([loaded, played]).then(lift);
+  // Once the page has loaded and been drawn, so it never holds up the page's
+  // own text, styles, fonts and images, nor its first frame.
+  const drawn = new Promise<void>((resolve) => {
+    if (performance.getEntriesByName('first-contentful-paint').length) return resolve();
+    try {
+      new PerformanceObserver((list, observer) => {
+        if (!list.getEntriesByName('first-contentful-paint').length) return;
+        observer.disconnect();
+        resolve();
+      }).observe({ type: 'paint', buffered: true });
+    } catch {
+      resolve();
+    }
+    // Should the browser not say when it has drawn.
+    window.setTimeout(resolve, 1500);
+  });
+  void Promise.all([loaded, drawn]).then(() => {
+    if (!lifted && image.dataset.src) image.src = image.dataset.src;
+  });
+  const enough = new Promise<void>((resolve) => window.setTimeout(resolve, Math.max(0, LATEST - performance.now())));
+  void Promise.all([loaded, Promise.race([played, enough])]).then(lift);
 }

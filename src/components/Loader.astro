@@ -1,22 +1,45 @@
 ---
 /**
  * The loading screen: Zagrosian's Z, its hands melting into the Kurdish sun
- * and back (src/assets/brand/zagrosian-loader.gif), on the page's own colour,
- * while a visit's first page loads (src/scripts/loader.ts).
+ * and back, on the page's own colour, while a visit's first page loads
+ * (src/scripts/loader.ts). The animation is zagrosian-loader.gif as it was
+ * given, re-encoded as zagrosian-loader.webp without loss (the same frames,
+ * pixel for pixel, and the same timing; 17% smaller).
  *
  * theme-init.js decides before the first paint (`data-loading` on <html>):
  * when a visit starts or the page is reloaded, not on the way from one page of
  * the site to another, and only when motion is welcome. Without JavaScript it
  * never appears, and should the script not start, it lifts by itself after
- * eight seconds. The image is lazy, so where the screen does not show, it is
- * not downloaded. It is decoration, hidden from screen readers, which read the
- * page underneath.
+ * eight seconds. It shows while the page loads, so it must not hold the page
+ * up: its first frame, the Z (zagrosian-loader-first.webp, 4 kB), shows at
+ * once, and the animation is fetched by loader.ts as soon as the page itself
+ * has loaded (and only when the screen shows; cached for the pages after),
+ * and takes over from the first frame where it stands as soon as it arrives. With reduced motion, when the
+ * screen never shows, a blank image stands in for the first frame. It is
+ * decoration, hidden from screen readers, which read the page underneath.
  */
-import loader from '../assets/brand/zagrosian-loader.gif';
+import blank from '../assets/brand/blank.png';
+import first from '../assets/brand/zagrosian-loader-first.webp';
+import animation from '../assets/brand/zagrosian-loader.webp';
 ---
 
 <div class="loader" data-loader aria-hidden="true">
-  <img class="loader__image" src={loader.src} width={loader.width} height={loader.height} alt="" loading="lazy" decoding="async" draggable="false" />
+  <div class="loader__art">
+    <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcset={blank.src} />
+      <img class="loader__image" src={first.src} width={first.width} height={first.height} alt="" fetchpriority="high" decoding="async" draggable="false" />
+    </picture>
+    <img
+      class="loader__image"
+      data-loader-animation
+      data-src={animation.src}
+      width={animation.width}
+      height={animation.height}
+      alt=""
+      decoding="async"
+      draggable="false"
+    />
+  </div>
 </div>
 
 <style>
@@ -43,19 +66,31 @@ import loader from '../assets/brand/zagrosian-loader.gif';
     transition: opacity 0.5s var(--ease-out);
   }
 
-  /* 256 px: the animation's own pixels on a high-density screen. Its ground
-     is a shade under white (254), lifted to white and blended into the
-     page's own colour, so no square shows round it. */
-  .loader__image {
+  /* The first frame and the animation, one over the other: 256 px, the
+     animation's own pixels on a high-density screen. Their ground is a shade
+     under white (254), lifted to white and blended into the page's own
+     colour, so no square shows round it. */
+  .loader__art {
+    display: grid;
     width: min(16rem, 64vw);
-    height: auto;
-    user-select: none;
+    isolation: isolate;
     filter: brightness(1.01);
     mix-blend-mode: multiply;
   }
 
+  .loader picture {
+    display: contents;
+  }
+
+  .loader__image {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
+    user-select: none;
+  }
+
   /* On the dark page, white on black: the same, inverted. */
-  :global(:root[data-theme='dark']) .loader__image {
+  :global(:root[data-theme='dark']) .loader__art {
     filter: brightness(1.01) invert(1);
     mix-blend-mode: screen;
   }

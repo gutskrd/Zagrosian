@@ -7,8 +7,7 @@
  *
  * The black logo is shown in the light theme and the white one in the dark
  * theme: they are drawn to match, the white one a touch finer, as white on
- * black reads heavier. `tone="light"` always shows the white one, for surfaces
- * that are dark in both themes (the site menu).
+ * black reads heavier.
  *
  * It is decoration beside the Zagrosian name, so it is hidden from screen
  * readers; other attributes (such as `data-*`) go on the wrapper.
@@ -17,15 +16,13 @@ import type { HTMLAttributes } from 'astro/types';
 import DarkLogo from '../assets/brand/zagrosian-logo-dark.svg';
 import LightLogo from '../assets/brand/zagrosian-logo-light.svg';
 
-interface Props extends HTMLAttributes<'span'> {
-  tone?: 'auto' | 'light';
-}
+type Props = HTMLAttributes<'span'>;
 
-const { tone = 'auto', class: className, ...attributes } = Astro.props;
+const { class: className, ...attributes } = Astro.props;
 ---
 
-<span class:list={['logo', `logo--${tone}`, className]} aria-hidden="true" {...attributes}>
-  {tone === 'auto' && <DarkLogo class="logo__shape logo__shape--dark" focusable="false" />}
+<span class:list={['logo', className]} aria-hidden="true" {...attributes}>
+  <DarkLogo class="logo__shape logo__shape--dark" focusable="false" />
   <LightLogo class="logo__shape logo__shape--light" focusable="false" />
 </span>
 
@@ -43,34 +40,34 @@ const { tone = 'auto', class: className, ...attributes } = Astro.props;
     height: auto;
   }
 
-  .logo--auto :global(.logo__shape--light),
-  :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--dark) {
+  .logo :global(.logo__shape--light),
+  :global(:root[data-theme='dark']) .logo :global(.logo__shape--dark) {
     display: none;
   }
 
-  :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--light) {
+  :global(:root[data-theme='dark']) .logo :global(.logo__shape--light) {
     display: block;
   }
 
   /* In a part of the page drawn in the other theme's colours (`data-inverse`,
      global.css), the other version shows. */
-  :global(:root:not([data-theme='dark']) [data-inverse]) .logo--auto :global(.logo__shape--dark),
-  :global(:root[data-theme='dark'] [data-inverse]) .logo--auto :global(.logo__shape--light) {
+  :global(:root:not([data-theme='dark']) [data-inverse]:not(:has(:popover-open))) .logo :global(.logo__shape--dark),
+  :global(:root[data-theme='dark'] [data-inverse]:not(:has(:popover-open))) .logo :global(.logo__shape--light) {
     display: none;
   }
 
-  :global(:root:not([data-theme='dark']) [data-inverse]) .logo--auto :global(.logo__shape--light),
-  :global(:root[data-theme='dark'] [data-inverse]) .logo--auto :global(.logo__shape--dark) {
+  :global(:root:not([data-theme='dark']) [data-inverse]:not(:has(:popover-open))) .logo :global(.logo__shape--light),
+  :global(:root[data-theme='dark'] [data-inverse]:not(:has(:popover-open))) .logo :global(.logo__shape--dark) {
     display: block;
   }
 
   /* Printed pages are always light. */
   @media print {
-    :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--dark) {
+    :global(:root[data-theme='dark']) .logo :global(.logo__shape--dark) {
       display: block;
     }
 
-    :global(:root[data-theme='dark']) .logo--auto :global(.logo__shape--light) {
+    :global(:root[data-theme='dark']) .logo :global(.logo__shape--light) {
       display: none;
     }
   }

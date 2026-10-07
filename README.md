@@ -73,7 +73,7 @@ public/            Favicons, logo, social images (og.png and og/<language>.png),
                    robots.txt and Cloudflare _headers
 src/
   assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
-                   sizes), the 21-ray sun, the loading animation (zagrosian-loader.gif), the
+                   sizes), the 21-ray sun, the loading animation (zagrosian-loader.gif, served as a lossless WebP), the
                    Hevalo app icon and (deer/) its 3D deer's layers
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Loader, Hero, Story, ProductShowcase, About, Faq, Contact,
@@ -106,7 +106,7 @@ src/
     Each is traced to a vector (6× upscale, lightly blurred, threshold 50%, potrace, then SVGO:
     about 2 KB each), `zagrosian-logo-dark.svg` and `zagrosian-logo-light.svg`, filled with
     `currentColor`. [`Logo.astro`](src/components/Logo.astro) inlines them: the black one in the
-    light theme, the white one in the dark theme, and always the white one on the dark menu.
+    light theme and the white one in the dark theme.
     - `favicon.svg` holds both and switches with the browser's colour scheme (through a `<style>`,
       which its own header rule in `public/_headers` allows); `favicon-96.png` (black) and
       `favicon-96-dark.png` (white) do the same for browsers without SVG icons, and `favicon.ico`
@@ -212,6 +212,10 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 Animation is handled by [`src/scripts/motion.ts`](src/scripts/motion.ts) with no dependencies, using
 the Web Animations API, IntersectionObserver and a single requestAnimationFrame loop:
 
+- **Long pages:** the homepage's last sections (About, FAQ, Contact) and every page's footer are
+  not laid out or drawn until the reader nears them (`content-visibility: auto`), so the first
+  screen is ready sooner; their text is in the page all the while, for search engines, screen
+  readers and find-in-page.
 - **Loading screen** ([`Loader.astro`](src/components/Loader.astro),
   [`loader.ts`](src/scripts/loader.ts)): when a visit starts, or the page is reloaded, the page's
   own colour covers it while Zagrosian's Z plays (`zagrosian-loader.gif`): it squeezes into a
@@ -221,7 +225,10 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   theme it is inverted, white on black; either way its ground is blended into the page's colour,
   so no square shows round it. Not between pages of the site (they open at once), not with
   *reduce motion*, and never without JavaScript; should the script not start, it lifts by itself
-  after eight seconds. The animation is only downloaded when it shows. The page loads and draws
+  after eight seconds. It never holds the page up: its first frame, the Z (4 kB), shows at once,
+  and the animation is fetched once the page itself has loaded, taking over from the first frame
+  where it stands (it is cached for the pages after); on a slow connection the screen lifts four
+  seconds after the page started, at the latest. The page loads and draws
   underneath all the while, so it costs the page nothing in search engines' measures of speed.
 - **Hero:** the headline rises line by line from behind masks on load, and the lifted logo rises
   into place and comes into focus. Each of these lets go when it ends, so nothing stays animated
@@ -355,7 +362,7 @@ reduced motion, and the site works fully without it.
   the header is the same at every size: the logo, then Visit Hevalo (from 768px), quick navigation
   (from 1024px), the world icon for languages ([`Globe.astro`](src/components/Globe.astro), whose
   meridians spin on hover), sound, theme, and the menu button: two dots on their own, which flip across
-  to each other's side on hover (the label rolls with them) and stretch into an X when the menu opens. The menu is a full-screen, always-dark panel that drops
+  to each other's side on hover (the label rolls with them) and stretch into an X when the menu opens. The menu is a full-screen panel, in the page's own colours (light or dark as the theme is), that drops
   in like a curtain; its links, set very large, rise one after another from behind masks (the others
   dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
   contact, social media, every language, sound, the legal pages and the time at headquarters. It is a
