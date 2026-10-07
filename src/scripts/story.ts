@@ -23,16 +23,22 @@
  * frame sets transforms, opacity, custom properties and a clip path through
  * the CSSOM (which the Content-Security-Policy allows).
  *
- * So that nothing lags, the graphics card does the moving: the logo and the
- * sun are drawn at a size, then moved and scaled. The logo is laid out at its
- * size until it faces the reader; flying in, it is laid out at steps that
- * double (`step` below) and scaled between them, and its perspective shortens
- * as it grows, which gives exactly the picture a larger logo would (a scene
- * and its camera distance scaled together look the same). The sun, shrinking
- * from its largest, steps down by halves the same way. Each is therefore
- * always drawn within twice the size it is seen at, scrolling down or up: a
- * drawing scaled far beyond that would have to be redrawn at a size the
- * graphics memory cannot hold when it comes back into view. And once the
+ * So that nothing lags, the graphics card does the moving. Turned in 3D, the
+ * logo is laid out at the size it is seen at (a drawing in perspective is
+ * drawn at its layout's size). From when it turns to face the reader, it is
+ * laid out once, at its size facing the reader, and the sun once, at its
+ * largest; from there they are only moved and scaled, the perspective
+ * shortening as they grow, which gives exactly the picture a larger logo would
+ * (a scene and its camera distance scaled together look the same). So their
+ * layout does not change as the camera flies in or the sun settles, and
+ * nothing on the page shifts (which search engines would count against it).
+ * The graphics card keeps each drawing as it is while it moves
+ * (`will-change`), and draws it again, sharp, at the size it is seen at only
+ * when that size has grown or shrunk by half a doubling since (`redraw`, on
+ * the ladder of `rung` below). Each is therefore always drawn within 1.4
+ * times the size it is seen at, scrolling down or up: neither blurred by being
+ * scaled up far, nor holding on to a drawing much larger than it is seen at
+ * (which would take graphics memory and time to put on the screen). And once the
  * logo faces the reader, the layers that make its edge are not drawn: face
  * on, the edge cannot be seen, and twenty see-through layers the size of the
  * screen are what would make the fly-in stutter.
@@ -50,13 +56,11 @@ const mix = (from: number, to: number, t: number) => from + (to - from) * t;
 const zoom = (from: number, to: number, t: number) => from * (to / from) ** t;
 
 /**
- * The size to lay a scaled drawing out at, on a ladder of doublings and
- * halvings of `base`: the step at or below `size` when growing past `base`,
- * at or above it when shrinking below. The drawing is then scaled by less
- * than two to `size`, and is only laid out (and drawn) again at the next step.
+ * The rung `size` is on, of a ladder of half doublings (1.41 times) above and
+ * below `base`. A drawing is drawn again only when its size moves to another
+ * rung, so it is never scaled by more than 1.41 from where it was drawn.
  */
-const step = (base: number, size: number) =>
-  size >= base ? base * 2 ** Math.floor(Math.log2(size / base)) : base / 2 ** Math.floor(Math.log2(base / size));
+const rung = (base: number, size: number) => Math.round(2 * Math.log2(size / base));
 
 /** 0 to 1 between two points, easing in and out. */
 const ease = (from: number, to: number, value: number) => {
@@ -195,6 +199,9 @@ export function initStory() {
     // The sun at its largest, as it rises.
     large = Math.min(width, view) * 0.44;
     written.clear();
+    // The sun is laid out once, at its largest, and only moved and scaled.
+    style(sunrise, 'width', `${large.toFixed(2)}px`, 'sun-w');
+    drawn.clear();
   };
 
   /** How large the logo must grow for its ink to cover the screen, seen in perspective. */
@@ -212,6 +219,18 @@ export function initStory() {
   };
   const shown = (element: HTMLElement, visible: boolean, key: string) =>
     style(element, 'visibility', visible ? 'visible' : '', key);
+
+  // Which rung of its ladder each drawing was last drawn at. Moving to another
+  // (or first seen), it lets go of `will-change` for one frame, so the
+  // graphics card draws it again at the size it is seen at, then holds that
+  // drawing while it moves.
+  const drawn = new Map<HTMLElement, number>();
+  const redraw = (element: HTMLElement, at: number) => {
+    if (drawn.get(element) === at) return;
+    drawn.set(element, at);
+    element.style.willChange = 'auto';
+    requestAnimationFrame(() => element.style.removeProperty('will-change'));
+  };
 
   const render = () => {
     const scroll = Math.max(0, window.scrollY);
@@ -254,14 +273,19 @@ export function initStory() {
 
     const inScene = ease(DIVE[2] - 0.04, DIVE[2], q);
     const travelling = inScene < 1;
-    // Laid out at its size up to the dive; flying in, at steps that double,
-    // and scaled from there, with a perspective as much shorter as it is
-    // larger (see above).
-    const flying = size > dive * 1.001;
-    const box = flying ? step(dive, size) : size;
+    // Laid out at its size while it is turned; from when it turns to face the
+    // reader, at its size facing the reader, and scaled from there, with a
+    // perspective as much shorter as it is larger (see above). Its few sizes
+    // in pixels (its edge's lines, its lean) are then as many times larger as
+    // its layout is than it was, so that scaled, they are as they were.
+    const facing = q >= DIVE[0];
+    const box = facing ? dive : size;
     if (travelling) {
       style(art, 'width', `${box.toFixed(2)}px`, 'art-w');
       style(art, 'height', `${box.toFixed(2)}px`, 'art-h');
+      style(art, '--grow', facing ? (dive / rest.size).toFixed(4) : '1', 'art-grow');
+      if (facing) redraw(art, rung(dive, size));
+      else drawn.delete(art);
       style(art, 'perspective', `${((perspective * box) / size).toFixed(1)}px`, 'art-p');
       style(
         art,
@@ -276,7 +300,7 @@ export function initStory() {
       style(layer, '--front', (1 - ease(DIVE[1], DIVE[1] + 0.05, q)).toFixed(3));
     }
     layer.toggleAttribute('data-hidden', !travelling);
-    layer.toggleAttribute('data-flying', flying && travelling);
+    layer.toggleAttribute('data-facing', facing && travelling);
     // Face on, the block's edge cannot be seen: it is not drawn.
     layer.toggleAttribute('data-flat', faced > 0.5);
 
@@ -309,12 +333,12 @@ export function initStory() {
     const up = ease(SUN[0], SUN[1], q);
     const settle = ease(SUN[1], SUN[2], q);
     const sunSize = zoom(large, sunAt.size, settle);
-    const sunBox = step(large, sunSize);
+    const sunBox = large;
+    if (inView) redraw(sunrise, rung(large, sunSize));
     const sunX = mix(middleX, sunAt.x, settle);
     const sunY = mix(mix(stageHeight + large / 2, middleY, up), sunAt.y, settle);
     const spin = q * 160;
     const tumble = 1 - settle;
-    style(sunrise, 'width', `${sunBox.toFixed(2)}px`, 'sun-w');
     style(sunrise, 'perspective', `${((sunPerspective * sunBox) / sunSize).toFixed(1)}px`, 'sun-p');
     style(
       sunrise,

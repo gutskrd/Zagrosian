@@ -132,8 +132,10 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 
   /* The edge: ten thin layers through the thickness of the block, seen from
      both sides. */
+  /* (1.5px at the size it is seen at: facing the reader, story.ts lays the
+     travelling copy out larger and scales it down, by --grow.) */
   .lifted-logo__slice {
-    border: 1.5px solid var(--edge);
+    border: calc(1.5px * var(--grow, 1)) solid var(--edge);
     opacity: 0.6;
   }
 

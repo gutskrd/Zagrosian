@@ -1,8 +1,8 @@
 /**
- * Life for Hevalo's deer, looking out of its hole in the page (HevaloDeer.astro):
+ * Life for Hevalo's deer, coming out of its hole in the page (HevaloDeer.astro):
  * while it is on screen it blinks every few seconds and, less
- * often, twitches an ear or sniffs; when it first comes into view it pricks up
- * both ears and blinks, as if it had seen you; a tap or a click on it gets all
+ * often, twitches an ear or sniffs; when it is first all the way out it pricks
+ * up both ears and blinks, as if it had seen you; a tap or a click on it gets all
  * of that at once (and the tap sound, when sound is on). Each is a short CSS
  * animation, started by an attribute on the deer and removed when it is over,
  * so nothing runs in between.
@@ -80,15 +80,23 @@ export function initDeer() {
   new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;
-      if (visible && !seen) {
-        seen = true;
-        // Once it is well in view.
-        window.setTimeout(greet, 900);
-      }
       start();
     },
     { threshold: 0.4 },
   ).observe(deer);
+
+  // It is all the way out once the icon's middle is above 45% of the screen's
+  // height (HevaloDeer.astro): the first time, it greets you.
+  const out = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting || seen) return;
+      seen = true;
+      out.disconnect();
+      window.setTimeout(greet, 250);
+    },
+    { rootMargin: '0px 0px -55% 0px', threshold: 0.5 },
+  );
+  out.observe(deer);
 
   document.addEventListener('visibilitychange', start);
 

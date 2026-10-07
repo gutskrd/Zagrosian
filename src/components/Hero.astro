@@ -284,13 +284,16 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   /* Once the block faces the reader, its edge cannot be seen, so it is not
-     drawn (story.ts). Flying in, the logo is drawn at sizes that double and
-     scaled between them by the graphics card. */
+     drawn (story.ts). */
   .journey[data-flat] :global(.lifted-logo__slice) {
     visibility: hidden;
   }
 
-  .journey[data-flying] .journey__art {
+  /* Facing the reader, laid out once and only moved and scaled by the
+     graphics card, which keeps its drawing while it moves; story.ts has it
+     drawn again, sharp, when its size has grown or shrunk by half a
+     doubling. */
+  .journey[data-facing] .journey__art {
     will-change: transform;
   }
 
@@ -314,7 +317,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     z-index: 1;
     transform-style: preserve-3d;
     rotate: calc(var(--lean-y) * -1) var(--lean-x) 0 calc(var(--lean, 1) * var(--lean-angle));
-    translate: calc(var(--lean, 1) * var(--lean-x) * 12px) calc(var(--lean, 1) * var(--lean-y) * 8px);
+    translate: calc(var(--lean, 1) * var(--lean-x) * 12px * var(--grow, 1)) calc(var(--lean, 1) * var(--lean-y) * 8px * var(--grow, 1));
   }
 
   :global(:root[data-story='on']) .hero__art,

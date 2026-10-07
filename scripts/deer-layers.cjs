@@ -587,9 +587,10 @@ async function layersFor({ season, source, height: H }) {
   // hole can show it as the two move: under the chin, where the artwork has
   // none (each row is filled across from the neck either side), and below the
   // tile's edge (it carries straight on down, so the layer is taller than the
-  // artwork; the hole hides that part).
+  // artwork; the hole hides that part). Long enough to reach below the hole's
+  // edge however far back the deer is, as it comes out of the page.
   if (season === 'everyday') {
-    const NH = H + 20;
+    const NH = H + 180;
     const neckLayer = new Float32Array(W * NH * 4);
     for (let i = 0; i < N; i++) {
       const a = A[i] * neck[i];
@@ -671,7 +672,7 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
             x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + 1); y1 = Math.max(y1, y + 1);
           }
     }
-    const H = Math.max(...results.map((r) => r.H));
+    const H = Math.max(...results.map((r) => (r.layers[name] ? r.layers[name].length / 4 / W : 0)));
     x0 = Math.max(0, Math.floor(x0 / 5) * 5); y0 = Math.max(0, Math.floor(y0 / 5) * 5);
     x1 = Math.min(W, Math.ceil(x1 / 5) * 5); y1 = Math.min(H + 3, Math.ceil(y1 / 5) * 5);
     boxes[name] = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
@@ -684,13 +685,14 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
     for (const [name, L] of Object.entries(layers)) {
       const box = boxes[name];
       const prefix = name === 'neck' ? 'hevalo' : file;
-      const padded = Buffer.alloc(W * HMAX * 4);
+      const rows = Math.max(HMAX, L.length / 4 / W + 8);
+      const padded = Buffer.alloc(W * rows * 4);
       toBuffer(L).copy(padded);
-      const full = sharp(padded, { raw: { width: W, height: HMAX, channels: 4 } });
+      const full = sharp(padded, { raw: { width: W, height: rows, channels: 4 } });
       const png = await full.png().toBuffer();
       for (const frame of name === 'shade' ? [144] : [288, 576]) {
         const k = frame / W;
-        const scaled = await sharp(png).resize({ width: frame, height: Math.round(HMAX * k), kernel: 'mitchell' }).raw().toBuffer({ resolveWithObject: true });
+        const scaled = await sharp(png).resize({ width: frame, height: Math.round(rows * k), kernel: 'mitchell' }).raw().toBuffer({ resolveWithObject: true });
         const h = Math.round(box.h * k);
         const out = path.join(OUT, `${prefix}-${name}-${frame}.webp`);
         // (The resized pixels are straight, not premultiplied, whatever the

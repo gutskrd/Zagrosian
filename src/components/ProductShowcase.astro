@@ -13,9 +13,10 @@ const { t } = i18n(Astro.url);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a hole in the page, the deer looking out of it
-          (HevaloDeer.astro). Decoration: the name beside it says what it is. */}
-      <div class="showcase__art" aria-hidden="true" data-reveal>
+      {/* Hevalo's app icon as a hole in the page, the deer coming out of it
+          from behind the page (HevaloDeer.astro): that is its entrance.
+          Decoration: the name beside it says what it is. */}
+      <div class="showcase__art" aria-hidden="true">
         <HevaloDeer
           widths={[
             ['(min-width: 64rem)', 21],
@@ -84,7 +85,7 @@ const { t } = i18n(Astro.url);
   }
 
   /* ---- The icon ----
-     A hole in the page in the shape of the app icon, with the deer looking
+     A hole in the page in the shape of the app icon, with the deer coming
      out of it (HevaloDeer.astro). */
   .showcase__art {
     position: relative;

@@ -311,8 +311,9 @@ const words = kurdish.motto.split(' ');
     width: 100%;
   }
 
-  /* Drawn at sizes that halve as it settles (story.ts sets the width), and
-     moved and scaled between them by the graphics card. */
+  /* Laid out once at its largest (story.ts sets the width), and only moved
+     and scaled by the graphics card, which draws it again, sharp, when its
+     size has shrunk or grown by half a doubling. */
   .story__glass-sun {
     will-change: transform;
   }
