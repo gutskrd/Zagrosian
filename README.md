@@ -16,6 +16,7 @@ Requires Node 22.12 or later.
 | `npm run dev`     | Start the dev server at `http://localhost:4321`  |
 | `npm run check`   | Type-check `.astro` and `.ts` files              |
 | `npm run build`   | Type-check, then build the site into `dist/`     |
+| `npm test`        | Check the built site (run `npm run build` first; see **Testing**) |
 | `npm run preview` | Build, then serve the site at `http://localhost:8787` exactly as Cloudflare does, with the headers from `public/_headers`, clean URLs and the 404 page. Rebuilds when files in `src/` change |
 | `npm run deploy`  | Build and deploy to Cloudflare (after `npx wrangler login`); normally Cloudflare deploys from GitHub instead |
 
@@ -25,7 +26,11 @@ Requires Node 22.12 or later.
   (see **Languages** below). The homepage, its Markdown versions and `llms.txt` are built from these
   files, so change text there rather than in the components.
 - [`src/site.ts`](src/site.ts): facts that are the same in every language: company name, country,
-  Hevalo's name and address, the Kurdish phrases, social profiles and the email addresses. Each address
+  Hevalo's name and address, the Kurdish phrases, social profiles, the company's registration and the
+  email addresses. The registration (`registration`: registered address, KvK number and VAT number) is
+  empty until the company is registered; each detail appears in every footer and in the structured data
+  as soon as it is filled in, and nothing is shown until then. Update `site.legalName` to the
+  registered name at the same time, and the company details in the legal pages. Each email address
   appears only where it is needed:
 
   | Address                 | Where it appears                                       |
@@ -535,6 +540,42 @@ is missing.
   a plain dimmed backdrop behind quick navigation) and to Windows' forced colours (high contrast),
   where buttons get outlines and drawn marks use the system text colour.
 
+## Testing
+
+[`tests/`](tests/) checks the built site in Chromium with [Playwright](https://playwright.dev), served
+as Cloudflare serves it, with the headers from `public/_headers`
+([`tests/wrangler.jsonc`](tests/wrangler.jsonc)):
+
+| File                    | What it checks |
+| ----------------------- | -------------- |
+| `security.spec.ts`      | The security headers, and that no page in any language breaks the Content-Security-Policy or logs an error while it is scrolled through |
+| `accessibility.spec.ts` | Every page and 404 page in every language, light and dark, on a computer and a phone, with [axe](https://github.com/dequelabs/axe-core) against WCAG 2.2 AA and its best practices |
+| `layout.spec.ts`        | Every page at six widths from 320 to 1920 pixels: nothing runs off the screen or is cut off, and everything you tap is at least 24 by 24 pixels |
+| `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
+| `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
+| `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
+| `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story |
+| `loader.spec.ts`        | When the loading screen shows, that it lifts, and that it never shows with reduced motion |
+| `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
+
+```sh
+npm run build
+npm test                               # everything (about 4 minutes)
+npx playwright test tests/seo.spec.ts  # one file
+```
+
+The first time, install the browser with `npx playwright install chromium`. `npm test` starts the
+server itself, on port 8788.
+
+On every push, GitHub Actions runs the same tests, and Lighthouse on five pages
+([`.github/workflows/checks.yml`](.github/workflows/checks.yml)). Accessibility, best practices and
+SEO must score 100 ([`lighthouserc.json`](lighthouserc.json)); a performance score under 90 is reported
+as a warning, as the machines GitHub runs it on vary in speed. When a run fails, its report is kept with
+the run (**Actions → the run → Artifacts**).
+
+What is still to be done, and what needs people or decisions rather than code, is in
+[`TODO.md`](TODO.md).
+
 ## Deploying to Cloudflare
 
 The site runs on Cloudflare Workers as static assets, with no Worker script. Everything is configured
@@ -617,4 +658,5 @@ Recommended settings outside the code:
   HTTPS.
 
 Dependabot ([`.github/dependabot.yml`](.github/dependabot.yml)) opens monthly dependency update pull
-requests. It skips TypeScript 7, which `astro check` does not support yet.
+requests, for the site's packages and for the actions the checks use. It skips TypeScript 7, which
+`astro check` does not support yet.

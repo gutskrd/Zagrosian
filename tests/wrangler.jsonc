@@ -1,0 +1,13 @@
+// Serves the built site (dist/) for the tests as production serves it: with the
+// headers in public/_headers (the Content-Security-Policy among them) and the
+// same URL handling as wrangler.jsonc, but without building it again (run
+// `npm run build` before `npm test`).
+{
+  "name": "zagrosian-tests",
+  "compatibility_date": "2026-09-28",
+  "assets": {
+    "directory": "../dist",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

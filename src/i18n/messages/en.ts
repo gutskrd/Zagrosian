@@ -162,6 +162,9 @@ export const en = {
     about: ['Independent technology company', 'based in the Netherlands.'],
     /** Translation of the Kurmanji "Mala we ava." (thank you). Empty in Kurmanji. */
     thanks: 'Thank you. Literally: may your home prosper.',
+    /** Before the trade register (KvK) and VAT numbers, once they are filled in (src/site.ts). */
+    kvk: 'KvK',
+    vat: 'VAT',
   },
   legal: {
     eyebrow: 'Legal',

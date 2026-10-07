@@ -141,6 +141,8 @@ export const nl: Messages = {
   footer: {
     about: ['Onafhankelijk technologiebedrijf', 'uit Nederland.'],
     thanks: 'Dank u. Letterlijk: moge uw huis bloeien.',
+    kvk: 'KvK',
+    vat: 'Btw-id',
   },
   legal: {
     eyebrow: 'Juridisch',

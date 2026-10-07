@@ -142,6 +142,8 @@ export const es: Messages = {
   footer: {
     about: ['Empresa tecnológica independiente', 'con sede en los Países Bajos.'],
     thanks: 'Gracias. Literalmente: que tu casa prospere.',
+    kvk: 'KvK',
+    vat: 'NIF-IVA',
   },
   legal: {
     eyebrow: 'Información legal',

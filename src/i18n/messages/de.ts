@@ -142,6 +142,8 @@ export const de: Messages = {
   footer: {
     about: ['Unabhängiges Technologieunternehmen', 'mit Sitz in den Niederlanden.'],
     thanks: 'Danke. Wörtlich: Möge Ihr Haus gedeihen.',
+    kvk: 'KvK',
+    vat: 'USt-IdNr.',
   },
   legal: {
     eyebrow: 'Rechtliches',

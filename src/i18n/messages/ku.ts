@@ -145,6 +145,8 @@ export const ku: Messages = {
   footer: {
     about: ['Şirketeke teknolojiyê ya serbixwe', 'li Holendayê.'],
     thanks: '',
+    kvk: 'KvK',
+    vat: 'Hejmara bacê',
   },
   legal: {
     eyebrow: 'Hiqûqî',

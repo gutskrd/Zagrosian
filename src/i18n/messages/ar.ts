@@ -142,6 +142,8 @@ export const ar: Messages = {
   footer: {
     about: ['شركة تقنية مستقلة', 'مقرّها هولندا.'],
     thanks: 'شكراً. وحرفياً: ليكن بيتكم عامراً.',
+    kvk: 'KvK',
+    vat: 'الرقم الضريبي',
   },
   legal: {
     eyebrow: 'معلومات قانونية',

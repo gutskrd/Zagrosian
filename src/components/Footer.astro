@@ -1,6 +1,6 @@
 ---
 import { i18n, navigation } from '../i18n';
-import { hevalo, kurdish, site, socialProfiles } from '../site';
+import { hevalo, kurdish, registration, site, socialProfiles } from '../site';
 import Arrow from './Arrow.astro';
 import SocialIcon from './SocialIcon.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
@@ -9,6 +9,13 @@ const { locale, t } = i18n(Astro.url);
 const nav = navigation(locale);
 const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
+// The company's registered details, those that are filled in (src/site.ts).
+const { address, kvk, vat } = registration;
+const registered = [
+  address && `${address.street}, ${address.postalCode} ${address.city}`,
+  kvk && `${t.footer.kvk} ${kvk}`,
+  vat && `${t.footer.vat} ${vat}`,
+].filter((detail): detail is string => !!detail);
 ---
 
 <footer class="site-footer">
@@ -86,6 +93,20 @@ const year = new Date().getFullYear();
         </ul>
       </nav>
     </div>
+
+    {
+      registered.length > 0 && (
+        <address class="site-footer__registration">
+          {site.legalName}
+          {registered.map((detail) => (
+            <>
+              {' · '}
+              <bdi>{detail}</bdi>
+            </>
+          ))}
+        </address>
+      )
+    }
   </div>
 </footer>
 
@@ -242,6 +263,13 @@ const year = new Date().getFullYear();
 
   .site-footer__bottom small {
     font-size: inherit;
+  }
+
+  /* The company's registered details, when filled in. */
+  .site-footer__registration {
+    padding-top: 0.5rem;
+    color: var(--color-muted);
+    font-style: normal;
   }
 
   .site-footer__legal {

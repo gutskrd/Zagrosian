@@ -10,6 +10,26 @@ export interface SocialProfile {
   icon: 'instagram' | 'tiktok';
 }
 
+/** A registered address, in the Dutch order: street and number, postcode, place. */
+export interface PostalAddress {
+  /** Street and house number. */
+  street: string;
+  /** Postcode: four digits and two letters, such as "1234 AB". */
+  postalCode: string;
+  /** Place. */
+  city: string;
+}
+
+/** The company's registration, as the registers have issued it. */
+export interface Registration {
+  /** The registered address (the one in the trade register). */
+  address?: PostalAddress;
+  /** The number in the Dutch trade register (the KvK number): eight digits. */
+  kvk?: string;
+  /** The VAT identification number (btw-id), such as "NL000000000B01". */
+  vat?: string;
+}
+
 export const site = {
   name: 'Zagrosian',
   /** Name used in legal documents. Update when the company is registered. */
@@ -40,6 +60,18 @@ export const site = {
     press: 'press@zagrosian.com',
   },
 };
+
+/**
+ * The company's registration. A company in the EU that offers services online
+ * shows its registered address, trade register number and VAT number on its
+ * site (Directive 2000/31/EC, article 5; in the Netherlands, Burgerlijk Wetboek
+ * 3:15d). Each detail is shown in every footer (Footer.astro) and added to the
+ * structured data (src/lib/structured-data.ts) as soon as it is filled in here;
+ * until then nothing is shown. Fill in only what the Chamber of Commerce (KVK)
+ * and the tax office have issued, and update `site.legalName` to the registered
+ * name with them.
+ */
+export const registration: Registration = {};
 
 export const hevalo = {
   name: 'Hevalo',

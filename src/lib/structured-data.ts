@@ -7,12 +7,15 @@
  * so they are identical wherever they appear.
  */
 import { locales, messages, type Locale } from '../i18n';
-import { hevalo, site, socialProfiles } from '../site';
+import { hevalo, registration, site, socialProfiles } from '../site';
 import { answerText, faq } from './faq';
 
 const english = messages('en');
 
 const home = `${site.url}/`;
+
+/** The company's registered details, those that are filled in (src/site.ts). */
+const { address, kvk, vat } = registration;
 
 const ids = {
   website: `${home}#website`,
@@ -53,13 +56,20 @@ export function structuredData(page: PageData) {
       '@type': 'Organization',
       '@id': ids.organization,
       name: site.name,
+      legalName: site.legalName,
       url: home,
       logo: { '@type': 'ImageObject', url: `${site.url}/logo.png`, width: 512, height: 512 },
       image: `${site.url}/og.png`,
       description: english.meta.description,
       slogan: english.meta.tagline,
       email: site.emails.contact,
-      address: { '@type': 'PostalAddress', addressCountry: site.country },
+      address: {
+        '@type': 'PostalAddress',
+        ...(address && { streetAddress: address.street, postalCode: address.postalCode, addressLocality: address.city }),
+        addressCountry: site.country,
+      },
+      ...(kvk && { identifier: { '@type': 'PropertyValue', propertyID: 'KvK', value: kvk } }),
+      ...(vat && { vatID: vat }),
       areaServed: 'Worldwide',
       knowsLanguage: locales.map((locale) => locale.code),
       contactPoint: [

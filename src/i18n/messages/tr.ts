@@ -142,6 +142,8 @@ export const tr: Messages = {
   footer: {
     about: ['Hollanda merkezli bağımsız', 'teknoloji şirketi.'],
     thanks: 'Teşekkürler. Kelimesi kelimesine: Eviniz bayındır olsun.',
+    kvk: 'KvK',
+    vat: 'KDV no.',
   },
   legal: {
     eyebrow: 'Yasal',

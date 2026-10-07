@@ -145,6 +145,8 @@ export const ckb: Messages = {
   footer: {
     about: ['کۆمپانیایەکی سەربەخۆی تەکنەلۆژی', 'لە هۆڵەندا.'],
     thanks: 'سوپاس. وشە بە وشە: ماڵتان ئاوا.',
+    kvk: 'KvK',
+    vat: 'ژمارەی باج',
   },
   legal: {
     eyebrow: 'یاسایی',
