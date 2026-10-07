@@ -18,14 +18,10 @@ export const pages = locales.flatMap(({ code }) => pagesIn(code));
 /** A page that does not exist, in every language (the 404 page). */
 export const missing = locales.map(({ code }) => `${prefix(code)}/no-such-page`);
 
-/**
- * As on a later page of a visit, with a language chosen and sound off: no
- * loading screen and no language suggestion.
- */
+/** With a language chosen and sound off: no language suggestion or sound prompt. */
 export async function settled(context: BrowserContext) {
   await context.addInitScript(() => {
     try {
-      sessionStorage.setItem('loaded', '1');
       localStorage.setItem('language-chosen', '1');
       localStorage.setItem('sound', 'off');
     } catch {

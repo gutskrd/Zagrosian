@@ -26,19 +26,12 @@ have. Each item says why it matters and where it goes.
    that are true and can be shown. They belong in the About section, and in the structured data
    (`founder`, `foundingDate` in [`src/lib/structured-data.ts`](src/lib/structured-data.ts)).
 
-3. **The loading screen.** It holds a visit's first page (and every reload) for close to four seconds,
-   while the animation plays once, unless the visitor clicks, taps, scrolls or presses a key. Search
-   engines do not count it (they measure the page behind it, which scores 97 to 100), but every
-   first-time visitor waits for it. Neither Apple nor Meta show one. It
-   can be kept as it is, shown only on the homepage, or removed; this is a brand decision, not a
-   technical one.
-
-4. **How much moves.** The homepage has a lot of scroll-driven motion: the logo's journey into the
+3. **How much moves.** The homepage has a lot of scroll-driven motion: the logo's journey into the
    story, the sun, the motto, the deer, the water on hover, and sound. Each is smooth on its own, and
    all of it is switched off for visitors who ask for reduced motion, but together they compete for
    attention. Consider keeping the two or three that carry the story and letting the rest go.
 
-5. **Hevalo's apps.** When the iOS and Android apps are out, replace the *Coming soon* note with links
+4. **Hevalo's apps.** When the iOS and Android apps are out, replace the *Coming soon* note with links
    to the App Store and Google Play ([`ProductShowcase.astro`](src/components/ProductShowcase.astro)),
    and add them to the structured data.
 
@@ -55,8 +48,8 @@ have. Each item says why it matters and where it goes.
    whenever the site starts to collect more than it does now (analytics, forms, accounts).
 3. **Real devices and assistive technology.** The tests run in Chromium on a desktop computer. The
    site has not been tried on an iPhone (Safari), a low-end Android phone, or with VoiceOver, TalkBack
-   or NVDA. Spend half an hour with each: the menu, the language menu, the story and the deer, the
-   loading screen, and the legal pages.
+   or NVDA. Spend half an hour with each: the menu, the language menu, the story and the deer,
+   and the legal pages.
 
 ## Needs access
 

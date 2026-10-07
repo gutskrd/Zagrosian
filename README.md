@@ -78,10 +78,10 @@ public/            Favicons, logo, social images (og.png and og/<language>.png),
                    robots.txt and Cloudflare _headers
 src/
   assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
-                   sizes), the 21-ray sun, the loading animation (zagrosian-loader.gif, served as a lossless WebP), the
+                   sizes), the 21-ray sun, the
                    Hevalo app icon and (deer/) its 3D deer's layers
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
-  components/      Header, Footer, Loader, Hero, Story, ProductShowcase, About, Faq, Contact,
+  components/      Header, Footer, Hero, Story, ProductShowcase, About, Faq, Contact,
                    CommandMenu, LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
   content/legal/   Legal pages in Markdown, one folder per language
   i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
@@ -92,8 +92,7 @@ src/
   pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
-                   local time, legal page tools), loader.ts (the loading screen),
-                   command.ts (quick navigation), motion.ts,
+                   local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts and deer.ts
                    (Hevalo's eyes, and the 3D deer's blinks and twitches), sound.ts, text.ts,
                    language.ts, theme.ts and theme-init.js
@@ -203,8 +202,8 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
 - [`src/scripts/theme-init.js`](src/scripts/theme-init.js) is a tiny blocking script in `<head>`
   that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
   is an external file because the Content-Security-Policy forbids inline scripts. When motion is
-  welcome, it also decides whether the loading screen shows (`data-loading`) and makes room before
-  the first paint for the homepage story (`data-story`), so nothing shifts when it starts.
+  welcome, it also makes room before the first paint for the homepage story (`data-story`), so
+  nothing shifts when it starts.
 - [`src/scripts/theme.ts`](src/scripts/theme.ts) runs the controls. Where the browser supports view
   transitions, the new theme spreads out in a circle from the control that was used; with *reduce
   motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
@@ -221,20 +220,8 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   not laid out or drawn until the reader nears them (`content-visibility: auto`), so the first
   screen is ready sooner; their text is in the page all the while, for search engines, screen
   readers and find-in-page.
-- **Loading screen** ([`Loader.astro`](src/components/Loader.astro),
-  [`loader.ts`](src/scripts/loader.ts)): when a visit starts, or the page is reloaded, the page's
-  own colour covers it while Zagrosian's Z plays (`zagrosian-loader.gif`): it squeezes into a
-  rounded square and back, then its hands melt into the 21-ray Kurdish sun, which holds, and come
-  back. It plays once through, about three seconds (longer only while the page is still loading),
-  then fades away; a click, a tap, a key or a scroll lets the visitor straight in. On the dark
-  theme it is inverted, white on black; either way its ground is blended into the page's colour,
-  so no square shows round it. Not between pages of the site (they open at once), not with
-  *reduce motion*, and never without JavaScript; should the script not start, it lifts by itself
-  after eight seconds. It never holds the page up: its first frame, the Z (4 kB), shows at once,
-  and the animation is fetched once the page itself has loaded, taking over from the first frame
-  where it stands (it is cached for the pages after); on a slow connection the screen lifts four
-  seconds after the page started, at the latest. The page loads and draws
-  underneath all the while, so it costs the page nothing in search engines' measures of speed.
+- **No loading screen:** every page shows its own content from the first paint, as apple.com and
+  meta.com do. A splash screen in front of a page that is already there only makes visitors wait.
 - **Hero:** the headline rises line by line from behind masks on load, and the lifted logo rises
   into place and comes into focus. Each of these lets go when it ends, so nothing stays animated
   (and composited) behind the story. Coming from another page of the site, the page slides in as a
@@ -555,7 +542,6 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story |
-| `loader.spec.ts`        | When the loading screen shows, that it lifts, and that it never shows with reduced motion |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
 
 ```sh

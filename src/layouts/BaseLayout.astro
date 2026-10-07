@@ -6,7 +6,6 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import CommandMenu from '../components/CommandMenu.astro';
 import LanguageSuggestion from '../components/LanguageSuggestion.astro';
-import Loader from '../components/Loader.astro';
 import SoundPrompt from '../components/SoundPrompt.astro';
 import { defaultLocale, i18n, localizePath, locales } from '../i18n';
 import { structuredData, toJsonLd } from '../lib/structured-data';
@@ -122,7 +121,6 @@ const jsonLd = noindex
     <slot name="head" />
   </head>
   <body>
-    <Loader />
     <a class="skip-link" href="#main">{t.common.skipToContent}</a>
     <Header />
     <main id="main">

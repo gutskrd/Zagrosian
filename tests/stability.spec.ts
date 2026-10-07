@@ -1,6 +1,6 @@
 /**
- * Nothing jumps: no layout shift while the homepage loads (with its loading
- * screen, as on a first visit), and none while it is scrolled all the way down
+ * Nothing jumps: no layout shift while the homepage loads (as on a first
+ * visit), and none while it is scrolled all the way down
  * with a mouse wheel and back up again, through the story and the deer, left
  * to right and right to left (where the browser measures from the right).
  */
@@ -42,7 +42,7 @@ for (const { name, ...screen } of screens) {
       test(path, async ({ page }) => {
         const shifts = await measureShifts(page);
         await page.goto(path, { waitUntil: 'networkidle' });
-        // Until the loading screen has lifted and the page has settled.
+        // Until the hero's entrance has played and the page has settled.
         await page.waitForTimeout(5000);
         const { total, where } = await shifts();
         expect(total, where.join('\n')).toBeLessThan(0.01);

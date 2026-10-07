@@ -4,11 +4,10 @@
  */
 import { expect, test } from '@playwright/test';
 
-/** As on a later page of a visit, so the loading screen does not show. */
+/** With sound off. */
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     try {
-      sessionStorage.setItem('loaded', '1');
       localStorage.setItem('sound', 'off');
     } catch {
       // Storage can be unavailable.
