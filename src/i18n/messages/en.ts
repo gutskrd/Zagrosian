@@ -80,7 +80,7 @@ export const en = {
     dialects: 'Kurmanji first, more planned',
     platformsLabel: 'iOS and Android',
     /** Translation of the Kurmanji proverb shown with Hevalo (`kurdish.proverb` in src/site.ts). Empty in Kurmanji. */
-    proverb: 'A tree thrives on its roots, a person on their language.',
+    proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
   },
