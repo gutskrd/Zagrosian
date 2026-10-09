@@ -68,7 +68,7 @@ export const de: Messages = {
     dialectsLabel: 'Dialekte',
     dialects: 'Zuerst Kurmandschi, weitere geplant',
     platformsLabel: 'iOS und Android',
-    proverb: 'Ein Baum gedeiht auf seinen eigenen Wurzeln, ein Mensch in seiner eigenen Sprache.',
+    proverb: 'Der Baum wächst aus seinen Wurzeln, der Mensch aus seiner Sprache.',
     proverbSource: 'Kurdisches Sprichwort',
   },
   story: {

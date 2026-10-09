@@ -54,8 +54,8 @@ Requires Node 22.12 or later.
   underneath in every language except Kurmanji (`motto` in the message files). The site closes with
   *Mala we ava.* ("Thank you", literally "may your home prosper", in the footer). The Hevalo section carries a proverb, one of the
   *gotinên pêşiyan* ("sayings of the forebears", as Kurdish proverbs are called), and credits it as
-  one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree flourishes on its own roots,
-  a person in their own language"), *Gotina pêşiyan*. The thanks is an everyday expression, not a
+  one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree thrives on its roots, a
+  person on their language"), *Gotina pêşiyan*. The thanks is an everyday expression, not a
   proverb, so it carries no such credit. All of them are in `kurdish` in
   [`src/site.ts`](src/site.ts), stay in Kurmanji in every language with a translation in the message
   files (`footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets

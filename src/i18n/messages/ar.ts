@@ -69,7 +69,7 @@ export const ar: Messages = {
     dialectsLabel: 'اللهجات',
     dialects: 'الكرمانجية أولًا، مع خطط للهجات أخرى',
     platformsLabel: 'iOS وأندرويد',
-    proverb: 'الشجرة على جذورها، والإنسان على لسانه يزدهر.',
+    proverb: 'الشجرة تزدهر بجذورها، والإنسان بلغته.',
     proverbSource: 'مثل كردي',
   },
   story: {
@@ -141,7 +141,7 @@ export const ar: Messages = {
   },
   footer: {
     about: ['شركة تقنية مستقلة', 'مقرّها هولندا.'],
-    thanks: 'شكراً. وحرفياً: ليكن بيتكم عامراً.',
+    thanks: 'شكراً. وحرفياً: بيتكم عامر.',
     kvk: 'KvK',
     vat: 'الرقم الضريبي',
   },

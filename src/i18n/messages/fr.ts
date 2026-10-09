@@ -69,7 +69,7 @@ export const fr: Messages = {
     dialectsLabel: 'Dialectes',
     dialects: 'D’abord le kurmandji, d’autres prévus',
     platformsLabel: 'iOS et Android',
-    proverb: 'L’arbre s’épanouit sur ses propres racines, l’être humain dans sa propre langue.',
+    proverb: 'L’arbre puise sa force dans ses racines, et chacun dans sa langue.',
     proverbSource: 'Proverbe kurde',
   },
   story: {

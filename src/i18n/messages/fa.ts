@@ -71,7 +71,7 @@ export const fa: Messages = {
     dialectsLabel: 'گویش‌ها',
     dialects: 'نخست کرمانجی، گویش‌های دیگر در برنامه است',
     platformsLabel: 'iOS و اندروید',
-    proverb: 'درخت بر ریشهٔ خود سبز می‌شود و انسان در زبان خود.',
+    proverb: 'درخت با ریشه‌اش سبز می‌شود و انسان با زبانش.',
     proverbSource: 'ضرب‌المثل کردی',
   },
   story: {

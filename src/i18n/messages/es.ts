@@ -68,7 +68,7 @@ export const es: Messages = {
     dialectsLabel: 'Dialectos',
     dialects: 'Primero kurmanji, más previstos',
     platformsLabel: 'iOS y Android',
-    proverb: 'El árbol crece sobre sus propias raíces; la persona, en su propia lengua.',
+    proverb: 'El árbol se nutre de sus raíces, y la persona, de su lengua.',
     proverbSource: 'Proverbio kurdo',
   },
   story: {

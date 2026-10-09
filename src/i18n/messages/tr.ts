@@ -68,7 +68,7 @@ export const tr: Messages = {
     dialectsLabel: 'Lehçeler',
     dialects: 'Önce Kurmanci, diğerleri planlanıyor',
     platformsLabel: 'iOS ve Android',
-    proverb: 'Ağaç kendi kökünde, insan kendi dilinde yeşerir.',
+    proverb: 'Ağaç köküyle, insan diliyle yeşerir.',
     proverbSource: 'Kürt atasözü',
   },
   story: {
@@ -141,7 +141,7 @@ export const tr: Messages = {
   },
   footer: {
     about: ['Hollanda merkezli bağımsız', 'teknoloji şirketi.'],
-    thanks: 'Teşekkürler. Kelimesi kelimesine: Eviniz bayındır olsun.',
+    thanks: 'Teşekkürler. Kelimesi kelimesine: Eviniz abat olsun.',
     kvk: 'KvK',
     vat: 'KDV no.',
   },

@@ -68,7 +68,7 @@ export const nl: Messages = {
     dialectsLabel: 'Dialecten',
     dialects: 'Eerst Kurmanji, meer volgen',
     platformsLabel: 'iOS en Android',
-    proverb: 'Een boom gedijt op zijn eigen wortels, een mens in zijn eigen taal.',
+    proverb: 'De boom groeit uit zijn wortels, de mens uit zijn taal.',
     proverbSource: 'Koerdisch spreekwoord',
   },
   story: {
