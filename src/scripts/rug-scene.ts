@@ -1,254 +1,223 @@
 /**
- * The kilim in 3D (Rug.astro), drawn with WebGL 2: a rug of wool hanging in
- * the light, which unrolls as it scrolls into view and leans towards the
- * pointer, as Apple TV's posters do, with a soft glare that follows it.
+ * The kilim (Rug.astro) as a rug of wool lying on the page, seen from above,
+ * that can be picked up: lift a corner and fold it over, drag it, twist it
+ * round, let go and it drops and settles, as cloth does. WebGL 2.
  *
- * - The rug is one sheet, 40 by 220 quads. Above the line it has unrolled to
- *   it hangs flat; below it the rest is wound in a spiral, its pattern outward
- *   (the vertex shader). Scrolling down unrolls it, scrolling up rolls it up.
- * - Its pattern is the drawing in rug.ts (scripts/kilim.mjs), one texel a cell.
- *   The fragment shader weaves it: each cell is two passes of weft over two
- *   warps, each pass a row of small rounded pips that catch the light, with
- *   woolly edges between the colours, a little variation from strand to
- *   strand and in the dye, and a sheen at grazing angles. Where the pips are
- *   smaller than a pixel they fade out, so they never shimmer.
- * - Plain bands close both ends, and the warp hangs from the foot as a fringe,
- *   which swings when the rug moves.
- * - It casts a soft shadow on the page behind it.
+ * - The cloth is rug-cloth.ts: a grid of particles. Each frame its positions
+ *   and normals go to the GPU as two small float textures, and a finer mesh
+ *   (four times as many rows and columns) is drawn through them with
+ *   Catmull-Rom curves, so folds are round, not faceted.
+ * - The wool is rug-texture.ts, woven once into a mipmapped texture; the
+ *   shader adds the light on each pip of wool.
+ * - The light is a large soft one from the upper left. Its shadow map (the
+ *   rug's depth as the light sees it) gives the shadow the rug casts on the
+ *   page, sharp where it touches and softer the higher it is lifted
+ *   (percentage-closer soft shadows), and the shadow a fold casts on the rug
+ *   under it.
+ * - Hover shows a hand; press and drag (on a touch screen, press and hold
+ *   first, so scrolling stays scrolling). When it first comes into view it
+ *   is let fall onto the page.
  *
- * Frames are drawn only while something changes, and only while the rug is on
- * screen. For visitors who prefer reduced motion it hangs unrolled and still.
+ * It simulates and draws only while something moves; at rest it costs
+ * nothing. Played with and scrolled away, it is laid straight again. For
+ * visitors who prefer reduced motion it lies still and flat.
  */
 import { rugCells } from '../assets/kilim/rug';
+import { Cloth } from './rug-cloth';
+import { weave } from './rug-texture';
 
-const COLUMNS = rugCells[0].length;
-const ROWS = rugCells.length;
-/** Plain bands at either end and the fringe, in cells. */
-const END = 2;
-const FRINGE = 7;
-const ALL_ROWS = END + ROWS + END + FRINGE;
-/** In units of the rug's width. */
-const LENGTH = ALL_ROWS / COLUMNS;
-const FRINGE_START = (ALL_ROWS - FRINGE) / COLUMNS;
-const THICKNESS = 0.0105;
-const CORE = 0.018;
+const FRINGE = 6;
+const COLUMNS = 29;
+const CELLS_ACROSS = rugCells[0].length;
+const CELLS_ALONG = rugCells.length + 2 * FRINGE;
+const ROWS = Math.round((COLUMNS - 1) * (CELLS_ALONG / CELLS_ACROSS)) + 1;
+const SUBDIVIDE = 4;
+/** How much of the stage's width the rug takes, and how it lies at rest. */
+const SHARE = 0.62;
+const REST_ANGLE = -0.05;
+const LIFT = 0.1;
+const STEP = 1 / 60;
 
-const vertexShader = /* glsl */ `#version 300 es
+const surface = /* glsl */ `
+uniform highp sampler2D uPositions;
+uniform highp sampler2D uNormals;
+uniform ivec2 uGrid;
+
+vec3 catmullRom(vec3 a, vec3 b, vec3 c, vec3 d, float t) {
+  return 0.5 * (2.0 * b + (c - a) * t + (2.0 * a - 5.0 * b + 4.0 * c - d) * t * t + (3.0 * b - a - 3.0 * c + d) * t * t * t);
+}
+
+vec3 grid(highp sampler2D values, ivec2 at) {
+  return texelFetch(values, clamp(at, ivec2(0), uGrid - 1), 0).xyz;
+}
+
+// The cloth at a point between its particles, through the four by four
+// nearest of them.
+vec3 smoothly(highp sampler2D values, vec2 uv) {
+  vec2 g = uv * vec2(uGrid - 1);
+  ivec2 i = min(ivec2(floor(g)), uGrid - 2);
+  vec2 f = g - vec2(i);
+  vec3 rows[4];
+  for (int y = 0; y < 4; y++) {
+    ivec2 r = i + ivec2(0, y - 1);
+    rows[y] = catmullRom(grid(values, r + ivec2(-1, 0)), grid(values, r), grid(values, r + ivec2(1, 0)), grid(values, r + ivec2(2, 0)), f.x);
+  }
+  return catmullRom(rows[0], rows[1], rows[2], rows[3], f.y);
+}
+`;
+
+const rugVertex = /* glsl */ `#version 300 es
 precision highp float;
 in vec2 aUv;
-uniform mat4 uProjection;
-uniform mat4 uView;
-uniform mat4 uModel;
-uniform float uLength;
-uniform float uFlat;
-uniform float uOuter;
-uniform float uThickness;
-uniform float uFringeStart;
-uniform vec2 uSway;
+uniform mat4 uViewProjection;
+${surface}
 out vec2 vUv;
 out vec3 vWorld;
 out vec3 vNormal;
-out vec3 vAlong;
-const float PI = 3.14159265;
-
 void main() {
-  float x = aUv.x - 0.5;
-  float s = aUv.y * uLength;
-  vec3 p;
-  vec3 n;
-  vec3 t;
-  if (s <= uFlat) {
-    // Hanging: a slight, even waviness, none at the top where it is held.
-    float hold = smoothstep(0.0, 0.25, s);
-    float wave = 0.006 * hold * sin(x * 7.0 + s * 2.3) * sin(s * 4.1 + 0.6);
-    p = vec3(x, -s, wave);
-    n = normalize(vec3(-0.006 * hold * 7.0 * cos(x * 7.0 + s * 2.3) * sin(s * 4.1 + 0.6), 0.0, 1.0));
-    t = vec3(0.0, -1.0, 0.0);
-    // The fringe swings from its knots.
-    if (s > uFringeStart) {
-      float d = (s - uFringeStart) / (uLength - uFringeStart);
-      p.x += uSway.x * d * d;
-      p.z += uSway.y * d * d;
-    }
-  } else {
-    // Wound up: the sheet runs round a spiral, a thickness further in each turn.
-    float l = s - uFlat;
-    float r = sqrt(max(uOuter * uOuter - uThickness * l / PI, 1e-6));
-    float a = 2.0 * PI * (uOuter - r) / uThickness;
-    p = vec3(x, -uFlat - r * sin(a), r * cos(a) - uOuter);
-    n = vec3(0.0, -sin(a), cos(a));
-    t = vec3(0.0, -cos(a), -sin(a));
-  }
-  vec4 world = uModel * vec4(p, 1.0);
+  vec3 world = smoothly(uPositions, aUv);
   vUv = aUv;
-  vWorld = world.xyz;
-  vNormal = mat3(uModel) * n;
-  vAlong = mat3(uModel) * t;
-  gl_Position = uProjection * uView * world;
+  vWorld = world;
+  vNormal = smoothly(uNormals, aUv);
+  gl_Position = uViewProjection * vec4(world, 1.0);
 }`;
 
-const fragmentShader = /* glsl */ `#version 300 es
+const depthFragment = /* glsl */ `#version 300 es
+precision mediump float;
+void main() {}`;
+
+/** Sixteen points spread evenly over a disc, for soft shadows. */
+const disc = /* glsl */ `
+const vec2 DISC[16] = vec2[](
+  vec2(-0.94, -0.40), vec2(0.95, -0.77), vec2(-0.09, -0.93), vec2(0.34, 0.29),
+  vec2(-0.92, 0.46), vec2(-0.82, 0.15), vec2(-0.38, 0.28), vec2(-0.20, -0.04),
+  vec2(0.97, 0.19), vec2(0.44, -0.40), vec2(0.54, 0.75), vec2(-0.26, 0.96),
+  vec2(0.79, 0.53), vec2(0.14, -0.38), vec2(-0.66, -0.73), vec2(0.21, 0.67)
+);
+`;
+
+const rugFragment = /* glsl */ `#version 300 es
 precision highp float;
 in vec2 vUv;
 in vec3 vWorld;
 in vec3 vNormal;
-in vec3 vAlong;
-uniform sampler2D uCells;
-uniform vec2 uGrid;
-uniform float uRows;
-uniform float uEnd;
-uniform float uFringe;
-uniform vec3 uAcross;
-uniform vec3 uCamera;
-uniform vec3 uLight;
-uniform vec3 uGlare;
+uniform sampler2D uWeave;
+uniform highp sampler2DShadow uShadow;
+uniform mat4 uLight;
+uniform vec3 uToLight;
+uniform vec3 uEye;
+uniform vec2 uCells;
 out vec4 outColor;
 const float PI = 3.14159265;
-
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
-
-float noise(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-
-vec3 toScreen(vec3 linear) {
-  return pow(clamp(linear, 0.0, 1.0), vec3(1.0 / 2.2));
-}
-
-// Light from the upper left, wrapped round the wool's fibres, a soft
-// highlight, and a sheen where the surface turns away.
-vec3 light(vec3 base, vec3 n, vec3 v, float occlusion) {
-  vec3 l = normalize(uLight);
-  float diffuse = max((dot(n, l) + 0.45) / 1.45, 0.0);
-  vec3 h = normalize(l + v);
-  float highlight = pow(max(dot(n, h), 0.0), 24.0) * 0.05;
-  float sheen = pow(1.0 - max(dot(n, v), 0.0), 4.0) * 0.12;
-  return base * (0.2 + 0.95 * diffuse) * occlusion + highlight + sheen * vec3(0.8);
-}
+${disc}
 
 void main() {
-  vec3 v = normalize(uCamera - vWorld);
+  vec4 wool = texture(uWeave, vUv);
+  if (wool.a < 0.45) discard;
+  vec3 base = pow(wool.rgb / wool.a, vec3(2.2));
   vec3 n = normalize(vNormal);
-  vec3 along = normalize(vAlong);
   if (!gl_FrontFacing) {
     n = -n;
-  }
-  float cx = vUv.x * uGrid.x;
-  float cy = vUv.y * uRows;
-  float woven = uRows - uFringe;
-  vec3 wool = vec3(0.74, 0.71, 0.65);
-
-  // The fringe: two threads to a cell, of uneven length, round in section.
-  if (cy > woven) {
-    float d = (cy - woven) / uFringe;
-    float k = cx * 2.0;
-    float id = floor(k);
-    float end = 0.72 + 0.28 * hash(vec2(id, 7.0));
-    float across = fract(k + 0.05 * sin(cy * 1.9 + id * 2.1)) - 0.5;
-    float half_ = 0.34 - 0.08 * d;
-    float edge = fwidth(k);
-    float coverage = (1.0 - smoothstep(half_ - edge, half_ + edge, abs(across))) * (1.0 - smoothstep(end - 0.02, end, d));
-    if (coverage < 0.01) discard;
-    float q = clamp(across / half_, -1.0, 1.0);
-    vec3 round_ = normalize(n * sqrt(1.0 - q * q) + normalize(uAcross) * q);
-    // A knot where the fringe leaves the weave.
-    float knot = d < 0.14 ? 0.85 : 1.0;
-    vec3 colour = light(wool * (0.9 + 0.1 * hash(vec2(id, 3.0))) * knot, round_, v, 1.0);
-    outColor = vec4(toScreen(colour) * coverage, coverage);
-    return;
+    // The back of a kilim: the same pattern, a little duller.
+    base *= 0.78;
   }
 
-  // Which colour this point is woven in, from a slightly shaken point, so the
-  // edges between colours are woolly rather than ruled.
-  vec2 jitter = (vec2(noise(vec2(cx, cy) * 5.0), noise(vec2(cy, cx) * 5.0 + 3.7)) - 0.5) * 0.22;
-  vec2 cell = vec2(cx, cy - uEnd) + jitter;
-  float ink = 0.0;
-  if (cell.y >= 0.0 && cell.y < uGrid.y) {
-    ink = texelFetch(uCells, ivec2(clamp(floor(cell), vec2(0.0), uGrid - 1.0)), 0).r;
-  } else {
-    // The plain ends, each with one thin dark stripe.
-    float e = cell.y < 0.0 ? -cell.y : cell.y - uGrid.y;
-    ink = step(0.75, e) * step(e, 1.1);
-  }
-
-  // The weave: two passes of weft a cell, each over every other warp, offset
-  // from the pass before; each pip is rounded along and across.
-  float py = cy * 2.0;
+  // The pips of wool catch the light: two passes a cell over two warps, as in
+  // the texture. They fade where they are too small to see.
+  vec2 cell = vUv * uCells;
+  float py = cell.y * 2.0;
   float pass = floor(py);
-  float px = cx * 2.0 + 0.5 * mod(pass, 2.0);
+  float px = cell.x * 2.0 + 0.5 * mod(pass, 2.0);
   float u = fract(px);
   float w = fract(py);
-  float su = sin(PI * u);
-  float sw = sin(PI * w);
-  float height = su * sw;
-  // Where the pips come closer than about six pixels apart they fade into
-  // their average, so they never beat against the screen's pixels.
-  float detail = 1.0 - smoothstep(0.14, 0.32, max(fwidth(py), fwidth(px)));
-  vec3 slope = (PI * cos(PI * u) * sw) * normalize(uAcross) + (PI * su * cos(PI * w)) * along;
-  vec3 bumped = normalize(n - 0.22 * detail * slope);
-  // Shade in the hollows between pips; 0.405 is the pips' mean height.
-  float occlusion = 1.0 - 0.28 * (1.0 - mix(0.405, height, detail));
+  float detail = 1.0 - smoothstep(0.18, 0.4, max(fwidth(px), fwidth(py)));
+  vec3 across = normalize(dFdx(vWorld) * dFdx(cell.x) + dFdy(vWorld) * dFdy(cell.x) + vec3(1e-6));
+  vec3 along = normalize(cross(n, across));
+  vec3 slope = PI * cos(PI * u) * sin(PI * w) * across + PI * sin(PI * u) * cos(PI * w) * along;
+  vec3 bumped = normalize(n - 0.18 * detail * slope);
 
-  // Undyed wool and a near-black, each strand a little different, and the dye
-  // a little uneven along the rug, as in a rug woven by hand.
-  vec3 ground = vec3(0.70, 0.68, 0.63);
-  vec3 dark = vec3(0.012, 0.0115, 0.011);
-  float strand = hash(vec2(floor(px), pass));
-  float dye = noise(vec2(cx * 0.12, cy * 0.09)) * 0.6 + noise(vec2(3.0, cy * 0.4)) * 0.4;
-  vec3 base = mix(ground, dark, ink) * (0.9 + 0.12 * dye + 0.08 * (strand - 0.5));
-  if (!gl_FrontFacing) {
-    base *= 0.82;
-  }
+  // How much of the light reaches it, past any fold above.
+  vec4 l = uLight * vec4(vWorld + n * 0.006, 1.0);
+  vec3 s = l.xyz / l.w * 0.5 + 0.5;
+  float lit = 0.0;
+  for (int i = 0; i < 8; i++) lit += texture(uShadow, vec3(s.xy + DISC[i * 2] * 0.0035, s.z - 0.0015));
+  lit /= 8.0;
 
-  vec3 colour = light(base, bumped, v, occlusion);
-  // The glare that follows the pointer, broad and soft.
-  vec2 g = (vUv - uGlare.xy) * vec2(1.0, uRows / uGrid.x);
-  colour += uGlare.z * 0.2 * exp(-dot(g, g) / 0.14);
-  outColor = vec4(toScreen(colour), 1.0);
+  vec3 toLight = normalize(uToLight);
+  vec3 v = normalize(uEye - vWorld);
+  float sun = max(dot(bumped, toLight), 0.0) * lit;
+  // Light from the whole sky above, less from the floor.
+  float sky = 0.55 + 0.45 * bumped.y;
+  float sheen = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.25 * lit;
+  vec3 colour = base * (0.42 * sky + 0.78 * sun) + sheen * base;
+  outColor = vec4(pow(colour, vec3(1.0 / 2.2)), 1.0);
 }`;
 
-const shadowVertexShader = /* glsl */ `#version 300 es
+const floorVertex = /* glsl */ `#version 300 es
 precision highp float;
 in vec2 aUv;
-uniform mat4 uProjection;
-uniform mat4 uView;
-uniform mat4 uModel;
-uniform vec2 uExtent;
-uniform float uWall;
-uniform vec2 uOffset;
-out vec2 vLocal;
+uniform mat4 uViewProjection;
+uniform vec4 uArea;
+out vec3 vWorld;
 void main() {
-  // A rectangle a little larger than the rug, for the blur, laid on the wall.
-  vec2 local = vec2(mix(-0.5 - 0.25, 0.5 + 0.25, aUv.x), mix(0.25, -uExtent.y - 0.25, aUv.y));
-  vec4 world = uModel * vec4(local, 0.0, 1.0);
-  world.z = uWall;
-  world.xy += uOffset;
-  vLocal = local;
-  gl_Position = uProjection * uView * world;
+  vWorld = vec3(mix(uArea.x, uArea.z, aUv.x), 0.0, mix(uArea.y, uArea.w, aUv.y));
+  gl_Position = uViewProjection * vec4(vWorld, 1.0);
 }`;
 
-const shadowFragmentShader = /* glsl */ `#version 300 es
+const floorFragment = /* glsl */ `#version 300 es
 precision highp float;
-in vec2 vLocal;
-uniform vec2 uExtent;
+in vec3 vWorld;
+uniform highp sampler2D uDepth;
+uniform highp sampler2DShadow uShadow;
+uniform mat4 uLight;
+uniform float uDepthRange;
+uniform float uTexel;
 uniform float uStrength;
 out vec4 outColor;
+${disc}
+
 void main() {
-  // A soft-edged box: the rug's outline, blurred.
-  float blur = 0.16;
-  float x = smoothstep(0.5 + blur, 0.5 - blur, abs(vLocal.x));
-  float top = smoothstep(blur, -blur, vLocal.y);
-  float bottom = smoothstep(-uExtent.y - blur, -uExtent.y + blur, vLocal.y);
-  float a = x * top * bottom * uStrength;
-  outColor = vec4(0.0, 0.0, 0.0, a);
+  vec4 l = uLight * vec4(vWorld, 1.0);
+  vec3 s = l.xyz / l.w * 0.5 + 0.5;
+  // Where the rug is, as the light sees it, and how high above the floor.
+  float found = 0.0;
+  float depth = 0.0;
+  for (int i = 0; i < 16; i++) {
+    float d = texture(uDepth, s.xy + DISC[i] * uTexel * 14.0).r;
+    if (d < s.z - 0.0005) {
+      found += 1.0;
+      depth += d;
+    }
+  }
+  if (found < 0.5) {
+    outColor = vec4(0.0);
+    return;
+  }
+  float height = (s.z - depth / found) * uDepthRange;
+  // A large light: the higher the rug, the softer its shadow.
+  float radius = uTexel * (1.5 + height * 260.0);
+  float lit = 0.0;
+  for (int i = 0; i < 16; i++) lit += texture(uShadow, vec3(s.xy + DISC[i] * radius, s.z - 0.0005));
+  // Fainter the further it falls.
+  float shade = (1.0 - lit / 16.0) / (1.0 + height * 4.0);
+  // And a soft dimness all round where it lies close: the sky is hidden.
+  float near = found / 16.0 * 0.4 / (1.0 + height * 10.0);
+  outColor = vec4(0.0, 0.0, 0.0, max(shade, near) * uStrength);
 }`;
 
 type Matrix = Float32Array;
+
+const multiply = (a: Matrix, b: Matrix): Matrix => {
+  const out = new Float32Array(16);
+  for (let c = 0; c < 4; c++) {
+    for (let r = 0; r < 4; r++) {
+      let sum = 0;
+      for (let k = 0; k < 4; k++) sum += a[k * 4 + r] * b[c * 4 + k];
+      out[c * 4 + r] = sum;
+    }
+  }
+  return out;
+};
 
 const perspective = (fov: number, aspect: number, near: number, far: number): Matrix => {
   const f = 1 / Math.tan(fov / 2);
@@ -256,57 +225,51 @@ const perspective = (fov: number, aspect: number, near: number, far: number): Ma
   return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (near + far) * range, -1, 0, 0, 2 * near * far * range, 0]);
 };
 
-const multiply = (a: Matrix, b: Matrix): Matrix => {
-  const out = new Float32Array(16);
-  for (let column = 0; column < 4; column++) {
-    for (let row = 0; row < 4; row++) {
-      let sum = 0;
-      for (let k = 0; k < 4; k++) sum += a[k * 4 + row] * b[column * 4 + k];
-      out[column * 4 + row] = sum;
-    }
-  }
-  return out;
+const orthographic = (half: number, near: number, far: number): Matrix => {
+  const range = 1 / (near - far);
+  return new Float32Array([1 / half, 0, 0, 0, 0, 1 / half, 0, 0, 0, 0, 2 * range, 0, 0, 0, (near + far) * range, 1]);
 };
 
-const translation = (x: number, y: number, z: number): Matrix =>
-  new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]);
-
-const rotationX = (angle: number): Matrix => {
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
-  return new Float32Array([1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]);
+/** A camera at `eye` looking at the origin, with `up` towards the top of its picture. */
+const lookAt = (eye: number[], up: number[]): Matrix => {
+  const length = (v: number[]) => Math.hypot(v[0], v[1], v[2]);
+  const back = eye.map((value) => value / length(eye));
+  let right = [up[1] * back[2] - up[2] * back[1], up[2] * back[0] - up[0] * back[2], up[0] * back[1] - up[1] * back[0]];
+  right = right.map((value) => value / length(right));
+  const top = [back[1] * right[2] - back[2] * right[1], back[2] * right[0] - back[0] * right[2], back[0] * right[1] - back[1] * right[0]];
+  const dot = (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  return new Float32Array([
+    right[0], top[0], back[0], 0,
+    right[1], top[1], back[1], 0,
+    right[2], top[2], back[2], 0,
+    -dot(right, eye), -dot(top, eye), -dot(back, eye), 1,
+  ]);
 };
 
-const rotationY = (angle: number): Matrix => {
-  const c = Math.cos(angle);
-  const s = Math.sin(angle);
-  return new Float32Array([c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]);
-};
-
-function program(gl: WebGL2RenderingContext, vertex: string, fragment: string) {
-  const compile = (type: number, source: string) => {
-    const shader = gl.createShader(type)!;
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(shader) ?? 'shader');
-    return shader;
+function compile(gl: WebGL2RenderingContext, vertex: string, fragment: string) {
+  const shader = (type: number, source: string) => {
+    const made = gl.createShader(type)!;
+    gl.shaderSource(made, source);
+    gl.compileShader(made);
+    if (!gl.getShaderParameter(made, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(made) ?? 'shader');
+    return made;
   };
-  const built = gl.createProgram()!;
-  gl.attachShader(built, compile(gl.VERTEX_SHADER, vertex));
-  gl.attachShader(built, compile(gl.FRAGMENT_SHADER, fragment));
-  gl.bindAttribLocation(built, 0, 'aUv');
-  gl.linkProgram(built);
-  if (!gl.getProgramParameter(built, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(built) ?? 'program');
-  const uniforms = new Map<string, WebGLUniformLocation | null>();
+  const program = gl.createProgram()!;
+  gl.attachShader(program, shader(gl.VERTEX_SHADER, vertex));
+  gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fragment));
+  gl.bindAttribLocation(program, 0, 'aUv');
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) ?? 'program');
+  const locations = new Map<string, WebGLUniformLocation | null>();
   const at = (name: string) => {
-    if (!uniforms.has(name)) uniforms.set(name, gl.getUniformLocation(built, name));
-    return uniforms.get(name)!;
+    if (!locations.has(name)) locations.set(name, gl.getUniformLocation(program, name));
+    return locations.get(name)!;
   };
-  return { program: built, at };
+  return { program, at };
 }
 
 /** A grid of points over the unit square, as triangles. */
-function sheet(gl: WebGL2RenderingContext, across: number, along: number) {
+function mesh(gl: WebGL2RenderingContext, across: number, along: number) {
   const points = new Float32Array((across + 1) * (along + 1) * 2);
   let i = 0;
   for (let y = 0; y <= along; y++) {
@@ -337,255 +300,447 @@ function sheet(gl: WebGL2RenderingContext, across: number, along: number) {
   return { vao, count: indices.length };
 }
 
-const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
-const smooth = (t: number) => t * t * (3 - 2 * t);
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /**
- * Draws the rug into the stage's canvas. Returns false where WebGL 2 is not
- * available, and the flat rug stays.
+ * Sets the rug up in the stage's canvas. Resolves false where WebGL 2 is not
+ * available, and the flat picture stays.
  */
-export function mountRug(stage: HTMLElement): boolean {
+export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const canvas = stage.querySelector<HTMLCanvasElement>('canvas');
-  // Smoothed edges where pixels are large; on denser screens the pixels are
-  // fine enough, and multisampling would cost several times the memory.
   const gl = canvas?.getContext('webgl2', {
     alpha: true,
     premultipliedAlpha: true,
+    // Smoothed edges where pixels are large; denser screens do not need it.
     antialias: (window.devicePixelRatio || 1) < 1.5,
     powerPreference: 'low-power',
   });
   if (!canvas || !gl) return false;
 
-  let rug: ReturnType<typeof program>;
-  let shadow: ReturnType<typeof program>;
+  let rugProgram: ReturnType<typeof compile>;
+  let depthProgram: ReturnType<typeof compile>;
+  let floorProgram: ReturnType<typeof compile>;
   try {
-    rug = program(gl, vertexShader, fragmentShader);
-    shadow = program(gl, shadowVertexShader, shadowFragmentShader);
+    rugProgram = compile(gl, rugVertex, rugFragment);
+    depthProgram = compile(gl, rugVertex, depthFragment);
+    floorProgram = compile(gl, floorVertex, floorFragment);
   } catch {
     return false;
   }
-  const cloth = sheet(gl, 40, 220);
-  const quad = sheet(gl, 1, 1);
 
-  // The pattern, one texel a cell: 1 where it is woven in ink.
-  const texels = new Uint8Array(COLUMNS * ROWS);
-  rugCells.forEach((row, y) => [...row].forEach((cell, x) => (texels[y * COLUMNS + x] = cell === '#' ? 255 : 0)));
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, COLUMNS, ROWS, 0, gl.RED, gl.UNSIGNED_BYTE, texels);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  // The wool, woven at about as many pixels a cell as the screen will show.
+  const density = Math.min(window.devicePixelRatio || 1, 2);
+  const scale = clamp(Math.round((stage.clientWidth * SHARE * density * 1.3) / CELLS_ACROSS), 4, 8);
+  const woven = await weave(rugCells, FRINGE, scale);
+  const weaveTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, weaveTexture);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, woven.width, woven.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, woven.pixels);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const anisotropic = gl.getExtension('EXT_texture_filter_anisotropic');
+  if (anisotropic) {
+    gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(anisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+  }
+
+  // The cloth's positions and normals, a texel a particle.
+  const cloth = new Cloth(COLUMNS, ROWS);
+  const floatTexture = () => {
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, COLUMNS, ROWS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    return texture;
+  };
+  const positionTexture = floatTexture();
+  const normalTexture = floatTexture();
+  const upload = new Float32Array(cloth.count * 4);
+  const send = (texture: WebGLTexture | null, values: Float32Array) => {
+    for (let i = 0; i < cloth.count; i++) upload.set(values.subarray(i * 3, i * 3 + 3), i * 4);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, COLUMNS, ROWS, gl.RGBA, gl.FLOAT, upload);
+  };
+
+  // The shadow map, and two ways of reading it: as depths, and compared.
+  const SHADOW_SIZE = 1024;
+  const shadowTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, shadowTexture);
+  gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT24, SHADOW_SIZE, SHADOW_SIZE);
+  const shadowFramebuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, shadowFramebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, shadowTexture, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  const compared = gl.createSampler()!;
+  gl.samplerParameteri(compared, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+  gl.samplerParameteri(compared, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
+  gl.samplerParameteri(compared, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.samplerParameteri(compared, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.samplerParameteri(compared, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.samplerParameteri(compared, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  const raw = gl.createSampler()!;
+  gl.samplerParameteri(raw, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.samplerParameteri(raw, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.samplerParameteri(raw, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.samplerParameteri(raw, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  const rugMesh = mesh(gl, (COLUMNS - 1) * SUBDIVIDE, (ROWS - 1) * SUBDIVIDE);
+  const quad = mesh(gl, 1, 1);
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const toLight = [-0.5, 1.4, -0.7];
+  const lightLength = Math.hypot(...toLight);
+  const LIGHT_NEAR = 0.5;
+  const LIGHT_FAR = 8;
 
-  // What the rug is doing, and what it is easing towards.
-  const rest = { yaw: -0.2, pitch: 0.06 };
-  const target = { yaw: rest.yaw, pitch: rest.pitch, glare: 0.35, gx: 0.28, gy: 0.18 };
-  const now = { ...target, unrolled: 0 };
-  let sway = { x: 0, z: 0, vx: 0, vz: 0 };
-  let width = 0;
-  let height = 0;
-  let onScreen = false;
-  let frame = 0;
-  let last = 0;
+  // The stage in world units, and the camera above it.
+  const view = { width: 1, height: 1, fov: 0.42, distance: 5, tan: Math.tan(0.21), aspect: 1 };
+  let viewProjection: Matrix = new Float32Array(16);
+  let lightViewProjection: Matrix = new Float32Array(16);
+  let pixels = { width: 1, height: 1 };
   let shadowStrength = 0.3;
 
-  const readTheme = () => {
-    shadowStrength = document.documentElement.dataset.theme === 'dark' ? 0.7 : 0.26;
-  };
-  readTheme();
-
-  /** How far the rug has unrolled, from its place on the screen. */
-  const unrolledFromScroll = () => {
-    if (still.matches) return 1;
-    const box = stage.getBoundingClientRect();
-    const view = document.documentElement.clientHeight;
-    const start = view * 0.95;
-    const end = Math.max(view - box.height, 0) + view * 0.05;
-    return smooth(clamp((start - box.top) / Math.max(start - end, 1)));
-  };
-
-  /** A gentle lean with the scroll, so it is never quite flat to the screen. */
-  const leanFromScroll = () => {
-    if (still.matches) return 0;
-    const box = stage.getBoundingClientRect();
-    const view = document.documentElement.clientHeight;
-    return clamp((box.top + box.height / 2) / view, -0.5, 1.5) - 0.5;
-  };
-
-  const resize = () => {
+  const layout = () => {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    width = Math.max(1, Math.round(canvas.clientWidth * ratio));
-    height = Math.max(1, Math.round(canvas.clientHeight * ratio));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
+    pixels = { width: Math.max(1, Math.round(canvas.clientWidth * ratio)), height: Math.max(1, Math.round(canvas.clientHeight * ratio)) };
+    if (canvas.width !== pixels.width || canvas.height !== pixels.height) {
+      canvas.width = pixels.width;
+      canvas.height = pixels.height;
     }
+    view.aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight);
+    view.width = 1 / SHARE;
+    view.height = view.width / view.aspect;
+    view.tan = Math.tan(view.fov / 2);
+    view.distance = view.height / 2 / view.tan;
+    viewProjection = multiply(
+      perspective(view.fov, view.aspect, 0.5, view.distance + 2),
+      new Float32Array([1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, -view.distance, 1]),
+    );
+    const eye = toLight.map((value) => (value / lightLength) * 4);
+    const half = Math.max(view.width, view.height) * 0.62;
+    lightViewProjection = multiply(orthographic(half, LIGHT_NEAR, LIGHT_FAR), lookAt(eye, [0, 0, -1]));
+    const margin = 0.02;
+    cloth.bounds = { left: -view.width / 2 + margin, right: view.width / 2 - margin, top: -view.height / 2 + margin, bottom: view.height / 2 - margin };
+  };
+
+  const readTheme = () => {
+    shadowStrength = document.documentElement.dataset.theme === 'dark' ? 0.75 : 0.42;
   };
 
   const draw = () => {
-    const aspect = width / height;
-    const fov = 0.5;
-    // Far enough back that the whole rug and its lean fit, with a margin.
-    const distance = Math.max((LENGTH * 1.08) / (2 * Math.tan(fov / 2)), 1.32 / (2 * Math.tan(fov / 2) * aspect));
-    const projection = perspective(fov, aspect, 0.1, 20);
-    const camera: [number, number, number] = [0, 0, distance];
-    const view = translation(0, 0, -distance);
-    const lean = leanFromScroll();
-    const model = multiply(
-      multiply(rotationY(now.yaw), rotationX(now.pitch + lean * 0.12)),
-      translation(0, LENGTH / 2, 0),
-    );
-    const flat = now.unrolled * LENGTH;
-    const outer = Math.sqrt(CORE * CORE + (THICKNESS * (LENGTH - flat)) / Math.PI);
+    send(positionTexture, cloth.position);
+    send(normalTexture, cloth.normal);
 
-    gl.viewport(0, 0, width, height);
+    const bindCloth = (program: ReturnType<typeof compile>) => {
+      gl.uniform1i(program.at('uPositions'), 0);
+      gl.uniform1i(program.at('uNormals'), 1);
+      gl.uniform2i(program.at('uGrid'), COLUMNS, ROWS);
+    };
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, positionTexture);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, normalTexture);
+
+    // The rug as the light sees it.
+    gl.bindFramebuffer(gl.FRAMEBUFFER, shadowFramebuffer);
+    gl.viewport(0, 0, SHADOW_SIZE, SHADOW_SIZE);
+    gl.clear(gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.enable(gl.POLYGON_OFFSET_FILL);
+    gl.polygonOffset(1.5, 2);
+    gl.useProgram(depthProgram.program);
+    bindCloth(depthProgram);
+    gl.uniformMatrix4fv(depthProgram.at('uViewProjection'), false, lightViewProjection);
+    gl.bindVertexArray(rugMesh.vao);
+    gl.drawElements(gl.TRIANGLES, rugMesh.count, gl.UNSIGNED_SHORT, 0);
+    gl.disable(gl.POLYGON_OFFSET_FILL);
+
+    // The shadow on the page.
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, pixels.width, pixels.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, shadowTexture);
+    gl.bindSampler(2, raw);
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, shadowTexture);
+    gl.bindSampler(3, compared);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
-    // The shadow on the page behind, down and to the right of the rug.
     gl.disable(gl.DEPTH_TEST);
-    gl.useProgram(shadow.program);
-    gl.uniformMatrix4fv(shadow.at('uProjection'), false, projection);
-    gl.uniformMatrix4fv(shadow.at('uView'), false, view);
-    gl.uniformMatrix4fv(shadow.at('uModel'), false, model);
-    gl.uniform2f(shadow.at('uExtent'), 1, flat + outer * 1.6);
-    gl.uniform1f(shadow.at('uWall'), -0.32);
-    gl.uniform2f(shadow.at('uOffset'), 0.05 - now.yaw * 0.1, -0.07);
-    gl.uniform1f(shadow.at('uStrength'), shadowStrength);
+    gl.useProgram(floorProgram.program);
+    gl.uniformMatrix4fv(floorProgram.at('uViewProjection'), false, viewProjection);
+    gl.uniformMatrix4fv(floorProgram.at('uLight'), false, lightViewProjection);
+    gl.uniform4f(floorProgram.at('uArea'), -view.width / 2, -view.height / 2, view.width / 2, view.height / 2);
+    gl.uniform1i(floorProgram.at('uDepth'), 2);
+    gl.uniform1i(floorProgram.at('uShadow'), 3);
+    gl.uniform1f(floorProgram.at('uDepthRange'), LIGHT_FAR - LIGHT_NEAR);
+    gl.uniform1f(floorProgram.at('uTexel'), 1 / SHADOW_SIZE);
+    gl.uniform1f(floorProgram.at('uStrength'), shadowStrength);
     gl.bindVertexArray(quad.vao);
     gl.drawElements(gl.TRIANGLES, quad.count, gl.UNSIGNED_SHORT, 0);
 
     // The rug.
     gl.enable(gl.DEPTH_TEST);
-    gl.useProgram(rug.program);
-    gl.uniformMatrix4fv(rug.at('uProjection'), false, projection);
-    gl.uniformMatrix4fv(rug.at('uView'), false, view);
-    gl.uniformMatrix4fv(rug.at('uModel'), false, model);
-    gl.uniform1f(rug.at('uLength'), LENGTH);
-    gl.uniform1f(rug.at('uFlat'), flat);
-    gl.uniform1f(rug.at('uOuter'), outer);
-    gl.uniform1f(rug.at('uThickness'), THICKNESS);
-    gl.uniform1f(rug.at('uFringeStart'), FRINGE_START);
-    gl.uniform2f(rug.at('uSway'), sway.x, sway.z);
-    gl.uniform2f(rug.at('uGrid'), COLUMNS, ROWS);
-    gl.uniform1f(rug.at('uRows'), ALL_ROWS);
-    gl.uniform1f(rug.at('uEnd'), END);
-    gl.uniform1f(rug.at('uFringe'), FRINGE);
-    gl.uniform3f(rug.at('uAcross'), model[0], model[1], model[2]);
-    gl.uniform3f(rug.at('uCamera'), ...camera);
-    gl.uniform3f(rug.at('uLight'), -0.45, 0.55, 0.75);
-    gl.uniform3f(rug.at('uGlare'), now.gx, now.gy, now.glare);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(rug.at('uCells'), 0);
-    gl.bindVertexArray(cloth.vao);
-    gl.drawElements(gl.TRIANGLES, cloth.count, gl.UNSIGNED_SHORT, 0);
+    gl.useProgram(rugProgram.program);
+    bindCloth(rugProgram);
+    gl.uniformMatrix4fv(rugProgram.at('uViewProjection'), false, viewProjection);
+    gl.uniformMatrix4fv(rugProgram.at('uLight'), false, lightViewProjection);
+    gl.uniform3f(rugProgram.at('uToLight'), toLight[0], toLight[1], toLight[2]);
+    gl.uniform3f(rugProgram.at('uEye'), 0, view.distance, 0);
+    gl.uniform2f(rugProgram.at('uCells'), CELLS_ACROSS, CELLS_ALONG);
+    gl.activeTexture(gl.TEXTURE4);
+    gl.bindTexture(gl.TEXTURE_2D, weaveTexture);
+    gl.uniform1i(rugProgram.at('uWeave'), 4);
+    gl.uniform1i(rugProgram.at('uShadow'), 3);
+    gl.bindVertexArray(rugMesh.vao);
+    gl.drawElements(gl.TRIANGLES, rugMesh.count, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
   };
 
-  /** One step: everything eases towards where it is going; true while it moves. */
-  const step = (time: number) => {
-    const dt = Math.min((time - (last || time)) / 1000, 1 / 20);
-    last = time;
-    const ease = 1 - Math.exp(-dt * 7);
-    const before = { yaw: now.yaw, unrolled: now.unrolled };
-    const unrolled = unrolledFromScroll();
-    now.unrolled += (unrolled - now.unrolled) * (still.matches ? 1 : 1 - Math.exp(-dt * 14));
-    for (const key of ['yaw', 'pitch', 'glare', 'gx', 'gy'] as const) now[key] += (target[key] - now[key]) * ease;
+  // --- Pointer -----------------------------------------------------------
 
-    // The fringe: a damped swing, pushed by the rug's turning and settling.
-    if (dt > 0) {
-      const push = ((now.yaw - before.yaw) / dt) * 0.02;
-      const drop = ((now.unrolled - before.unrolled) / dt) * 0.01;
-      sway.vx += (-sway.x * 60 - sway.vx * 6) * dt - push * 0.5;
-      sway.vz += (-sway.z * 60 - sway.vz * 6) * dt + drop;
-      sway.x += sway.vx * dt;
-      sway.z += sway.vz * dt;
-      sway.x = clamp(sway.x, -0.06, 0.06);
-      sway.z = clamp(sway.z, -0.06, 0.06);
-    }
-    draw();
-    const moving =
-      Math.abs(unrolled - now.unrolled) > 0.0005 ||
-      Math.abs(target.yaw - now.yaw) > 0.0005 ||
-      Math.abs(target.pitch - now.pitch) > 0.0005 ||
-      Math.abs(target.glare - now.glare) > 0.002 ||
-      Math.abs(sway.vx) + Math.abs(sway.vz) + Math.abs(sway.x) + Math.abs(sway.z) > 0.0004;
-    if (!moving) sway = { x: 0, z: 0, vx: 0, vz: 0 };
-    return moving;
+  /** Where a point on the screen meets the plane `height` above the floor. */
+  const onPlane = (clientX: number, clientY: number, height: number) => {
+    const box = canvas.getBoundingClientRect();
+    const nx = ((clientX - box.left) / box.width) * 2 - 1;
+    const ny = 1 - ((clientY - box.top) / box.height) * 2;
+    const t = view.distance - height;
+    return [nx * view.tan * view.aspect * t, height, -ny * view.tan * t];
   };
 
-  // When it comes to rest, how far it has unrolled (for the tests).
-  const settle = () => {
-    last = 0;
-    stage.dataset.unrolled = now.unrolled.toFixed(2);
+  /** The particle under a point on the screen, the uppermost if layers overlap. */
+  const particleAt = (clientX: number, clientY: number) => {
+    const box = canvas.getBoundingClientRect();
+    const reach = Math.max(14, (box.width * SHARE) / (COLUMNS - 1)) ** 2;
+    let best = -1;
+    let bestHeight = -1;
+    let bestDistance = Infinity;
+    for (let i = 0; i < cloth.count; i++) {
+      const x = cloth.position[i * 3];
+      const y = cloth.position[i * 3 + 1];
+      const z = cloth.position[i * 3 + 2];
+      const depth = (view.distance - y) * view.tan;
+      const sx = box.left + ((x / (depth * view.aspect) + 1) / 2) * box.width;
+      const sy = box.top + ((1 + z / depth) / 2) * box.height;
+      const distance = (sx - clientX) ** 2 + (sy - clientY) ** 2;
+      if (distance > reach) continue;
+      if (y > bestHeight + 0.004 || (Math.abs(y - bestHeight) <= 0.004 && distance < bestDistance)) {
+        best = i;
+        bestHeight = y;
+        bestDistance = distance;
+      }
+    }
+    return best;
+  };
+
+  // --- Motion ------------------------------------------------------------
+
+  let frame = 0;
+  let last = 0;
+  let behind = 0;
+  let quiet = 0;
+  let fallen = false;
+  let disturbed = false;
+  const hold = { pointer: -1, offset: [0, 0], lifted: 0, from: 0, trail: [] as { t: number; p: number[] }[] };
+
+  const setState = (state: 'moving' | 'resting') => {
+    if (stage.dataset.state !== state) stage.dataset.state = state;
   };
 
   const loop = (time: number) => {
     frame = 0;
-    if (!onScreen || document.hidden) return;
-    if (step(time)) frame = requestAnimationFrame(loop);
-    else settle();
+    if (document.hidden) return;
+    const dt = Math.min((time - (last || time)) / 1000, 0.05);
+    last = time;
+    behind += dt;
+    let steps = 0;
+    while (behind >= STEP && steps < 2) {
+      if (hold.pointer >= 0) {
+        // Lift what is held, smoothly, to a hand's height.
+        hold.lifted = Math.min(1, hold.lifted + STEP / 0.15);
+        const eased = 1 - (1 - hold.lifted) ** 3;
+        cloth.target[1] = hold.from + (LIFT - hold.from) * eased;
+      }
+      cloth.step(STEP);
+      behind -= STEP;
+      steps++;
+    }
+    if (steps === 2) behind = 0;
+    draw();
+    quiet = hold.pointer < 0 && cloth.motion < 0.0006 ? quiet + 1 : 0;
+    if (quiet > 30) {
+      last = 0;
+      behind = 0;
+      setState('resting');
+      return;
+    }
+    frame = requestAnimationFrame(loop);
   };
 
   const wake = () => {
-    if (!frame && onScreen) frame = requestAnimationFrame(loop);
+    if (still.matches) return;
+    setState('moving');
+    quiet = 0;
+    if (!frame) frame = requestAnimationFrame(loop);
   };
 
-  // Leaning towards the pointer, with the glare under it.
-  const point = (event: PointerEvent) => {
-    if (still.matches || (event.pointerType === 'mouse' && !fine.matches)) return;
-    const box = stage.getBoundingClientRect();
-    const x = clamp((event.clientX - box.left) / box.width) - 0.5;
-    const y = clamp((event.clientY - box.top) / box.height) - 0.5;
-    target.yaw = rest.yaw * 0.4 + x * 0.55;
-    target.pitch = rest.pitch + y * 0.35;
-    target.gx = x + 0.5;
-    target.gy = y + 0.5;
-    target.glare = 1;
-    wake();
+  const rest = () => {
+    cloth.layFlat(0, 0, REST_ANGLE);
+    disturbed = false;
   };
-  const leave = () => {
-    Object.assign(target, { yaw: rest.yaw, pitch: rest.pitch, glare: 0.35, gx: 0.28, gy: 0.18 });
-    wake();
-  };
-  stage.addEventListener('pointermove', point);
-  stage.addEventListener('pointerdown', point);
-  stage.addEventListener('pointerleave', leave);
-  stage.addEventListener('pointerup', (event) => event.pointerType !== 'mouse' && leave());
-  stage.addEventListener('pointercancel', leave);
 
-  window.addEventListener('scroll', wake, { passive: true });
+  // Picking up and letting go.
+  const lead = (event: PointerEvent) => {
+    const p = onPlane(event.clientX, event.clientY, cloth.target[1]);
+    const x = clamp(p[0] + hold.offset[0], cloth.bounds.left, cloth.bounds.right);
+    const z = clamp(p[2] + hold.offset[1], cloth.bounds.top, cloth.bounds.bottom);
+    cloth.target[0] = x;
+    cloth.target[2] = z;
+    const now = performance.now();
+    hold.trail.push({ t: now, p: [x, cloth.target[1], z] });
+    while (hold.trail.length > 2 && now - hold.trail[0].t > 80) hold.trail.shift();
+  };
+
+  const pickUp = (event: PointerEvent, particle: number) => {
+    if (particle < 0) return;
+    cloth.hold(particle);
+    hold.pointer = event.pointerId;
+    hold.lifted = 0;
+    hold.from = cloth.position[particle * 3 + 1];
+    hold.trail = [];
+    const p = onPlane(event.clientX, event.clientY, hold.from);
+    hold.offset = [cloth.position[particle * 3] - p[0], cloth.position[particle * 3 + 2] - p[2]];
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // The pointer may already be gone.
+    }
+    stage.setAttribute('data-holding', '');
+    disturbed = true;
+    wake();
+  };
+
+  const letGo = () => {
+    if (hold.pointer < 0) return;
+    const trail = hold.trail;
+    let velocity = [0, 0, 0];
+    if (trail.length >= 2) {
+      const first = trail[0];
+      const end = trail[trail.length - 1];
+      const seconds = Math.max((end.t - first.t) / 1000, 1 / 120);
+      velocity = end.p.map((value, i) => clamp((value - first.p[i]) / seconds, -3, 3));
+    }
+    cloth.release(velocity[0], 0, velocity[2], STEP);
+    hold.pointer = -1;
+    stage.removeAttribute('data-holding');
+    wake();
+  };
+
+  let press = 0;
+  let pressAt = [0, 0];
+  canvas.addEventListener('pointerdown', (event) => {
+    if (still.matches || !fallen || hold.pointer >= 0 || event.button > 0) return;
+    const particle = particleAt(event.clientX, event.clientY);
+    if (particle < 0) return;
+    if (event.pointerType === 'touch') {
+      // On a touch screen, press and hold to pick it up; a swipe still scrolls.
+      pressAt = [event.clientX, event.clientY];
+      window.clearTimeout(press);
+      press = window.setTimeout(() => {
+        press = 0;
+        pickUp(event, particleAt(pressAt[0], pressAt[1]));
+      }, 260);
+      return;
+    }
+    event.preventDefault();
+    pickUp(event, particle);
+  });
+  canvas.addEventListener('pointermove', (event) => {
+    if (press && Math.hypot(event.clientX - pressAt[0], event.clientY - pressAt[1]) > 8) {
+      window.clearTimeout(press);
+      press = 0;
+    }
+    pressAt = [event.clientX, event.clientY];
+    if (event.pointerId === hold.pointer) {
+      lead(event);
+      wake();
+    } else if (event.pointerType !== 'touch' && fallen && !still.matches) {
+      stage.toggleAttribute('data-over', particleAt(event.clientX, event.clientY) >= 0);
+    }
+  });
+  const end = (event: PointerEvent) => {
+    window.clearTimeout(press);
+    press = 0;
+    if (event.pointerId === hold.pointer) letGo();
+  };
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointercancel', end);
+  canvas.addEventListener('lostpointercapture', end);
+  canvas.addEventListener('pointerleave', () => stage.removeAttribute('data-over'));
+  // While it is held on a touch screen, the page does not scroll.
+  canvas.addEventListener(
+    'touchmove',
+    (event) => {
+      if (hold.pointer >= 0) event.preventDefault();
+    },
+    { passive: false },
+  );
+  canvas.addEventListener('contextmenu', (event) => event.preventDefault());
+
+  // --- Life --------------------------------------------------------------
+
+  /** The first time it is seen, it is let fall onto the page. */
+  const fall = () => {
+    fallen = true;
+    if (still.matches) {
+      rest();
+      draw();
+      setState('resting');
+      return;
+    }
+    cloth.layFlat(0, 0, REST_ANGLE, { height: 0.32, ripple: 0.05 });
+    wake();
+  };
+
+  new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting && !fallen && entry.intersectionRatio >= 0.25) fall();
+      // Played with and then scrolled away: laid straight for next time.
+      if (!entry.isIntersecting && fallen && disturbed && hold.pointer < 0) {
+        rest();
+        draw();
+        setState('resting');
+      }
+    },
+    { threshold: [0, 0.25] },
+  ).observe(stage);
+
   new ResizeObserver(() => {
-    resize();
-    if (onScreen) draw();
-    wake();
+    layout();
+    if (fallen) draw();
   }).observe(canvas);
-  new IntersectionObserver(([entry]) => {
-    onScreen = entry.isIntersecting;
-    wake();
-  }).observe(stage);
   new MutationObserver(() => {
     readTheme();
-    wake();
-    if (onScreen) draw();
+    if (fallen) draw();
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  still.addEventListener('change', wake);
-  document.addEventListener('visibilitychange', wake);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && stage.dataset.state === 'moving') wake();
+  });
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();
     stage.removeAttribute('data-live');
   });
 
-  resize();
-  now.unrolled = unrolledFromScroll();
-  draw();
-  settle();
+  readTheme();
+  layout();
+  if (still.matches) fall();
   stage.setAttribute('data-live', '');
   return true;
 }

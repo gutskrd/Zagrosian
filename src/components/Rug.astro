@@ -1,63 +1,96 @@
 ---
 /**
- * A kilim of wool beside the About text (drawn by scripts/kilim.mjs, after
- * the motifs of Kurdish kilims from the Zagros: hooked diamonds, ram's horns
- * and eyes).
+ * A kilim of wool lying on the page beside the About text (drawn by
+ * scripts/kilim.mjs, after the motifs of Kurdish kilims from the Zagros), that
+ * can be picked up and played with: lift a corner and fold it over, drag it,
+ * twist it round, let go and it drops and settles (rug-scene.ts, loaded as it
+ * comes near; WebGL 2). The first time it comes into view it falls onto the
+ * page.
  *
- * In 3D where the browser has WebGL 2 (rug-scene.ts, loaded as the rug comes
- * near): it hangs in the light and unrolls as it scrolls into view, leans
- * towards the pointer with a glare under it, as Apple TV's posters do (on a
- * touch screen, towards the finger), and its fringe swings when it moves.
- * Until then, and without WebGL, it is a flat picture of the same rug.
- * Decorative: it is hidden from assistive technology.
+ * Until then, and without WebGL, it is a flat picture of the same rug, lying
+ * where the 3D one rests. Decorative: hidden from assistive technology.
  */
 ---
 
 <div class="rug" data-rug aria-hidden="true">
-  <div class="rug__flat"><div class="rug__ink"></div></div>
+  <div class="rug__flat">
+    <div class="rug__wool rug__wool--grey"></div>
+    <div class="rug__wool rug__wool--ink"></div>
+  </div>
   <canvas class="rug__canvas"></canvas>
 </div>
 
 <style>
-  /* The stage: the rug and the room it needs to lean and cast its shadow. */
+  /* The floor it lies on, with room around it to be moved and folded. */
   .rug {
     position: relative;
-    width: min(100%, 30rem);
-    aspect-ratio: 3 / 5;
+    width: min(100%, 34rem);
+    aspect-ratio: 3 / 4;
     margin-inline: auto;
-    /* A sideways drag leans the rug; scrolling stays the page's. */
+    /* A swipe still scrolls the page; the rug is picked up by pressing on it
+       (on a touch screen, pressing and holding). */
     touch-action: pan-y;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* The flat picture, where the 3D rug will hang. */
-  .rug__flat {
-    position: absolute;
-    top: 9%;
-    left: 12%;
-    width: 76%;
-    aspect-ratio: 47 / 77;
-    background: #e2ded4;
-    box-shadow: 0 1.5rem 3rem -1rem rgb(0 0 0 / 0.3);
+  .rug[data-over] {
+    cursor: grab;
   }
 
-  /* Its fringe. */
+  .rug[data-holding] {
+    cursor: grabbing;
+  }
+
+  /* The flat picture: 62% of the stage's width, turned a little, as the 3D
+     rug rests; 101 by 161 cells of weave and six of fringe at either end. */
+  .rug__flat {
+    position: absolute;
+    top: 50%;
+    left: 19%;
+    width: 62%;
+    aspect-ratio: 101 / 161;
+    background: #ded8ca;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.25),
+      0 0.75rem 2rem -0.75rem rgb(0 0 0 / 0.35);
+    translate: 0 -50%;
+    rotate: -2.9deg;
+  }
+
+  .rug__flat::before,
   .rug__flat::after {
     content: '';
     position: absolute;
-    top: 100%;
-    left: 1%;
-    right: 1%;
-    height: 9%;
-    background: repeating-linear-gradient(to right, #d6d1c5 0 2px, transparent 2px 5px);
+    left: 0.5%;
+    right: 0.5%;
+    height: 5.9%;
+    background: repeating-linear-gradient(to right, #d6cfc0 0 2px, transparent 2px 4px);
   }
 
-  .rug__ink {
+  .rug__flat::before {
+    bottom: 100%;
+  }
+
+  .rug__flat::after {
+    top: 100%;
+  }
+
+  .rug__wool {
     position: absolute;
     inset: 0;
-    background: #171615;
-    mask: url('../assets/kilim/rug.svg') 0 0 / 100% 100% no-repeat;
+  }
+
+  .rug__wool--ink {
+    background: #1b1918;
+    mask: url('../assets/kilim/rug-ink.svg') 0 0 / 100% 100% no-repeat;
+  }
+
+  .rug__wool--grey {
+    background: #807a70;
+    mask: url('../assets/kilim/rug-grey.svg') 0 0 / 100% 100% no-repeat;
   }
 
   .rug__canvas {
@@ -65,22 +98,14 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
   }
 
-  .rug[data-live] .rug__canvas {
-    opacity: 1;
-  }
-
-  /* Once the 3D rug is drawn the picture goes at once, so the two never
-     show together. */
+  /* Once the 3D rug is ready the picture goes, so the two never show together. */
   .rug[data-live] .rug__flat {
-    opacity: 0;
-    transition: none;
+    visibility: hidden;
   }
 
-  /* In forced colours (Windows High Contrast), in the visitor's own colours. */
+  /* In forced colours (Windows High Contrast), the picture in the visitor's colours. */
   @media (forced-colors: active) {
     .rug__flat {
       forced-color-adjust: none;
@@ -88,9 +113,13 @@
       box-shadow: none;
     }
 
-    .rug__ink {
+    .rug__wool--ink {
       forced-color-adjust: none;
       background: CanvasText;
+    }
+
+    .rug__wool--grey {
+      display: none;
     }
 
     .rug__canvas {
@@ -98,7 +127,7 @@
     }
 
     .rug[data-live] .rug__flat {
-      opacity: 1;
+      visibility: visible;
     }
   }
 </style>
