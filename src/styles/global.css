@@ -474,13 +474,16 @@ svg {
    Rolling labels (src/components/RollText.astro)
    Each letter carries a copy of itself below it (a text shadow); on hover
    the letters slide up one after another, so the copies take their place.
+   Each word is its own mask, one line high, so a label wraps between words
+   like any text, and the copies stay hidden under their words.
    ========================================================================== */
 
 .roll {
   display: inline-block;
+  max-width: 100%;
 }
 
-.roll__track {
+.roll__word {
   display: inline-flex;
   overflow: hidden;
   /* Room for accents and descenders inside the mask. */
@@ -500,10 +503,6 @@ svg {
   content: attr(data-char);
 }
 
-.roll__space {
-  white-space: pre;
-}
-
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .roll__piece {
     transition: translate 0.6s var(--ease-out);
@@ -514,160 +513,160 @@ svg {
   }
 }
 
-/* One after another, 16 ms apart. */
-.roll__piece:nth-child(2) {
+/* One after another, 16 ms apart, across the whole label. */
+.roll__piece[data-i='1'] {
   transition-delay: 0.016s;
 }
 
-.roll__piece:nth-child(3) {
+.roll__piece[data-i='2'] {
   transition-delay: 0.032s;
 }
 
-.roll__piece:nth-child(4) {
+.roll__piece[data-i='3'] {
   transition-delay: 0.048s;
 }
 
-.roll__piece:nth-child(5) {
+.roll__piece[data-i='4'] {
   transition-delay: 0.064s;
 }
 
-.roll__piece:nth-child(6) {
+.roll__piece[data-i='5'] {
   transition-delay: 0.080s;
 }
 
-.roll__piece:nth-child(7) {
+.roll__piece[data-i='6'] {
   transition-delay: 0.096s;
 }
 
-.roll__piece:nth-child(8) {
+.roll__piece[data-i='7'] {
   transition-delay: 0.112s;
 }
 
-.roll__piece:nth-child(9) {
+.roll__piece[data-i='8'] {
   transition-delay: 0.128s;
 }
 
-.roll__piece:nth-child(10) {
+.roll__piece[data-i='9'] {
   transition-delay: 0.144s;
 }
 
-.roll__piece:nth-child(11) {
+.roll__piece[data-i='10'] {
   transition-delay: 0.160s;
 }
 
-.roll__piece:nth-child(12) {
+.roll__piece[data-i='11'] {
   transition-delay: 0.176s;
 }
 
-.roll__piece:nth-child(13) {
+.roll__piece[data-i='12'] {
   transition-delay: 0.192s;
 }
 
-.roll__piece:nth-child(14) {
+.roll__piece[data-i='13'] {
   transition-delay: 0.208s;
 }
 
-.roll__piece:nth-child(15) {
+.roll__piece[data-i='14'] {
   transition-delay: 0.224s;
 }
 
-.roll__piece:nth-child(16) {
+.roll__piece[data-i='15'] {
   transition-delay: 0.240s;
 }
 
-.roll__piece:nth-child(17) {
+.roll__piece[data-i='16'] {
   transition-delay: 0.256s;
 }
 
-.roll__piece:nth-child(18) {
+.roll__piece[data-i='17'] {
   transition-delay: 0.272s;
 }
 
-.roll__piece:nth-child(19) {
+.roll__piece[data-i='18'] {
   transition-delay: 0.288s;
 }
 
-.roll__piece:nth-child(20) {
+.roll__piece[data-i='19'] {
   transition-delay: 0.304s;
 }
 
-.roll__piece:nth-child(21) {
+.roll__piece[data-i='20'] {
   transition-delay: 0.320s;
 }
 
-.roll__piece:nth-child(22) {
+.roll__piece[data-i='21'] {
   transition-delay: 0.336s;
 }
 
-.roll__piece:nth-child(23) {
+.roll__piece[data-i='22'] {
   transition-delay: 0.352s;
 }
 
-.roll__piece:nth-child(24) {
+.roll__piece[data-i='23'] {
   transition-delay: 0.368s;
 }
 
-.roll__piece:nth-child(25) {
+.roll__piece[data-i='24'] {
   transition-delay: 0.384s;
 }
 
-.roll__piece:nth-child(26) {
+.roll__piece[data-i='25'] {
   transition-delay: 0.400s;
 }
 
-.roll__piece:nth-child(27) {
+.roll__piece[data-i='26'] {
   transition-delay: 0.416s;
 }
 
-.roll__piece:nth-child(28) {
+.roll__piece[data-i='27'] {
   transition-delay: 0.432s;
 }
 
-.roll__piece:nth-child(29) {
+.roll__piece[data-i='28'] {
   transition-delay: 0.448s;
 }
 
-.roll__piece:nth-child(30) {
+.roll__piece[data-i='29'] {
   transition-delay: 0.464s;
 }
 
-.roll__piece:nth-child(31) {
+.roll__piece[data-i='30'] {
   transition-delay: 0.480s;
 }
 
-.roll__piece:nth-child(32) {
+.roll__piece[data-i='31'] {
   transition-delay: 0.496s;
 }
 
-.roll__piece:nth-child(33) {
+.roll__piece[data-i='32'] {
   transition-delay: 0.512s;
 }
 
-.roll__piece:nth-child(34) {
+.roll__piece[data-i='33'] {
   transition-delay: 0.528s;
 }
 
-.roll__piece:nth-child(35) {
+.roll__piece[data-i='34'] {
   transition-delay: 0.544s;
 }
 
-.roll__piece:nth-child(36) {
+.roll__piece[data-i='35'] {
   transition-delay: 0.560s;
 }
 
-.roll__piece:nth-child(37) {
+.roll__piece[data-i='36'] {
   transition-delay: 0.576s;
 }
 
-.roll__piece:nth-child(38) {
+.roll__piece[data-i='37'] {
   transition-delay: 0.592s;
 }
 
-.roll__piece:nth-child(39) {
+.roll__piece[data-i='38'] {
   transition-delay: 0.608s;
 }
 
-.roll__piece:nth-child(40) {
+.roll__piece[data-i='39'] {
   transition-delay: 0.624s;
 }
 

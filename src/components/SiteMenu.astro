@@ -205,15 +205,23 @@ const year = new Date().getFullYear();
     padding-block: clamp(1.5rem, 1rem + 3vw, 3rem);
   }
 
+  /* The links are sized to their column (11% of its width, between 2 and
+     5.5rem), so the longest word in any language fits on its line; a label
+     longer than its line wraps between words. */
   .site-menu__links {
     display: grid;
+    container-type: inline-size;
   }
 
+  /* A little more space between links than between the lines of one that
+     wraps, so each reads as one. */
   .site-menu__link {
     display: inline-flex;
     align-items: center;
+    max-width: 100%;
+    margin-block: 0.08em;
     gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
-    font-size: clamp(2.75rem, 1.25rem + 7vw, 7.25rem);
+    font-size: clamp(2rem, 11cqi, 5.5rem);
     font-weight: 500;
     line-height: 1.02;
     letter-spacing: -0.045em;
@@ -276,9 +284,11 @@ const year = new Date().getFullYear();
     translate: 0 0;
   }
 
+  /* Contact and social media side by side where both fit, one above the
+     other where they do not: never squeezed into each other. */
   .site-menu__aside {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
     gap: 2rem 1.5rem;
     align-content: end;
   }
@@ -316,11 +326,14 @@ const year = new Date().getFullYear();
     height: 1rem;
   }
 
+  /* 44px tall, as Apple's guidelines ask of anything tapped. */
   .site-menu__small-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    min-height: 2.25rem;
+    max-width: 100%;
+    min-height: 2.75rem;
+    overflow-wrap: anywhere;
     color: var(--color-ink);
     font-size: var(--text-sm);
     text-decoration: none;
@@ -349,7 +362,7 @@ const year = new Date().getFullYear();
 
   .site-menu__languages {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
     gap: 0 1rem;
     width: 100%;
   }
@@ -357,7 +370,7 @@ const year = new Date().getFullYear();
   .site-menu__language {
     display: flex;
     align-items: center;
-    min-height: 2.5rem;
+    min-height: 2.75rem;
     font-size: var(--text-sm);
     color: var(--color-muted);
     text-decoration: none;

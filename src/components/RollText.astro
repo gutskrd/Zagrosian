@@ -7,7 +7,14 @@
  * readers, search engines, AI crawlers and copying all get it exactly once.
  * The letters you see are drawn by CSS from `data-char` attributes, and are
  * hidden from assistive technology. Arabic script is joined, and splitting it
- * would break the joins, so Arabic, Persian and Sorani labels roll as one piece.
+ * would break the joins, so Arabic, Persian and Sorani labels roll word by
+ * word.
+ *
+ * Each word is a mask of its own, one line high, with real spaces between the
+ * words: a label too long for its line wraps between words as any text does,
+ * and the copy waiting below each word stays hidden under it. (As one mask, a
+ * label that wrapped showed its first line's copy over its second.) `data-i`
+ * counts the pieces across the whole label, for the order they roll in.
  */
 interface Props {
   text: string;
@@ -17,7 +24,15 @@ interface Props {
 const { text, class: className } = Astro.props;
 
 const joined = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(text);
-const pieces = joined ? [text] : [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)].map((s) => s.segment);
+let count = 0;
+const words = text
+  .split(/\s+/)
+  .filter(Boolean)
+  .map((word) =>
+    (joined ? [word] : [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(word)].map((s) => s.segment)).map(
+      (piece) => ({ piece, i: count++ }),
+    ),
+  );
 // Split letters are separate boxes, which a right-to-left page would lay out
 // from right to left ("Hevalo" as "olaveH"); split labels keep left to right.
 const dir = joined ? undefined : 'ltr';
@@ -25,6 +40,17 @@ const dir = joined ? undefined : 'ltr';
 
 <span class:list={['roll', className]} dir={dir}
   ><span class="visually-hidden">{text}</span><span class="roll__track" aria-hidden="true"
-    >{pieces.map((piece) => <span class:list={['roll__piece', piece === ' ' && 'roll__space']} data-char={piece} />)}</span
+    >{
+      words.map((pieces, index) => (
+        <>
+          {index > 0 && ' '}
+          <span class="roll__word">
+            {pieces.map(({ piece, i }) => (
+              <span class="roll__piece" data-char={piece} data-i={i} />
+            ))}
+          </span>
+        </>
+      ))
+    }</span
   ></span
 >

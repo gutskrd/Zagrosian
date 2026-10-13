@@ -375,11 +375,16 @@ reduced motion, and the site works fully without it.
   dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
   contact, social media, every language, sound, the legal pages and the time at headquarters. It is a
   native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
-  does not scroll while it is open.
+  does not scroll while it is open. Its links are sized to their column (container query units), so
+  the longest word in any language fits on its line, and a label too long for one line wraps between
+  words; every small link and language in it is at least 44 pixels tall, as Apple's guidelines ask.
+  A check opens it, and the language menu, in every language and with every word 40% longer, at six
+  widths, and fails if anything in them overlaps, runs off the screen or is cut off.
 - **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`RollText.astro`](src/components/RollText.astro)):
   under a mouse their colour fills in from the middle, labels roll letter by letter (Arabic script,
-  whose letters join, rolls as one piece) and arrows slide out as a copy slides in. The menu's links
-  roll too.
+  whose letters join, rolls word by word) and arrows slide out as a copy slides in. The menu's links
+  roll too. Each word rolls behind a mask of its own, with real spaces between the words, so a long
+  label wraps like any text, and the copy waiting below a word never shows over the next line.
 - **Text** ([`text.ts`](src/scripts/text.ts)): paragraphs marked `data-lines` rise line by line from
   behind masks, then are put back as they were. Section labels are small monospace capitals.
   Headlines are set large and fairly light.
