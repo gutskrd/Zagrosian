@@ -83,7 +83,6 @@ export const nl: Messages = {
     headquarters: 'Nederland',
     productsLabel: 'Producten',
     localTime: '{time} lokale tijd',
-    rug: 'Een patroon geïnspireerd op Koerdische kelims.',
   },
   faq: {
     eyebrow: 'FAQ',

@@ -31,7 +31,7 @@ have. Each item says why it matters and where it goes.
    all of it is switched off for visitors who ask for reduced motion, but together they compete for
    attention. Consider keeping the two or three that carry the story and letting the rest go.
 
-4. **Photographs of the Zagros.** The site's one picture of Kurdish life is the kilim it draws
+4. **Photographs of the Zagros.** The site's one picture of Kurdish life is the kilim it weaves
    itself (see **Brand assets** in the README). Real photographs of the Zagros or of Kurdish weaving
    would make it warmer, but only ones the company may use without limits: its own, or ones in the
    public domain (CC0), never stock photos found online. If there are some, they fit as a quiet, full-
@@ -49,7 +49,7 @@ have. Each item says why it matters and where it goes.
    Each translated legal page says the English version applies, but text that reads as machine-made
    costs trust in the very languages Hevalo is about. Have each language read through by a native
    speaker, Kurmanji and Sorani first. New this round: the VAT label in the footer (`footer.vat`),
-   shown once a VAT number is filled in, and the caption under the kilim (`about.rug`).
+   shown once a VAT number is filled in.
 2. **A lawyer.** The privacy policy, terms and security policy were written carefully but have not
    been reviewed by a lawyer. A review is due once the company is registered (see above), and again
    whenever the site starts to collect more than it does now (analytics, forms, accounts).

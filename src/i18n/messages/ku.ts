@@ -87,7 +87,6 @@ export const ku: Messages = {
     headquarters: 'Holenda',
     productsLabel: 'Berhem',
     localTime: 'Demjimêra herêmî: {time}',
-    rug: 'Nexşeyek bi şêwaza kilîmên kurdî.',
   },
   faq: {
     eyebrow: 'Pirs û bersiv',

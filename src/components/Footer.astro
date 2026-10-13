@@ -120,88 +120,53 @@ const registered = [
   }
 
   /* The band (band.svg, 24 by 31 cells, two pixels a cell) repeats from the
-     middle out, so it is cut alike at both ends. Its threads run along the
-     page, so where the browser runs scroll-linked animations itself it is
-     woven across, from the side the page's text starts on, as it comes into
-     view; the warp shows where it is not woven yet. */
+     middle out, so it is cut alike at both ends. Its motifs stand up from the
+     cloth like raised wool: each casts a fine shadow below it, catches the
+     light along its top, and shows its weave, a rib to every other pixel. */
   .site-footer__kilim {
     --cell: 2px;
     position: relative;
     height: calc(31 * var(--cell));
     margin-bottom: 4rem;
-    background: repeating-linear-gradient(
-      to bottom,
-      var(--color-line-strong) 0 1px,
-      transparent 1px calc(2 * var(--cell))
-    );
-    view-timeline-name: --kilim;
+    filter: drop-shadow(0 1.5px 0.75px rgb(0 0 0 / 0.35));
   }
 
-  .site-footer__kilim::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-paper);
-  }
-
+  .site-footer__kilim::before,
   .site-footer__kilim::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: var(--color-ink);
     mask: url('../assets/kilim/band.svg') 50% 0 / calc(24 * var(--cell)) 100% repeat-x;
   }
 
+  .site-footer__kilim::before {
+    background: var(--color-ink);
+  }
+
+  .site-footer__kilim::after {
+    background:
+      linear-gradient(to bottom, rgb(255 255 255 / 0.22), transparent 35%),
+      repeating-linear-gradient(to right, rgb(255 255 255 / 0.14) 0 1px, transparent 1px 2px),
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 2px);
+  }
+
+  :global(:root[data-theme='dark']) .site-footer__kilim {
+    filter: drop-shadow(0 1.5px 0.75px rgb(0 0 0 / 0.9));
+  }
+
+  /* In forced colours (Windows High Contrast), in the visitor's text colour. */
   @media (forced-colors: active) {
     .site-footer__kilim {
       forced-color-adjust: none;
-      background: Canvas;
+      filter: none;
     }
 
     .site-footer__kilim::before {
-      background: Canvas;
+      background: CanvasText;
     }
 
     .site-footer__kilim::after {
-      background: CanvasText;
-    }
-  }
-
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .site-footer__kilim::before,
-      .site-footer__kilim::after {
-        animation-name: kilim-weave;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: --kilim;
-        animation-range: entry 0% cover 40%;
-      }
-
-      :global(:root[dir='rtl']) .site-footer__kilim::before,
-      :global(:root[dir='rtl']) .site-footer__kilim::after {
-        animation-name: kilim-weave-rtl;
-      }
-    }
-  }
-
-  @keyframes kilim-weave {
-    from {
-      clip-path: inset(0 100% 0 0);
-    }
-
-    to {
-      clip-path: inset(0 0 0 0);
-    }
-  }
-
-  @keyframes kilim-weave-rtl {
-    from {
-      clip-path: inset(0 0 0 100%);
-    }
-
-    to {
-      clip-path: inset(0 0 0 0);
+      display: none;
     }
   }
 

@@ -49,9 +49,9 @@ const { t } = i18n(Astro.url);
     gap: 1.25rem;
   }
 
-  /* On narrow screens it follows the text. */
+  /* On narrow screens it follows the text (its stage has room around it). */
   .about__grid > :global(.rug) {
-    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
+    margin-top: 1rem;
   }
 
   .about__statement {
@@ -133,26 +133,21 @@ const { t } = i18n(Astro.url);
       align-items: start;
     }
 
+    /* The text on one side and the rug on the other, as the hero has the logo
+       and Products the deer. */
     .about__grid > .eyebrow {
-      grid-column: 1 / span 3;
-      padding-top: 0.6rem;
+      grid-column: 1 / span 7;
     }
 
     .about__body {
-      grid-column: 4 / -1;
-      grid-row: 1 / span 3;
-    }
-
-    /* Under the label, beside the text: the label and the rug take what they
-       need, the last row the rest. */
-    .about__grid {
-      grid-template-rows: auto auto 1fr;
+      grid-column: 1 / span 7;
     }
 
     .about__grid > :global(.rug) {
-      grid-column: 1 / span 3;
-      grid-row: 2;
-      margin-top: clamp(2rem, 1rem + 2vw, 3.5rem);
+      grid-column: 8 / -1;
+      grid-row: 1 / span 2;
+      align-self: center;
+      margin-top: 0;
     }
   }
 </style>

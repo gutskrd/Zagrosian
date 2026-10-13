@@ -6,6 +6,8 @@
 //   them, inside a chain border.
 // - band.svg: one repeat of a woven band (Footer.astro): a medallion and a
 //   pair of ram's horns between two chain borders, tiled across the page.
+// - rug.ts: the rug's cells as text, which the 3D rug (rug-scene.ts) weaves
+//   from.
 //
 // The motifs are those of Kurdish kilims from the Zagros: the hooked diamond,
 // the ram's horn (strength) and the eye (protection), on a grid of square
@@ -102,6 +104,11 @@ class Grid {
     }
   }
 
+  /** The grid as text, a row a line: `#` woven, `.` ground. */
+  rows() {
+    return this.cells.map((row) => row.map((woven) => (woven ? '#' : '.')).join(''));
+  }
+
   /** The grid as SVG: each run of woven cells in a row is one rectangle. */
   svg() {
     const runs = [];
@@ -163,6 +170,13 @@ function band() {
 }
 
 mkdirSync(OUT, { recursive: true });
-writeFileSync(`${OUT}rug.svg`, rug().svg());
+const theRug = rug();
+writeFileSync(`${OUT}rug.svg`, theRug.svg());
 writeFileSync(`${OUT}band.svg`, band().svg());
-console.log('Wrote rug.svg and band.svg to src/assets/kilim/');
+writeFileSync(
+  `${OUT}rug.ts`,
+  `// Drawn by scripts/kilim.mjs; edit that and run it again. The rug's cells,\n` +
+    `// row by row from the top: # woven in ink, . the ground.\n` +
+    `export const rugCells = [\n${theRug.rows().map((row) => `  '${row}',`).join('\n')}\n];\n`,
+);
+console.log('Wrote rug.svg, band.svg and rug.ts to src/assets/kilim/');

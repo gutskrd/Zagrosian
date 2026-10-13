@@ -10,6 +10,7 @@ import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { enteredFromAbove, initMotion } from './motion';
+import { initRug } from './rug';
 import { initTheme } from './theme';
 
 /** Adds a hairline under the sticky header once the page has scrolled. */
@@ -281,3 +282,4 @@ initText();
 initSound();
 initEyes();
 initDeer();
+initRug();

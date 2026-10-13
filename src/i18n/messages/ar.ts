@@ -84,7 +84,6 @@ export const ar: Messages = {
     headquarters: 'هولندا',
     productsLabel: 'المنتجات',
     localTime: 'الساعة {time} بالتوقيت المحلي',
-    rug: 'نقش مستوحى من الكليم الكردي.',
   },
   faq: {
     eyebrow: 'أسئلة وأجوبة',

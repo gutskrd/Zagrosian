@@ -94,8 +94,9 @@ src/
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts and deer.ts
-                   (Hevalo's eyes, and the 3D deer's blinks and twitches), sound.ts, text.ts,
-                   language.ts, theme.ts and theme-init.js
+                   (Hevalo's eyes, and the 3D deer's blinks and twitches), rug.ts and
+                   rug-scene.ts (the 3D kilim), sound.ts, text.ts, language.ts, theme.ts and
+                   theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -148,22 +149,29 @@ src/
   by [`scripts/kilim.mjs`](scripts/kilim.mjs) (`node scripts/kilim.mjs`) as a weaver would on a
   loom: the motifs of Kurdish kilims from the Zagros (the hooked diamond, the ram's horn and the
   eye) inside chain borders. The drawing is our own, so it is free of anyone else's rights; the
-  motifs are centuries-old folk patterns. It is two small SVG masks in `src/assets/kilim/`, which the
-  page paints in its own ink, so they follow the theme (light motifs on a dark rug in the dark
-  theme):
-  - `rug.svg` (47 by 77 cells, 11 KB): a small rug beside the About text
-    ([`Rug.astro`](src/components/Rug.astro)), three hooked medallions stacked down the middle, with
-    its fringe and a caption in every language. Each cell is a whole number of pixels (up to 6), as
-    large as the column allows, so its steps stay sharp.
-  - `band.svg` (24 by 31 cells, 1.4 KB): a woven band across the top of the footer on every page,
-    over "Mala we ava" (may your home prosper), repeated from the middle out so it is cut alike at
-    both ends.
+  motifs are centuries-old folk patterns. It needs no words, so it has none.
+  - **The rug** (`rug.svg` and `rug.ts`, 47 by 77 cells) hangs beside the About text, as the logo
+    does in the hero and the deer in Products ([`Rug.astro`](src/components/Rug.astro)). Where the
+    browser has WebGL 2 it is a rug of wool in 3D ([`rug-scene.ts`](src/scripts/rug-scene.ts),
+    6 KB compressed, loaded only as the rug comes within a screen of view): it unrolls as it
+    scrolls into view and rolls up again when scrolled back, its pattern wound outward in a spiral
+    a rug's thickness deep; it leans towards the pointer (on a touch screen, towards the finger),
+    with a soft glare under it, as Apple TV's posters do; its fringe swings when it moves; and it
+    casts a soft shadow on the page. Its wool is woven in the shader rather than painted: two passes
+    of weft a cell over two warps, each a rounded pip that catches the light, woolly edges between
+    the colours, strands and dye a little uneven, and a sheen at grazing angles. Where the pips come
+    closer than about six pixels apart they fade into their average, so they never shimmer. It
+    keeps the colours of undyed and black wool in both themes, as a real rug would. Frames are drawn
+    only while something changes and the rug is on screen. With reduced motion it hangs unrolled
+    and still; without WebGL 2, or before it loads, it is a flat picture of the same rug
+    (`rug.svg`); in High Contrast mode, the flat picture in the visitor's colours.
+  - **The band** (`band.svg`, 24 by 31 cells, 1.4 KB) runs across the top of the footer on every
+    page, over "Mala we ava" (may your home prosper), repeated from the middle out so it is cut
+    alike at both ends. Its motifs stand up from the cloth like raised wool: a fine shadow under
+    each, light along its top, and its weave showing. It is drawn in the page's ink, so it follows
+    the theme.
 
-  Where the browser runs scroll-linked animations itself, both are woven as they come into view:
-  the rug row by row from the bottom up over its warp threads, the band across from the side the
-  page's text starts on (from the right in Arabic, Persian and Sorani). Scrolling back unpicks
-  them. With reduced motion, or in other browsers, they are simply there. There are no
-  photographs yet (see [TODO.md](TODO.md)).
+  There are no photographs yet (see [TODO.md](TODO.md)).
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
   is drawn from its measured geometry ([`src/lib/sun.ts`](src/lib/sun.ts): 21 straight rays, the
   gaps between them at 51.2% of the rays' length), so it is sharp at any size: in the colour of the
@@ -583,12 +591,13 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
 | `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
-| `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story |
+| `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
+| `rug.spec.ts`           | The kilim is drawn in 3D without errors, unrolls as it scrolls into view and rolls up when scrolled back, and keeps its box; with reduced motion it hangs unrolled |
 
 ```sh
 npm run build
-npm test                               # everything (about 4 minutes)
+npm test                               # everything (about 6 minutes)
 npx playwright test tests/seo.spec.ts  # one file
 ```
 

@@ -87,7 +87,6 @@ export const ckb: Messages = {
     headquarters: 'هۆڵەندا',
     productsLabel: 'بەرهەمەکان',
     localTime: 'کاتی ناوخۆیی: {time}',
-    rug: 'نەخشێک بە شێوازی بەڕەی کوردی.',
   },
   faq: {
     eyebrow: 'پرسیار و وەڵام',

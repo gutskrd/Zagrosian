@@ -87,7 +87,6 @@ export const fa: Messages = {
     headquarters: 'هلند',
     productsLabel: 'محصولات',
     localTime: 'ساعت {time} به وقت محلی',
-    rug: 'نقشی برگرفته از گلیم‌های کردی.',
   },
   faq: {
     eyebrow: 'پرسش و پاسخ',
