@@ -84,6 +84,7 @@ export const de: Messages = {
     headquarters: 'Niederlande',
     productsLabel: 'Produkte',
     localTime: '{time} Uhr Ortszeit',
+    rug: 'Ein Muster nach dem Vorbild kurdischer Kelims.',
   },
   faq: {
     eyebrow: 'FAQ',

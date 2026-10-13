@@ -19,6 +19,9 @@ const registered = [
 ---
 
 <footer class="site-footer">
+  {/* A woven band across the doorstep, under "Mala we ava" (Kilim: scripts/kilim.mjs). */}
+  <div class="site-footer__kilim" aria-hidden="true"></div>
+
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__about">
@@ -112,9 +115,94 @@ const registered = [
 
 <style>
   .site-footer {
-    padding-block: 4rem 2rem;
-    border-top: 1px solid var(--color-line);
+    padding-block: 0 2rem;
     font-size: var(--text-sm);
+  }
+
+  /* The band (band.svg, 24 by 31 cells, two pixels a cell) repeats from the
+     middle out, so it is cut alike at both ends. Its threads run along the
+     page, so where the browser runs scroll-linked animations itself it is
+     woven across, from the side the page's text starts on, as it comes into
+     view; the warp shows where it is not woven yet. */
+  .site-footer__kilim {
+    --cell: 2px;
+    position: relative;
+    height: calc(31 * var(--cell));
+    margin-bottom: 4rem;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--color-line-strong) 0 1px,
+      transparent 1px calc(2 * var(--cell))
+    );
+    view-timeline-name: --kilim;
+  }
+
+  .site-footer__kilim::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-paper);
+  }
+
+  .site-footer__kilim::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-ink);
+    mask: url('../assets/kilim/band.svg') 50% 0 / calc(24 * var(--cell)) 100% repeat-x;
+  }
+
+  @media (forced-colors: active) {
+    .site-footer__kilim {
+      forced-color-adjust: none;
+      background: Canvas;
+    }
+
+    .site-footer__kilim::before {
+      background: Canvas;
+    }
+
+    .site-footer__kilim::after {
+      background: CanvasText;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .site-footer__kilim::before,
+      .site-footer__kilim::after {
+        animation-name: kilim-weave;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --kilim;
+        animation-range: entry 0% cover 40%;
+      }
+
+      :global(:root[dir='rtl']) .site-footer__kilim::before,
+      :global(:root[dir='rtl']) .site-footer__kilim::after {
+        animation-name: kilim-weave-rtl;
+      }
+    }
+  }
+
+  @keyframes kilim-weave {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes kilim-weave-rtl {
+    from {
+      clip-path: inset(0 0 0 100%);
+    }
+
+    to {
+      clip-path: inset(0 0 0 0);
+    }
   }
 
   .site-footer__top {
@@ -287,8 +375,8 @@ const registered = [
   }
 
   @media (min-width: 48rem) {
-    .site-footer {
-      padding-block: 5rem 2rem;
+    .site-footer__kilim {
+      margin-bottom: 5rem;
     }
 
     .site-footer__top {

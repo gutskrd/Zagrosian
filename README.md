@@ -143,6 +143,27 @@ src/
     size, which made the story stutter as it flew into the logo; an image is only stretched.
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
+
+- **Kilim:** the site's one ornament, a Kurdish flat weave in black and white, drawn cell by cell
+  by [`scripts/kilim.mjs`](scripts/kilim.mjs) (`node scripts/kilim.mjs`) as a weaver would on a
+  loom: the motifs of Kurdish kilims from the Zagros (the hooked diamond, the ram's horn and the
+  eye) inside chain borders. The drawing is our own, so it is free of anyone else's rights; the
+  motifs are centuries-old folk patterns. It is two small SVG masks in `src/assets/kilim/`, which the
+  page paints in its own ink, so they follow the theme (light motifs on a dark rug in the dark
+  theme):
+  - `rug.svg` (47 by 77 cells, 11 KB): a small rug beside the About text
+    ([`Rug.astro`](src/components/Rug.astro)), three hooked medallions stacked down the middle, with
+    its fringe and a caption in every language. Each cell is a whole number of pixels (up to 6), as
+    large as the column allows, so its steps stay sharp.
+  - `band.svg` (24 by 31 cells, 1.4 KB): a woven band across the top of the footer on every page,
+    over "Mala we ava" (may your home prosper), repeated from the middle out so it is cut alike at
+    both ends.
+
+  Where the browser runs scroll-linked animations itself, both are woven as they come into view:
+  the rug row by row from the bottom up over its warp threads, the band across from the side the
+  page's text starts on (from the right in Arabic, Persian and Sorani). Scrolling back unpicks
+  them. With reduced motion, or in other browsers, they are simply there. There are no
+  photographs yet (see [TODO.md](TODO.md)).
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
   is drawn from its measured geometry ([`src/lib/sun.ts`](src/lib/sun.ts): 21 straight rays, the
   gaps between them at 51.2% of the rays' length), so it is sharp at any size: in the colour of the

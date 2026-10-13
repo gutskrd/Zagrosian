@@ -84,6 +84,7 @@ export const tr: Messages = {
     headquarters: 'Hollanda',
     productsLabel: 'Ürünler',
     localTime: 'Yerel saat {time}',
+    rug: 'Kürt kilimlerinden esinlenen bir desen.',
   },
   faq: {
     eyebrow: 'SSS',

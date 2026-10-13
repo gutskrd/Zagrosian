@@ -1,6 +1,7 @@
 ---
 import { i18n } from '../i18n';
 import { hevalo, site } from '../site';
+import Rug from './Rug.astro';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
@@ -33,6 +34,8 @@ const { t } = i18n(Astro.url);
         </div>
       </dl>
     </div>
+
+    <Rug />
   </div>
 </section>
 
@@ -44,6 +47,11 @@ const { t } = i18n(Astro.url);
   .about__grid {
     display: grid;
     gap: 1.25rem;
+  }
+
+  /* On narrow screens it follows the text. */
+  .about__grid > :global(.rug) {
+    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
   }
 
   .about__statement {
@@ -132,6 +140,19 @@ const { t } = i18n(Astro.url);
 
     .about__body {
       grid-column: 4 / -1;
+      grid-row: 1 / span 3;
+    }
+
+    /* Under the label, beside the text: the label and the rug take what they
+       need, the last row the rest. */
+    .about__grid {
+      grid-template-rows: auto auto 1fr;
+    }
+
+    .about__grid > :global(.rug) {
+      grid-column: 1 / span 3;
+      grid-row: 2;
+      margin-top: clamp(2rem, 1rem + 2vw, 3.5rem);
     }
   }
 </style>

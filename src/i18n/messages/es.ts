@@ -84,6 +84,7 @@ export const es: Messages = {
     headquarters: 'Países Bajos',
     productsLabel: 'Productos',
     localTime: '{time}, hora local',
+    rug: 'Un diseño inspirado en los kilims kurdos.',
   },
   faq: {
     eyebrow: 'FAQ',

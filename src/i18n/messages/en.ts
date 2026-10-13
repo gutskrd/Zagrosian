@@ -99,6 +99,8 @@ export const en = {
     productsLabel: 'Products',
     /** Shown with the headquarters: the current time there. */
     localTime: '{time} local time',
+    /** Under the kilim beside the About text (Rug.astro). */
+    rug: 'A pattern drawn from Kurdish kilims.',
   },
   /**
    * Questions and answers, before Contact (Faq.astro), also in the Markdown

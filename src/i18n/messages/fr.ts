@@ -85,6 +85,7 @@ export const fr: Messages = {
     headquarters: 'Pays-Bas',
     productsLabel: 'Produits',
     localTime: '{time}, heure locale',
+    rug: 'Un motif inspiré des kilims kurdes.',
   },
   faq: {
     eyebrow: 'FAQ',
