@@ -6,8 +6,9 @@
  *
  * From left to right, as room allows: Visit Hevalo (from 768px), quick
  * navigation (from 1024px, with JavaScript), the world icon for languages,
- * sound, theme, and the menu. On the narrowest phones the language and sound
- * controls live in the menu instead.
+ * sound and theme (from 768px), and the menu. On a phone the bar keeps only
+ * the world icon and the menu, as an app's would; sound and theme are in the
+ * menu (and on the narrowest phones the languages too).
  */
 import Arrow from './Arrow.astro';
 import LanguagePicker from './LanguagePicker.astro';
@@ -192,10 +193,17 @@ const { t, localize } = i18n(Astro.url);
     }
   }
 
-  /* On the narrowest phones, languages and sound move into the menu. */
+  /* On a phone, sound and theme are in the menu; on the narrowest phones the
+     languages too. */
+  @media (max-width: 47.99rem) {
+    .site-header__end :global(.site-header__sound),
+    .site-header__end :global(.theme-toggle) {
+      display: none !important;
+    }
+  }
+
   @media (max-width: 23.99rem) {
-    .site-header__language,
-    .site-header__end :global(.site-header__sound) {
+    .site-header__language {
       display: none !important;
     }
   }

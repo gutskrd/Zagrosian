@@ -1,12 +1,18 @@
 ---
 /**
- * Footer control to follow the system theme or choose light or dark
- * (src/scripts/theme.ts). Native radio buttons, so arrow keys and screen
- * readers work as usual; the sliding indicator follows the
- * `data-theme-preference` attribute on <html>.
+ * A control to follow the system theme or choose light or dark
+ * (src/scripts/theme.ts), in the footer and in the site menu. Native radio
+ * buttons, so arrow keys and screen readers work as usual; the sliding
+ * indicator follows the `data-theme-preference` attribute on <html>. Each
+ * copy has a `name` of its own, so their radio buttons are separate groups.
  */
 import { i18n } from '../i18n';
 
+interface Props {
+  name?: string;
+}
+
+const { name = 'theme' } = Astro.props;
 const { t } = i18n(Astro.url);
 const options = [
   { value: 'system', label: t.theme.system },
@@ -21,7 +27,7 @@ const options = [
   {
     options.map(({ value, label }) => (
       <label class="theme-switch__option" data-value={value} title={label}>
-        <input class="visually-hidden" type="radio" name="theme" value={value} />
+        <input class="visually-hidden" type="radio" name={name} value={value} />
         <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
           {value === 'system' && (
             <>

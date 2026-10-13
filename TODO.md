@@ -85,6 +85,6 @@ have. Each item says why it matters and where it goes.
    images must be made on the CI machine, as fonts render differently on each system.
 3. **Tighter Lighthouse.** Performance under 90 is a warning, not a failure, until a few CI runs show
    how much GitHub's machines vary; then make it a failure.
-4. **Development tools.** `npm audit` reports advisories in the copy of undici inside Wrangler, the
-   local server for development and tests. It is not part of the site, and clears when Wrangler
-   updates it (Dependabot proposes updates monthly).
+4. **Development tools.** `npm audit` is clean (October 2026). Its advisories are in the tools that
+   build and test the site, not in the site, which is static files; keep them current (Dependabot
+   proposes updates monthly) and run `npm audit fix` when it reports any.

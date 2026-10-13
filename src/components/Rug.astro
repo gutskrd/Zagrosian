@@ -34,6 +34,7 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+    container-type: inline-size;
   }
 
   .rug[data-over] {
@@ -44,8 +45,9 @@
     cursor: grabbing;
   }
 
-  /* The flat picture: 62% of the stage's width, turned a little, as the 3D
-     rug rests; 101 by 161 cells of weave and six of fringe at either end. */
+  /* The flat picture: 62% of the stage's width (72% on a phone), turned a
+     little, as the 3D rug rests; 101 by 161 cells of weave and six of fringe
+     at either end. */
   .rug__flat {
     position: absolute;
     top: 50%;
@@ -58,6 +60,14 @@
       0 0.75rem 2rem -0.75rem rgb(0 0 0 / 0.35);
     translate: 0 -50%;
     rotate: -2.9deg;
+  }
+
+  /* On a phone the rug takes more of the stage (as rug-scene.ts's shareOf). */
+  @container (max-width: 479.98px) {
+    .rug__flat {
+      left: 14%;
+      width: 72%;
+    }
   }
 
   .rug__flat::before,

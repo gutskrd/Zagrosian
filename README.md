@@ -421,13 +421,16 @@ reduced motion, and the site works fully without it.
   pauses while the tab is hidden.
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
-  the header is the same at every size: the logo, then Visit Hevalo (from 768px), quick navigation
-  (from 1024px), the world icon for languages ([`Globe.astro`](src/components/Globe.astro), whose
-  meridians spin on hover), sound, theme, and the menu button: two dots on their own, which flip across
-  to each other's side on hover (the label rolls with them) and stretch into an X when the menu opens. The menu is a full-screen panel, in the page's own colours (light or dark as the theme is), that drops
+  the logo, then Visit Hevalo (from 768px), quick navigation (from 1024px), the world icon for
+  languages ([`Globe.astro`](src/components/Globe.astro), whose meridians spin on hover), sound and
+  theme (from 768px), and the menu button: two dots on their own, which flip across to each other's
+  side on hover (the label rolls with them) and stretch into an X when the menu opens. On a phone the
+  bar holds only the logo, the world icon and the menu, as an app's would; sound and theme are in
+  the menu (and on the narrowest phones the languages too). The menu is a full-screen panel, in the page's own colours (light or dark as the theme is), that drops
   in like a curtain; its links, set very large, rise one after another from behind masks (the others
   dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
-  contact, social media, every language, sound, the legal pages and the time at headquarters. It is a
+  contact, social media, every language, sound, the theme, the legal pages and the time at
+  headquarters. It is a
   native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
   does not scroll while it is open. Its links are sized to their column (container query units), so
   the longest word in any language fits on its line, and a label too long for one line wraps between
@@ -435,7 +438,9 @@ reduced motion, and the site works fully without it.
   A check opens it, and the language menu, in every language and with every word 40% longer, at six
   widths, and fails if anything in them overlaps, runs off the screen or is cut off.
 - **Buttons** ([`Cta.astro`](src/components/Cta.astro), [`RollText.astro`](src/components/RollText.astro)):
-  under a mouse their colour fills in from the middle, labels roll letter by letter (Arabic script,
+  a pill for the main action, and, as Apple sets "Learn more", a plain link with an arrow beside it
+  for a secondary one (still a 44-pixel target). Under a mouse the pill's colour fills in from the
+  middle, labels roll letter by letter (Arabic script,
   whose letters join, rolls word by word) and arrows slide out as a copy slides in. The menu's links
   roll too. Each word rolls behind a mask of its own, with real spaces between the words, so a long
   label wraps like any text, and the copy waiting below a word never shows over the next line.

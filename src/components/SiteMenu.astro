@@ -5,7 +5,8 @@
  * It drops in from the top like a curtain; the links, set very large, rise one
  * after another from behind their masks, and the rest follows. Hovering a
  * link dims the others. Besides the pages it holds contact, social media,
- * every language (with the world icon), sound, and the time at headquarters.
+ * every language (with the world icon), sound, the theme, and the time at
+ * headquarters.
  *
  * It is a popover (`#site-menu`), so it opens, closes on Escape and returns
  * focus by itself, without JavaScript. Its top bar mirrors the header, with
@@ -23,6 +24,7 @@ import MenuButton from './MenuButton.astro';
 import RollText from './RollText.astro';
 import SocialIcon from './SocialIcon.astro';
 import SoundToggle from './SoundToggle.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
 import Wordmark from './Wordmark.astro';
 
 const { locale, t, base, localize } = i18n(Astro.url);
@@ -108,6 +110,11 @@ const year = new Date().getFullYear();
       <div class="site-menu__group">
         <p class="site-menu__label">{t.sound.label}</p>
         <SoundToggle labelled />
+      </div>
+
+      <div class="site-menu__group">
+        <p class="site-menu__label">{t.theme.legend}</p>
+        <ThemeSwitch name="theme-menu" />
       </div>
     </div>
   </div>

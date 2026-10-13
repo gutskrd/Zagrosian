@@ -34,8 +34,11 @@ const CELLS_ACROSS = rugCells[0].length;
 const CELLS_ALONG = rugCells.length + 2 * FRINGE;
 const ROWS = Math.round((COLUMNS - 1) * (CELLS_ALONG / CELLS_ACROSS)) + 1;
 const SUBDIVIDE = 4;
-/** How much of the stage's width the rug takes, and how it lies at rest. */
-const SHARE = 0.62;
+/**
+ * How much of the stage's width the rug takes (more on a phone, where the
+ * stage is narrow), and how it lies at rest. Rug.astro's flat picture matches.
+ */
+const shareOf = (width: number) => (width < 480 ? 0.72 : 0.62);
 const REST_ANGLE = -0.05;
 const LIFT = 0.1;
 const STEP = 1 / 60;
@@ -366,7 +369,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
 
   // The wool, woven at about as many pixels a cell as the screen will show.
   const density = Math.min(window.devicePixelRatio || 1, 2);
-  const scale = clamp(Math.round((stage.clientWidth * SHARE * density * 1.3) / CELLS_ACROSS), 4, 8);
+  const scale = clamp(Math.round((stage.clientWidth * shareOf(stage.clientWidth) * density * 1.3) / CELLS_ACROSS), 4, 8);
   const wool = await weave(rugCells, FRINGE, scale);
   const weaveTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, weaveTexture);
@@ -439,6 +442,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   let lightViewProjection: Matrix = new Float32Array(16);
   let pixels = { width: 1, height: 1 };
   let shadowStrength = 0.3;
+  let share = 0.62;
 
   const layout = () => {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -448,7 +452,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       canvas.height = pixels.height;
     }
     view.aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight);
-    view.width = 1 / SHARE;
+    share = shareOf(canvas.clientWidth);
+    view.width = 1 / share;
     view.height = view.width / view.aspect;
     view.tan = Math.tan(view.fov / 2);
     view.distance = view.height / 2 / view.tan;
@@ -561,7 +566,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   /** The particle under a point on the screen, the uppermost if layers overlap. */
   const particleAt = (clientX: number, clientY: number) => {
     const box = canvas.getBoundingClientRect();
-    const reach = Math.max(14, (box.width * SHARE) / (COLUMNS - 1)) ** 2;
+    const reach = Math.max(14, (box.width * share) / (COLUMNS - 1)) ** 2;
     let best = -1;
     let bestHeight = -1;
     let bestDistance = Infinity;
