@@ -546,6 +546,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   let last = 0;
   let behind = 0;
   let quiet = 0;
+  /** Simulated steps since it was last let go of, or let fall. */
+  let idle = 0;
   let fallen = false;
   let disturbed = false;
   const hold = { pointer: -1, offset: [0, 0], lifted: 0, from: 0, trail: [] as { t: number; p: number[] }[] };
@@ -571,11 +573,16 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       cloth.step(STEP);
       behind -= STEP;
       steps++;
+      idle = hold.pointer < 0 ? idle + 1 : 0;
     }
     if (steps === 2) behind = 0;
     draw();
-    quiet = hold.pointer < 0 && cloth.motion < 0.0006 ? quiet + 1 : 0;
-    if (quiet > 30) {
+    // At rest when nothing has moved more than about half a pixel a frame for
+    // a third of a second, or, after five seconds untouched, when nothing is
+    // visibly moving at all: folded double, the layers can keep a tremor too
+    // small to see, which is not worth a running loop.
+    quiet = hold.pointer < 0 && cloth.motion < 0.0015 ? quiet + 1 : 0;
+    if (quiet > 20 || (idle > 300 && cloth.motion < 0.01)) {
       last = 0;
       behind = 0;
       setState('resting');
@@ -610,6 +617,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
 
   const pickUp = (event: PointerEvent, particle: number) => {
     if (particle < 0) return;
+    idle = 0;
     cloth.hold(particle);
     hold.pointer = event.pointerId;
     hold.lifted = 0;
@@ -706,6 +714,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       return;
     }
     cloth.layFlat(0, 0, REST_ANGLE, { height: 0.32, ripple: 0.05 });
+    idle = 0;
     wake();
   };
 

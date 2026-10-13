@@ -44,8 +44,9 @@ export class Cloth {
   /** The particle held, or -1, and where it is being led. */
   held = -1;
   readonly target = new Float32Array(3);
-  /** How far the fastest particle moved in the last step. */
+  /** How far the fastest particle moved in the last step, start to end. */
   motion = 0;
+  private before = new Float32Array(0);
   // Buckets for finding particles near each other.
   private cellOf = new Int32Array(0);
   private start = new Int32Array(0);
@@ -130,7 +131,8 @@ export class Cloth {
     const h = dt / SUBSTEPS;
     const p = this.position;
     const q = this.previous;
-    let motion = 0;
+    if (this.before.length !== p.length) this.before = new Float32Array(p.length);
+    this.before.set(p);
     for (let s = 0; s < SUBSTEPS; s++) {
       // Move: each particle keeps its velocity, slowed a little by the air,
       // and falls.
@@ -157,7 +159,10 @@ export class Cloth {
       if (s % 2) this.separateLayers();
       this.collide();
     }
-    for (let k = 0; k < this.count * 3; k++) motion = Math.max(motion, Math.abs(p[k] - q[k]) * SUBSTEPS);
+    // What the eye sees: how far each particle got this step, not how it
+    // trembled on the way.
+    let motion = 0;
+    for (let k = 0; k < this.count * 3; k++) motion = Math.max(motion, Math.abs(p[k] - this.before[k]));
     this.motion = motion;
     this.computeNormals();
   }
