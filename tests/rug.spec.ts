@@ -124,7 +124,7 @@ test.describe('on a touch screen', () => {
   /** A finger: down at `from`, held for `hold` ms, then drawn to `to`, and up. */
   async function finger(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, hold: number, check?: () => Promise<void>) {
     const cdp = await page.context().newCDPSession(page);
-    const touch = (type: string, x: number, y: number) =>
+    const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
       cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
     await touch('touchStart', from.x, from.y);
     await page.waitForTimeout(hold);
