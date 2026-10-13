@@ -180,8 +180,11 @@ src/
       shadows), with a faint dimness all round where it lies, and the shadow a fold casts on the
       rug below it. The rug keeps the colours of its wool in both themes, as a real rug would; the
       shadow is deeper on the dark page.
-    - **First sight:** the first time it comes into view, it falls onto the page and settles.
-      Played with and scrolled away, it is laid straight again for next time.
+    - **Made in front of you:** until it is seen it lies on the page as bare warp threads. The
+      first time it comes into view it is woven, the weft beaten in a row at a time from the
+      bottom up (slowly at first, then at a weaver's pace, slowing for the last rows), the
+      newest row catching the light, its shadow growing with it; then it is cloth. Played with
+      and scrolled away, it is laid straight again for next time.
     - **Cost:** it simulates and draws only while something moves, and at rest costs nothing.
       Multisampling only where pixels are large. With reduced motion it lies still and flat and
       cannot be picked up; without WebGL 2, or before it loads, it is a flat picture of the same
@@ -615,7 +618,7 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
-| `rug.spec.ts`           | The kilim is drawn in 3D without errors, falls onto the page and comes to rest; a corner picked up with the mouse folds over and stays folded; scrolled away and back it lies straight; on a touch screen a swipe over it scrolls and pressing and holding picks it up without scrolling; with reduced motion it lies still and cannot be picked up; its box never changes size |
+| `rug.spec.ts`           | The kilim is drawn in 3D without errors, is woven on the page as it comes into view and comes to rest; a corner picked up with the mouse folds over and stays folded; scrolled away and back it lies straight; on a touch screen a swipe over it scrolls and pressing and holding picks it up without scrolling; with reduced motion it lies still and cannot be picked up; its box never changes size |
 
 ```sh
 npm run build

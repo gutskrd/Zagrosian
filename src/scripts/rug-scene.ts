@@ -14,9 +14,11 @@
  *   page, sharp where it touches and softer the higher it is lifted
  *   (percentage-closer soft shadows), and the shadow a fold casts on the rug
  *   under it.
+ * - It is made in front of you: it lies at first as bare warp threads, and
+ *   when it comes into view the weft is woven in from the bottom up, a row at
+ *   a time, the newest row catching the light; then it is cloth.
  * - Hover shows a hand; press and drag (on a touch screen, press and hold
- *   first, so scrolling stays scrolling). When it first comes into view it
- *   is let fall onto the page.
+ *   first, so scrolling stays scrolling).
  *
  * It simulates and draws only while something moves; at rest it costs
  * nothing. Played with and scrolled away, it is laid straight again. For
@@ -37,6 +39,9 @@ const SHARE = 0.62;
 const REST_ANGLE = -0.05;
 const LIFT = 0.1;
 const STEP = 1 / 60;
+const WEAVE_ROWS = rugCells.length;
+/** How long the weaving takes, in seconds. */
+const WEAVING = 2.6;
 
 const surface = /* glsl */ `
 uniform highp sampler2D uPositions;
@@ -82,9 +87,24 @@ void main() {
   gl_Position = uViewProjection * vec4(world, 1.0);
 }`;
 
+/** Where the weaving has reached: rows above it (towards the top) are still bare warp. */
+const loom = /* glsl */ `
+uniform float uWoven;
+uniform float uEnds;
+bool bare(vec2 uv) {
+  float line = 1.0 - uEnds - uWoven * (1.0 - 2.0 * uEnds);
+  return uv.y > uEnds && uv.y < line;
+}
+`;
+
+// Only what is woven casts a shadow.
 const depthFragment = /* glsl */ `#version 300 es
-precision mediump float;
-void main() {}`;
+precision highp float;
+in vec2 vUv;
+${loom}
+void main() {
+  if (bare(vUv)) discard;
+}`;
 
 /** Sixteen points spread evenly over a disc, for soft shadows. */
 const disc = /* glsl */ `
@@ -110,8 +130,18 @@ uniform vec2 uCells;
 out vec4 outColor;
 const float PI = 3.14159265;
 ${disc}
+${loom}
 
 void main() {
+  // Not woven yet: only the warp, a thread to a cell, stretched straight.
+  if (bare(vUv)) {
+    float k = vUv.x * uCells.x;
+    float edge = fwidth(k);
+    float cover = 1.0 - smoothstep(0.17 - edge, 0.17 + edge, abs(fract(k) - 0.5));
+    if (cover < 0.04) discard;
+    outColor = vec4(vec3(0.6, 0.58, 0.54) * cover, cover);
+    return;
+  }
   vec4 wool = texture(uWeave, vUv);
   if (wool.a < 0.45) discard;
   vec3 base = pow(wool.rgb / wool.a, vec3(2.2));
@@ -150,6 +180,12 @@ void main() {
   float sky = 0.55 + 0.45 * bumped.y;
   float sheen = pow(1.0 - max(dot(n, v), 0.0), 3.0) * 0.25 * lit;
   vec3 colour = base * (0.42 * sky + 0.78 * sun) + sheen * base;
+  // The row just woven, still catching the light as it is beaten down.
+  if (uWoven < 1.0) {
+    float line = 1.0 - uEnds - uWoven * (1.0 - 2.0 * uEnds);
+    float fresh = 1.0 - smoothstep(0.0, 2.5 / uCells.y, vUv.y - line);
+    colour = mix(colour, colour * 1.25 + 0.04, fresh * step(line, vUv.y));
+  }
   outColor = vec4(pow(colour, vec3(1.0 / 2.2)), 1.0);
 }`;
 
@@ -331,11 +367,11 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   // The wool, woven at about as many pixels a cell as the screen will show.
   const density = Math.min(window.devicePixelRatio || 1, 2);
   const scale = clamp(Math.round((stage.clientWidth * SHARE * density * 1.3) / CELLS_ACROSS), 4, 8);
-  const woven = await weave(rugCells, FRINGE, scale);
+  const wool = await weave(rugCells, FRINGE, scale);
   const weaveTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, weaveTexture);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, woven.width, woven.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, woven.pixels);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, wool.width, wool.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, wool.pixels);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -435,6 +471,11 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     send(positionTexture, cloth.position);
     send(normalTexture, cloth.normal);
 
+    // How far the weaving has got, a whole row at a time.
+    const bindLoom = (program: ReturnType<typeof compile>) => {
+      gl.uniform1f(program.at('uWoven'), Math.floor(woven * WEAVE_ROWS) / WEAVE_ROWS);
+      gl.uniform1f(program.at('uEnds'), FRINGE / CELLS_ALONG);
+    };
     const bindCloth = (program: ReturnType<typeof compile>) => {
       gl.uniform1i(program.at('uPositions'), 0);
       gl.uniform1i(program.at('uNormals'), 1);
@@ -455,6 +496,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.polygonOffset(1.5, 2);
     gl.useProgram(depthProgram.program);
     bindCloth(depthProgram);
+    bindLoom(depthProgram);
     gl.uniformMatrix4fv(depthProgram.at('uViewProjection'), false, lightViewProjection);
     gl.bindVertexArray(rugMesh.vao);
     gl.drawElements(gl.TRIANGLES, rugMesh.count, gl.UNSIGNED_SHORT, 0);
@@ -490,6 +532,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.enable(gl.DEPTH_TEST);
     gl.useProgram(rugProgram.program);
     bindCloth(rugProgram);
+    bindLoom(rugProgram);
     gl.uniformMatrix4fv(rugProgram.at('uViewProjection'), false, viewProjection);
     gl.uniformMatrix4fv(rugProgram.at('uLight'), false, lightViewProjection);
     gl.uniform3f(rugProgram.at('uToLight'), toLight[0], toLight[1], toLight[2]);
@@ -546,13 +589,15 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   let last = 0;
   let behind = 0;
   let quiet = 0;
-  /** Simulated steps since it was last let go of, or let fall. */
+  /** Simulated steps since it was last let go of. */
   let idle = 0;
-  let fallen = false;
+  /** How much of it is woven, from 0 to 1, and whether it can be picked up. */
+  let woven = 0;
+  let ready = false;
   let disturbed = false;
   const hold = { pointer: -1, offset: [0, 0], lifted: 0, from: 0, trail: [] as { t: number; p: number[] }[] };
 
-  const setState = (state: 'moving' | 'resting') => {
+  const setState = (state: 'weaving' | 'moving' | 'resting') => {
     if (stage.dataset.state !== state) stage.dataset.state = state;
   };
 
@@ -654,7 +699,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   let press = 0;
   let pressAt = [0, 0];
   canvas.addEventListener('pointerdown', (event) => {
-    if (still.matches || !fallen || hold.pointer >= 0 || event.button > 0) return;
+    if (still.matches || !ready || hold.pointer >= 0 || event.button > 0) return;
     const particle = particleAt(event.clientX, event.clientY);
     if (particle < 0) return;
     if (event.pointerType === 'touch') {
@@ -679,7 +724,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     if (event.pointerId === hold.pointer) {
       lead(event);
       wake();
-    } else if (event.pointerType !== 'touch' && fallen && !still.matches) {
+    } else if (event.pointerType !== 'touch' && ready && !still.matches) {
       stage.toggleAttribute('data-over', particleAt(event.clientX, event.clientY) >= 0);
     }
   });
@@ -704,40 +749,65 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
 
   // --- Life --------------------------------------------------------------
 
-  /** The first time it is seen, it is let fall onto the page. */
-  const fall = () => {
-    fallen = true;
+  /**
+   * The first time it is seen, it is woven: a row at a time from the bottom
+   * up, slowly at first, then at a weaver's pace, slowing again for the last
+   * rows. Then it can be picked up.
+   */
+  let begun = false;
+  const weaveIn = () => {
+    begun = true;
     if (still.matches) {
-      rest();
+      woven = 1;
+      ready = true;
       draw();
       setState('resting');
       return;
     }
-    cloth.layFlat(0, 0, REST_ANGLE, { height: 0.32, ripple: 0.05 });
-    idle = 0;
-    wake();
+    setState('weaving');
+    let start = 0;
+    const row = (time: number) => {
+      if (document.hidden) {
+        start = 0;
+        document.addEventListener('visibilitychange', () => requestAnimationFrame(row), { once: true });
+        return;
+      }
+      start ||= time - woven * WEAVING * 1000;
+      const t = Math.min(1, (time - start) / (WEAVING * 1000));
+      woven = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+      draw();
+      if (t < 1) {
+        requestAnimationFrame(row);
+        return;
+      }
+      woven = 1;
+      ready = true;
+      draw();
+      setState('resting');
+    };
+    requestAnimationFrame(row);
   };
 
   new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting && !fallen && entry.intersectionRatio >= 0.25) fall();
+      if (entry.isIntersecting && !begun && entry.intersectionRatio >= 0.35) weaveIn();
       // Played with and then scrolled away: laid straight for next time.
-      if (!entry.isIntersecting && fallen && disturbed && hold.pointer < 0) {
+      if (!entry.isIntersecting && ready && disturbed && hold.pointer < 0) {
         rest();
         draw();
         setState('resting');
       }
     },
-    { threshold: [0, 0.25] },
+    { threshold: [0, 0.35] },
   ).observe(stage);
 
   new ResizeObserver(() => {
     layout();
-    if (fallen) draw();
+    draw();
   }).observe(canvas);
   new MutationObserver(() => {
     readTheme();
-    if (fallen) draw();
+    draw();
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && stage.dataset.state === 'moving') wake();
@@ -747,9 +817,12 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     stage.removeAttribute('data-live');
   });
 
+  // Until it is woven, the warp lies ready on the page.
   readTheme();
   layout();
-  if (still.matches) fall();
+  rest();
+  if (still.matches) weaveIn();
+  else draw();
   stage.setAttribute('data-live', '');
   return true;
 }

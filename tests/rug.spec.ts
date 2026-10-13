@@ -1,11 +1,11 @@
 /**
  * The kilim beside the About text: drawn in 3D once it comes near, without
- * errors; it falls onto the page and comes to rest; a corner can be picked up
- * with the mouse and folded over, and it stays folded when let go; scrolled
- * away and back, it lies straight again. On a touch screen a swipe over it
- * still scrolls the page, and pressing and holding picks it up instead. With
- * reduced motion it lies still and cannot be picked up. Its box never
- * changes size, so nothing around it moves.
+ * errors; it is woven on the page as it comes into view and comes to rest; a
+ * corner can be picked up with the mouse and folded over, and it stays folded
+ * when let go; scrolled away and back, it lies straight again. On a touch
+ * screen a swipe over it still scrolls the page, and pressing and holding
+ * picks it up instead. With reduced motion it lies still, already woven, and
+ * cannot be picked up. Its box never changes size, so nothing around it moves.
  */
 import { type Page, expect, test } from '@playwright/test';
 import sharp from 'sharp';
@@ -60,17 +60,18 @@ async function corner(page: Page) {
   };
 }
 
-/** Brings the rug into view and waits for it to fall and come to rest. */
-async function arrive(page: Page) {
+/** Brings the rug into view and waits for it to be woven and come to rest. */
+async function arrive(page: Page, { weaving = true } = {}) {
   await rug(page).scrollIntoViewIfNeeded();
   await expect(rug(page)).toHaveAttribute('data-live', '');
+  if (weaving) await expect(rug(page), 'it is woven in front of you').toHaveAttribute('data-state', 'weaving');
   await resting(page);
 }
 
 test.describe('with a mouse', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('it falls onto the page, a corner can be folded over, and it is laid straight again', async ({ page }) => {
+  test('it is woven on the page, a corner can be folded over, and it is laid straight again', async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -95,18 +96,17 @@ test.describe('with a mouse', () => {
     await expect.poll(() => rug(page).getAttribute('data-state')).toBe('resting');
     await rug(page).scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
-    // (It first came to rest from its fall, a hair differently.)
     expect(difference(before, await picture(page)), 'back again, it lies straight').toBeLessThan(folded / 2);
 
     expect(await rug(page).evaluate((element) => [element.clientWidth, element.clientHeight])).toEqual(size);
     expect(problems).toEqual([]);
   });
 
-  test('with reduced motion, it lies still and cannot be picked up', async ({ page }) => {
+  test('with reduced motion, it lies still, already woven, and cannot be picked up', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
-    await arrive(page);
+    await arrive(page, { weaving: false });
     const before = await picture(page);
     const from = await corner(page);
     await page.mouse.move(from.x, from.y);
