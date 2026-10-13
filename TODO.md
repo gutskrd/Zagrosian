@@ -31,8 +31,8 @@ have. Each item says why it matters and where it goes.
    all of it is switched off for visitors who ask for reduced motion, but together they compete for
    attention. Consider keeping the two or three that carry the story and letting the rest go.
 
-4. **Photographs of the Zagros.** The site's one picture of Kurdish life is the kilim it weaves
-   itself (see **Brand assets** in the README). Real photographs of the Zagros or of Kurdish weaving
+4. **Photographs of the Zagros.** The site's one Kurdish ornament is the woven band in the footer
+   (see **Kilim band** in the README). Real photographs of the Zagros or of Kurdish weaving
    would make it warmer, but only ones the company may use without limits: its own, or ones in the
    public domain (CC0), never stock photos found online. If there are some, they fit as a quiet, full-
    width picture between the story and Products, in black and white, as AVIF and WebP in several

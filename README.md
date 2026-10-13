@@ -94,9 +94,8 @@ src/
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts and deer.ts
-                   (Hevalo's eyes, and the 3D deer's blinks and twitches), rug.ts,
-                   rug-scene.ts, rug-cloth.ts and rug-texture.ts (the kilim you can pick up),
-                   sound.ts, text.ts, language.ts, theme.ts and theme-init.js
+                   (Hevalo's eyes, and the 3D deer's blinks and twitches), sound.ts, text.ts,
+                   language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 ```
@@ -145,56 +144,14 @@ src/
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
 
-- **Kilim:** the site's one ornament, a Kurdish flat weave in black, ivory and grey wool, drawn
-  cell by cell by [`scripts/kilim.mjs`](scripts/kilim.mjs) (`node scripts/kilim.mjs`) as a weaver
-  would on a loom. The drawing is our own, so it is free of anyone else's rights; its motifs (the
-  hooked diamond, the ram's horn, the eye, the eight-pointed star) are centuries-old patterns of
-  Kurdish kilims from the Zagros. It needs no words, so it has none.
-  - **The rug** (`rug.ts`, 101 by 161 cells) is laid out as such kilims are, symmetrical about both
-    its axes: a selvedge, a chain guard, a main border of small diamonds and pairs of ram's horns
-    with a star in each corner, a guard of dots, and the field: a tall hooked medallion in bands with
-    a star at its heart and a pendant at either end, quarter medallions in the corners, and eyes
-    and horns in the open ground. It lies on the page beside the About text, as the logo stands in
-    the hero and the deer in Products ([`Rug.astro`](src/components/Rug.astro)), and it can be
-    picked up. Where the browser has WebGL 2 it is a rug of wool, seen from above
-    ([`rug-scene.ts`](src/scripts/rug-scene.ts), 10 KB compressed with its parts, loaded only as
-    the rug comes within a screen of view):
-    - **Cloth** ([`rug-cloth.ts`](src/scripts/rug-cloth.ts)): 29 by 49 particles, stepped with
-      position-based dynamics in eight small steps a frame. The weave does not stretch, resists
-      shearing, and bends in broad, heavy curves as a wool rug does; it falls through a little air,
-      grips the floor, and where it folds over itself the upper layer lies on the lower instead of
-      sinking through it. The GPU draws a mesh four times finer through the particles on
-      Catmull-Rom curves, so folds are round.
-    - **Hands on:** hovering shows a hand. Press on it and drag: what you hold lifts a hand's
-      height and follows, the rest comes after, so a corner folds over and a pull slides the rug
-      and twists it round; let go, and it drops and settles where it falls, keeping the speed it
-      was moving at. On a touch screen, press and hold first (a quarter of a second), so a swipe
-      over the rug still scrolls the page; while it is held, the page stays put.
-    - **Wool** ([`rug-texture.ts`](src/scripts/rug-texture.ts)): woven once from the cells into a
-      texture, a slice at a time so the page never stalls: each cell two passes of weft over two
-      warps, small rounded pips, woolly edges between the colours, each strand a shade apart and the
-      dye drifting along the rug, and a fringe knotted at both ends. It is mipmapped and filtered
-      anisotropically, so it stays calm at every size and angle; the shader lights each pip.
-    - **Light:** a large soft light from the upper left. Its shadow map gives the shadow on the
-      page, sharp where the rug touches and softer the higher it is lifted (percentage-closer soft
-      shadows), with a faint dimness all round where it lies, and the shadow a fold casts on the
-      rug below it. The rug keeps the colours of its wool in both themes, as a real rug would; the
-      shadow is deeper on the dark page.
-    - **Made in front of you:** until it is seen it lies on the page as bare warp threads. The
-      first time it comes into view it is woven, the weft beaten in a row at a time from the
-      bottom up (slowly at first, then at a weaver's pace, slowing for the last rows), the
-      newest row catching the light, its shadow growing with it; then it is cloth. Played with
-      and scrolled away, it is laid straight again for next time.
-    - **Cost:** it simulates and draws only while something moves, and at rest costs nothing.
-      Multisampling only where pixels are large. With reduced motion it lies still and flat and
-      cannot be picked up; without WebGL 2, or before it loads, it is a flat picture of the same
-      rug where the 3D one rests (`rug-ink.svg` and `rug-grey.svg`, a mask for each dyed wool); in
-      High Contrast mode, that picture in the visitor's colours.
-  - **The band** (`band.svg`, 24 by 31 cells, 1.4 KB) runs across the top of the footer on every
-    page, over "Mala we ava" (may your home prosper), repeated from the middle out so it is cut
-    alike at both ends. Its motifs stand up from the cloth like raised wool: a fine shadow under
-    each, light along its top, and its weave showing. It is drawn in the page's ink, so it follows
-    the theme.
+- **Kilim band:** the site's one ornament, a woven band across the top of the footer on every page,
+  over "Mala we ava" (may your home prosper): a hooked diamond and a pair of ram's horns between two
+  chain borders, motifs of Kurdish kilims from the Zagros, drawn cell by cell by
+  [`scripts/kilim.mjs`](scripts/kilim.mjs) (`node scripts/kilim.mjs`). The drawing is our own, so it is
+  free of anyone else's rights. `band.svg` (24 by 31 cells, 1.4 KB) repeats from the middle out so it
+  is cut alike at both ends. Its motifs stand up from the cloth like raised wool: a fine shadow under
+  each, light along its top, and its weave showing. It is drawn in the page's ink, so it follows the
+  theme. Otherwise the pages carry nothing but their words and the product.
 
   There are no photographs yet (see [TODO.md](TODO.md)).
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
@@ -623,7 +580,6 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
-| `rug.spec.ts`           | The kilim is drawn in 3D without errors, is woven on the page as it comes into view and comes to rest; a corner picked up with the mouse folds over and stays folded; scrolled away and back it lies straight; on a touch screen a swipe over it scrolls and pressing and holding picks it up without scrolling; with reduced motion it lies still and cannot be picked up; its box never changes size |
 
 ```sh
 npm run build

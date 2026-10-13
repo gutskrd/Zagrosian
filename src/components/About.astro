@@ -1,7 +1,6 @@
 ---
 import { i18n } from '../i18n';
 import { hevalo, site } from '../site';
-import Rug from './Rug.astro';
 import SplitText from './SplitText.astro';
 
 const { t } = i18n(Astro.url);
@@ -35,7 +34,6 @@ const { t } = i18n(Astro.url);
       </dl>
     </div>
 
-    <Rug />
   </div>
 </section>
 
@@ -47,11 +45,6 @@ const { t } = i18n(Astro.url);
   .about__grid {
     display: grid;
     gap: 1.25rem;
-  }
-
-  /* On narrow screens it follows the text (its stage has room around it). */
-  .about__grid > :global(.rug) {
-    margin-top: 1rem;
   }
 
   .about__statement {
@@ -133,21 +126,13 @@ const { t } = i18n(Astro.url);
       align-items: start;
     }
 
-    /* The text on one side and the rug on the other, as the hero has the logo
-       and Products the deer. */
     .about__grid > .eyebrow {
-      grid-column: 1 / span 7;
+      grid-column: 1 / span 3;
+      padding-top: 0.6rem;
     }
 
     .about__body {
-      grid-column: 1 / span 7;
-    }
-
-    .about__grid > :global(.rug) {
-      grid-column: 8 / -1;
-      grid-row: 1 / span 2;
-      align-self: center;
-      margin-top: 0;
+      grid-column: 4 / -1;
     }
   }
 </style>
