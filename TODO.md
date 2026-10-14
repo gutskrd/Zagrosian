@@ -72,8 +72,10 @@ have. Each item says why it matters and where it goes.
    before merging (**Settings → Branches**).
 4. **Cloudflare, DNS and email.** The recommended settings in the README under **Security** (DNSSEC,
    CAA records, SPF, DKIM and DMARC for the published email addresses, two-factor authentication)
-   cannot be checked from the repository. HSTS preload: the header is ready; submitting the domain at
-   [hstspreload.org](https://hstspreload.org) is a commitment for every subdomain, so decide first.
+   cannot be checked from the repository. Turn on **Always Use HTTPS** (the Worker redirects http
+   to https too). HSTS preload: the header and the http-to-https redirect are ready; submitting the
+   domain at [hstspreload.org](https://hstspreload.org) makes browsers use https even on a first
+   visit, but it is a commitment for every subdomain, so decide first.
 
 ## Engineering, later
 

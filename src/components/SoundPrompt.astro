@@ -1,9 +1,10 @@
 ---
 /**
  * A small card, offered once, inviting the visitor to turn sound on
- * (src/scripts/sound.ts). It appears in the corner a moment after the page has
- * settled (after the language note, which uses the same corner), and either
- * answer is remembered. After that, sound is switched from the header or quick
+ * (src/scripts/sound.ts). It appears in the corner a moment after the first
+ * page of a visit has settled (after the language note, which uses the same
+ * corner), and either answer is remembered. Left unanswered while the visitor
+ * reads on, it steps aside. Sound is also switched from the header or quick
  * navigation.
  */
 import { i18n } from '../i18n';

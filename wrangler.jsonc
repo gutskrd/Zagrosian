@@ -1,15 +1,21 @@
 // Cloudflare Workers configuration. The site is served as static assets from
-// dist/; there is no Worker script. `npx wrangler deploy` (the deploy command in
-// Workers Builds) builds the site and uploads it.
+// dist/, behind a small Worker (worker/index.ts) that sends http visitors to
+// https. `npx wrangler deploy` (the deploy command in Workers Builds) builds
+// the site and uploads both.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "zagrosian",
   "compatibility_date": "2026-09-28",
+  "main": "./worker/index.ts",
   "build": {
     "command": "npm run build"
   },
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    // Every request but the fingerprinted build files goes through the
+    // Worker first, so a page requested over http is redirected to https.
+    "run_worker_first": ["/*", "!/_astro/*"],
     // Pages are built as privacy.html etc. and linked as /privacy.
     "html_handling": "drop-trailing-slash",
     // Unknown URLs get dist/404.html with a 404 status.

@@ -407,6 +407,30 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     .journey__tilt {
       animation: logo-in 1.4s var(--ease-out) 0.3s backwards;
     }
+
+    /* The two soft lights behind the travelling logo come with it. */
+    .journey__art::before,
+    .journey__art::after {
+      animation: glow-in 1.4s var(--ease-out) 0.3s backwards;
+    }
+
+    /* On the homepage the header arrives with the rest, so the first thing
+       seen is never a part of the page in a stand-in font. */
+    :global(:root:has(.hero) .site-header__inner) {
+      animation: glow-in 0.9s var(--ease-out) backwards;
+    }
+  }
+
+  /* Held on its first frame for a moment while the typeface and the logo's
+     images arrive (theme-init.js), so it plays once, whole. */
+  :global(:root[data-entrance='waiting']) .hero__line > span,
+  :global(:root[data-entrance='waiting']) .intro,
+  :global(:root[data-entrance='waiting']) .hero__mark,
+  :global(:root[data-entrance='waiting']) .journey__tilt,
+  :global(:root[data-entrance='waiting']) .journey__art::before,
+  :global(:root[data-entrance='waiting']) .journey__art::after,
+  :global(:root[data-entrance='waiting'] .site-header__inner) {
+    animation-play-state: paused;
   }
 
   /* Coming from another page of the site, the page slides in as a whole
@@ -414,19 +438,32 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   :global(:root[data-arrival='slide']) .hero__line > span,
   :global(:root[data-arrival='slide']) .intro,
   :global(:root[data-arrival='slide']) .hero__mark,
-  :global(:root[data-arrival='slide']) .journey__tilt {
+  :global(:root[data-arrival='slide']) .journey__tilt,
+  :global(:root[data-arrival='slide']) .journey__art::before,
+  :global(:root[data-arrival='slide']) .journey__art::after,
+  :global(:root[data-arrival='slide'] .site-header__inner) {
     animation: none;
   }
 
+  /* Far enough below its mask that no ascender peeks over its edge. */
   @keyframes line-rise {
     from {
-      transform: translateY(105%);
+      transform: translateY(130%);
     }
   }
 
-  @keyframes intro {
+  @keyframes glow-in {
     from {
       opacity: 0;
+    }
+  }
+
+  /* The fades start at 1% rather than nothing: the same to the eye, but the
+     browser then counts the hero as shown when it starts to appear, not when
+     its fade has ended (Largest Contentful Paint, which search engines use). */
+  @keyframes intro {
+    from {
+      opacity: 0.01;
       transform: translateY(1rem);
     }
   }
@@ -434,7 +471,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   /* The logo rises into place as it comes into focus. */
   @keyframes logo-in {
     from {
-      opacity: 0;
+      opacity: 0.01;
       transform: translateY(2.5rem) scale(0.92);
       filter: blur(0.5rem);
     }

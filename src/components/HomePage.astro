@@ -7,9 +7,22 @@ import Faq from './Faq.astro';
 import Hero from './Hero.astro';
 import ProductShowcase from './ProductShowcase.astro';
 import Story from './Story.astro';
+import shading from '../assets/brand/lifted-logo-shading.webp?url';
+import shadowLight from '../assets/brand/lifted-logo-shadow-light.webp?url';
+import shadowDark from '../assets/brand/lifted-logo-shadow-dark.webp?url';
 ---
 
 <BaseLayout>
+  {
+    /* The hero logo's soft shading and shadow are CSS backgrounds, found only
+       once the stylesheet is read; fetched at once instead, they are there
+       when the logo first appears (theme-init.js waits a moment for them). */
+  }
+  <Fragment slot="head">
+    <link rel="preload" as="image" href={shading} />
+    <link rel="preload" as="image" href={shadowLight} media="(prefers-color-scheme: light)" />
+    <link rel="preload" as="image" href={shadowDark} media="(prefers-color-scheme: dark)" />
+  </Fragment>
   <Hero />
   <Story />
   <ProductShowcase />

@@ -2,9 +2,10 @@
 
 The website of Zagrosian, the technology company behind [Hevalo](https://hevalo.app).
 
-Built with [Astro](https://astro.build) as a fully static site: no server, no database, no forms, no
-cookies and no third-party requests. Available in ten languages: the nine of Hevalo (Kurdish in
-Kurmanji and Sorani, English, Dutch, German, Spanish, French, Turkish and Arabic) and Persian.
+Built with [Astro](https://astro.build) as a fully static site, behind a few lines of Worker script
+for redirects: no database, no forms, no cookies and no third-party requests. Available in ten
+languages: the nine of Hevalo (Kurdish in Kurmanji and Sorani, English, Dutch, German, Spanish,
+French, Turkish and Arabic) and Persian.
 
 ## Commands
 
@@ -98,6 +99,8 @@ src/
                    language.ts, theme.ts and theme-init.js
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
+worker/            The small Worker in front of the static files: http to https, www to the bare
+                   domain, and security.txt's expiry date
 ```
 
 ## Brand assets
@@ -220,7 +223,11 @@ choice is saved in the browser (`localStorage`) and applies to every open tab at
   that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
   is an external file because the Content-Security-Policy forbids inline scripts. When motion is
   welcome, it also makes room before the first paint for the homepage story (`data-story`), so
-  nothing shifts when it starts.
+  nothing shifts when it starts, and holds the homepage's entrance (`data-entrance`) until Inter
+  and the hero logo's images are in: 0.6 s after the page is read at the latest, 2.5 s after it was
+  opened in any case. The page then appears once, whole, instead of in a stand-in font or in
+  pieces. The fades start at 1% opacity, which looks the same but lets browsers count the hero as
+  shown when it starts to appear (Largest Contentful Paint).
 - [`src/scripts/theme.ts`](src/scripts/theme.ts) runs the controls. Where the browser supports view
   transitions, the new theme spreads out in a circle from the control that was used; with *reduce
   motion* it changes instantly. It also updates the browser toolbar colour (`theme-color`) and
@@ -362,9 +369,10 @@ reduced motion, and the site works fully without it.
 
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
   off until the visitor turns it on, from the header (the level meter), the site menu, quick
-  navigation, or a small card offered once to first-time visitors. Everything is synthesised with the Web Audio API, so no
-  audio files are downloaded and the Content-Security-Policy needs no media sources; the synthesiser
-  itself (5 KB) is downloaded only once sound is on:
+  navigation, or a small card offered once to first-time visitors, on the first page of a visit
+  (left unanswered while the visitor reads on, it steps aside). Everything is synthesised with the
+  Web Audio API, so no audio files are downloaded and the Content-Security-Policy needs no media
+  sources; the synthesiser itself (5 KB) is downloaded only once sound is on:
   - an ambient score: a slow chord in D Phrygian (the scale of the Kurdish maqam Kurd) that breathes,
     soft wind, and now and then a bell, in a generated reverb;
   - interface sounds: a tick when the pointer or keyboard reaches a control, a tap on a click, air
@@ -572,7 +580,7 @@ as Cloudflare serves it, with the headers from `public/_headers`
 
 | File                    | What it checks |
 | ----------------------- | -------------- |
-| `security.spec.ts`      | The security headers, and that no page in any language breaks the Content-Security-Policy or logs an error while it is scrolled through |
+| `security.spec.ts`      | The security headers; the Worker's redirects (http to https, www to the bare domain) and security.txt's expiry; and that no page in any language breaks the Content-Security-Policy or logs an error while it is scrolled through |
 | `accessibility.spec.ts` | Every page and 404 page in every language, light and dark, on a computer and a phone, with [axe](https://github.com/dequelabs/axe-core) against WCAG 2.2 AA and its best practices |
 | `layout.spec.ts`        | Every page at six widths from 320 to 1920 pixels: nothing runs off the screen or is cut off, and everything you tap is at least 24 by 24 pixels |
 | `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
@@ -601,10 +609,27 @@ What is still to be done, and what needs people or decisions rather than code, i
 
 ## Deploying to Cloudflare
 
-The site runs on Cloudflare Workers as static assets, with no Worker script. Everything is configured
-in [`wrangler.jsonc`](wrangler.jsonc): the Worker's name (`zagrosian`), the `dist/` folder, clean URLs
-(`/privacy` serves `privacy.html`, and `/privacy.html` redirects to it) and the 404 page. `npx wrangler
-deploy` runs `npm run build` itself, then uploads the site.
+The site runs on Cloudflare Workers as static assets, behind a small Worker script
+([`worker/index.ts`](worker/index.ts)). Everything is configured in [`wrangler.jsonc`](wrangler.jsonc):
+the Worker's name (`zagrosian`), its script, the `dist/` folder, clean URLs (`/privacy` serves
+`privacy.html`, and `/privacy.html` redirects to it) and the 404 page. `npx wrangler deploy` runs
+`npm run build` itself, then uploads the site and the script.
+
+The script runs before the static files for every address except the fingerprinted files in
+`/_astro/` (`run_worker_first`), and does three things:
+
+- **http to https.** A first visit often arrives over plain http (a typed address, an old link, a QR
+  code); browsers only remember to use https (HSTS) after one visit over https. Served over http, the
+  page would show as bare HTML: the Content-Security-Policy upgrades its stylesheet, fonts and
+  scripts to https, a different origin, and their `Cross-Origin-Resource-Policy` refuses them. So
+  every http request is redirected (301) to the same address over https, on the same host, as the
+  [HSTS preload list](https://hstspreload.org) asks.
+- **www to the bare domain.** `https://www.zagrosian.com/…` is redirected to
+  `https://zagrosian.com/…`, so search engines see one address for every page.
+- **security.txt never lapses.** Its `Expires` date is moved to 180 days after the day it is served.
+
+Everything else, every header in `public/_headers` included, is served by the static assets as
+before (the tests check both).
 
 Cloudflare deploys it from GitHub with Workers Builds. In the Cloudflare dashboard, under **Workers &
 Pages → zagrosian → Settings → Build**, use:
@@ -621,12 +646,14 @@ Pages → zagrosian → Settings → Build**, use:
 The Node version is pinned by [`.node-version`](.node-version).
 
 Then, under **Settings → Domains & Routes**, add `zagrosian.com` and `www.zagrosian.com` as custom
-domains, and redirect `www.zagrosian.com` to `zagrosian.com` with a Cloudflare redirect rule (**Rules →
-Redirect Rules**, template *Redirect from WWW to root*). The Worker's own `*.workers.dev` address and
+domains (the Worker redirects www to the bare domain itself). Also turn on **SSL/TLS → Edge
+Certificates → Always Use HTTPS**, which redirects http at Cloudflare's edge before the Worker is
+reached; the Worker does the same, so either is enough. The Worker's own `*.workers.dev` address and
 its preview URLs send `X-Robots-Tag: noindex`, so search engines only index zagrosian.com; you can also
 turn them off on the same settings page.
 
-`security.txt` expires 180 days after each build, so redeploy at least twice a year.
+`security.txt` is built with an expiry date 180 days after the build, and the Worker keeps it 180
+days ahead of the day it is served, so it never lapses between builds.
 
 ## Getting indexed by Google
 
@@ -647,9 +674,9 @@ exists:
 
 New sites usually appear for searches on their own name within days to a few weeks.
 
-**Cost:** the site is served entirely as static files by Cloudflare, with no Worker script, so
-requests do not count against Workers usage, and hashed assets (`/_astro/*`) are cached by browsers
-for a year.
+**Cost:** requests for pages and other files outside `/_astro/` run the small Worker script and
+count towards Workers usage (the free plan includes 100,000 requests a day); the hashed assets in
+`/_astro/` are served as static files without it, free, and cached by browsers for a year.
 
 ## Security
 

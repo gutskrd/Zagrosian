@@ -170,6 +170,8 @@ function initPrompt() {
 
   const suggestion = document.querySelector<HTMLElement>('[data-language-suggestion]');
   let visible = false;
+  /** Where the page was scrolled to when the card appeared. */
+  let shownAt = 0;
 
   const hide = () => {
     if (!visible) return;
@@ -190,12 +192,34 @@ function initPrompt() {
       return;
     }
     visible = true;
+    shownAt = window.scrollY;
     prompt.hidden = false;
     requestAnimationFrame(() => requestAnimationFrame(() => prompt.toggleAttribute('data-visible', true)));
   };
 
+  // Offered on the first page of a visit only: coming from another page of
+  // the site, the visitor has seen it already (nothing is stored for this).
+  let cameFromSite = false;
+  try {
+    cameFromSite = !!document.referrer && new URL(document.referrer).origin === location.origin;
+  } catch {
+    // An unreadable referrer counts as arriving from elsewhere.
+  }
+  if (cameFromSite) return;
+
   // A moment after the page has settled.
   whenShown(() => window.setTimeout(show, 2500));
+
+  // Left unanswered while the visitor reads on, it steps aside: it never sits
+  // over the page all the way down. No answer is recorded.
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!visible || prompt.contains(document.activeElement)) return;
+      if (Math.abs(window.scrollY - shownAt) > window.innerHeight * 0.75) hide();
+    },
+    { passive: true },
+  );
 
   for (const button of prompt.querySelectorAll<HTMLElement>('[data-sound-choice]')) {
     button.addEventListener('click', () => {
