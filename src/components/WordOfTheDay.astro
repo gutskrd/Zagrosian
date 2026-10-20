@@ -1,0 +1,112 @@
+---
+/**
+ * The Kurdish word of the day, beside the proverb in Hevalo's section: one
+ * everyday word (src/lib/words.ts) in Kurmanji and in Sorani, with what it
+ * means in the page's language. In Sorani the word leads in Sorani; in
+ * Kurmanji and Sorani there is no translation line.
+ *
+ * The page is built with the word of the day it was built on, so it reads
+ * the same without JavaScript and to search engines; site.ts then shows the
+ * word for the visitor's own date.
+ */
+import { i18n } from '../i18n';
+import { dayNumber, wordIndex, words, type Word } from '../lib/words';
+
+const { locale, t } = i18n(Astro.url);
+
+const today = new Date();
+const index = wordIndex(dayNumber(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+const soraniFirst = locale === 'ckb';
+const meaningOf = (word: Word) => (locale === 'ku' || locale === 'ckb' ? '' : word.meaning[locale]);
+
+const word = words[index]!;
+const main = soraniFirst ? { text: word.ckb, lang: 'ckb', dir: 'rtl' } : { text: word.ku, lang: 'ku', dir: 'ltr' };
+const other = soraniFirst ? { text: word.ku, lang: 'ku', dir: 'ltr', name: t.hevalo.word.kurmanji } : { text: word.ckb, lang: 'ckb', dir: 'rtl', name: t.hevalo.word.sorani };
+const meaning = meaningOf(word);
+
+// Every word, as the script needs it on another day: [main, other, meaning].
+const list = words.map((entry) => (soraniFirst ? [entry.ckb, entry.ku, ''] : [entry.ku, entry.ckb, meaningOf(entry)]));
+---
+
+<aside class="word rule" aria-labelledby="word-label" data-word data-word-index={index} data-words={JSON.stringify(list)} data-reveal>
+  <p id="word-label" class="word__label">{t.hevalo.word.label}</p>
+  <p class:list={['word__term', soraniFirst ? 'word__term--sorani' : 'kurdish']} lang={main.lang} dir={main.dir} data-word-main>
+    {main.text}
+  </p>
+  <p class="word__other">
+    <span class="word__dialect">{other.name}</span>
+    <span class:list={['word__other-term', !soraniFirst && 'word__other-term--sorani']} lang={other.lang} dir={other.dir} data-word-other>
+      {other.text}
+    </span>
+  </p>
+  {meaning && <p class="word__meaning" data-word-meaning>{meaning}</p>}
+</aside>
+
+<style>
+  /* Under a hairline, like Hevalo's facts; the word set like the proverb. */
+  .word {
+    display: grid;
+    align-content: start;
+    gap: 0.875rem;
+    padding-top: 1.5rem;
+    --rule-color: var(--color-line-strong);
+  }
+
+  .word__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  :root:is([lang='ar'], [lang='ckb'], [lang='fa']) .word__label {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    letter-spacing: 0;
+  }
+
+  .word__term {
+    margin-top: 0.25rem;
+    font-size: clamp(2.75rem, 1.75rem + 3.5vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+
+  .word__term--sorani {
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.25;
+  }
+
+  /* Kurmanji runs left to right, but lines up with the page's own side. */
+  :global(:root[dir='rtl']) .word__term[dir='ltr'] {
+    text-align: right;
+  }
+
+  .word__other {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+  }
+
+  .word__dialect {
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .word__other-term {
+    font-size: var(--text-lead);
+  }
+
+  .word__other-term--sorani {
+    font-weight: 500;
+  }
+
+  .word__meaning {
+    font-size: var(--text-lead);
+    line-height: 1.4;
+    color: var(--color-ink-soft);
+  }
+</style>

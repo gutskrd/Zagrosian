@@ -6,9 +6,9 @@
  *
  * From left to right, as room allows: Visit Hevalo (from 768px), quick
  * navigation (from 1024px, with JavaScript), the world icon for languages,
- * sound and theme (from 768px), and the menu. On a phone the bar keeps only
- * the world icon and the menu, as an app's would; sound and theme are in the
- * menu (and on the narrowest phones the languages too).
+ * and the menu. Nothing else: the bar is kept quiet so the page has the
+ * room. Sound and the theme are settings, so they are in the menu (and in
+ * quick navigation), as are the languages on the narrowest phones.
  */
 import Arrow from './Arrow.astro';
 import LanguagePicker from './LanguagePicker.astro';
@@ -16,8 +16,6 @@ import Logo from './Logo.astro';
 import MenuButton from './MenuButton.astro';
 import RollText from './RollText.astro';
 import SiteMenu from './SiteMenu.astro';
-import SoundToggle from './SoundToggle.astro';
-import ThemeToggle from './ThemeToggle.astro';
 import Wordmark from './Wordmark.astro';
 import { i18n } from '../i18n';
 import { hevalo } from '../site';
@@ -59,8 +57,6 @@ const { t, localize } = i18n(Astro.url);
         <LanguagePicker />
       </div>
 
-      <SoundToggle class="site-header__sound" />
-      <ThemeToggle />
       <MenuButton />
     </div>
   </div>
@@ -193,15 +189,7 @@ const { t, localize } = i18n(Astro.url);
     }
   }
 
-  /* On a phone, sound and theme are in the menu; on the narrowest phones the
-     languages too. */
-  @media (max-width: 47.99rem) {
-    .site-header__end :global(.site-header__sound),
-    .site-header__end :global(.theme-toggle) {
-      display: none !important;
-    }
-  }
-
+  /* On the narrowest phones the languages are in the menu only. */
   @media (max-width: 23.99rem) {
     .site-header__language {
       display: none !important;
@@ -213,8 +201,8 @@ const { t, localize } = i18n(Astro.url);
     margin-inline-start: 0.5rem;
   }
 
-  /* Quick navigation (CommandMenu): a round icon button, like sound and theme
-     (Ctrl K or ⌘K opens it too). It needs JavaScript, so it appears once the
+  /* Quick navigation (CommandMenu): a round icon button (Ctrl K or ⌘K opens
+     it too). It needs JavaScript, so it appears once the
      theme script has run, and only on wider screens; phones have the menu. */
   .command-trigger {
     display: none;

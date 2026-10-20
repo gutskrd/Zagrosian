@@ -2,8 +2,8 @@
  * Light and dark theme. The visitor can follow their system setting (the
  * default) or choose light or dark; the choice is kept in localStorage.
  *
- * - The header button switches between light and dark.
- * - The footer control offers System, Light and Dark.
+ * - The control in the site menu and in the footer offers System, Light and
+ *   Dark; quick navigation offers the same three.
  * - Where the browser supports view transitions, the new theme spreads out in
  *   a circle from the control that was used.
  *
@@ -44,7 +44,7 @@ function savePreference(preference: Preference) {
 const resolve = (preference: Preference): Theme =>
   preference === 'system' ? (systemDark.matches ? 'dark' : 'light') : preference;
 
-/** Applies a preference to the page and to both controls. */
+/** Applies a preference to the page and to every theme control. */
 function render(preference: Preference) {
   const theme = resolve(preference);
   root.dataset.theme = theme;
@@ -52,9 +52,6 @@ function render(preference: Preference) {
 
   for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
     meta.content = THEME_COLORS[theme];
-  }
-  for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
-    toggle.setAttribute('aria-pressed', String(theme === 'dark'));
   }
   for (const input of document.querySelectorAll<HTMLInputElement>('[data-theme-switch] input')) {
     input.checked = input.value === preference;
@@ -107,12 +104,6 @@ export function setThemePreference(preference: Preference) {
 
 export function initTheme() {
   render(readPreference());
-
-  for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
-    toggle.addEventListener('click', () => {
-      choose(root.dataset.theme === 'dark' ? 'light' : 'dark', centreOf(toggle));
-    });
-  }
 
   for (const input of document.querySelectorAll<HTMLInputElement>('[data-theme-switch] input')) {
     input.addEventListener('change', () => {

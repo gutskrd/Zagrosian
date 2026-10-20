@@ -175,6 +175,90 @@ function initCopyButtons() {
 }
 
 /**
+ * Share in the site menu: the system's share sheet where the browser has one
+ * (phones, Safari, Chrome and Edge), otherwise the page's address is copied
+ * and the button says so for a moment. The address shared is the page's
+ * canonical one. Hidden where neither is possible.
+ */
+function initShare() {
+  const canShare = typeof navigator.share === 'function';
+  const canCopy = typeof navigator.clipboard?.writeText === 'function';
+  if (!canShare && !canCopy) return;
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-share]')) {
+    const text = button.querySelector<HTMLElement>('[data-share-text]');
+    const status = button.parentElement?.querySelector<HTMLElement>('[data-share-status]');
+    const label = text?.textContent ?? '';
+    let reset: number | undefined;
+    button.hidden = false;
+
+    const copy = async (url: string) => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        return;
+      }
+      window.clearTimeout(reset);
+      if (text) text.textContent = button.dataset.copiedLabel ?? label;
+      if (status) status.textContent = button.dataset.copiedStatus ?? '';
+      reset = window.setTimeout(() => {
+        if (text) text.textContent = label;
+        if (status) status.textContent = '';
+      }, 2000);
+    };
+
+    button.addEventListener('click', async () => {
+      const url = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? location.href;
+      const data = { title: document.title, url };
+      if (canShare && (navigator.canShare?.(data) ?? true)) {
+        try {
+          await navigator.share(data);
+          return;
+        } catch (error) {
+          // Closed by the visitor: nothing more to do.
+          if (error instanceof DOMException && error.name === 'AbortError') return;
+        }
+      }
+      if (canCopy) await copy(url);
+    });
+  }
+}
+
+/**
+ * The Kurdish word of the day with Hevalo (WordOfTheDay.astro): the page
+ * holds the word of the day it was built on, and every word; this shows the
+ * one for the visitor's own date, counted as src/lib/words.ts counts.
+ */
+function initWordOfTheDay() {
+  for (const card of document.querySelectorAll<HTMLElement>('[data-word]')) {
+    let list: string[][];
+    try {
+      list = JSON.parse(card.dataset.words ?? '[]');
+    } catch {
+      continue;
+    }
+    if (list.length === 0) continue;
+
+    const now = new Date();
+    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
+    const index = ((day % list.length) + list.length) % list.length;
+    if (String(index) === card.dataset.wordIndex) continue;
+
+    const [main = '', other = '', meaning = ''] = list[index] ?? [];
+    const slots: [string, string][] = [
+      ['[data-word-main]', main],
+      ['[data-word-other]', other],
+      ['[data-word-meaning]', meaning],
+    ];
+    for (const [selector, text] of slots) {
+      const slot = card.querySelector<HTMLElement>(selector);
+      if (slot) slot.textContent = text;
+    }
+    card.dataset.wordIndex = String(index);
+  }
+}
+
+/**
  * The current time at the headquarters, next to the country in About. It is
  * formatted for the page's language and updates on the minute.
  */
@@ -270,6 +354,8 @@ initReveal();
 initTableOfContents();
 initSectionNav();
 initCopyButtons();
+initShare();
+initWordOfTheDay();
 initLocalTime();
 initLegalTools();
 initCommandMenu();

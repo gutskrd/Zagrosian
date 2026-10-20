@@ -1,8 +1,9 @@
 /**
  * The controls a visitor uses: the language menu, the language suggestion,
- * the site menu on a phone, and the theme.
+ * the site menu on a phone, the theme, Share, and the word of the day.
  */
 import { expect, test } from '@playwright/test';
+import { dayNumber, wordIndex, words } from '../src/lib/words';
 
 /** With sound off. */
 test.beforeEach(async ({ context }) => {
@@ -35,11 +36,52 @@ test.describe('on a computer', () => {
 
     const theme = await page.locator('html').getAttribute('data-theme');
     const other = theme === 'dark' ? 'light' : 'dark';
-    await page.locator('[data-theme-toggle]:visible').first().click();
+    // The theme is a setting in the site menu.
+    await page.locator('.menu-button--open').click();
+    await page.locator(`#site-menu [data-theme-switch] label[data-value="${other}"]`).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', other);
     await page.goto('/ar/privacy');
     await expect(page.locator('html')).toHaveAttribute('data-theme', other);
   });
+});
+
+test.describe('in the menu and with Hevalo', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test('Share copies the page’s own address where there is no share sheet', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await context.addInitScript(() => {
+      // As in a browser without a share sheet (desktop Firefox).
+      Object.defineProperty(navigator, 'share', { value: undefined });
+    });
+    await page.goto('/de/privacy', { waitUntil: 'networkidle' });
+    await page.locator('.menu-button--open').click();
+    const share = page.locator('#site-menu [data-share]');
+    await expect(share).toHaveText('Diese Seite teilen');
+    await share.click();
+    await expect(share).toHaveText('Link kopiert');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('https://zagrosian.com/de/privacy');
+  });
+
+  for (const [path, main, other] of [
+    ['/', 'ku', 'ckb'],
+    ['/ckb', 'ckb', 'ku'],
+    ['/ku', 'ku', 'ckb'],
+  ] as const) {
+    test(`the word of the day is the visitor’s day’s: ${path}`, async ({ page }) => {
+      await page.goto(path, { waitUntil: 'networkidle' });
+      const today = await page.evaluate(() => {
+        const now = new Date();
+        return [now.getFullYear(), now.getMonth(), now.getDate()] as const;
+      });
+      const word = words[wordIndex(dayNumber(...today))]!;
+      const card = page.locator('[data-word]');
+      await expect(card.locator('[data-word-main]')).toHaveText(word[main]);
+      await expect(card.locator('[data-word-other]')).toHaveText(word[other]);
+      if (path === '/') await expect(card.locator('[data-word-meaning]')).toHaveText(word.meaning.en);
+      else await expect(card.locator('[data-word-meaning]')).toHaveCount(0);
+    });
+  }
 });
 
 test.describe('on a phone', () => {

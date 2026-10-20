@@ -30,7 +30,6 @@ export const tr: Messages = {
     security: 'Güvenlik',
   },
   theme: {
-    toggle: 'Koyu tema',
     legend: 'Tema',
     system: 'Sistem',
     light: 'Açık',
@@ -42,6 +41,11 @@ export const tr: Messages = {
     off: 'Sesi kapat',
     prompt: 'Sesle daha güzel.',
     dismiss: 'Hayır, teşekkürler',
+  },
+  share: {
+    button: 'Bu sayfayı paylaş',
+    copied: 'Bağlantı kopyalandı',
+    copiedStatus: 'Bağlantı panoya kopyalandı.',
   },
   language: {
     label: 'Dil',
@@ -70,6 +74,11 @@ export const tr: Messages = {
     platformsLabel: 'iOS ve Android',
     proverb: 'Ağaç köküyle, insan diliyle yeşerir.',
     proverbSource: 'Kürt atasözü',
+    word: {
+      label: 'Günün kelimesi',
+      kurmanji: 'Kurmanci',
+      sorani: 'Sorani',
+    },
   },
   story: {
     values: ['Sadelik.', 'Gizlilik.', 'Netlik.'],

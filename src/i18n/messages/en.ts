@@ -36,20 +36,25 @@ export const en = {
     security: 'Security',
   },
   theme: {
-    toggle: 'Dark theme',
     legend: 'Theme',
     system: 'System',
     light: 'Light',
     dark: 'Dark',
   },
   sound: {
-    /** The header button that switches sound on and off (its state is announced as pressed). */
+    /** The button in the site menu that switches sound on and off (announced as pressed or not). */
     label: 'Sound',
     on: 'Turn sound on',
     off: 'Turn sound off',
     /** Offered once to first-time visitors, with the `on` and `dismiss` buttons. */
     prompt: 'Best experienced with sound.',
     dismiss: 'No thanks',
+  },
+  share: {
+    /** In the site menu: the system's share sheet, or the link copied where there is none. */
+    button: 'Share this page',
+    copied: 'Link copied',
+    copiedStatus: 'Link copied to the clipboard.',
   },
   language: {
     label: 'Language',
@@ -83,6 +88,12 @@ export const en = {
     proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
+    /** The Kurdish word of the day (src/lib/words.ts), and the names of the two dialects it is shown in. */
+    word: {
+      label: 'Word of the day',
+      kurmanji: 'Kurmanji',
+      sorani: 'Sorani',
+    },
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {

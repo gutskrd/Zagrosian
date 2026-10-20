@@ -31,7 +31,6 @@ export const fr: Messages = {
     security: 'Sécurité',
   },
   theme: {
-    toggle: 'Thème sombre',
     legend: 'Thème',
     system: 'Système',
     light: 'Clair',
@@ -43,6 +42,11 @@ export const fr: Messages = {
     off: 'Couper le son',
     prompt: 'À découvrir avec le son.',
     dismiss: 'Non merci',
+  },
+  share: {
+    button: 'Partager cette page',
+    copied: 'Lien copié',
+    copiedStatus: 'Lien copié dans le presse-papiers.',
   },
   language: {
     label: 'Langue',
@@ -71,6 +75,11 @@ export const fr: Messages = {
     platformsLabel: 'iOS et Android',
     proverb: 'L’arbre puise sa force dans ses racines, et chacun dans sa langue.',
     proverbSource: 'Proverbe kurde',
+    word: {
+      label: 'Mot du jour',
+      kurmanji: 'kurmandji',
+      sorani: 'sorani',
+    },
   },
   story: {
     values: ['Simplicité.', 'Confidentialité.', 'Clarté.'],

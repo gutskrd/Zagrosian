@@ -62,6 +62,12 @@ Requires Node 22.12 or later.
   files (`footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets
   them in the same serif italic as hevalo.app (see **Fonts** below). On right-to-left pages they still
   run left to right, but line up on the right with the rest of the page.
+- **The word of the day:** beside the proverb, an everyday Kurdish word
+  ([`WordOfTheDay.astro`](src/components/WordOfTheDay.astro)) in Kurmanji and in Sorani, with what it
+  means in the page's language (on the Sorani page it leads in Sorani; in Kurmanji and Sorani there
+  is no translation line). The 31 words are in [`src/lib/words.ts`](src/lib/words.ts), one a day in
+  order, the same for every visitor on the same date. The page is built with the day's word, so it
+  reads the same without JavaScript; `site.ts` then shows the word for the visitor's own date.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro) (text: `hevalo.comingSoon*` in the
   message files). When the apps are out, replace it with links to the App Store and Google Play.
@@ -83,7 +89,7 @@ src/
                    Hevalo app icon and (deer/) its 3D deer's layers
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, Story, ProductShowcase, About, Faq, Contact,
-                   CommandMenu, LanguagePicker, LanguageSuggestion, ThemeToggle, ThemeSwitch, …
+                   CommandMenu, LanguagePicker, LanguageSuggestion, ThemeSwitch, …
   content/legal/   Legal pages in Markdown, one folder per language
   i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
@@ -215,9 +221,9 @@ worker/            The small Worker in front of the static files: http to https,
 
 ## Light and dark theme
 
-The site follows the visitor's system setting by default. The sun/moon button in the header switches
-between light and dark, and the control in the footer offers *System*, *Light* and *Dark*. The
-choice is saved in the browser (`localStorage`) and applies to every open tab at once.
+The site follows the visitor's system setting by default. The control in the site menu and in the
+footer offers *System*, *Light* and *Dark* (quick navigation offers the same). The choice is saved
+in the browser (`localStorage`) and applies to every open tab at once.
 
 - [`src/scripts/theme-init.js`](src/scripts/theme-init.js) is a tiny blocking script in `<head>`
   that sets `data-theme` on `<html>` before the page is drawn, so the wrong colours never flash. It
@@ -368,7 +374,7 @@ browser, and nothing is borrowed from another site. Every piece steps back for v
 reduced motion, and the site works fully without it.
 
 - **Sound** ([`sound.ts`](src/scripts/sound.ts), [`sound-engine.ts`](src/scripts/sound-engine.ts)):
-  off until the visitor turns it on, from the header (the level meter), the site menu, quick
+  off until the visitor turns it on, from the site menu (the level meter), quick
   navigation, or a small card offered once to first-time visitors, on the first page of a visit
   (left unanswered while the visitor reads on, it steps aside). Everything is synthesised with the
   Web Audio API, so no audio files are downloaded and the Content-Security-Policy needs no media
@@ -387,15 +393,16 @@ reduced motion, and the site works fully without it.
 - **Header and menu** ([`Header.astro`](src/components/Header.astro),
   [`MenuButton.astro`](src/components/MenuButton.astro), [`SiteMenu.astro`](src/components/SiteMenu.astro)):
   the logo, then Visit Hevalo (from 768px), quick navigation (from 1024px), the world icon for
-  languages ([`Globe.astro`](src/components/Globe.astro), whose meridians spin on hover), sound and
-  theme (from 768px), and the menu button: two dots on their own, which flip across to each other's
-  side on hover (the label rolls with them) and stretch into an X when the menu opens. On a phone the
-  bar holds only the logo, the world icon and the menu, as an app's would; sound and theme are in
-  the menu (and on the narrowest phones the languages too). The menu is a full-screen panel, in the page's own colours (light or dark as the theme is), that drops
+  languages ([`Globe.astro`](src/components/Globe.astro), whose meridians spin on hover), and the
+  menu button: two dots on their own, which flip across to each other's side on hover (the label
+  rolls with them) and stretch into an X when the menu opens. Nothing else, so the bar stays quiet
+  and the page has the room: sound and the theme are settings, in the menu and in quick navigation
+  (on the narrowest phones the languages too). The menu is a full-screen panel, in the page's own colours (light or dark as the theme is), that drops
   in like a curtain; its links, set very large, rise one after another from behind masks (the others
-  dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo,
-  contact, social media, every language, sound, the theme, the legal pages and the time at
-  headquarters. It is a
+  dim under the pointer, and the section in view is marked with a dot), followed by Visit Hevalo and
+  Share, contact, social media, every language, sound, the theme, the legal pages and the time at
+  headquarters. Share opens the system's share sheet where the browser has one (phones, Safari,
+  Chrome and Edge) and otherwise copies the page's address, saying so on the button for a moment. It is a
   native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
   does not scroll while it is open. Its links are sized to their column (container query units), so
   the longest word in any language fits on its line, and a label too long for one line wraps between
@@ -552,7 +559,7 @@ is missing.
 
 - **Quick navigation:** Ctrl K (⌘K on Apple devices), the `/` key or the round search button in the header
   opens a searchable list of every page, section, language and theme, with a few actions (visit
-  Hevalo, copy the email address). It is keyboard-first (arrow keys, Enter, Escape), follows the ARIA
+  Hevalo, copy the email address, share the page). It is keyboard-first (arrow keys, Enter, Escape), follows the ARIA
   combobox pattern for screen readers, and finds entries by their English name too, so *privacy*
   also finds *Datenschutz*. The entries are written at build time in
   [`CommandMenu.astro`](src/components/CommandMenu.astro); [`command.ts`](src/scripts/command.ts)
@@ -585,7 +592,7 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `layout.spec.ts`        | Every page at six widths from 320 to 1920 pixels: nothing runs off the screen or is cut off, and everything you tap is at least 24 by 24 pixels |
 | `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
 | `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
-| `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone and the theme |
+| `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu), Share, and the word of the day for the visitor's date |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
 

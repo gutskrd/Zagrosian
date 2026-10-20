@@ -31,7 +31,6 @@ export const ar: Messages = {
     security: 'الأمان',
   },
   theme: {
-    toggle: 'المظهر الداكن',
     legend: 'المظهر',
     system: 'حسب النظام',
     light: 'فاتح',
@@ -43,6 +42,11 @@ export const ar: Messages = {
     off: 'إيقاف الصوت',
     prompt: 'التجربة أجمل مع الصوت.',
     dismiss: 'لا، شكرًا',
+  },
+  share: {
+    button: 'مشاركة هذه الصفحة',
+    copied: 'تم نسخ الرابط',
+    copiedStatus: 'تم نسخ الرابط إلى الحافظة.',
   },
   language: {
     label: 'اللغة',
@@ -71,6 +75,11 @@ export const ar: Messages = {
     platformsLabel: 'iOS وأندرويد',
     proverb: 'الشجرة تزدهر بجذورها، والإنسان بلغته.',
     proverbSource: 'مثل كردي',
+    word: {
+      label: 'كلمة اليوم',
+      kurmanji: 'الكرمانجية',
+      sorani: 'السورانية',
+    },
   },
   story: {
     values: ['البساطة.', 'الخصوصية.', 'الوضوح.'],

@@ -30,7 +30,6 @@ export const de: Messages = {
     security: 'Sicherheit',
   },
   theme: {
-    toggle: 'Dunkles Design',
     legend: 'Design',
     system: 'System',
     light: 'Hell',
@@ -42,6 +41,11 @@ export const de: Messages = {
     off: 'Ton ausschalten',
     prompt: 'Am schönsten mit Ton.',
     dismiss: 'Nein, danke',
+  },
+  share: {
+    button: 'Diese Seite teilen',
+    copied: 'Link kopiert',
+    copiedStatus: 'Link in die Zwischenablage kopiert.',
   },
   language: {
     label: 'Sprache',
@@ -70,6 +74,11 @@ export const de: Messages = {
     platformsLabel: 'iOS und Android',
     proverb: 'Der Baum wächst aus seinen Wurzeln, der Mensch aus seiner Sprache.',
     proverbSource: 'Kurdisches Sprichwort',
+    word: {
+      label: 'Wort des Tages',
+      kurmanji: 'Kurmandschi',
+      sorani: 'Sorani',
+    },
   },
   story: {
     values: ['Einfachheit.', 'Privatsphäre.', 'Klarheit.'],

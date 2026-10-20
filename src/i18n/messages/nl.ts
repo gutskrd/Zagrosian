@@ -30,7 +30,6 @@ export const nl: Messages = {
     security: 'Beveiliging',
   },
   theme: {
-    toggle: 'Donker thema',
     legend: 'Thema',
     system: 'Systeem',
     light: 'Licht',
@@ -42,6 +41,11 @@ export const nl: Messages = {
     off: 'Geluid uitzetten',
     prompt: 'Het mooist met geluid.',
     dismiss: 'Nee, bedankt',
+  },
+  share: {
+    button: 'Deze pagina delen',
+    copied: 'Link gekopieerd',
+    copiedStatus: 'Link gekopieerd naar het klembord.',
   },
   language: {
     label: 'Taal',
@@ -70,6 +74,11 @@ export const nl: Messages = {
     platformsLabel: 'iOS en Android',
     proverb: 'De boom groeit uit zijn wortels, de mens uit zijn taal.',
     proverbSource: 'Koerdisch spreekwoord',
+    word: {
+      label: 'Woord van de dag',
+      kurmanji: 'Kurmanji',
+      sorani: 'Sorani',
+    },
   },
   story: {
     values: ['Eenvoud.', 'Privacy.', 'Helderheid.'],

@@ -4,6 +4,7 @@ import { hevalo, kurdish } from '../site';
 import Cta from './Cta.astro';
 import HevaloDeer from './HevaloDeer.astro';
 import SplitText from './SplitText.astro';
+import WordOfTheDay from './WordOfTheDay.astro';
 
 const { t } = i18n(Astro.url);
 ---
@@ -51,17 +52,21 @@ const { t } = i18n(Astro.url);
       </div>
     </div>
 
-    {/* Why Hevalo exists, in a Kurdish proverb, credited as one ("gotina pêşiyan"). */}
-    <figure class="showcase__proverb" data-reveal>
-      <blockquote class="showcase__proverb-text kurdish" lang="ku" dir="ltr">
-        <p>{kurdish.proverb}</p>
-      </blockquote>
-      {t.hevalo.proverb && <p class="showcase__proverb-translation">{t.hevalo.proverb}</p>}
-      <figcaption class="showcase__proverb-source">
-        <span lang="ku" dir="ltr">{kurdish.proverbSource}</span>
-        {t.hevalo.proverbSource && <span>{t.hevalo.proverbSource}</span>}
-      </figcaption>
-    </figure>
+    {/* Kurdish, as Hevalo teaches it: why Hevalo exists, in a proverb credited
+        as one ("gotina pêşiyan"), and beside it the word of the day. */}
+    <div class="showcase__kurdish">
+      <figure class="showcase__proverb" data-reveal>
+        <blockquote class="showcase__proverb-text kurdish" lang="ku" dir="ltr">
+          <p>{kurdish.proverb}</p>
+        </blockquote>
+        {t.hevalo.proverb && <p class="showcase__proverb-translation">{t.hevalo.proverb}</p>}
+        <figcaption class="showcase__proverb-source">
+          <span lang="ku" dir="ltr">{kurdish.proverbSource}</span>
+          {t.hevalo.proverbSource && <span>{t.hevalo.proverbSource}</span>}
+        </figcaption>
+      </figure>
+      <WordOfTheDay />
+    </div>
 
   </div>
 </section>
@@ -135,10 +140,17 @@ const { t } = i18n(Astro.url);
 
   /* The proverb: large, in the serif italic of the site's Kurdish, with its
      translation and its credit under it. */
+  .showcase__kurdish {
+    display: grid;
+    gap: clamp(3.5rem, 2.5rem + 4vw, 5rem);
+    margin-top: clamp(4.5rem, 3rem + 5vw, 8rem);
+  }
+
   .showcase__proverb {
     display: grid;
+    align-content: start;
     gap: 1.25rem;
-    margin: clamp(4.5rem, 3rem + 5vw, 8rem) 0 0;
+    margin: 0;
   }
 
   .showcase__proverb-text {
@@ -260,5 +272,21 @@ const { t } = i18n(Astro.url);
       --reveal-delay: 0.2s;
     }
 
+    /* The proverb takes two thirds; the word stands in the last third,
+       level with the proverb's last line. */
+    .showcase__kurdish {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: end;
+    }
+
+    .showcase__proverb {
+      grid-column: 1 / span 8;
+    }
+
+    .showcase__kurdish :global(.word) {
+      grid-column: 9 / -1;
+      --reveal-delay: 0.12s;
+    }
   }
 </style>

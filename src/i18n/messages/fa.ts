@@ -33,7 +33,6 @@ export const fa: Messages = {
     security: 'امنیت',
   },
   theme: {
-    toggle: 'حالت تیره',
     legend: 'ظاهر',
     system: 'سیستم',
     light: 'روشن',
@@ -45,6 +44,11 @@ export const fa: Messages = {
     off: 'خاموش کردن صدا',
     prompt: 'با صدا دلنشین‌تر است.',
     dismiss: 'نه، ممنون',
+  },
+  share: {
+    button: 'اشتراک‌گذاری این صفحه',
+    copied: 'پیوند کپی شد',
+    copiedStatus: 'پیوند در کلیپ‌بورد کپی شد.',
   },
   language: {
     label: 'زبان',
@@ -73,6 +77,11 @@ export const fa: Messages = {
     platformsLabel: 'iOS و اندروید',
     proverb: 'درخت با ریشه‌اش سبز می‌شود و انسان با زبانش.',
     proverbSource: 'ضرب‌المثل کردی',
+    word: {
+      label: 'واژهٔ روز',
+      kurmanji: 'کرمانجی',
+      sorani: 'سورانی',
+    },
   },
   story: {
     values: ['سادگی.', 'حریم خصوصی.', 'وضوح.'],

@@ -118,6 +118,24 @@ export function initCommandMenu() {
       setSound(value === 'on');
       return;
     }
+    if (action === 'share') {
+      // As Share in the site menu (site.ts): the share sheet, else a copy.
+      const url = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? location.href;
+      const data = { title: document.title, url };
+      const copy = () =>
+        navigator.clipboard
+          ?.writeText(url)
+          .then(() => announce(status?.dataset.linkCopied ?? ''))
+          .catch(() => {});
+      if (typeof navigator.share === 'function' && (navigator.canShare?.(data) ?? true)) {
+        navigator.share(data).catch((error: unknown) => {
+          if (!(error instanceof DOMException && error.name === 'AbortError')) copy();
+        });
+      } else {
+        copy();
+      }
+      return;
+    }
     if (action === 'copy') {
       navigator.clipboard
         ?.writeText(value)

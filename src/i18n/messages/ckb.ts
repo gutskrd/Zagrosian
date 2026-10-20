@@ -33,7 +33,6 @@ export const ckb: Messages = {
     security: 'ئاسایش',
   },
   theme: {
-    toggle: 'ڕووکاری تاریک',
     legend: 'ڕووکار',
     system: 'سیستەم',
     light: 'ڕووناک',
@@ -45,6 +44,11 @@ export const ckb: Messages = {
     off: 'دەنگ بکوژێنەوە',
     prompt: 'بە دەنگەوە خۆشترە.',
     dismiss: 'نا، سوپاس',
+  },
+  share: {
+    button: 'هاوبەشکردنی ئەم پەڕەیە',
+    copied: 'بەستەرەکە لەبەرگیرایەوە',
+    copiedStatus: 'بەستەرەکە لەبەرگیرایەوە.',
   },
   language: {
     label: 'زمان',
@@ -73,6 +77,11 @@ export const ckb: Messages = {
     platformsLabel: 'iOS و ئەندرۆید',
     proverb: 'دار لەسەر ڕەگی خۆی سەوز دەبێت و مرۆڤ لەسەر زمانی خۆی.',
     proverbSource: 'پەندی پێشینانی کوردی',
+    word: {
+      label: 'وشەی ڕۆژ',
+      kurmanji: 'کرمانجی',
+      sorani: 'سۆرانی',
+    },
   },
   story: {
     values: ['سادەیی.', 'تایبەتێتی.', 'ڕوونی.'],

@@ -30,7 +30,6 @@ export const es: Messages = {
     security: 'Seguridad',
   },
   theme: {
-    toggle: 'Tema oscuro',
     legend: 'Tema',
     system: 'Sistema',
     light: 'Claro',
@@ -42,6 +41,11 @@ export const es: Messages = {
     off: 'Desactivar el sonido',
     prompt: 'Mejor con sonido.',
     dismiss: 'No, gracias',
+  },
+  share: {
+    button: 'Compartir esta página',
+    copied: 'Enlace copiado',
+    copiedStatus: 'Enlace copiado al portapapeles.',
   },
   language: {
     label: 'Idioma',
@@ -70,6 +74,11 @@ export const es: Messages = {
     platformsLabel: 'iOS y Android',
     proverb: 'El árbol se nutre de sus raíces, y la persona, de su lengua.',
     proverbSource: 'Proverbio kurdo',
+    word: {
+      label: 'Palabra del día',
+      kurmanji: 'kurmanji',
+      sorani: 'sorani',
+    },
   },
   story: {
     values: ['Sencillez.', 'Privacidad.', 'Claridad.'],

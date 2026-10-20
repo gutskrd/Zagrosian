@@ -32,7 +32,6 @@ export const ku: Messages = {
     security: 'Ewlekarî',
   },
   theme: {
-    toggle: 'Tema tarî',
     legend: 'Tema',
     system: 'Pergal',
     light: 'Ronî',
@@ -44,6 +43,11 @@ export const ku: Messages = {
     off: 'Deng vemirîne',
     prompt: 'Bi deng xweştir e.',
     dismiss: 'Na, spas',
+  },
+  share: {
+    button: 'Vê rûpelê parve bike',
+    copied: 'Girêdan hat kopîkirin',
+    copiedStatus: 'Girêdan hat kopîkirin.',
   },
   language: {
     label: 'Ziman',
@@ -72,6 +76,11 @@ export const ku: Messages = {
     platformsLabel: 'iOS û Android',
     proverb: '',
     proverbSource: '',
+    word: {
+      label: 'Peyva rojê',
+      kurmanji: 'Kurmancî',
+      sorani: 'Soranî',
+    },
   },
   story: {
     values: ['Sadeyî.', 'Nepenî.', 'Zelalî.'],

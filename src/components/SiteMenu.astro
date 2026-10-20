@@ -4,9 +4,9 @@
  *
  * It drops in from the top like a curtain; the links, set very large, rise one
  * after another from behind their masks, and the rest follows. Hovering a
- * link dims the others. Besides the pages it holds contact, social media,
- * every language (with the world icon), sound, the theme, and the time at
- * headquarters.
+ * link dims the others. Besides the pages it holds Visit Hevalo and Share,
+ * contact, social media, every language (with the world icon), the settings
+ * (sound and the theme), and the time at headquarters.
  *
  * It is a popover (`#site-menu`), so it opens, closes on Escape and returns
  * focus by itself, without JavaScript. Its top bar mirrors the header, with
@@ -63,6 +63,26 @@ const year = new Date().getFullYear();
     <div class="site-menu__aside">
       <div class="site-menu__group site-menu__group--cta">
         <Cta href={hevalo.url} arrow="up-right" label={t.nav.visitHevalo} />
+        {
+          /* The system's share sheet where there is one (phones, Safari,
+             Chrome and Edge), otherwise the link is copied (site.ts). Shown
+             once the script can do either. */
+        }
+        <button
+          class="site-menu__share"
+          type="button"
+          data-share
+          data-copied-label={t.share.copied}
+          data-copied-status={t.share.copiedStatus}
+          hidden
+        >
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+            <path d="M10 12.25V2.75M6.5 6.25 10 2.75l3.5 3.5"></path>
+            <path d="M6.75 9.25h-1.5a1.5 1.5 0 0 0-1.5 1.5v4.5a1.5 1.5 0 0 0 1.5 1.5h9.5a1.5 1.5 0 0 0 1.5-1.5v-4.5a1.5 1.5 0 0 0-1.5-1.5h-1.5"></path>
+          </svg>
+          <span data-share-text>{t.share.button}</span>
+        </button>
+        <p class="visually-hidden" role="status" data-share-status></p>
       </div>
 
       <div class="site-menu__group">
@@ -310,6 +330,58 @@ const year = new Date().getFullYear();
   .site-menu__group--cta,
   .site-menu__group--languages {
     grid-column: 1 / -1;
+  }
+
+  /* Visit Hevalo, and beside it the quieter Share. */
+  .site-menu__group--cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* An outlined pill, like the sound button below it. */
+  .site-menu__share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      scale 0.2s var(--ease-out);
+  }
+
+  .site-menu__share[hidden] {
+    display: none;
+  }
+
+  .site-menu__share:active {
+    scale: 0.97;
+  }
+
+  @media (hover: hover) {
+    .site-menu__share:hover {
+      border-color: var(--color-ink);
+    }
+  }
+
+  .site-menu__share svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .site-menu__label {
