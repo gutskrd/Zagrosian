@@ -75,11 +75,6 @@ export const ar: Messages = {
     platformsLabel: 'iOS وأندرويد',
     proverb: 'الشجرة تزدهر بجذورها، والإنسان بلغته.',
     proverbSource: 'مثل كردي',
-    word: {
-      label: 'كلمة اليوم',
-      kurmanji: 'الكرمانجية',
-      sorani: 'السورانية',
-    },
   },
   story: {
     values: ['البساطة.', 'الخصوصية.', 'الوضوح.'],

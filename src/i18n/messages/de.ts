@@ -74,11 +74,6 @@ export const de: Messages = {
     platformsLabel: 'iOS und Android',
     proverb: 'Der Baum wächst aus seinen Wurzeln, der Mensch aus seiner Sprache.',
     proverbSource: 'Kurdisches Sprichwort',
-    word: {
-      label: 'Wort des Tages',
-      kurmanji: 'Kurmandschi',
-      sorani: 'Sorani',
-    },
   },
   story: {
     values: ['Einfachheit.', 'Privatsphäre.', 'Klarheit.'],

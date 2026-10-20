@@ -62,12 +62,6 @@ Requires Node 22.12 or later.
   files (`footer.thanks`, `hevalo.proverb`), and use the `kurdish` class, which sets
   them in the same serif italic as hevalo.app (see **Fonts** below). On right-to-left pages they still
   run left to right, but line up on the right with the rest of the page.
-- **The word of the day:** beside the proverb, an everyday Kurdish word
-  ([`WordOfTheDay.astro`](src/components/WordOfTheDay.astro)) in Kurmanji and in Sorani, with what it
-  means in the page's language (on the Sorani page it leads in Sorani; in Kurmanji and Sorani there
-  is no translation line). The 31 words are in [`src/lib/words.ts`](src/lib/words.ts), one a day in
-  order, the same for every visitor on the same date. The page is built with the day's word, so it
-  reads the same without JavaScript; `site.ts` then shows the word for the visitor's own date.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro) (text: `hevalo.comingSoon*` in the
   message files). When the apps are out, replace it with links to the App Store and Google Play.
@@ -592,7 +586,7 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `layout.spec.ts`        | Every page at six widths from 320 to 1920 pixels: nothing runs off the screen or is cut off, and everything you tap is at least 24 by 24 pixels |
 | `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
 | `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
-| `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu), Share, and the word of the day for the visitor's date |
+| `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu) and Share |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
 

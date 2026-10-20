@@ -1,9 +1,8 @@
 /**
  * The controls a visitor uses: the language menu, the language suggestion,
- * the site menu on a phone, the theme, Share, and the word of the day.
+ * the site menu on a phone, the theme, and Share.
  */
 import { expect, test } from '@playwright/test';
-import { dayNumber, wordIndex, words } from '../src/lib/words';
 
 /** With sound off. */
 test.beforeEach(async ({ context }) => {
@@ -45,7 +44,7 @@ test.describe('on a computer', () => {
   });
 });
 
-test.describe('in the menu and with Hevalo', () => {
+test.describe('in the menu', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test('Share copies the page’s own address where there is no share sheet', async ({ page, context }) => {
@@ -63,25 +62,6 @@ test.describe('in the menu and with Hevalo', () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('https://zagrosian.com/de/privacy');
   });
 
-  for (const [path, main, other] of [
-    ['/', 'ku', 'ckb'],
-    ['/ckb', 'ckb', 'ku'],
-    ['/ku', 'ku', 'ckb'],
-  ] as const) {
-    test(`the word of the day is the visitor’s day’s: ${path}`, async ({ page }) => {
-      await page.goto(path, { waitUntil: 'networkidle' });
-      const today = await page.evaluate(() => {
-        const now = new Date();
-        return [now.getFullYear(), now.getMonth(), now.getDate()] as const;
-      });
-      const word = words[wordIndex(dayNumber(...today))]!;
-      const card = page.locator('[data-word]');
-      await expect(card.locator('[data-word-main]')).toHaveText(word[main]);
-      await expect(card.locator('[data-word-other]')).toHaveText(word[other]);
-      if (path === '/') await expect(card.locator('[data-word-meaning]')).toHaveText(word.meaning.en);
-      else await expect(card.locator('[data-word-meaning]')).toHaveCount(0);
-    });
-  }
 });
 
 test.describe('on a phone', () => {

@@ -225,40 +225,6 @@ function initShare() {
 }
 
 /**
- * The Kurdish word of the day with Hevalo (WordOfTheDay.astro): the page
- * holds the word of the day it was built on, and every word; this shows the
- * one for the visitor's own date, counted as src/lib/words.ts counts.
- */
-function initWordOfTheDay() {
-  for (const card of document.querySelectorAll<HTMLElement>('[data-word]')) {
-    let list: string[][];
-    try {
-      list = JSON.parse(card.dataset.words ?? '[]');
-    } catch {
-      continue;
-    }
-    if (list.length === 0) continue;
-
-    const now = new Date();
-    const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
-    const index = ((day % list.length) + list.length) % list.length;
-    if (String(index) === card.dataset.wordIndex) continue;
-
-    const [main = '', other = '', meaning = ''] = list[index] ?? [];
-    const slots: [string, string][] = [
-      ['[data-word-main]', main],
-      ['[data-word-other]', other],
-      ['[data-word-meaning]', meaning],
-    ];
-    for (const [selector, text] of slots) {
-      const slot = card.querySelector<HTMLElement>(selector);
-      if (slot) slot.textContent = text;
-    }
-    card.dataset.wordIndex = String(index);
-  }
-}
-
-/**
  * The current time at the headquarters, next to the country in About. It is
  * formatted for the page's language and updates on the minute.
  */
@@ -355,7 +321,6 @@ initTableOfContents();
 initSectionNav();
 initCopyButtons();
 initShare();
-initWordOfTheDay();
 initLocalTime();
 initLegalTools();
 initCommandMenu();

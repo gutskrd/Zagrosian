@@ -88,12 +88,6 @@ export const en = {
     proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
-    /** The Kurdish word of the day (src/lib/words.ts), and the names of the two dialects it is shown in. */
-    word: {
-      label: 'Word of the day',
-      kurmanji: 'Kurmanji',
-      sorani: 'Sorani',
-    },
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {

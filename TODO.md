@@ -49,9 +49,7 @@ have. Each item says why it matters and where it goes.
    Each translated legal page says the English version applies, but text that reads as machine-made
    costs trust in the very languages Hevalo is about. Have each language read through by a native
    speaker, Kurmanji and Sorani first. New this round: the VAT label in the footer (`footer.vat`),
-   shown once a VAT number is filled in; Share in the menu (`share`); and the word of the day with
-   Hevalo: its 31 words in Kurmanji and Sorani and their meanings in the other eight languages
-   ([`src/lib/words.ts`](src/lib/words.ts)), and its labels (`hevalo.word`).
+   shown once a VAT number is filled in, and Share in the menu (`share`).
 2. **A lawyer.** The privacy policy, terms and security policy were written carefully but have not
    been reviewed by a lawyer. A review is due once the company is registered (see above), and again
    whenever the site starts to collect more than it does now (analytics, forms, accounts).

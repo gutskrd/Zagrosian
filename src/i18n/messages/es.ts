@@ -74,11 +74,6 @@ export const es: Messages = {
     platformsLabel: 'iOS y Android',
     proverb: 'El árbol se nutre de sus raíces, y la persona, de su lengua.',
     proverbSource: 'Proverbio kurdo',
-    word: {
-      label: 'Palabra del día',
-      kurmanji: 'kurmanji',
-      sorani: 'sorani',
-    },
   },
   story: {
     values: ['Sencillez.', 'Privacidad.', 'Claridad.'],

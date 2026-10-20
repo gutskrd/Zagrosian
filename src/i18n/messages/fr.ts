@@ -75,11 +75,6 @@ export const fr: Messages = {
     platformsLabel: 'iOS et Android',
     proverb: 'L’arbre puise sa force dans ses racines, et chacun dans sa langue.',
     proverbSource: 'Proverbe kurde',
-    word: {
-      label: 'Mot du jour',
-      kurmanji: 'kurmandji',
-      sorani: 'sorani',
-    },
   },
   story: {
     values: ['Simplicité.', 'Confidentialité.', 'Clarté.'],

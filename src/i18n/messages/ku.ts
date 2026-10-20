@@ -76,11 +76,6 @@ export const ku: Messages = {
     platformsLabel: 'iOS û Android',
     proverb: '',
     proverbSource: '',
-    word: {
-      label: 'Peyva rojê',
-      kurmanji: 'Kurmancî',
-      sorani: 'Soranî',
-    },
   },
   story: {
     values: ['Sadeyî.', 'Nepenî.', 'Zelalî.'],

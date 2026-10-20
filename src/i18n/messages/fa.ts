@@ -77,11 +77,6 @@ export const fa: Messages = {
     platformsLabel: 'iOS و اندروید',
     proverb: 'درخت با ریشه‌اش سبز می‌شود و انسان با زبانش.',
     proverbSource: 'ضرب‌المثل کردی',
-    word: {
-      label: 'واژهٔ روز',
-      kurmanji: 'کرمانجی',
-      sorani: 'سورانی',
-    },
   },
   story: {
     values: ['سادگی.', 'حریم خصوصی.', 'وضوح.'],

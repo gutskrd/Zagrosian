@@ -77,11 +77,6 @@ export const ckb: Messages = {
     platformsLabel: 'iOS و ئەندرۆید',
     proverb: 'دار لەسەر ڕەگی خۆی سەوز دەبێت و مرۆڤ لەسەر زمانی خۆی.',
     proverbSource: 'پەندی پێشینانی کوردی',
-    word: {
-      label: 'وشەی ڕۆژ',
-      kurmanji: 'کرمانجی',
-      sorani: 'سۆرانی',
-    },
   },
   story: {
     values: ['سادەیی.', 'تایبەتێتی.', 'ڕوونی.'],

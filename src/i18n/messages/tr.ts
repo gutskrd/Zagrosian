@@ -74,11 +74,6 @@ export const tr: Messages = {
     platformsLabel: 'iOS ve Android',
     proverb: 'Ağaç köküyle, insan diliyle yeşerir.',
     proverbSource: 'Kürt atasözü',
-    word: {
-      label: 'Günün kelimesi',
-      kurmanji: 'Kurmanci',
-      sorani: 'Sorani',
-    },
   },
   story: {
     values: ['Sadelik.', 'Gizlilik.', 'Netlik.'],
