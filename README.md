@@ -630,7 +630,10 @@ The script runs before the static files for every address except the fingerprint
 - **security.txt never lapses.** Its `Expires` date is moved to 180 days after the day it is served.
 
 Everything else, every header in `public/_headers` included, is served by the static assets as
-before (the tests check both).
+before (the tests check both). Workers Logs are switched off (`observability` in `wrangler.jsonc`):
+Cloudflare turns them on for new Workers, and they would keep each visit's request details and
+location for days, while the privacy policy says the site keeps no server logs of its own. If you
+turn them on in the dashboard to debug something, turn them off again afterwards.
 
 Cloudflare deploys it from GitHub with Workers Builds. In the Cloudflare dashboard, under **Workers &
 Pages → zagrosian → Settings → Build**, use:

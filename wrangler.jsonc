@@ -7,6 +7,10 @@
   "name": "zagrosian",
   "compatibility_date": "2026-09-28",
   "main": "./worker/index.ts",
+  // No Workers Logs: Cloudflare turns them on for new Workers, and they would
+  // keep each visit's request details and location for days. The privacy
+  // policy says the site keeps no server logs of its own.
+  "observability": { "enabled": false },
   "build": {
     "command": "npm run build"
   },
