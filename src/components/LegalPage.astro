@@ -1,14 +1,14 @@
 ---
 /**
- * A legal page (privacy, terms or security) in the language of the URL, from
+ * A legal page (privacy, terms or security, or one of the Hevalo bot's) in the language of the URL, from
  * src/content/legal/<language>/<page>.md.
  */
 import { getEntry, render } from 'astro:content';
-import { i18n, type LegalSlug } from '../i18n';
+import { i18n, type DocumentSlug } from '../i18n';
 import LegalLayout from '../layouts/LegalLayout.astro';
 
 interface Props {
-  slug: LegalSlug;
+  slug: DocumentSlug;
 }
 
 const { slug } = Astro.props;

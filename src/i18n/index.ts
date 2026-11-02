@@ -21,6 +21,18 @@ export type { Messages };
 export const legalSlugs = ['privacy', 'terms', 'security'] as const;
 export type LegalSlug = (typeof legalSlugs)[number];
 
+/**
+ * The Hevalo Discord bot's own terms and privacy policy. They are written and
+ * built like the legal pages (src/content/legal/<language>/<page>.md), but
+ * they belong to the product, not to this website, so the footer and menus
+ * list only `legalSlugs`; the bot's page (/hevalo-bot) links to these.
+ */
+export const botLegalSlugs = ['hevalo-bot-terms', 'hevalo-bot-privacy'] as const;
+
+/** Every page built from src/content/legal. */
+export const documentSlugs = [...legalSlugs, ...botLegalSlugs] as const;
+export type DocumentSlug = (typeof documentSlugs)[number];
+
 const catalogues: Record<Locale, Messages> = { en, ku, ckb, nl, de, es, fr, tr, ar, fa };
 
 export const messages = (locale: Locale): Messages => catalogues[locale];

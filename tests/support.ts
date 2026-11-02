@@ -9,8 +9,16 @@ export { locales };
 /** A language's URL prefix: none for English. */
 export const prefix = (code: string) => (code === defaultLocale ? '' : `/${code}`);
 
-/** A language's pages: the homepage and the legal pages. */
-export const pagesIn = (code: string) => [prefix(code) || '/', `${prefix(code)}/privacy`, `${prefix(code)}/terms`, `${prefix(code)}/security`];
+/** A language's pages: the homepage, the legal pages and the Hevalo bot's page and documents. */
+export const pagesIn = (code: string) => [
+  prefix(code) || '/',
+  `${prefix(code)}/privacy`,
+  `${prefix(code)}/terms`,
+  `${prefix(code)}/security`,
+  `${prefix(code)}/hevalo-bot`,
+  `${prefix(code)}/hevalo-bot-terms`,
+  `${prefix(code)}/hevalo-bot-privacy`,
+];
 
 /** Every page in every language. */
 export const pages = locales.flatMap(({ code }) => pagesIn(code));

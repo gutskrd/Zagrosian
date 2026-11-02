@@ -81,6 +81,38 @@ export const hevalo = {
   logo: 'https://hevalo.app/logo.png',
 };
 
+/** Discord's id for the Hevalo bot (public: it is in every invite link). */
+const hevaloBotClientId = '1533561206449766652';
+
+/**
+ * The permissions the "Add to Discord server" link asks for: only what the bot's
+ * features use, never Administrator. Each one is explained on /hevalo-bot
+ * (`bot.permissions`); keep the two in step. Discord's permission bits:
+ * View Channels, Send Messages (and in threads), Embed Links, Read Message
+ * History, Add Reactions, Mention Everyone, Manage Messages, Manage Channels,
+ * Manage Roles, Kick, Ban and Timeout Members, Manage Server, Connect, Speak.
+ */
+const hevaloBotPermissions = '1374661340278';
+
+export const hevaloBot = {
+  name: 'Hevalo',
+  /** Adds the bot to a server (guild install), with its slash commands. */
+  inviteUrl: `https://discord.com/oauth2/authorize?client_id=${hevaloBotClientId}&permissions=${hevaloBotPermissions}&integration_type=0&scope=bot+applications.commands`,
+  /** Adds Hevalo's commands to the visitor's own account (user install): DMs and any server. */
+  userInstallUrl: `https://discord.com/oauth2/authorize?client_id=${hevaloBotClientId}&integration_type=1&scope=applications.commands`,
+  /** The languages the bot speaks, in their own names, Kurmanji first (the bot's default). */
+  languages: [
+    { name: 'Kurmancî', lang: 'ku', dir: 'ltr' },
+    { name: 'سۆرانی', lang: 'ckb', dir: 'rtl' },
+    { name: 'English', lang: 'en', dir: 'ltr' },
+    { name: 'Nederlands', lang: 'nl', dir: 'ltr' },
+    { name: 'Deutsch', lang: 'de', dir: 'ltr' },
+    { name: 'Français', lang: 'fr', dir: 'ltr' },
+    { name: 'Türkçe', lang: 'tr', dir: 'ltr' },
+    { name: 'العربية', lang: 'ar', dir: 'rtl' },
+  ],
+};
+
 /**
  * Kurdish phrases that belong to the brand and stay in Kurmanji in every
  * language, each with a translation in the message files.

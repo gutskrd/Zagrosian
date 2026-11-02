@@ -8,21 +8,21 @@
 import { getCollection } from 'astro:content';
 import {
   defaultLocale,
-  legalSlugs,
+  documentSlugs,
   localizePath,
   locales,
   messages,
   navigation,
-  type LegalSlug,
+  type DocumentSlug,
   type Locale,
 } from '../i18n';
-import { hevalo, kurdish, site, socialProfiles } from '../site';
+import { hevalo, hevaloBot, kurdish, site, socialProfiles } from '../site';
 import { answerMarkdown, faq, faqMore } from './faq';
 
 export interface TextPage {
   locale: Locale;
-  /** `index` for the homepage, otherwise the legal page. */
-  slug: 'index' | LegalSlug;
+  /** `index` for the homepage, `hevalo-bot` for the bot's page, otherwise the legal page. */
+  slug: 'index' | 'hevalo-bot' | DocumentSlug;
   title: string;
   description: string;
   /** Canonical URL of the HTML page. */
@@ -107,6 +107,56 @@ ${legal.join('\n')}
 `;
 }
 
+/** The Hevalo bot's page (/hevalo-bot) as Markdown, from the same messages as the HTML page. */
+function botMarkdown(locale: Locale): string {
+  const { bot } = messages(locale);
+  const link = (path: string) => absolute(localizePath(locale, path));
+  const features = bot.features.map((item) => `### ${item.title}\n\n${item.text}`);
+  const steps = bot.steps.map((step, index) => `${index + 1}. ${step.text}${step.command ? `: \`${step.command}\`` : ''}`);
+  const permissions = bot.permissions.map((item) => `- **${item.name}**: ${item.why}`);
+
+  return `# ${bot.title}
+
+> ${bot.headline.join(' ')}
+
+${bot.lead}
+
+- [${bot.add}](${hevaloBot.inviteUrl})
+- [${bot.addApp}](${hevaloBot.userInstallUrl}): ${bot.addAppNote}
+
+## ${bot.featuresTitle}
+
+${features.join('\n\n')}
+
+## ${bot.languagesTitle}
+
+${bot.languages}
+
+${hevaloBot.languages.map((language) => language.name).join(' · ')}
+
+## ${bot.startTitle}
+
+${steps.join('\n')}
+
+## ${bot.permissionsTitle}
+
+${bot.permissionsLead}
+
+${permissions.join('\n')}
+
+${bot.noReading}
+
+## ${bot.legalTitle}
+
+${bot.legalLead}
+
+- [${bot.terms}](${link('/hevalo-bot-terms')})
+- [${bot.privacy}](${link('/hevalo-bot-privacy')})
+
+${bot.app} [${hevalo.domain}](${hevalo.url})
+`;
+}
+
 /** Every page with a Markdown version, in every language. */
 export async function textPages(): Promise<TextPage[]> {
   const legal = await getCollection('legal');
@@ -124,7 +174,17 @@ export async function textPages(): Promise<TextPage[]> {
       markdown: homeMarkdown(locale),
     };
 
-    const legalPages = legalSlugs.map((slug): TextPage => {
+    const botPage: TextPage = {
+      locale,
+      slug: 'hevalo-bot',
+      title: t.bot.title,
+      description: t.bot.description,
+      url: absolute(localizePath(locale, '/hevalo-bot')),
+      markdownUrl: absolute(markdownPath(locale, 'hevalo-bot')),
+      markdown: botMarkdown(locale),
+    };
+
+    const legalPages = documentSlugs.map((slug): TextPage => {
       const entry = legal.find((item) => item.id === `${locale}/${slug}`);
       if (!entry) throw new Error(`Missing translation: src/content/legal/${locale}/${slug}.md`);
       const { title, description, updated } = entry.data;
@@ -144,7 +204,7 @@ export async function textPages(): Promise<TextPage[]> {
       };
     });
 
-    return [home, ...legalPages];
+    return [home, botPage, ...legalPages];
   });
 }
 
@@ -188,6 +248,7 @@ ${languages.join('\n')}
 ## Products
 
 - [${hevalo.name}](${hevalo.url}): ${t.hevalo.description}
+- [${t.bot.title}](${absolute('/hevalo-bot')}): ${t.bot.description}
 
 ## Optional
 

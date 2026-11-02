@@ -88,6 +88,85 @@ export const en = {
     proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
+    /** The link from the Hevalo section to /hevalo-bot. */
+    discord: 'Hevalo for Discord',
+  },
+  /**
+   * The Hevalo Discord bot's page (/hevalo-bot). Slash commands such as /setup
+   * stay in English in every language: they are what people type in Discord.
+   */
+  bot: {
+    /** The page's name: its title (with " — Zagrosian"), breadcrumb and Markdown heading. */
+    title: 'Hevalo for Discord',
+    description:
+      'Learn Kurdish in your Discord server with words, quizzes, games and an AI tutor, plus moderation, safety tools and music. Free, and Kurmanji first.',
+    eyebrow: 'Hevalo for Discord',
+    /** One entry per line of the heading. */
+    headline: ['Learn Kurdish', 'where you already talk.'],
+    lead: 'Hevalo brings Kurdish into your Discord server: a new word every morning, quizzes and games with friends, and an AI tutor that answers in Kurmanji. It also keeps your community safe and plays music.',
+    add: 'Add to Discord server',
+    addApp: 'Add to my apps',
+    addAppNote: 'Puts Hevalo’s learning and AI commands in your own account, for direct messages and any server.',
+    free: 'Free · Kurmanji first · Eight languages',
+    featuresTitle: 'What Hevalo does',
+    features: [
+      {
+        title: 'Learn every day',
+        text: 'Words with pronunciation and examples, quizzes and a daily challenge, with XP, levels and streaks. A word of the day appears in your server every morning.',
+      },
+      {
+        title: 'Play together',
+        text: 'Peyvok, a Kurmanji word game with ç, ê, î, ş and û, and a leaderboard of your server’s best learners.',
+      },
+      {
+        title: 'Ask and translate',
+        text: 'An AI tutor that answers questions, explains grammar and lets you practise conversations. Right-click any message to translate it.',
+      },
+      {
+        title: 'Keep it safe',
+        text: 'Discord’s own AutoMod rules against spam, mass mentions, slurs and scam links, raid protection, warnings that escalate, and a log of every moderation action.',
+      },
+      {
+        title: 'Run your server',
+        text: 'Welcome messages, a role for new members, buttons for picking roles and well-formatted announcements, all set up from inside Discord.',
+      },
+      {
+        title: 'Listen together',
+        text: 'Music in voice channels, with buttons to pause, skip, repeat and shuffle. Only the people listening can control it.',
+      },
+    ],
+    languagesTitle: 'Speaks your language',
+    languages:
+      'Hevalo speaks Kurmanji unless you ask for another language. Members choose their own with /ziman, and administrators choose the server’s.',
+    startTitle: 'Get started in a minute',
+    /** `command` is shown as code after the step; leave it empty for none. */
+    steps: [
+      { text: 'Add Hevalo to your server with the button above', command: '' },
+      { text: 'Choose a channel for moderation logs', command: '/setup modlog' },
+      { text: 'Turn on protection against spam and raids', command: '/automod setup' },
+      { text: 'Welcome new members in a channel of your choice', command: '/setup welcome' },
+    ],
+    permissionsTitle: 'What Hevalo asks for, and why',
+    permissionsLead:
+      'Hevalo asks only for the permissions its features use, never Administrator. You can untick any of them when you add it; the features that need it then stop working.',
+    /** One entry per group of permissions in the invite link (`hevaloBotPermissions` in src/site.ts). */
+    permissions: [
+      { name: 'View channels, send messages, embed links, add reactions', why: 'To answer commands and post the word of the day, welcomes and polls.' },
+      { name: 'Read message history and manage messages', why: 'For /purge, which moderators use to clear spam.' },
+      { name: 'Manage channels', why: 'For /lock and /slowmode.' },
+      { name: 'Manage roles', why: 'For the role for new members, role buttons, and locking channels.' },
+      { name: 'Time out, kick and ban members', why: 'For the moderation commands, which only your moderators can use.' },
+      { name: 'Manage server', why: 'To set up AutoMod rules and pause invites during a raid.' },
+      { name: 'Connect and speak', why: 'To play music in voice channels.' },
+      { name: 'Mention everyone', why: 'For announcements that notify a role.' },
+    ],
+    noReading:
+      'Hevalo does not read your server’s messages. It sees only the commands you use and the messages you choose to translate.',
+    legalTitle: 'Terms and privacy',
+    legalLead: 'By adding or using Hevalo, you agree to its terms. Its privacy policy explains what it stores, why and for how long.',
+    terms: 'Terms of Service',
+    privacy: 'Privacy Policy',
+    app: 'Hevalo is also an app for learning Kurdish with friends:',
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {
