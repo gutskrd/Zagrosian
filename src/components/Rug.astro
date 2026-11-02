@@ -1,9 +1,8 @@
 ---
 /**
  * A rug lying on the floor in late sun: a pile rug after those of Bijar and
- * Senneh, Kurdish weaving towns in the Zagros (drawn by scripts/rug.mjs). The
- * first time it comes into view it is woven in front of you, a row at a time
- * on its warp; then its nearest corner turns up, and it can be picked up:
+ * Senneh, Kurdish weaving towns in the Zagros (drawn by scripts/rug.mjs). It
+ * is simply there, its nearest corner turned up, and it can be picked up:
  * lift the corner and fold it over, drag it, twist it round (rug-scene.ts,
  * loaded as it comes near; WebGL 2).
  *
@@ -18,20 +17,23 @@ import rugPicture from '../assets/rug/rug.webp?url';
 
 <div class="rug" data-rug>
   <div class="rug__flat" aria-hidden="true">
-    <img src={rugPicture} alt="" width="1010" height="1730" loading="lazy" decoding="async" />
+    {/* The first thing on the homepage: fetched at once. */}
+    <img src={rugPicture} alt="" width="1010" height="1730" fetchpriority="high" decoding="async" />
   </div>
   <canvas class="rug__canvas" aria-hidden="true"></canvas>
 </div>
 
 <style>
-  /* The floor, with room around the rug for the light, and to move and fold it. */
+  /* The floor, with room around the rug for the light, and to move and fold
+     it; on a computer low enough that the hint and the button below it are
+     on the first screen too. */
   .rug {
-    --rug-share: 0.27;
+    --rug-share: 0.25;
     --rug-angle: -0.5;
     --rug-width: calc(var(--rug-share) * 100cqw);
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 2 / 1;
     container-type: inline-size;
     /* A swipe still scrolls the page; the rug is picked up by pressing on it
        (on a touch screen, pressing and holding). */

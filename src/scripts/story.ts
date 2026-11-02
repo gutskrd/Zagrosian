@@ -173,6 +173,8 @@ export function initStory() {
   const perspective = parseFloat(getComputedStyle(art).perspective) || 1280;
   const sunPerspective = parseFloat(getComputedStyle(sunrise).perspective) || 960;
   let start = { x: 0, y: 0, size: 1 };
+  /** Where the hero is on the page: the logo travels from it once it reaches the top of the screen. */
+  let heroTop = 0;
   let storyTop = 0;
   let pinned = 1;
   let rest = { x: 0, y: 0, size: 1 };
@@ -192,6 +194,7 @@ export function initStory() {
     stageHeight = stage.offsetHeight;
     view = stage.clientHeight - parseFloat(getComputedStyle(stage).paddingBottom);
     start = { x: hero.x + hero.width / 2, y: hero.y + hero.width / 2, size: hero.width };
+    heroTop = place(from.closest<HTMLElement>('.hero') ?? from).y;
     storyTop = place(story).y;
     pinned = Math.max(1, story.offsetHeight - stageHeight);
     rest = { x: spot.x - top.x + spot.width / 2, y: spot.y - top.y + spot.width / 2, size: spot.width || hero.width };
@@ -207,7 +210,7 @@ export function initStory() {
     // as it scrolls up, resizes the window without changing any of this (the
     // stage is sized to stay put): then the drawings are kept, as they are,
     // rather than drawn again just as the reader turns round.
-    const as = [width, stageHeight, view, storyTop, pinned, start.x, start.y, start.size, rest.x, rest.y, rest.size, sunAt.x, sunAt.y, sunAt.size]
+    const as = [width, stageHeight, view, heroTop, storyTop, pinned, start.x, start.y, start.size, rest.x, rest.y, rest.size, sunAt.x, sunAt.y, sunAt.size]
       .map((value) => value.toFixed(1))
       .join();
     if (as === measuredAs) return;
@@ -253,15 +256,16 @@ export function initStory() {
     const middleY = view / 2;
 
     // ---- The glass logo: down from the hero, beside the values, to the
-    // middle, and in.
-    const glide = ease(0, storyTop, scroll);
+    // middle, and in. Until the hero reaches the top of the screen (the rug
+    // comes first, Underneath.astro), the logo goes up the screen with it.
+    const glide = ease(heroTop, storyTop, scroll);
     const risen = VALUES.map((at) => ease(at, at + RISE, q));
     const turned = risen.reduce((sum, value) => sum + value, 0);
     const faced = ease(DIVE[0], DIVE[1], q);
     const flight = ease(DIVE[1], DIVE[2], q);
 
     let x = mix(start.x, rest.x, glide);
-    let y = mix(start.y, rest.y, glide);
+    let y = mix(start.y - Math.min(scroll, heroTop), rest.y, glide);
     let size = mix(start.size, rest.size, glide);
     let pitch = REST_PITCH - turned * 2;
     let yaw = REST_YAW + turned * 14;

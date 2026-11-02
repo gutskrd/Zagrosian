@@ -15,7 +15,7 @@ export function initRug() {
 
   const button = document.querySelector<HTMLButtonElement>('[data-rug-button]');
   if (button) {
-    button.hidden = false;
+    button.setAttribute('data-ready', '');
     const label = (lifted: boolean) => {
       button.textContent = (lifted ? button.dataset.lay : button.dataset.lift) ?? '';
     };
