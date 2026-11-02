@@ -92,6 +92,13 @@ export const fa: Messages = {
     productsLabel: 'محصولات',
     localTime: 'ساعت {time} به وقت محلی',
   },
+  under: {
+    title: 'گوشه‌ای را بلند کنید.',
+    hintPointer: 'گوشه را بلند کنید',
+    hintTouch: 'گوشه را لمس کنید و نگه دارید',
+    lift: 'بلند کردن گلیم',
+    lay: 'دوباره پهن کردن',
+  },
   faq: {
     eyebrow: 'پرسش و پاسخ',
     title: 'پرسش‌های متداول.',

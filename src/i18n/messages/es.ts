@@ -89,6 +89,13 @@ export const es: Messages = {
     productsLabel: 'Productos',
     localTime: '{time}, hora local',
   },
+  under: {
+    title: 'Levanta una esquina.',
+    hintPointer: 'Levanta la esquina',
+    hintTouch: 'Mantén pulsada la esquina',
+    lift: 'Levantar la alfombra',
+    lay: 'Volver a extenderla',
+  },
   faq: {
     eyebrow: 'FAQ',
     title: 'Preguntas frecuentes.',

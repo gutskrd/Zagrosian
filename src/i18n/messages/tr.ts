@@ -89,6 +89,13 @@ export const tr: Messages = {
     productsLabel: 'Ürünler',
     localTime: 'Yerel saat {time}',
   },
+  under: {
+    title: 'Bir köşesini kaldırın.',
+    hintPointer: 'Köşeyi kaldırın',
+    hintTouch: 'Köşeye basılı tutun',
+    lift: 'Kilimi kaldır',
+    lay: 'Yeniden ser',
+  },
   faq: {
     eyebrow: 'SSS',
     title: 'Sıkça sorulan sorular.',

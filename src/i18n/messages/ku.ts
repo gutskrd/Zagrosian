@@ -92,6 +92,13 @@ export const ku: Messages = {
     productsLabel: 'Berhem',
     localTime: 'Demjimêra herêmî: {time}',
   },
+  under: {
+    title: 'Quncikekê hildin.',
+    hintPointer: 'Quncikê hildin',
+    hintTouch: 'Tiliya xwe li ser quncikê bihêlin',
+    lift: 'Kilîmê hildin',
+    lay: 'Dîsa raxin',
+  },
   faq: {
     eyebrow: 'Pirs û bersiv',
     title: 'Pirsên ku pir tên pirsîn.',

@@ -84,10 +84,18 @@ export const en = {
     dialectsLabel: 'Dialects',
     dialects: 'Kurmanji first, more planned',
     platformsLabel: 'iOS and Android',
-    /** Translation of the Kurmanji proverb shown with Hevalo (`kurdish.proverb` in src/site.ts). Empty in Kurmanji. */
+    /** Translation of the Kurmanji proverb (`kurdish.proverb` in src/site.ts, shown by Proverb.astro). Empty in Kurmanji. */
     proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
+  },
+  /** The rug in late sun (Underneath.astro). The title is for screen readers; the hint and button are seen. */
+  under: {
+    title: 'Lift a corner.',
+    hintPointer: 'Lift the corner',
+    hintTouch: 'Press and hold the corner',
+    lift: 'Lift the rug',
+    lay: 'Lay it back',
   },
   /** Zagrosian's three values, shown one by one in the story under the hero. */
   story: {

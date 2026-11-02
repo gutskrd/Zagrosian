@@ -89,6 +89,13 @@ export const de: Messages = {
     productsLabel: 'Produkte',
     localTime: '{time} Uhr Ortszeit',
   },
+  under: {
+    title: 'Heben Sie eine Ecke an.',
+    hintPointer: 'Ecke anheben',
+    hintTouch: 'Ecke gedrückt halten',
+    lift: 'Teppich anheben',
+    lay: 'Wieder hinlegen',
+  },
   faq: {
     eyebrow: 'FAQ',
     title: 'Häufige Fragen.',

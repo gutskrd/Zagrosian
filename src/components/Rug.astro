@@ -1,0 +1,124 @@
+---
+/**
+ * A rug lying on the floor in late sun: a pile rug after those of Bijar and
+ * Senneh, Kurdish weaving towns in the Zagros (drawn by scripts/rug.mjs). The
+ * first time it comes into view it is woven in front of you, a row at a time
+ * on its warp; then its nearest corner turns up, and it can be picked up:
+ * lift the corner and fold it over, drag it, twist it round (rug-scene.ts,
+ * loaded as it comes near; WebGL 2).
+ *
+ * Under it lies a paper plane (Proverb.astro, plane.ts), which takes its place
+ * from the size and lie of the rug set here: `--rug-share` (its width, as a
+ * share of the stage's) and `--rug-angle` (radians). The scene reads them too,
+ * and the flat picture is placed by them, so all agree. Until the scene is
+ * ready, and without WebGL, the flat picture lies there.
+ */
+import rugPicture from '../assets/rug/rug.webp?url';
+---
+
+<div class="rug" data-rug>
+  <div class="rug__flat" aria-hidden="true">
+    <img src={rugPicture} alt="" width="1010" height="1730" loading="lazy" decoding="async" />
+  </div>
+  <canvas class="rug__canvas" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  /* The floor, with room around the rug for the light, and to move and fold it. */
+  .rug {
+    --rug-share: 0.27;
+    --rug-angle: -0.5;
+    --rug-width: calc(var(--rug-share) * 100cqw);
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    container-type: inline-size;
+    /* A swipe still scrolls the page; the rug is picked up by pressing on it
+       (on a touch screen, pressing and holding). */
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (max-width: 63.99rem) {
+    .rug {
+      --rug-share: 0.36;
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 39.99rem) {
+    .rug {
+      --rug-share: 0.5;
+      aspect-ratio: 4 / 5;
+    }
+  }
+
+  .rug[data-over] {
+    cursor: grab;
+  }
+
+  .rug[data-holding] {
+    cursor: grabbing;
+  }
+
+  /* The flat picture hangs from the rug's centre, turned as it lies: 101 by
+     161 cells of pile and six of fringe at either end. */
+  .rug__flat {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--rug-width);
+    aspect-ratio: 101 / 173;
+    transform: translate(-50%, -50%) rotate(calc(var(--rug-angle) * 1rad));
+    filter: drop-shadow(0 0.6rem 0.9rem rgb(0 0 0 / 0.3));
+    transition: transform 0.9s var(--ease-in-out);
+  }
+
+  .rug__flat img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Lifted without the 3D scene: the picture is drawn back along its length. */
+  .rug[data-lifted] .rug__flat {
+    transform: translate(-50%, -50%) rotate(calc(var(--rug-angle) * 1rad)) translateY(-58%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rug__flat {
+      transition: none;
+    }
+  }
+
+  .rug__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Once the 3D rug is ready the picture goes, so the two never show together. */
+  .rug[data-live] .rug__flat {
+    visibility: hidden;
+  }
+
+  /* In forced colours (Windows High Contrast) the picture stays, as an outline. */
+  @media (forced-colors: active) {
+    .rug__flat {
+      filter: none;
+      outline: 2px solid CanvasText;
+    }
+
+    .rug__canvas {
+      display: none;
+    }
+
+    .rug[data-live] .rug__flat {
+      visibility: visible;
+    }
+  }
+</style>

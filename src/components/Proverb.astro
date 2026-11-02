@@ -1,0 +1,266 @@
+---
+/**
+ * A Kurdish proverb, written on a sheet of paper: the sheet the paper plane
+ * from under the rug (Underneath.astro) unfolds into as it lands here
+ * (src/scripts/plane.ts). The sheet keeps the plane's creases, worked out from
+ * the same folds (plane-folds.ts), drawn for both ways it can lie: tall on a
+ * phone, landing nose down; wide on a larger screen, landing nose first from
+ * the left.
+ *
+ * The sheet is never taller than the screen leaves under the header, so it
+ * can always be read whole where the plane opens it, and its writing grows
+ * and shrinks with it. The proverb is plain text in the page, read by screen
+ * readers and search engines whatever the plane is doing; without JavaScript,
+ * or with reduced motion, the sheet simply lies here. The plane's canvas is
+ * hidden until the script draws on it.
+ */
+import { i18n } from '../i18n';
+import { foldSheet, LENGTH } from '../scripts/plane-folds';
+import { kurdish } from '../site';
+
+const { t } = i18n(Astro.url);
+const { creases } = foldSheet();
+const round = (value: number) => +value.toFixed(4);
+// Tall, the nose at the bottom (turned half round); wide, the nose to the right.
+const tall = creases.map(({ from, to }) => [0.5 - from[0], LENGTH - from[1], 0.5 - to[0], LENGTH - to[1]].map(round));
+const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LENGTH - to[1], 0.5 + to[0]].map(round));
+---
+
+<div class="proverb section" data-proverb>
+  <div class="container">
+    <figure class="proverb__sheet" data-sheet>
+      <svg class="proverb__creases proverb__creases--tall" viewBox={`0 0 1 ${round(LENGTH)}`} aria-hidden="true" focusable="false">
+        {tall.map(([x1, y1, x2, y2]) => <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />)}
+      </svg>
+      <svg class="proverb__creases proverb__creases--wide" viewBox={`0 0 ${round(LENGTH)} 1`} aria-hidden="true" focusable="false">
+        {wide.map(([x1, y1, x2, y2]) => <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />)}
+      </svg>
+      <div class="proverb__writing">
+        <blockquote class="proverb__text kurdish" lang="ku" dir="ltr">
+          <p>{kurdish.proverb}</p>
+        </blockquote>
+        {t.hevalo.proverb && <p class="proverb__translation">{t.hevalo.proverb}</p>}
+        <figcaption class="proverb__source">
+          <span lang="ku" dir="ltr">{kurdish.proverbSource}</span>
+          {t.hevalo.proverbSource && <span>{t.hevalo.proverbSource}</span>}
+        </figcaption>
+      </div>
+    </figure>
+  </div>
+
+  <canvas class="flight" aria-hidden="true" data-plane hidden></canvas>
+</div>
+
+<style>
+  /* Whatever the plane does off to the side, the page never scrolls sideways. */
+  .proverb {
+    position: relative;
+    overflow-x: clip;
+  }
+
+  /*
+   * A sheet of A4's proportions, the same paper in either theme, as a real
+   * sheet would be: warm white, with the creases of having been a plane.
+   */
+  .proverb__sheet {
+    --paper: rgb(243 239 230);
+    --paper-ink: #1f1c17;
+    --paper-muted: #645e54;
+    /* The height the screen leaves under the header, with a margin. */
+    --room: calc(100vh - var(--header-height) - 3.5rem);
+    position: relative;
+    width: min(100%, 22rem, var(--room) / 1.41421);
+    aspect-ratio: 1 / 1.41421;
+    margin-inline: auto;
+    background: var(--paper);
+    color: var(--paper-ink);
+    text-align: center;
+    container-type: inline-size;
+  }
+
+  @supports (height: 100svh) {
+    .proverb__sheet {
+      --room: calc(100svh - var(--header-height) - 3.5rem);
+    }
+  }
+
+  /* The sheet's shadow on the page, apart so it can come and go softly. */
+  .proverb__sheet::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    box-shadow:
+      0 1px 1px rgb(0 0 0 / 0.1),
+      0 1.5rem 3rem -1.25rem rgb(0 0 0 / 0.4);
+    transition: opacity 0.8s var(--ease-out);
+  }
+
+  @media (min-width: 40rem) {
+    .proverb__sheet {
+      width: min(100%, 38rem, var(--room) * 1.41421);
+      aspect-ratio: 1.41421 / 1;
+    }
+  }
+
+  .proverb__creases {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    stroke: rgb(70 56 40 / 0.09);
+    stroke-width: 1;
+    pointer-events: none;
+  }
+
+  .proverb__creases--wide {
+    display: none;
+  }
+
+  @media (min-width: 40rem) {
+    .proverb__creases--tall {
+      display: none;
+    }
+
+    .proverb__creases--wide {
+      display: block;
+    }
+  }
+
+  /* The writing, sized by the sheet (container units), so it reads the same on any screen. */
+  .proverb__writing {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5cqi;
+    height: 100%;
+    padding: 8cqi;
+  }
+
+  .proverb__text,
+  .proverb__translation,
+  .proverb__source {
+    margin: 0;
+  }
+
+  .proverb__text {
+    font-size: max(1.0625rem, 6.6cqi);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .proverb__translation {
+    font-size: max(0.875rem, 4.4cqi);
+    line-height: 1.45;
+    color: var(--paper-muted);
+    text-wrap: balance;
+  }
+
+  @media (min-width: 40rem) {
+    .proverb__writing {
+      gap: 3.4cqi;
+      padding: 6cqi 10cqi;
+    }
+
+    .proverb__text {
+      font-size: 5cqi;
+    }
+
+    .proverb__translation {
+      font-size: 3cqi;
+    }
+
+    /* (After the credit's own rule below, so this one is the more particular.) */
+    .proverb__writing .proverb__source {
+      font-size: max(0.75rem, 2.2cqi);
+    }
+  }
+
+  .proverb__source {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: max(0.75rem, 3.7cqi);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper-muted);
+  }
+
+  .proverb__source span + span::before {
+    content: '·';
+    margin-inline-end: 0.75rem;
+  }
+
+  :root:is([lang='ar'], [lang='ckb'], [lang='fa']) .proverb__source {
+    font-family: var(--font-sans);
+  }
+
+  /*
+   * While the plane carries it (plane.ts), the sheet is out of sight; when it
+   * lands, the paper is there at once, where the plane opened, and the writing
+   * comes up on it.
+   */
+  .proverb[data-flight]:not([data-landed]) .proverb__sheet {
+    opacity: 0;
+  }
+
+  .proverb[data-flight]:not([data-landed]) .proverb__sheet::after {
+    opacity: 0;
+  }
+
+  .proverb[data-flight] .proverb__sheet > :not(svg) {
+    transition:
+      opacity 0.7s var(--ease-out) 0.1s,
+      translate 0.7s var(--ease-out) 0.1s;
+  }
+
+  .proverb[data-flight]:not([data-landed]) .proverb__sheet > :not(svg) {
+    opacity: 0;
+    translate: 0 0.35rem;
+  }
+
+  /*
+   * The plane's canvas, over the screen: under the rug while the plane lies
+   * there (below the rug's canvas, so the rug covers it), over the page once
+   * it flies, under the header. plane.ts draws on it only while the plane is
+   * in sight.
+   */
+  .flight {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .flight[data-aloft] {
+    z-index: 3;
+  }
+
+  @media (forced-colors: active) {
+    .flight {
+      display: none;
+    }
+
+    .proverb__sheet {
+      opacity: 1 !important;
+      border: 1px solid CanvasText;
+    }
+  }
+
+  @media print {
+    .flight {
+      display: none;
+    }
+
+    .proverb__sheet,
+    .proverb__sheet > * {
+      opacity: 1 !important;
+    }
+  }
+</style>

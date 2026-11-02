@@ -71,6 +71,10 @@
   /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the surface
      colour, above the 3:1 minimum for large text. */
   --color-dim: #878785;
+  /* The one colour: late sun, where it falls (the hero, the rug, the footer). Text in it
+     is 5.8:1 on paper; --sun is its light, for washes at low opacity. */
+  --color-sun: #9a5212;
+  --sun: 232 160 82;
   --header-bg: rgb(255 255 255 / 0.84);
 
   --focus-ring: var(--color-ink);
@@ -109,6 +113,14 @@
   interpolate-size: allow-keywords;
 }
 
+/* Where a patch of sunlight lies across something (the footer's wordmark),
+   registered so it can move smoothly. */
+@property --sun-at {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 66%;
+}
+
 /* Dark theme. `data-theme` is set before the page is drawn by
    src/scripts/theme-init.js, from the visitor's choice or, by default, their
    system setting. Without JavaScript the site stays light. */
@@ -125,6 +137,8 @@
   --color-underline: #555555;
   --color-solid-hover: #d4d4d4;
   --color-dim: #666666;
+  --color-sun: #f1c27d;
+  --sun: 241 178 102;
   --header-bg: rgb(10 10 10 / 0.8);
 }
 
@@ -142,6 +156,8 @@
   --color-underline: #555555;
   --color-solid-hover: #d4d4d4;
   --color-dim: #666666;
+  --color-sun: #f1c27d;
+  --sun: 241 178 102;
   --header-bg: rgb(10 10 10 / 0.8);
 }
 
@@ -156,6 +172,8 @@
   --color-underline: #c4c4c4;
   --color-solid-hover: #2b2b2b;
   --color-dim: #878785;
+  --color-sun: #9a5212;
+  --sun: 232 160 82;
   --header-bg: rgb(255 255 255 / 0.84);
 }
 

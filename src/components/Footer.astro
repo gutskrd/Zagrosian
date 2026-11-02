@@ -19,9 +19,6 @@ const registered = [
 ---
 
 <footer class="site-footer">
-  {/* A woven band across the doorstep, under "Mala we ava" (Kilim: scripts/kilim.mjs). */}
-  <div class="site-footer__kilim" aria-hidden="true"></div>
-
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__about">
@@ -68,7 +65,11 @@ const registered = [
     </div>
 
     <div class="site-footer__mark" aria-hidden="true" data-rise dir="ltr">
-      <span>{site.name}</span>
+      <span>
+        <span>{site.name}</span>
+        {/* The last of the sun, through a window, across the letters. */}
+        <span class="site-footer__sun">{site.name}</span>
+      </span>
     </div>
 
     <div class="site-footer__bottom">
@@ -114,60 +115,11 @@ const registered = [
 </footer>
 
 <style>
+  /* A hairline closes the page; the wordmark below is the footer's one flourish. */
   .site-footer {
-    padding-block: 0 2rem;
+    padding-block: 4rem 2rem;
+    border-top: 1px solid var(--color-line);
     font-size: var(--text-sm);
-  }
-
-  /* The band (band.svg, 24 by 31 cells, two pixels a cell) repeats from the
-     middle out, so it is cut alike at both ends. Its motifs stand up from the
-     cloth like raised wool: each casts a fine shadow below it, catches the
-     light along its top, and shows its weave, a rib to every other pixel. */
-  .site-footer__kilim {
-    --cell: 2px;
-    position: relative;
-    height: calc(31 * var(--cell));
-    margin-bottom: 4rem;
-    filter: drop-shadow(0 1.5px 0.75px rgb(0 0 0 / 0.35));
-  }
-
-  .site-footer__kilim::before,
-  .site-footer__kilim::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    mask: url('../assets/kilim/band.svg') 50% 0 / calc(24 * var(--cell)) 100% repeat-x;
-  }
-
-  .site-footer__kilim::before {
-    background: var(--color-ink);
-  }
-
-  .site-footer__kilim::after {
-    background:
-      linear-gradient(to bottom, rgb(255 255 255 / 0.22), transparent 35%),
-      repeating-linear-gradient(to right, rgb(255 255 255 / 0.14) 0 1px, transparent 1px 2px),
-      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 2px);
-  }
-
-  :global(:root[data-theme='dark']) .site-footer__kilim {
-    filter: drop-shadow(0 1.5px 0.75px rgb(0 0 0 / 0.9));
-  }
-
-  /* In forced colours (Windows High Contrast), in the visitor's text colour. */
-  @media (forced-colors: active) {
-    .site-footer__kilim {
-      forced-color-adjust: none;
-      filter: none;
-    }
-
-    .site-footer__kilim::before {
-      background: CanvasText;
-    }
-
-    .site-footer__kilim::after {
-      display: none;
-    }
   }
 
   .site-footer__top {
@@ -250,8 +202,8 @@ const registered = [
     user-select: none;
   }
 
-  .site-footer__mark span {
-    display: block;
+  .site-footer__mark > span {
+    display: grid;
     font-size: 24.2cqi;
     font-weight: 600;
     line-height: 0.8;
@@ -262,6 +214,61 @@ const registered = [
     padding-bottom: 0.2em;
     /* It stands up from its baseline as the footer scrolls in (motion.ts). */
     transform-origin: 50% 100%;
+  }
+
+  .site-footer__mark > span > span {
+    grid-area: 1 / 1;
+  }
+
+  /*
+   * Late sun through a window, as on the floor under the rug (rug-scene.ts):
+   * a copy of the word in the light's colours, in broad soft beams, inside
+   * the soft-edged patch of the window. It comes in from
+   * the right as the wordmark rises (`--sun-at`, where the patch is).
+   */
+  .site-footer__sun {
+    --sun-at: 66%;
+    /* Pale letters: warm white where the light falls, a little dimmer
+       between the beams. */
+    --mark-lit: color-mix(in oklab, rgb(var(--sun)) 42%, #fff);
+    --mark-shade: color-mix(in oklab, var(--color-ink) 80%, #000);
+    color: transparent;
+    background: linear-gradient(
+      40deg,
+      var(--mark-shade) 18%,
+      var(--mark-lit) 32% 44%,
+      var(--mark-shade) 55% 59%,
+      var(--mark-lit) 66% 72%,
+      var(--mark-shade) 82%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    mask-image: linear-gradient(
+      102deg,
+      transparent calc(var(--sun-at) - 30%),
+      #000 calc(var(--sun-at) - 14%),
+      #000 calc(var(--sun-at) + 6%),
+      transparent calc(var(--sun-at) + 24%)
+    );
+  }
+
+  /* Black letters: the light is only a low warmth on them, the shade
+     between the beams as black as the rest. */
+  :global(:root:not([data-theme='dark'])) .site-footer__sun {
+    --mark-lit: color-mix(in oklab, rgb(var(--sun)) 27%, var(--color-ink));
+    --mark-shade: var(--color-ink);
+  }
+
+  @media (forced-colors: active) {
+    .site-footer__sun {
+      display: none;
+    }
+  }
+
+  @media print {
+    .site-footer__sun {
+      display: none;
+    }
   }
 
   /* Where the browser runs scroll-linked animations itself, it stands the
@@ -276,13 +283,31 @@ const registered = [
     @media (prefers-reduced-motion: no-preference) {
       /* Separate properties, so the minifier cannot fold the timeline into
          the `animation` shorthand (which browsers do not accept). */
-      .site-footer__mark span {
+      .site-footer__mark > span {
         animation-name: wordmark-rise;
         animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
         animation-fill-mode: both;
         animation-timeline: --wordmark;
         animation-range: entry 0% entry 100%;
       }
+
+      .site-footer__sun {
+        animation-name: sun-across;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --wordmark;
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+
+  @keyframes sun-across {
+    from {
+      --sun-at: 118%;
+    }
+
+    to {
+      --sun-at: 66%;
     }
   }
 
@@ -340,8 +365,8 @@ const registered = [
   }
 
   @media (min-width: 48rem) {
-    .site-footer__kilim {
-      margin-bottom: 5rem;
+    .site-footer {
+      padding-top: 5rem;
     }
 
     .site-footer__top {
