@@ -90,6 +90,13 @@ export const fr: Messages = {
     productsLabel: 'Produits',
     localTime: '{time}, heure locale',
   },
+  under: {
+    title: 'Soulevez un coin.',
+    hintPointer: 'Soulevez le coin',
+    hintTouch: 'Maintenez le coin appuyé',
+    lift: 'Soulever le tapis',
+    lay: 'Le remettre en place',
+  },
   faq: {
     eyebrow: 'FAQ',
     title: 'Questions fréquentes.',

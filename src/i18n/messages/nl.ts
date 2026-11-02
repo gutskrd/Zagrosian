@@ -88,6 +88,13 @@ export const nl: Messages = {
     productsLabel: 'Producten',
     localTime: '{time} lokale tijd',
   },
+  under: {
+    title: 'Til een hoek op.',
+    hintPointer: 'Til de hoek op',
+    hintTouch: 'Houd de hoek ingedrukt',
+    lift: 'Til het tapijt op',
+    lay: 'Leg het terug',
+  },
   faq: {
     eyebrow: 'FAQ',
     title: 'Veelgestelde vragen.',

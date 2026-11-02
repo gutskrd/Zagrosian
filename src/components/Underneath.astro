@@ -1,0 +1,123 @@
+---
+/**
+ * The rug in late sun (Rug.astro), with a paper plane pressed flat under it
+ * that, as the page goes on, slips out and flies down to the proverb
+ * (Proverb.astro). A pointer or a finger lifts the turned-up corner to look;
+ * the button does it for everyone else, keyboard and screen reader included,
+ * and with reduced motion. The section's title is for screen readers only:
+ * on the page the rug speaks for itself. Text: `under` in the message files.
+ */
+import { i18n } from '../i18n';
+import Rug from './Rug.astro';
+
+const { t } = i18n(Astro.url);
+---
+
+<section class="under section" aria-labelledby="under-title">
+  <div class="container">
+    <h2 id="under-title" class="visually-hidden">{t.under.title}</h2>
+
+    <Rug />
+
+    <div class="under__controls">
+      <p class="under__hint" aria-hidden="true">
+        <span class="under__hint-pointer">{t.under.hintPointer}</span>
+        <span class="under__hint-touch">{t.under.hintTouch}</span>
+      </p>
+      <button
+        class="under__button"
+        type="button"
+        data-rug-button
+        data-lift={t.under.lift}
+        data-lay={t.under.lay}
+        hidden
+      >
+        {t.under.lift}
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .under {
+    position: relative;
+    overflow-x: clip;
+    /* The rug's floor already leaves room above and below it. */
+    padding-block: calc(var(--section-space) * 0.5);
+  }
+
+  .under__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+  }
+
+  /* The studio-index small print, as the eyebrows. */
+  .under__hint {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* A corner, turned up: the hint's mark. */
+  .under__hint::before {
+    content: '';
+    width: 0.75rem;
+    height: 0.75rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+
+  :root:is([lang='ar'], [lang='ckb'], [lang='fa']) .under__hint {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+  }
+
+  /* Pointer or touch: the hint that fits the hand. */
+  .under__hint-touch {
+    display: none;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .under__hint-pointer {
+      display: none;
+    }
+
+    .under__hint-touch {
+      display: inline;
+    }
+  }
+
+  .under__button {
+    min-height: 2.75rem;
+    padding: 0 1.25rem;
+    border: 0.8px solid var(--color-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 0.4s var(--ease-out),
+      background-color 0.4s var(--ease-out);
+  }
+
+  .under__button:hover {
+    border-color: var(--color-ink);
+  }
+
+  .under__button:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+</style>

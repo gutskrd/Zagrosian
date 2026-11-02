@@ -99,3 +99,26 @@ test.describe('on a phone', () => {
     });
   });
 });
+
+test.describe('links to a section', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /** How far the section's top is from the bottom of the header, in whole pixels. */
+  const offset = (page: import('@playwright/test').Page, id: string) =>
+    page.evaluate((target) => {
+      const header = document.querySelector<HTMLElement>('[data-site-header]')!.offsetHeight;
+      return Math.abs(Math.round(document.getElementById(target)!.getBoundingClientRect().top - header));
+    }, id);
+
+  test('opened from elsewhere, land on the section once the page has settled', async ({ page }) => {
+    await page.goto('/#about', { waitUntil: 'load' });
+    await expect.poll(() => offset(page, 'about'), { timeout: 6000 }).toBeLessThanOrEqual(1);
+  });
+
+  test('followed from another page of the site, land on the section', async ({ page }) => {
+    await page.goto('/privacy', { waitUntil: 'load' });
+    await page.locator('.site-footer a[href="/#faq"]').click();
+    await page.waitForURL('**/#faq');
+    await expect.poll(() => offset(page, 'faq'), { timeout: 6000 }).toBeLessThanOrEqual(1);
+  });
+});

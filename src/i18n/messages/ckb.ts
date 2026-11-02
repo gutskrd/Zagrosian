@@ -92,6 +92,13 @@ export const ckb: Messages = {
     productsLabel: 'بەرهەمەکان',
     localTime: 'کاتی ناوخۆیی: {time}',
   },
+  under: {
+    title: 'گۆشەیەک هەڵبگرن.',
+    hintPointer: 'گۆشەکە هەڵبگرن',
+    hintTouch: 'پەنجە لەسەر گۆشەکە ڕابگرن',
+    lift: 'بەڕەکە هەڵبگرن',
+    lay: 'ڕایبخەنەوە',
+  },
   faq: {
     eyebrow: 'پرسیار و وەڵام',
     title: 'پرسیارە باوەکان.',

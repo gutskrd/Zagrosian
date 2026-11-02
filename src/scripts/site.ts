@@ -10,6 +10,7 @@ import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { enteredFromAbove, initMotion } from './motion';
+import { initRug } from './rug';
 import { initTheme } from './theme';
 
 /** Adds a hairline under the sticky header once the page has scrolled. */
@@ -34,6 +35,59 @@ function initHeader() {
     },
     { passive: true },
   );
+}
+
+/**
+ * A link to a section from another page (/#about, /de#faq) should land on
+ * that section. The browser jumps there as soon as the page is read, before
+ * the typeface, the images and the story's stage have settled; as they do,
+ * the content above grows and the section slides away under the header.
+ * So the section is held in place while the page settles: each time the
+ * layout changes, it is put back under the header, until the visitor scrolls
+ * on their own or a few seconds after the page has loaded.
+ */
+function initDeepLink() {
+  const id = decodeURIComponent(window.location.hash.slice(1));
+  const target = id ? document.getElementById(id) : null;
+  if (!target) return;
+
+  const inputs = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
+  let queued = false;
+
+  const align = () => {
+    queued = false;
+    // Measured against the header, as `scroll-padding-top` is (global.css).
+    const header = document.querySelector<HTMLElement>('[data-site-header]')?.offsetHeight ?? 0;
+    if (Math.abs(target.getBoundingClientRect().top - header) >= 2) {
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+  };
+
+  const schedule = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(align);
+  };
+
+  // A layout change moves the section; so does the browser's own jump to it
+  // when a page transition interrupts it (with `scroll-behavior: smooth` it
+  // can stop short, even at the very top). Either way, put it back.
+  const observer = new ResizeObserver(schedule);
+  observer.observe(document.body);
+  window.addEventListener('scroll', schedule, { passive: true });
+
+  const release = () => {
+    observer.disconnect();
+    window.removeEventListener('scroll', schedule);
+    inputs.forEach((type) => window.removeEventListener(type, release));
+  };
+  inputs.forEach((type) => window.addEventListener(type, release, { passive: true }));
+
+  // The homepage's entrance waits up to 2.5 s for its fonts and images
+  // (theme-init.js); hold the section a little longer than that.
+  const letGo = () => window.setTimeout(release, 3000);
+  if (document.readyState === 'complete') letGo();
+  else window.addEventListener('load', letGo, { once: true });
 }
 
 /**
@@ -315,6 +369,7 @@ function initLegalTools() {
 /* -------------------------------------------------------------------------- */
 
 initHeader();
+initDeepLink();
 initMenu();
 initReveal();
 initTableOfContents();
@@ -332,3 +387,4 @@ initText();
 initSound();
 initEyes();
 initDeer();
+initRug();

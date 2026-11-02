@@ -89,6 +89,13 @@ export const ar: Messages = {
     productsLabel: 'المنتجات',
     localTime: 'الساعة {time} بالتوقيت المحلي',
   },
+  under: {
+    title: 'ارفع إحدى الزوايا.',
+    hintPointer: 'ارفع الزاوية',
+    hintTouch: 'اضغط مطوّلًا على الزاوية',
+    lift: 'ارفع السجادة',
+    lay: 'أعِدها مكانها',
+  },
   faq: {
     eyebrow: 'أسئلة وأجوبة',
     title: 'الأسئلة الشائعة.',

@@ -53,7 +53,7 @@ Requires Node 22.12 or later.
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement at
   the end of the homepage story, in [`Story.astro`](src/components/Story.astro), with a translation
   underneath in every language except Kurmanji (`motto` in the message files). The site closes with
-  *Mala we ava.* ("Thank you", literally "may your home prosper", in the footer). The Hevalo section carries a proverb, one of the
+  *Mala we ava.* ("Thank you", literally "may your home prosper", in the footer). The sheet the paper plane unfolds into carries a proverb, one of the
   *gotinên pêşiyan* ("sayings of the forebears", as Kurdish proverbs are called), and credits it as
   one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree thrives through its roots;
   a person through their language"), *Gotina pêşiyan*. The thanks is an everyday expression, not a
@@ -147,16 +147,16 @@ worker/            The small Worker in front of the static files: http to https,
 
   If a logo changes, trace the new one the same way and regenerate the icons and social images.
 
-- **Kilim band:** the site's one ornament, a woven band across the top of the footer on every page,
-  over "Mala we ava" (may your home prosper): a hooked diamond and a pair of ram's horns between two
-  chain borders, motifs of Kurdish kilims from the Zagros, drawn cell by cell by
-  [`scripts/kilim.mjs`](scripts/kilim.mjs) (`node scripts/kilim.mjs`). The drawing is our own, so it is
-  free of anyone else's rights. `band.svg` (24 by 31 cells, 1.4 KB) repeats from the middle out so it
-  is cut alike at both ends. Its motifs stand up from the cloth like raised wool: a fine shadow under
-  each, light along its top, and its weave showing. It is drawn in the page's ink, so it follows the
-  theme. Otherwise the pages carry nothing but their words and the product.
-
-  There are no photographs yet (see [TODO.md](TODO.md)).
+- **One colour, and one ornament:** the pages are black and white, with their words, the logo, the
+  sun and the product. The one colour is late sun through a window, in broad soft beams, from the photographs
+  of Hevalo's kilims (`--color-sun` and `--sun` in `global.css`): a faint patch of it on the wall
+  behind the hero's logo, the light the rug lies in, and the last of it across the footer's wordmark.
+  The one ornament is the rug. There are no photographs yet (see [TODO.md](TODO.md)).
+- **Rug** (`src/assets/rug/rug.webp`): a pile rug after those of Bijar and Senneh, Kurdish weaving
+  towns in the Zagros: a madder field, a lobed indigo medallion with pendants, ivory corners, an
+  indigo border of rosettes on a vine. The design is our own, drawn in code by
+  [`scripts/rug.mjs`](scripts/rug.mjs) (`node scripts/rug.mjs`, in a headless browser); the 3D rug
+  and the flat picture shown without WebGL both use it.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
   is drawn from its measured geometry ([`src/lib/sun.ts`](src/lib/sun.ts): 21 straight rays, the
   gaps between them at 51.2% of the rays' length), so it is sharp at any size: in the colour of the
@@ -318,7 +318,26 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   what comes up from below: opened part-way down the page (a link to Contact, a reload) and
   scrolled back up, everything above is simply there.
 - **Footer:** the Zagrosian wordmark stands up out of its baseline in 3D as the footer appears
-  (`data-rise`).
+  (`data-rise`), and the late sun comes across it as it does: a copy of the word in the light's
+  colours, in broad soft beams, inside the window's soft patch.
+- **The rug** ([`Rug.astro`](src/components/Rug.astro), [`rug-scene.ts`](src/scripts/rug-scene.ts),
+  [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): the rug lies in the late sun,
+  its beams across it and the floor. It is woven in front of you a row at a time as it first
+  comes into view; then its nearest corner turns up, and rises to meet a mouse that comes near. It is
+  cloth: pick it up anywhere, fold it, drag it, twist it (on a touch screen, press and hold first, so
+  a swipe still scrolls). *Lift the rug* folds the corner back for keyboards, screen readers and
+  reduced motion; without WebGL the flat picture is drawn back instead.
+- **The paper plane** ([`Proverb.astro`](src/components/Proverb.astro),
+  [`plane.ts`](src/scripts/plane.ts), [`plane-folds.ts`](src/scripts/plane-folds.ts)): under the rug
+  lies a paper plane, pressed flat. It stays there until it is found (the rug lifted, by the button
+  or by hand); until then the proverb's sheet simply lies where it is. Found, and the page scrolled
+  on, it slips out from under the corner, opens its wings and flies down the page with the scroll,
+  its shadow on the page an airliner's; once the sheet is fully in sight it lands and unfolds into
+  it by itself, so the sheet is always whole on the screen and can be read wherever the scrolling
+  stops. Scrolled back, it folds up and flies home. It is folded as a dart is folded by hand, so it
+  opens along real creases, and the sheet keeps them. It is drawn on one 2D canvas, a few dozen
+  shaded polygons a frame, light even for a slow phone; the proverb is real text all the while.
+  With reduced motion the sheet simply lies there.
 - **Products:** Hevalo's app icon is a hole in the page, and the deer comes out of it from behind
   the page. The page is cut in the icon's shape (its cut edge throws a soft shade inside), and
   through it is the purple space behind the page. As the section scrolls into view, the deer comes
@@ -589,6 +608,8 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu) and Share |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
+| `rug.spec.ts`           | The rug is woven, can be folded with a mouse and picked up by pressing and holding, lies straight again when scrolled away and back, and lies still with reduced motion |
+| `plane.spec.ts`         | The paper plane stays under the rug until it is found; found, it flies to the proverb and back, on a computer and a phone, landing with the sheet whole on the screen, without the page scrolling sideways; the proverb stays in the page; the button lifts the rug |
 
 ```sh
 npm run build

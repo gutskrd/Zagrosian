@@ -90,7 +90,10 @@ export const kurdish = {
   motto: 'Jiyan bi kurdî xweştire.',
   /** "Thank you", literally "may your home prosper": the footer (`footer.thanks`). */
   thanks: 'Mala we ava.',
-  /** A proverb, shown with Hevalo (`hevalo.proverb`). */
+  /**
+   * A proverb, written on the sheet a paper plane from under the rug unfolds
+   * into (Proverb.astro), with its translation (`hevalo.proverb`).
+   */
   proverb: 'Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.',
   /** "Proverb" (literally "a saying of the forebears"), the proverb's credit. */
   proverbSource: 'Gotina pêşiyan',

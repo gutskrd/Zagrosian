@@ -14,6 +14,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 ---
 
 <section class="hero" aria-labelledby="hero-title">
+  <div class="hero__sun" aria-hidden="true"></div>
   <div class="container hero__grid">
     <div class="hero__text">
       <a class="hero__notice intro" href="#hevalo">
@@ -67,12 +68,47 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
 <style>
   .hero {
+    position: relative;
     padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
     /* The logo's shadow may reach past the sides of the screen, but never scrolls it. */
     overflow-x: clip;
   }
 
+  /*
+   * Dim late sun through a window, on the wall behind the logo: two broad
+   * soft beams and a narrow one, as in the photographs of Hevalo's kilims; the light the rug lies in further down, and that crosses
+   * the footer's wordmark at the end. Painted once and never moved, so it
+   * costs nothing while the page scrolls.
+   */
+  .hero__sun {
+    --sun-a: 0.085;
+    position: absolute;
+    inset: 0 -8% 0 30%;
+    pointer-events: none;
+    background: linear-gradient(
+      40deg,
+      transparent 14%,
+      rgb(var(--sun) / var(--sun-a)) 30% 38%,
+      transparent 52%,
+      rgb(var(--sun) / calc(var(--sun-a) * 0.8)) 60% 64%,
+      transparent 76%
+    );
+    /* The window's patch, faded out well inside the hero. */
+    mask-image: radial-gradient(54% 44% at 64% 50%, #000 15%, transparent 100%);
+  }
+
+  :global(:root[data-theme='dark']) .hero__sun {
+    --sun-a: 0.07;
+  }
+
+  @media (forced-colors: active) {
+    .hero__sun {
+      display: none;
+    }
+  }
+
   .hero__grid {
+    position: relative;
     display: grid;
     gap: clamp(3rem, 2rem + 4vw, 4rem);
   }
