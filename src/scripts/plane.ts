@@ -195,7 +195,12 @@ const pieceOf = (piece: Piece, turns: Matrix[], lift: number): Matrix => {
   return m;
 };
 
-/** The shadow, drawn once for each theme: a soft airliner, or on a dark page, warm light with the airliner a gap in it. */
+/**
+ * The shadow, drawn once for each theme. On a dark page, where a shadow cannot
+ * be seen, warm light with the airliner a gap in it; on a light one, a faint
+ * warmth of the same light with the airliner's shadow in it, soft and warm
+ * grey, as a shadow is on paper in the sun.
+ */
 const shadowSprite = (dark: boolean) => {
   const size = 256;
   const sprite = document.createElement('canvas');
@@ -224,9 +229,19 @@ const shadowSprite = (dark: boolean) => {
     g.fillStyle = glow;
     g.fillRect(0, 0, size, size);
     g.globalCompositeOperation = 'destination-out';
+    g.filter = 'blur(3px)';
+    g.fillStyle = '#000';
+  } else {
+    const sun = getComputedStyle(document.documentElement).getPropertyValue('--sun').trim().split(/\s+/).join(',') || '232,160,82';
+    const glow = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    glow.addColorStop(0, `rgba(${sun},0.3)`);
+    glow.addColorStop(0.65, `rgba(${sun},0.1)`);
+    glow.addColorStop(1, `rgba(${sun},0)`);
+    g.fillStyle = glow;
+    g.fillRect(0, 0, size, size);
+    g.filter = 'blur(4px)';
+    g.fillStyle = 'rgba(74,58,44,0.6)';
   }
-  g.filter = 'blur(3px)';
-  g.fillStyle = dark ? '#000' : 'rgba(0,0,0,0.55)';
   airliner();
   return sprite;
 };
@@ -275,15 +290,15 @@ export function initPlane() {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
     const local = (x: number, y: number) => [cx + (x * cos - y * sin) * rug, cy + (x * sin + y * cos) * rug];
-    // Under the corner that turns up, nose towards it, as if slid there; as
-    // long as the rug is two fifths wide.
-    const [rx, ry] = local(0.28, 0.58);
+    // Under the corner that turns up, nose towards it and just out from under
+    // it, as if slid there and forgotten; as long as the rug is two fifths wide.
+    const [rx, ry] = local(0.36, 0.7);
     const heading = Math.atan2(0.5 * sin + 0.8 * cos, 0.5 * cos - 0.8 * sin);
     rest = { x: rx, y: ry, z: 0, heading, pitch: 0, bank: 0, scale: (rug * 0.42) / LENGTH };
     // Out past the corner, onto the open floor: on a narrow screen, only just
     // clear of the rug, so it stays in sight.
     const room = Math.cos(heading) > 0.1 ? (scrollX + window.innerWidth - 40 - rx) / Math.cos(heading) : Infinity;
-    const slide = clamp(room, rug * 0.45, rug * 0.66);
+    const slide = clamp(room, rug * 0.42, rug * 0.6);
     out = { ...rest, x: rx + Math.cos(heading) * slide, y: ry + Math.sin(heading) * slide };
 
     const paper = sheet.getBoundingClientRect();
@@ -445,7 +460,8 @@ export function initPlane() {
 
     // The shadow on the page below, cast by the window's light: larger than a paper plane's.
     const span = pose.scale * LENGTH * 1.6 * (1 + pose.z / 900);
-    const opacity = 0.22 * shadow * smooth(20, 90, pose.z);
+    const dark = document.documentElement.dataset.theme === 'dark';
+    const opacity = (dark ? 0.22 : 0.42) * shadow * smooth(20, 90, pose.z);
     const [gx, gy] = project(pose.x + pose.z * 0.32, pose.y + pose.z * 0.5, 0);
     const margin = 40;
     const seen = (l: number, r: number, t: number, b: number) => r > -margin && l < width + margin && b > -margin && t < height + margin;
@@ -455,7 +471,6 @@ export function initPlane() {
     g.setTransform(ratio, 0, 0, ratio, 0, 0);
     g.clearRect(0, 0, width, height);
     if (shadowSeen) {
-      const dark = document.documentElement.dataset.theme === 'dark';
       let sprite = sprites.get(dark);
       if (!sprite) {
         sprite = shadowSprite(dark);

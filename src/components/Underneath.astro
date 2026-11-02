@@ -1,11 +1,13 @@
 ---
 /**
- * The rug in late sun (Rug.astro), with a paper plane pressed flat under it
- * that, as the page goes on, slips out and flies down to the proverb
- * (Proverb.astro). A pointer or a finger lifts the turned-up corner to look;
- * the button does it for everyone else, keyboard and screen reader included,
- * and with reduced motion. The section's title is for screen readers only:
- * on the page the rug speaks for itself. Text: `under` in the message files.
+ * The first thing on the homepage: the rug in late sun (Rug.astro), with a
+ * paper plane under it, its nose just showing, that once found slips out and
+ * flies down to the proverb (Proverb.astro). A pointer or a finger lifts the
+ * turned-up corner to look; the button does it for everyone else, keyboard
+ * and screen reader included, and with reduced motion. The section is named
+ * for screen readers only (`aria-label`, not a heading, so the page's first
+ * heading is still the hero's): on the page the rug speaks for itself. Text:
+ * `under` in the message files.
  */
 import { i18n } from '../i18n';
 import Rug from './Rug.astro';
@@ -13,10 +15,8 @@ import Rug from './Rug.astro';
 const { t } = i18n(Astro.url);
 ---
 
-<section class="under section" aria-labelledby="under-title">
+<section class="under section" aria-label={t.under.title}>
   <div class="container">
-    <h2 id="under-title" class="visually-hidden">{t.under.title}</h2>
-
     <Rug />
 
     <div class="under__controls">
@@ -30,7 +30,6 @@ const { t } = i18n(Astro.url);
         data-rug-button
         data-lift={t.under.lift}
         data-lay={t.under.lay}
-        hidden
       >
         {t.under.lift}
       </button>
@@ -42,8 +41,9 @@ const { t } = i18n(Astro.url);
   .under {
     position: relative;
     overflow-x: clip;
-    /* The rug's floor already leaves room above and below it. */
-    padding-block: calc(var(--section-space) * 0.5);
+    /* The first thing on the page, just under the header: the rug's floor
+       already leaves room round it. */
+    padding-block: clamp(0.5rem, 2vw, 1.5rem) calc(var(--section-space) * 0.5);
   }
 
   .under__controls {
@@ -94,6 +94,12 @@ const { t } = i18n(Astro.url);
     .under__hint-touch {
       display: inline;
     }
+  }
+
+  /* It works only with the script (rug.ts), which shows it; until then it
+     keeps its place, so nothing below moves when it appears. */
+  .under__button:not([data-ready]) {
+    visibility: hidden;
   }
 
   .under__button {

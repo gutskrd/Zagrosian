@@ -321,15 +321,15 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   (`data-rise`), and the late sun comes across it as it does: a copy of the word in the light's
   colours, in broad soft beams, inside the window's soft patch.
 - **The rug** ([`Rug.astro`](src/components/Rug.astro), [`rug-scene.ts`](src/scripts/rug-scene.ts),
-  [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): the rug lies in the late sun,
-  its beams across it and the floor. It is woven in front of you a row at a time as it first
-  comes into view; then its nearest corner turns up, and rises to meet a mouse that comes near. It is
-  cloth: pick it up anywhere, fold it, drag it, twist it (on a touch screen, press and hold first, so
+  [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): the first thing on the
+  homepage, the rug lies in the late sun, its beams across it and the floor, its nearest corner
+  turned up (worked out before it is shown, so nothing moves into place), and that corner rises
+  slowly to meet a mouse that comes near. It is heavy cloth: pick it up anywhere, fold it, drag it, twist it (on a touch screen, press and hold first, so
   a swipe still scrolls). *Lift the rug* folds the corner back for keyboards, screen readers and
   reduced motion; without WebGL the flat picture is drawn back instead.
 - **The paper plane** ([`Proverb.astro`](src/components/Proverb.astro),
   [`plane.ts`](src/scripts/plane.ts), [`plane-folds.ts`](src/scripts/plane-folds.ts)): under the rug
-  lies a paper plane, pressed flat. It stays there until it is found (the rug lifted, by the button
+  lies a paper plane, its nose just showing. It stays there until it is found (the rug lifted, by the button
   or by hand); until then the proverb's sheet simply lies where it is. Found, and the page scrolled
   on, it slips out from under the corner, opens its wings and flies down the page with the scroll,
   its shadow on the page an airliner's; once the sheet is fully in sight it lands and unfolds into
@@ -608,7 +608,7 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu) and Share |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
-| `rug.spec.ts`           | The rug is woven, can be folded with a mouse and picked up by pressing and holding, lies straight again when scrolled away and back, and lies still with reduced motion |
+| `rug.spec.ts`           | The rug lies there, can be folded with a mouse and picked up by pressing and holding, lies straight again when scrolled away and back, and lies still with reduced motion |
 | `plane.spec.ts`         | The paper plane stays under the rug until it is found; found, it flies to the proverb and back, on a computer and a phone, landing with the sheet whole on the screen, without the page scrolling sideways; the proverb stays in the page; the button lifts the rug |
 
 ```sh

@@ -17,11 +17,12 @@
  * World units: the rug is 1 wide; y is up, the floor is y = 0.
  */
 
-// A heavy wool rug: it drops, and what moves it is soon spent (most of a
-// swing is gone within a second), so it never wobbles like rubber.
+// A heavy wool rug: it drops, and what moves it is soon spent (a swing is
+// all but gone within half a second), so it never wobbles like rubber; and
+// enough small steps that it never stretches like it either.
 const GRAVITY = 8.5;
-const SUBSTEPS = 8;
-const AIR = 0.994;
+const SUBSTEPS = 10;
+const AIR = 0.988;
 const THICKNESS = 0.012;
 const FLOOR = THICKNESS / 2;
 const FRICTION = 0.3;
