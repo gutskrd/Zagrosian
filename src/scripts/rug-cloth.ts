@@ -49,6 +49,8 @@ export class Cloth {
   readonly target = new Float32Array(3);
   /** How far the fastest particle moved in the last step, start to end. */
   motion = 0;
+  /** Small steps to each step: more is stiffer, and costs more. */
+  readonly substeps: number;
   private before = new Float32Array(0);
   // Buckets for finding particles near each other.
   private cellOf = new Int32Array(0);
@@ -56,8 +58,9 @@ export class Cloth {
   private order = new Int32Array(0);
   private fill = new Int32Array(0);
 
-  constructor(columns: number, rows: number) {
+  constructor(columns: number, rows: number, substeps = SUBSTEPS) {
     this.columns = columns;
+    this.substeps = substeps;
     this.rows = rows;
     this.count = columns * rows;
     this.spacing = 1 / (columns - 1);
@@ -86,6 +89,18 @@ export class Cloth {
     this.b = Uint16Array.from(links, (l) => l[1]);
     this.rest = Float32Array.from(links, (l) => l[2]);
     this.stiffness = Float32Array.from(links, (l) => l[3]);
+  }
+
+  /** The cloth as it is now, to be put back exactly later (restore). */
+  snapshot() {
+    return { position: this.position.slice(), previous: this.previous.slice(), normal: this.normal.slice() };
+  }
+
+  restore(snapshot: ReturnType<Cloth['snapshot']>) {
+    this.position.set(snapshot.position);
+    this.previous.set(snapshot.previous);
+    this.normal.set(snapshot.normal);
+    this.motion = 0;
   }
 
   /** Lays the rug out flat, centred on (x, z), turned by `angle`, `height` above the floor (rippled by `ripple`), still. */
@@ -123,7 +138,7 @@ export class Cloth {
     const i = this.held;
     this.hold(null);
     if (i < 0) return;
-    const h = dt / SUBSTEPS;
+    const h = dt / this.substeps;
     this.previous[i * 3] = this.position[i * 3] - vx * h;
     this.previous[i * 3 + 1] = this.position[i * 3 + 1] - vy * h;
     this.previous[i * 3 + 2] = this.position[i * 3 + 2] - vz * h;
@@ -131,12 +146,12 @@ export class Cloth {
 
   /** Advances the cloth by `dt` seconds. */
   step(dt: number) {
-    const h = dt / SUBSTEPS;
+    const h = dt / this.substeps;
     const p = this.position;
     const q = this.previous;
     if (this.before.length !== p.length) this.before = new Float32Array(p.length);
     this.before.set(p);
-    for (let s = 0; s < SUBSTEPS; s++) {
+    for (let s = 0; s < this.substeps; s++) {
       // Move: each particle keeps its velocity, slowed a little by the air,
       // and falls.
       for (let i = 0; i < this.count; i++) {
@@ -154,7 +169,7 @@ export class Cloth {
         const k = this.held * 3;
         for (let d = 0; d < 3; d++) {
           q[k + d] = p[k + d];
-          p[k + d] += (this.target[d] - p[k + d]) * (1 / (SUBSTEPS - s));
+          p[k + d] += (this.target[d] - p[k + d]) * (1 / (this.substeps - s));
         }
       }
       this.solve();
@@ -222,13 +237,24 @@ export class Cloth {
   /** The floor, its friction, and the edges of the floor. */
   private collide() {
     const p = this.position;
+    const q = this.previous;
     const { left, right, top, bottom } = this.bounds;
     for (let i = 0; i < this.count; i++) {
       if (!this.free[i]) continue;
       const k = i * 3;
       if (p[k + 1] < FLOOR) {
         p[k + 1] = FLOOR;
-        this.grip(k);
+        // Its grip on the floor, as grip() but written out: this runs for
+        // every particle in every small step.
+        const dx = p[k] - q[k];
+        const dz = p[k + 2] - q[k + 2];
+        if (dx * dx + dz * dz < STILL * STILL) {
+          p[k] = q[k];
+          p[k + 2] = q[k + 2];
+        } else {
+          p[k] -= dx * FRICTION;
+          p[k + 2] -= dz * FRICTION;
+        }
       }
       if (p[k] < left) p[k] = left;
       else if (p[k] > right) p[k] = right;
