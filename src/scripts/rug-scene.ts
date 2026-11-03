@@ -26,7 +26,7 @@
  * visitors who prefer reduced motion it lies still and flat.
  */
 import rugPicture from '../assets/rug/rug.webp?url';
-import { pixelRatio } from './device';
+import { modest, pixelRatio } from './device';
 import { Cloth } from './rug-cloth';
 
 /**
@@ -251,6 +251,8 @@ uniform float uDepthRange;
 uniform float uTexel;
 uniform float uStrength;
 uniform float uDark;
+// The rug as the light sees it, with room round it for its softest shadow.
+uniform vec4 uRugBox;
 out vec4 outColor;
 ${disc}
 ${sunlight}
@@ -258,14 +260,17 @@ ${sunlight}
 void main() {
   vec4 l = uLight * vec4(vWorld, 1.0);
   vec3 s = l.xyz / l.w * 0.5 + 0.5;
-  // Where the rug is, as the light sees it, and how high above the floor.
+  // Where the rug is, as the light sees it, and how high above the floor;
+  // looked for only near it (most of the floor is not).
   float found = 0.0;
   float depth = 0.0;
-  for (int i = 0; i < 16; i++) {
-    float d = texture(uDepth, s.xy + DISC[i] * uTexel * 14.0).r;
-    if (d < s.z - 0.0005) {
-      found += 1.0;
-      depth += d;
+  if (all(greaterThan(s.xy, uRugBox.xy)) && all(lessThan(s.xy, uRugBox.zw))) {
+    for (int i = 0; i < 16; i++) {
+      float d = texture(uDepth, s.xy + DISC[i] * uTexel * 14.0).r;
+      if (d < s.z - 0.0005) {
+        found += 1.0;
+        depth += d;
+      }
     }
   }
   float shade = 0.0;
@@ -442,7 +447,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   }
 
   // The cloth's positions and normals, a texel a particle.
-  const cloth = new Cloth(COLUMNS, ROWS);
+  // Fewer small steps on a modest device: a little less stiff, a fifth less work.
+  const cloth = new Cloth(COLUMNS, ROWS, modest() ? 8 : 10);
   const floatTexture = () => {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -532,6 +538,35 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     shadowStrength = dark ? 0.75 : 0.42;
   };
 
+  /** Where the rug is in the shadow map, with room for its softest shadow round it. */
+  const rugBox = () => {
+    const p = cloth.position;
+    const low = [Infinity, Infinity, Infinity];
+    const high = [-Infinity, -Infinity, -Infinity];
+    for (let k = 0; k < p.length; k += 3) {
+      for (let d = 0; d < 3; d++) {
+        low[d] = Math.min(low[d], p[k + d]);
+        high[d] = Math.max(high[d], p[k + d]);
+      }
+    }
+    const m = lightViewProjection;
+    const box = [Infinity, Infinity, -Infinity, -Infinity];
+    for (let corner = 0; corner < 8; corner++) {
+      const x = corner & 1 ? high[0] : low[0];
+      const y = corner & 2 ? high[1] : low[1];
+      const z = corner & 4 ? high[2] : low[2];
+      const w = m[3] * x + m[7] * y + m[11] * z + m[15];
+      const sx = ((m[0] * x + m[4] * y + m[8] * z + m[12]) / w) * 0.5 + 0.5;
+      const sy = ((m[1] * x + m[5] * y + m[9] * z + m[13]) / w) * 0.5 + 0.5;
+      box[0] = Math.min(box[0], sx);
+      box[1] = Math.min(box[1], sy);
+      box[2] = Math.max(box[2], sx);
+      box[3] = Math.max(box[3], sy);
+    }
+    const margin = 64 / SHADOW_SIZE;
+    return [box[0] - margin, box[1] - margin, box[2] + margin, box[3] + margin];
+  };
+
   const draw = () => {
     send(positionTexture, cloth.position);
     send(normalTexture, cloth.normal);
@@ -586,6 +621,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.uniform1f(floorProgram.at('uStrength'), shadowStrength);
     gl.uniform1f(floorProgram.at('uDark'), dark ? 1 : 0);
     gl.uniform3f(floorProgram.at('uToLight'), toLight[0], toLight[1], toLight[2]);
+    const box = rugBox();
+    gl.uniform4f(floorProgram.at('uRugBox'), box[0], box[1], box[2], box[3]);
     gl.bindVertexArray(quad.vao);
     gl.drawElements(gl.TRIANGLES, quad.count, gl.UNSIGNED_SHORT, 0);
 
@@ -791,27 +828,42 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
 
   /**
-   * Laid straight, with its corner turned up (but not with reduced motion),
-   * worked out out of sight: a few steps at a time until it has settled, so
-   * it is never seen moving into place.
+   * Laid straight, with its corner turned up (but not with reduced motion).
+   * The corner is worked out once, out of sight, in slices of a few
+   * milliseconds so the page never waits, until it has settled; after that
+   * the rug at rest is only put back, at once.
    */
+  let laid: { angle: number; cloth: ReturnType<Cloth['snapshot']>; corner: number; flat: number[]; inward: number[] } | null = null;
   const rest = async () => {
     uncurl();
     script = null;
     cloth.hold(null);
-    cloth.layFlat(0, 0, restAngle);
     disturbed = false;
     setLifted(false);
-    if (still.matches) return;
-    findCorner();
+    if (laid && laid.angle === restAngle) {
+      cloth.restore(laid.cloth);
+      curl.corner = laid.corner;
+      curl.flat = laid.flat;
+      curl.inward = laid.inward;
+    } else {
+      cloth.layFlat(0, 0, restAngle);
+      if (still.matches) return;
+      findCorner();
+    }
     cloth.hold(curl.corner);
     curl.on = true;
     curl.level = curl.goal = CURL;
     curlTo(CURL);
-    for (let n = 1; n <= 150; n++) {
+    if (laid && laid.angle === restAngle) return;
+    let slice = performance.now();
+    for (let n = 0; n < 120; n++) {
       cloth.step(STEP);
-      if (n % 30 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+      if (performance.now() - slice > 8) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        slice = performance.now();
+      }
     }
+    laid = { angle: restAngle, cloth: cloth.snapshot(), corner: curl.corner, flat: [...curl.flat], inward: [...curl.inward] };
   };
 
   const setLifted = (value: boolean) => {
@@ -987,11 +1039,17 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
 
   new IntersectionObserver(
     ([entry]) => {
-      // Played with and then scrolled away: laid straight for next time.
-      if (!entry.isIntersecting && ready && disturbed && hold.pointer < 0 && !script) {
+      if (entry.isIntersecting) return;
+      // Out of sight, nothing moves: the loop stops at once.
+      if (frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        last = 0;
+        behind = 0;
         setState('resting');
-        void rest().then(draw);
       }
+      // Played with and then scrolled away: laid straight for next time.
+      if (ready && disturbed && hold.pointer < 0 && !script) void rest().then(draw);
     },
     { threshold: [0, 0.35] },
   ).observe(stage);
