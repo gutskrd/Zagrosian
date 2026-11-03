@@ -5,7 +5,7 @@ import Cta from './Cta.astro';
 import HevaloDeer from './HevaloDeer.astro';
 import SplitText from './SplitText.astro';
 
-const { t } = i18n(Astro.url);
+const { t, localize } = i18n(Astro.url);
 ---
 
 <section id="hevalo" class="showcase" aria-labelledby="hevalo-title">
@@ -31,7 +31,10 @@ const { t } = i18n(Astro.url);
         <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
         <div class="showcase__details" data-reveal>
           <p class="showcase__description" data-lines>{t.hevalo.description}</p>
-          <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
+          <div class="showcase__actions">
+            <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
+            <Cta href={localize('/hevalo-bot')} variant="link" label={t.hevalo.discord} />
+          </div>
         </div>
         {/* The facts at a glance, as the FAQ and the hero's notice give them. */}
         <dl class="showcase__facts rule" data-reveal>
@@ -54,6 +57,13 @@ const { t } = i18n(Astro.url);
 </section>
 
 <style>
+  .showcase__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+
   /* A tinted band that sets the products apart. Like the rest of the page, it
      follows the light or dark theme. */
   .showcase {

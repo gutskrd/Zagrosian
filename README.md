@@ -71,6 +71,15 @@ Requires Node 22.12 or later.
   the original; each translated page says so and links to it. When you change a page, change every
   language and update each `updated:` date. Email addresses and company details are written out in
   these files, so update them there too if they change.
+- **Hevalo for Discord** ([`/hevalo-bot`](src/components/BotPage.astro)): the page for the Hevalo
+  Discord bot, linked from the Hevalo section. Its text is `bot` in the message files; its invite
+  links and the languages it speaks are `hevaloBot` in [`src/site.ts`](src/site.ts). The bot's own
+  terms and privacy policy are `hevalo-bot-terms.md` and `hevalo-bot-privacy.md` in each language
+  folder of `src/content/legal/`, built like the legal pages but listed only on the bot's page, not
+  in the footer (`botLegalSlugs` in [`src/i18n/index.ts`](src/i18n/index.ts)). The permissions the
+  "Add to Discord server" link asks for (`hevaloBotPermissions`) and the list explaining them
+  (`bot.permissions`) must stay in step; when the bot starts storing or sharing something new,
+  update its privacy policy in every language.
 
 ## Structure
 
