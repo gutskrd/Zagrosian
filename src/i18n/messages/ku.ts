@@ -96,7 +96,7 @@ export const ku: Messages = {
     title: 'Quncikekê hildin.',
     hintPointer: 'Quncikê hildin',
     hintTouch: 'Tiliya xwe li ser quncikê bihêlin',
-    lift: 'Kilîmê hildin',
+    lift: 'Xalîçeyê hildin',
     lay: 'Dîsa raxin',
   },
   faq: {

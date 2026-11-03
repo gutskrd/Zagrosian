@@ -96,7 +96,7 @@ export const fa: Messages = {
     title: 'گوشه‌ای را بلند کنید.',
     hintPointer: 'گوشه را بلند کنید',
     hintTouch: 'گوشه را لمس کنید و نگه دارید',
-    lift: 'بلند کردن گلیم',
+    lift: 'بلند کردن فرش',
     lay: 'دوباره پهن کردن',
   },
   faq: {

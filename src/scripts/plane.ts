@@ -8,15 +8,17 @@
  * always there to be read wherever the scrolling stops. Scrolled back, it
  * folds up again and flies home under the rug.
  *
- * The plane is folded as one is by hand (plane-folds.ts). It is drawn on one
- * canvas over the screen, a flat 2D drawing: each frame its pieces are placed
- * in 3D, seen from the reader's eye (as CSS perspective would), shaded by how
- * they face the light, and painted from the furthest to the nearest. That is
+ * The plane is folded as one is by hand (plane-folds.ts). It is a flat 2D
+ * drawing on a canvas: each frame its pieces are placed in 3D, seen from the
+ * reader's eye (as CSS perspective would), shaded by how they face the
+ * light, and painted from the furthest to the nearest. That is
  * a few dozen polygons a frame, light even for a slow phone, with nothing
  * kept on the graphics card. Its shadow on the page, an airliner's (a paper
- * plane dreaming), is drawn once and then only stamped. While it lies under
- * the rug the canvas is beneath the rug's, so the rug covers it and the rug's
- * shadow falls on it; once out, it is over the page, under the header.
+ * plane dreaming), is drawn once and then only stamped. While it lies still
+ * under the rug it is drawn once, on a canvas in the rug's place beneath the
+ * rug's own, so the rug covers it, the rug's shadow falls on it and it
+ * scrolls with the rug; moving, it is drawn on the canvas over the screen,
+ * under the rug until it is out, then over the page, under the header.
  *
  * The proverb is real text throughout, read by screen readers whatever the
  * plane is doing; it is only out of sight while the plane carries it. With
@@ -246,17 +248,79 @@ const shadowSprite = (dark: boolean) => {
   return sprite;
 };
 
+type Box = [number, number, number, number];
+
+/** A canvas the plane is drawn on: where it is on the page and its size (CSS pixels), and its pixels to each. */
+interface Surface {
+  canvas: HTMLCanvasElement;
+  g: CanvasRenderingContext2D;
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+  ratio: number;
+  /** The part drawn on last time, in its own CSS pixels: only that is cleared, not the whole canvas. */
+  dirty: Box | null;
+  shown: boolean;
+}
+
+const surfaceOf = (canvas: HTMLCanvasElement, g: CanvasRenderingContext2D): Surface => ({
+  canvas,
+  g,
+  left: 0,
+  top: 0,
+  width: 1,
+  height: 1,
+  ratio: 1,
+  dirty: null,
+  shown: false,
+});
+
+/** Gives a canvas its size, in CSS pixels and in its own; a new size clears it. */
+const resize = (surface: Surface, width: number, height: number, ratio: number) => {
+  surface.width = Math.max(1, width);
+  surface.height = Math.max(1, height);
+  surface.ratio = ratio;
+  const pixelsWide = Math.round(surface.width * ratio);
+  const pixelsHigh = Math.round(surface.height * ratio);
+  if (surface.canvas.width !== pixelsWide || surface.canvas.height !== pixelsHigh) {
+    surface.canvas.width = pixelsWide;
+    surface.canvas.height = pixelsHigh;
+    surface.dirty = null;
+  }
+};
+
+/** Where a point (x, y, z) on the page, z above it, is seen by the eye over (eyeX, eyeY), as CSS perspective would: in page pixels. */
+const seen = (eyeX: number, eyeY: number, x: number, y: number, z: number) => {
+  const f = PERSPECTIVE / (PERSPECTIVE - z);
+  return [eyeX + (x - eyeX) * f, eyeY + (y - eyeY) * f];
+};
+
 export function initPlane() {
   const section = document.querySelector<HTMLElement>('[data-proverb]');
   const stage = document.querySelector<HTMLElement>('[data-rug]');
   const sheet = section?.querySelector<HTMLElement>('[data-sheet]');
-  const canvas = section?.querySelector<HTMLCanvasElement>('[data-plane]');
-  const context = canvas?.getContext('2d');
-  if (!section || !stage || !sheet || !canvas || !context) return;
-  const g = context;
+  const screenCanvas = section?.querySelector<HTMLCanvasElement>('[data-plane]');
+  const floorCanvas = stage?.querySelector<HTMLCanvasElement>('[data-plane-rest]');
+  const screenContext = screenCanvas?.getContext('2d');
+  const floorContext = floorCanvas?.getContext('2d');
+  if (!section || !stage || !sheet || !screenCanvas || !floorCanvas || !screenContext || !floorContext) return;
   const header = document.querySelector<HTMLElement>('.site-header');
+  // Lying still under the rug, the plane is drawn on the floor: a canvas in
+  // the rug's own place (Rug.astro), which scrolls with it exactly. Moving,
+  // it is drawn on the canvas over the screen; drawn there while it lay
+  // still, it would be a frame behind the rug as the page is scrolled (the
+  // browser scrolls the page ahead of the script, and the drawing follows).
+  const floor = surfaceOf(floorCanvas, floorContext);
+  const screen = surfaceOf(screenCanvas, screenContext);
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Lying under the rug, the plane is drawn only once the rug covers it
+  // (`data-covered`, rug.ts: the flat picture fully shown; the 3D rug comes
+  // up over it). Until then (on a slow connection the picture comes after
+  // this script), the paper would lie on the bare floor.
+  const covered = () => stage.hasAttribute('data-covered');
   const items = foldSheet().pieces.map((piece) => ({ piece, points: [] as number[], depth: 0, colour: '', edge: '' }));
   const sprites = new Map<boolean, HTMLCanvasElement>();
 
@@ -270,12 +334,15 @@ export function initPlane() {
   /** Whether the plane has been found, and where the page was then: it sets off from there. */
   let found = false;
   let foundAt = -Infinity;
-  // The canvas: its size, and where on the screen its middle (the eye) is.
-  let width = 1;
-  let height = 1;
-  let ratio = 1;
+  // Where on the screen the canvas over it is, and its middle (the eye).
+  let viewLeft = 0;
+  let viewTop = 0;
   let eyeX = 0;
   let eyeY = 0;
+  // The eye the floor is seen from, on the page, and whether the plane lying there is drawn.
+  let floorEyeX = 0;
+  let floorEyeY = 0;
+  let floorDrawn = false;
 
   const measure = () => {
     const scrollX = window.scrollX;
@@ -323,18 +390,35 @@ export function initPlane() {
     start = Math.max(cy - window.innerHeight / 2, foundAt);
     end = Math.max(start + 120, Math.min(inSight, centred));
 
-    const view = canvas.getBoundingClientRect();
-    ratio = pixelRatio();
-    width = Math.max(1, view.width);
-    height = Math.max(1, view.height);
-    eyeX = view.left + width / 2;
-    eyeY = view.top + height / 2;
-    const pixelsWide = Math.round(width * ratio);
-    const pixelsHigh = Math.round(height * ratio);
-    if (canvas.width !== pixelsWide || canvas.height !== pixelsHigh) {
-      canvas.width = pixelsWide;
-      canvas.height = pixelsHigh;
-    }
+    const ratio = pixelRatio();
+    const view = screen.canvas.getBoundingClientRect();
+    resize(screen, view.width, view.height, ratio);
+    viewLeft = view.left;
+    viewTop = view.top;
+    eyeX = view.left + screen.width / 2;
+    eyeY = view.top + screen.height / 2;
+
+    // The floor's canvas, just round the plane lying there, seen from where
+    // the eye over the screen will be when it sets off: it looks the same
+    // when it goes from one canvas to the other.
+    floorEyeX = scrollX + eyeX;
+    floorEyeY = start + eyeY;
+    const [l, t, r, b] = shape(flying(0), floorEyeX, floorEyeY);
+    const stageLeft = box.left + scrollX;
+    const stageTop = box.top + scrollY;
+    const x0 = Math.floor(Math.max(l - 3, stageLeft) - stageLeft);
+    const x1 = Math.ceil(Math.min(r + 3, stageLeft + box.width) - stageLeft);
+    const y0 = Math.floor(t - 3 - stageTop);
+    const y1 = Math.ceil(b + 3 - stageTop);
+    floor.left = stageLeft + x0;
+    floor.top = stageTop + y0;
+    resize(floor, x1 - x0, y1 - y0, ratio);
+    const place = floor.canvas.style;
+    place.left = `${x0}px`;
+    place.top = `${y0}px`;
+    place.width = `${floor.width}px`;
+    place.height = `${floor.height}px`;
+    floorDrawn = false;
     measured = true;
   };
 
@@ -417,15 +501,11 @@ export function initPlane() {
     };
   };
 
-  /** Draws the plane and its shadow; false when none of it is on the screen. */
-  const paint = ({ pose, angles, shadow }: Moment) => {
-    const camX = window.scrollX + eyeX;
-    const camY = window.scrollY + eyeY;
-    const project = (x: number, y: number, z: number) => {
-      const f = PERSPECTIVE / (PERSPECTIVE - z);
-      return [width / 2 + (x - camX) * f, height / 2 + (y - camY) * f];
-    };
-
+  /**
+   * Places the plane's pieces as the eye at (eyeX, eyeY) on the page sees
+   * them, in page pixels, and shades them; returns the box they take up.
+   */
+  const shape = ({ pose, angles }: Moment, eyeX: number, eyeY: number) => {
     const lift = clamp((angles[0] + angles[1] + angles[2] + angles[3]) / (2 * Math.PI));
     const turns = foldTurns(angles);
     const body = bodyOf(pose);
@@ -439,7 +519,7 @@ export function initPlane() {
       let depth = 0;
       for (const [x, y] of item.piece.outline) {
         const p = transform(m, [x, y, 0]);
-        const [sx, sy] = project(p[0], p[1], p[2]);
+        const [sx, sy] = seen(eyeX, eyeY, p[0], p[1], p[2]);
         item.points.push(sx, sy);
         depth += p[2];
         left = Math.min(left, sx);
@@ -457,19 +537,45 @@ export function initPlane() {
       // Its edges a shade darker: the creases, and the paper's edge.
       item.edge = `rgb(${PAPER.map((value) => Math.round(value * brightness * 0.93)).join(',')})`;
     }
+    return [left, top, right, bottom];
+  };
+
+  /** Draws the plane and its shadow on a canvas, seen from (eyeX, eyeY); false when none of it is on the canvas. */
+  const paint = (moment: Moment, surface: Surface, eyeX: number, eyeY: number) => {
+    const { pose, shadow } = moment;
+    const [left, top, right, bottom] = shape(moment, eyeX, eyeY);
 
     // The shadow on the page below, cast by the window's light: larger than a paper plane's.
     const span = pose.scale * LENGTH * 1.6 * (1 + pose.z / 900);
     const dark = document.documentElement.dataset.theme === 'dark';
     const opacity = (dark ? 0.22 : 0.42) * shadow * smooth(20, 90, pose.z);
-    const [gx, gy] = project(pose.x + pose.z * 0.32, pose.y + pose.z * 0.5, 0);
+    const [gx, gy] = seen(eyeX, eyeY, pose.x + pose.z * 0.32, pose.y + pose.z * 0.5, 0);
+    // From here on, in the canvas's own pixels.
+    const ox = surface.left;
+    const oy = surface.top;
     const margin = 40;
-    const seen = (l: number, r: number, t: number, b: number) => r > -margin && l < width + margin && b > -margin && t < height + margin;
-    const shadowSeen = opacity > 0.002 && seen(gx - span, gx + span, gy - span, gy + span);
-    if (!seen(left, right, top, bottom) && !shadowSeen) return false;
+    const inside = (l: number, r: number, t: number, b: number) =>
+      r - ox > -margin && l - ox < surface.width + margin && b - oy > -margin && t - oy < surface.height + margin;
+    const shadowSeen = opacity > 0.002 && inside(gx - span, gx + span, gy - span, gy + span);
+    if (!inside(left, right, top, bottom) && !shadowSeen) return false;
 
+    const { g, ratio } = surface;
     g.setTransform(ratio, 0, 0, ratio, 0, 0);
-    g.clearRect(0, 0, width, height);
+    const last = surface.dirty;
+    if (last) g.clearRect(last[0], last[1], last[2] - last[0], last[3] - last[1]);
+    else g.clearRect(0, 0, surface.width, surface.height);
+    // What this drawing covers: the paper (and its edges' width), and the
+    // shadow's sprite, turned, so its half diagonal.
+    const reach = span * 0.71;
+    const dirty: Box = [left - 2 - ox, top - 2 - oy, right + 2 - ox, bottom + 2 - oy];
+    if (shadowSeen) {
+      dirty[0] = Math.min(dirty[0], gx - reach - ox);
+      dirty[1] = Math.min(dirty[1], gy - reach - oy);
+      dirty[2] = Math.max(dirty[2], gx + reach - ox);
+      dirty[3] = Math.max(dirty[3], gy + reach - oy);
+    }
+    surface.dirty = dirty;
+    g.setTransform(ratio, 0, 0, ratio, -ox * ratio, -oy * ratio);
     if (shadowSeen) {
       let sprite = sprites.get(dark);
       if (!sprite) {
@@ -501,6 +607,22 @@ export function initPlane() {
     return true;
   };
 
+  /**
+   * Shows or hides a canvas. Hidden, the one over the screen is cleared (it
+   * is drawn on again, clearing only where it drew last); the floor keeps the
+   * plane lying there, which does not change.
+   */
+  const show = (surface: Surface, value: boolean) => {
+    if (value === surface.shown) return;
+    surface.shown = value;
+    surface.canvas.style.visibility = value ? 'visible' : 'hidden';
+    if (!value && surface === screen) {
+      surface.g.setTransform(1, 0, 0, 1, 0, 0);
+      surface.g.clearRect(0, 0, surface.canvas.width, surface.canvas.height);
+      surface.dirty = null;
+    }
+  };
+
   let frame = 0;
   let land = 0;
   let target = 0;
@@ -508,13 +630,6 @@ export function initPlane() {
   let first = true;
   let landed = false;
   let aloft = false;
-  let shown = false;
-  const show = (value: boolean) => {
-    if (value === shown) return;
-    shown = value;
-    canvas.style.visibility = value ? 'visible' : 'hidden';
-    if (!value) g.clearRect(0, 0, canvas.width, canvas.height);
-  };
 
   const draw = (time: number) => {
     frame = 0;
@@ -541,16 +656,27 @@ export function initPlane() {
       landed = land >= 1;
       section.toggleAttribute('data-landed', landed);
     }
-    if (landed) {
-      show(false);
-      return;
-    }
     // Out from under the rug, it flies over the page.
     if ((t > OUT || land > 0) !== aloft) {
       aloft = t > OUT || land > 0;
-      canvas.toggleAttribute('data-aloft', aloft);
+      screen.canvas.toggleAttribute('data-aloft', aloft);
     }
-    show(paint(landing(flying(t), land)));
+    if (landed || (!aloft && !covered())) {
+      show(screen, false);
+      show(floor, false);
+      return;
+    }
+    if (t <= 0 && land <= 0) {
+      // Lying still under the rug: on the floor, drawn once.
+      if (!floorDrawn) floorDrawn = paint(flying(0), floor, floorEyeX, floorEyeY);
+      show(floor, true);
+      show(screen, false);
+      return;
+    }
+    screen.left = window.scrollX + viewLeft;
+    screen.top = window.scrollY + viewTop;
+    show(screen, paint(landing(flying(t), land), screen, window.scrollX + eyeX, window.scrollY + eyeY));
+    show(floor, false);
   };
 
   const schedule = () => {
@@ -571,11 +697,23 @@ export function initPlane() {
     section.setAttribute('data-flight', '');
     remeasure();
   };
+  // The shadow's sprite (blurred, so not free) is made ahead, while the page
+  // is idle, not in the first frame of the flight.
+  const warm = () => {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    if (!sprites.has(dark)) sprites.set(dark, shadowSprite(dark));
+  };
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(warm, { timeout: 2000 });
+  else setTimeout(warm, 500);
+
   new MutationObserver(find).observe(stage, { attributes: true, attributeFilter: ['data-looked'] });
+  new MutationObserver(schedule).observe(stage, { attributes: true, attributeFilter: ['data-covered'] });
   find();
-  canvas.hidden = false;
-  shown = true;
-  show(false);
+  // Both start hidden; the floor's canvas is so from its styles (Rug.astro).
+  screen.canvas.hidden = false;
+  screen.shown = true;
+  show(screen, false);
+  floor.canvas.hidden = false;
   schedule();
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', remeasure);

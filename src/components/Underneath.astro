@@ -42,8 +42,20 @@ const { t } = i18n(Astro.url);
     position: relative;
     overflow-x: clip;
     /* The first thing on the page, just under the header: the rug's floor
-       already leaves room round it. */
+       already leaves room round it. It has the first screen to itself, the
+       rug in the middle of it, so nothing else (not the proverb's sheet
+       below, where the plane lands) shows until the page is scrolled. */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-height));
     padding-block: clamp(0.5rem, 2vw, 1.5rem) calc(var(--section-space) * 0.5);
+  }
+
+  @supports (height: 100svh) {
+    .under {
+      min-height: calc(100svh - var(--header-height));
+    }
   }
 
   .under__controls {

@@ -402,7 +402,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
  * available, and the flat picture stays.
  */
 export async function mountRug(stage: HTMLElement): Promise<boolean> {
-  const canvas = stage.querySelector<HTMLCanvasElement>('canvas');
+  const canvas = stage.querySelector<HTMLCanvasElement>('.rug__canvas');
   const gl = canvas?.getContext('webgl2', {
     alpha: true,
     premultipliedAlpha: true,
@@ -423,9 +423,11 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return false;
   }
 
-  // The wool: the rug's picture (scripts/rug.mjs), decoded before it is needed.
+  // The wool: the rug's picture (scripts/rug.mjs), decoded before it is
+  // needed; the same file as the flat picture's (Rug.astro picks it for the
+  // screen), so it is not fetched twice.
   const picture = new Image();
-  picture.src = rugPicture;
+  picture.src = stage.querySelector<HTMLImageElement>('.rug__flat img')?.currentSrc || rugPicture;
   try {
     await picture.decode();
   } catch {
@@ -1037,9 +1039,43 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
 
   // --- Life --------------------------------------------------------------
 
+  // Played with and then scrolled away, it is laid straight for next time.
+  // Laying it and drawing it is a heavy frame, so not in the middle of the
+  // scroll (nor of the paper plane's landing, which takes 1.5 s): once the
+  // page has been still a moment, or at the latest as it comes near again.
+  // Back in sight before then, it stays as it was left: it is never laid
+  // straight while someone is looking.
+  let relay = false;
+  let relayTimer = 0;
+  let inSight = true;
+  const relayNow = () => {
+    window.clearTimeout(relayTimer);
+    if (!relay) return;
+    relay = false;
+    if (!inSight && ready && disturbed && hold.pointer < 0 && !script) void rest().then(draw);
+  };
+  const relayLater = () => {
+    window.clearTimeout(relayTimer);
+    relayTimer = window.setTimeout(relayNow, 1600);
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (relay) relayLater();
+    },
+    { passive: true },
+  );
   new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting) return;
+      if (entry.isIntersecting) relayNow();
+    },
+    { rootMargin: '50% 0px' },
+  ).observe(stage);
+
+  new IntersectionObserver(
+    ([entry]) => {
+      inSight = entry.isIntersecting;
+      if (inSight) return;
       // Out of sight, nothing moves: the loop stops at once.
       if (frame) {
         cancelAnimationFrame(frame);
@@ -1048,8 +1084,10 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
         behind = 0;
         setState('resting');
       }
-      // Played with and then scrolled away: laid straight for next time.
-      if (ready && disturbed && hold.pointer < 0 && !script) void rest().then(draw);
+      if (ready && disturbed && hold.pointer < 0 && !script) {
+        relay = true;
+        relayLater();
+      }
     },
     { threshold: [0, 0.35] },
   ).observe(stage);

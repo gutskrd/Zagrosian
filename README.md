@@ -155,8 +155,10 @@ worker/            The small Worker in front of the static files: http to https,
 - **Rug** (`src/assets/rug/rug.webp`): a pile rug after those of Bijar and Senneh, Kurdish weaving
   towns in the Zagros: a madder field, a lobed indigo medallion with pendants, ivory corners, an
   indigo border of rosettes on a vine. The design is our own, drawn in code by
-  [`scripts/rug.mjs`](scripts/rug.mjs) (`node scripts/rug.mjs`, in a headless browser); the 3D rug
-  and the flat picture shown without WebGL both use it.
+  [`scripts/rug.mjs`](scripts/rug.mjs) (`node scripts/rug.mjs`, in a headless browser), in two
+  sizes: `rug.webp` and, for phones, `rug-small.webp`. The 3D rug and the flat picture shown without
+  WebGL both use whichever the browser picked. On a slow connection the picture comes up only once it
+  is whole, never row by row, and the 3D rug fades in over it.
 - **Sun** (`src/assets/brand/sun-black-source.png` and `sun-white-source.png`): the 21-ray sun. It
   is drawn from its measured geometry ([`src/lib/sun.ts`](src/lib/sun.ts): 21 straight rays, the
   gaps between them at 51.2% of the rays' length), so it is sharp at any size: in the colour of the
@@ -335,9 +337,12 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   its shadow on the page an airliner's; once the sheet is fully in sight it lands and unfolds into
   it by itself, so the sheet is always whole on the screen and can be read wherever the scrolling
   stops. Scrolled back, it folds up and flies home. It is folded as a dart is folded by hand, so it
-  opens along real creases, and the sheet keeps them. It is drawn on one 2D canvas, a few dozen
-  shaded polygons a frame, light even for a slow phone; the proverb is real text all the while.
-  With reduced motion the sheet simply lies there.
+  opens along real creases, and the sheet keeps them. It is a 2D drawing, a few dozen shaded
+  polygons a frame, light even for a slow phone; the proverb is real text all the while. Lying
+  still, it is drawn once on a small canvas in the rug's own place, so it scrolls with the rug
+  exactly; only once it moves is it drawn on a canvas over the screen. It is never drawn before
+  the rug fully covers it, so the paper is never seen on the bare floor while the page loads. With
+  reduced motion the sheet simply lies there.
 - **Products:** Hevalo's app icon is a hole in the page, and the deer comes out of it from behind
   the page. The page is cut in the icon's shape (its cut edge throws a soft shade inside), and
   through it is the purple space behind the page. As the section scrolls into view, the deer comes

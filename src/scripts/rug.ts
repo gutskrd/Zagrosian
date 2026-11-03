@@ -13,6 +13,22 @@ export function initRug() {
   const stage = document.querySelector<HTMLElement>('[data-rug]');
   if (!stage) return;
 
+  // The flat picture is shown whole, once decoded, never as the rows that
+  // have arrived so far (Rug.astro keeps it out of sight until then). Once it
+  // has come up fully, the rug covers the floor (`data-covered`): only then is
+  // the paper plane drawn under it (plane.ts), never on the bare floor.
+  const picture = stage.querySelector<HTMLImageElement>('.rug__flat img');
+  const covered = () => stage.setAttribute('data-covered', '');
+  const pictured = () => {
+    stage.setAttribute('data-pictured', '');
+    if (!picture) return covered();
+    picture.addEventListener('transitionend', covered, { once: true });
+    // In case no transition runs (it was already shown, or styles differ).
+    window.setTimeout(covered, 600);
+  };
+  if (picture) picture.decode().then(pictured, pictured);
+  else pictured();
+
   const button = document.querySelector<HTMLButtonElement>('[data-rug-button]');
   if (button) {
     button.setAttribute('data-ready', '');

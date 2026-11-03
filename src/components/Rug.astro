@@ -13,12 +13,29 @@
  * ready, and without WebGL, the flat picture lies there.
  */
 import rugPicture from '../assets/rug/rug.webp?url';
+import rugSmall from '../assets/rug/rug-small.webp?url';
+
+// The rug is a little under a quarter of the stage wide on a computer, a little more than a
+// third on a tablet and half on a phone (--rug-share below): the browser picks
+// the picture that is fine enough, and the 3D scene uses the same one.
+const sizes = '(max-width: 39.99rem) 50vw, (max-width: 63.99rem) 36vw, 25vw';
 ---
 
 <div class="rug" data-rug>
+  {/* The paper plane, while it lies here (plane.ts): under the rug, and part of the floor, so it scrolls with it exactly. */}
+  <canvas class="rug__plane" aria-hidden="true" data-plane-rest hidden></canvas>
   <div class="rug__flat" aria-hidden="true">
     {/* The first thing on the homepage: fetched at once. */}
-    <img src={rugPicture} alt="" width="1010" height="1730" fetchpriority="high" decoding="async" />
+    <img
+      src={rugPicture}
+      srcset={`${rugSmall} 606w, ${rugPicture} 1010w`}
+      sizes={sizes}
+      alt=""
+      width="1010"
+      height="1730"
+      fetchpriority="high"
+      decoding="async"
+    />
   </div>
   <canvas class="rug__canvas" aria-hidden="true"></canvas>
 </div>
@@ -26,9 +43,11 @@ import rugPicture from '../assets/rug/rug.webp?url';
 <style>
   /* The floor, with room around the rug for the light, and to move and fold
      it; on a computer low enough that the hint and the button below it are
-     on the first screen too. */
+     on the first screen too. Lying turned, the rug (fringe and shadow
+     included) is never more than nine tenths of the floor's height: its
+     canvas would cut them off in a straight line. */
   .rug {
-    --rug-share: 0.25;
+    --rug-share: 0.235;
     --rug-angle: -0.5;
     --rug-width: calc(var(--rug-share) * 100cqw);
     position: relative;
@@ -58,12 +77,52 @@ import rugPicture from '../assets/rug/rug.webp?url';
     }
   }
 
+  /* On a computer whose screen is short (1280 by 720, 1366 by 768), the
+     floor is lower and the rug a little smaller, so the rug and its button
+     still fit the first screen; shorter still, smaller again. */
+  @media (min-width: 64rem) and (max-height: 56.24rem) {
+    .rug {
+      --rug-share: 0.2;
+      aspect-ratio: 2.3 / 1;
+    }
+  }
+
+  @media (min-width: 64rem) and (max-height: 40rem) {
+    .rug {
+      --rug-share: 0.168;
+      aspect-ratio: 2.8 / 1;
+    }
+  }
+
+  /* A phone held sideways: a long, low floor, so the whole rug is in sight. */
+  @media (max-width: 63.99rem) and (orientation: landscape) and (max-height: 32rem) {
+    .rug {
+      --rug-share: 0.17;
+      aspect-ratio: 2.6 / 1;
+    }
+  }
+
   .rug[data-over] {
     cursor: grab;
   }
 
   .rug[data-holding] {
     cursor: grabbing;
+  }
+
+  /* Placed and sized by plane.ts round the plane; first in the stage, so the
+     picture and the 3D rug, and the rug's shadow, lie over it. */
+  .rug__plane {
+    position: absolute;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.6s var(--ease-out);
+  }
+
+  /* It is drawn once the rug covers it (rug.ts), and the bit of it that
+     shows comes up softly, as if it had been there all along. */
+  .rug:not([data-covered]) .rug__plane {
+    opacity: 0;
   }
 
   /* The flat picture hangs from the rug's centre, turned as it lies: 101 by
@@ -76,13 +135,23 @@ import rugPicture from '../assets/rug/rug.webp?url';
     aspect-ratio: 101 / 173;
     transform: translate(-50%, -50%) rotate(calc(var(--rug-angle) * 1rad));
     filter: drop-shadow(0 0.6rem 0.9rem rgb(0 0 0 / 0.3));
-    transition: transform 0.9s var(--ease-in-out);
+    transition:
+      transform 0.9s var(--ease-in-out),
+      visibility 0s;
   }
 
   .rug__flat img {
     display: block;
     width: 100%;
     height: 100%;
+    transition: opacity 0.45s var(--ease-out);
+  }
+
+  /* With the script (theme-init.js has run), the picture waits until it is
+     whole (rug.ts), then comes up: a slow connection never shows it arriving
+     row by row. Without it, the picture shows as it loads. */
+  :global(:root[data-theme]) .rug:not([data-pictured]) .rug__flat img {
+    opacity: 0;
   }
 
   /* Lifted without the 3D scene: the picture is drawn back along its length. */
@@ -92,7 +161,7 @@ import rugPicture from '../assets/rug/rug.webp?url';
 
   @media (prefers-reduced-motion: reduce) {
     .rug__flat {
-      transition: none;
+      transition: visibility 0s;
     }
   }
 
@@ -101,11 +170,32 @@ import rugPicture from '../assets/rug/rug.webp?url';
     inset: 0;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    transition: opacity 0.7s var(--ease-out);
+    /* Whatever reaches the floor's foot (the last of the rug's shadow, or the
+       rug carried there) fades out, never cut off in a line. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 0.75rem), transparent);
   }
 
-  /* Once the 3D rug is ready the picture goes, so the two never show together. */
+  /* Once the 3D rug is ready it comes up over the picture, as the light
+     settles on it, and the picture goes only when it is fully there: the
+     floor never shows between them. */
+  .rug[data-live] .rug__canvas {
+    opacity: 1;
+  }
+
   .rug[data-live] .rug__flat {
     visibility: hidden;
+    transition:
+      transform 0.9s var(--ease-in-out),
+      visibility 0s 0.7s;
+  }
+
+  /* With reduced motion the rug comes at once (global.css), and so the picture goes at once. */
+  @media (prefers-reduced-motion: reduce) {
+    .rug[data-live] .rug__flat {
+      transition-delay: 0s;
+    }
   }
 
   /* In forced colours (Windows High Contrast) the picture stays, as an outline. */
@@ -115,12 +205,19 @@ import rugPicture from '../assets/rug/rug.webp?url';
       outline: 2px solid CanvasText;
     }
 
-    .rug__canvas {
+    .rug__canvas,
+    .rug__plane {
       display: none;
     }
 
     .rug[data-live] .rug__flat {
       visibility: visible;
+    }
+  }
+
+  @media print {
+    .rug__plane {
+      display: none;
     }
   }
 </style>

@@ -224,10 +224,11 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
   }
 
   /*
-   * The plane's canvas, over the screen: under the rug while the plane lies
-   * there (below the rug's canvas, so the rug covers it), over the page once
-   * it flies, under the header. plane.ts draws on it only while the plane is
-   * in sight.
+   * The plane's canvas, over the screen, for while it moves: under the rug
+   * (below the rug's canvas, so the rug covers it) as it slides out, over the
+   * page once it flies, under the header. Lying still under the rug, it is
+   * drawn on the rug's own floor instead (Rug.astro). plane.ts draws on it
+   * only while the plane is in sight.
    */
   .flight {
     position: fixed;

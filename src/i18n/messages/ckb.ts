@@ -96,7 +96,7 @@ export const ckb: Messages = {
     title: 'گۆشەیەک هەڵبگرن.',
     hintPointer: 'گۆشەکە هەڵبگرن',
     hintTouch: 'پەنجە لەسەر گۆشەکە ڕابگرن',
-    lift: 'بەڕەکە هەڵبگرن',
+    lift: 'قاڵییەکە هەڵبگرن',
     lay: 'ڕایبخەنەوە',
   },
   faq: {

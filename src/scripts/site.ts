@@ -47,7 +47,14 @@ function initHeader() {
  * on their own or a few seconds after the page has loaded.
  */
 function initDeepLink() {
-  const id = decodeURIComponent(window.location.hash.slice(1));
+  // A link can carry a hash that is not valid percent-encoding (`#%`); it
+  // names no section, and must not stop the rest of this script.
+  let id = '';
+  try {
+    id = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
   const target = id ? document.getElementById(id) : null;
   if (!target) return;
 

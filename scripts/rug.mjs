@@ -1,5 +1,6 @@
 // Draws the rug (Rug.astro, rug-scene.ts) and saves it as
-// src/assets/rug/rug.webp: a pile rug after those of Bijar and Senneh, Kurdish
+// src/assets/rug/rug.webp, and smaller as rug-small.webp for phones and
+// ordinary screens (so the rug is there sooner on a slow connection): a pile rug after those of Bijar and Senneh, Kurdish
 // weaving towns in the Zagros. A madder-red field with a lobed indigo
 // medallion at its heart, pendants on stems at either end, ivory corners
 // scalloped like the medallion; flowers, palmettes and leaves on a running
@@ -22,8 +23,9 @@ const OUT = fileURLToPath(new URL('../src/assets/rug/', import.meta.url));
 const ACROSS = 101;
 const ALONG = 161;
 const FRINGE = 6;
-/** Pixels to a cell: about as fine as the rug is ever seen. */
+/** Pixels to a cell: about as fine as the rug is ever seen; and for the smaller picture. */
 const SCALE = 10;
+const SMALL_SCALE = 6;
 
 /** Runs in the browser: the whole drawing, in cells, then the picture as WebP. */
 function draw({ across: W, along: H, fringe, scale }) {
@@ -535,9 +537,14 @@ function draw({ across: W, along: H, fringe, scale }) {
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
-const picture = await page.evaluate(draw, { across: ACROSS, along: ALONG, fringe: FRINGE, scale: SCALE });
-await browser.close();
 mkdirSync(OUT, { recursive: true });
-const bytes = Buffer.from(picture.slice(picture.indexOf(',') + 1), 'base64');
-writeFileSync(`${OUT}rug.webp`, bytes);
-console.log(`Wrote rug.webp (${ACROSS * SCALE} by ${(ALONG + 2 * FRINGE) * SCALE}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`);
+for (const [name, scale] of [
+  ['rug.webp', SCALE],
+  ['rug-small.webp', SMALL_SCALE],
+]) {
+  const picture = await page.evaluate(draw, { across: ACROSS, along: ALONG, fringe: FRINGE, scale });
+  const bytes = Buffer.from(picture.slice(picture.indexOf(',') + 1), 'base64');
+  writeFileSync(`${OUT}${name}`, bytes);
+  console.log(`Wrote ${name} (${ACROSS * scale} by ${(ALONG + 2 * FRINGE) * scale}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`);
+}
+await browser.close();

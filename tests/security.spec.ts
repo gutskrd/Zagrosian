@@ -63,6 +63,18 @@ test('a page in another language says so', async ({ request }) => {
   expect((await request.get('/de')).headers()['content-language']).toBe('de');
 });
 
+// Anyone can link to the site with any address after it; one that is not
+// valid percent-encoding (`#%`) once stopped the page's script before the
+// menu, the theme and the search were set up.
+test('a malformed address leaves the page working', async ({ page }) => {
+  await settled(page.context());
+  const problems = await watch(page);
+  for (const path of ['/#%', '/privacy#%zz', '/de#%E0%A4']) {
+    await page.goto(path, { waitUntil: 'networkidle' });
+  }
+  expect(problems).toEqual([]);
+});
+
 for (const { code } of locales) {
   test(`no policy violations or errors on any page: ${code}`, async ({ page }) => {
     await settled(page.context());

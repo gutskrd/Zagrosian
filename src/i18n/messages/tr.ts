@@ -93,7 +93,7 @@ export const tr: Messages = {
     title: 'Bir köşesini kaldırın.',
     hintPointer: 'Köşeyi kaldırın',
     hintTouch: 'Köşeye basılı tutun',
-    lift: 'Kilimi kaldır',
+    lift: 'Halıyı kaldır',
     lay: 'Yeniden ser',
   },
   faq: {
