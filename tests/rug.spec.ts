@@ -3,9 +3,12 @@
  * lying there (never woven or settling in front of you) and at rest; a
  * corner can be picked up with the mouse and folded over, and it stays folded
  * when let go; scrolled away and back, it lies straight again. On a touch
- * screen a swipe over it still scrolls the page, and pressing and holding
- * picks it up instead. With reduced motion it lies still and cannot be
- * picked up. Its box never changes size, so nothing around it moves.
+ * screen a swipe up or down over it still scrolls the page; pressing and
+ * holding, or setting off sideways, picks it up instead, a tap lifts the
+ * corner and lays it back, and two fingers still zoom the page. With reduced
+ * motion it lies still and cannot be picked up, but lifting it (a tap, or
+ * the button) still folds the corner over, at once. Its box never changes
+ * size, so nothing around it moves.
  */
 import { type Page, expect, test } from '@playwright/test';
 import sharp from 'sharp';
@@ -123,6 +126,14 @@ test.describe('with a mouse', () => {
 test.describe('on a touch screen', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
+  /** A tap: a finger down at a point and up again at once. */
+  async function tap(page: Page, at: { x: number; y: number }) {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: at.x, y: at.y, id: 1 }] });
+    await page.waitForTimeout(60);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  }
+
   /** A finger: down at `from`, held for `hold` ms, then drawn to `to`, and up. */
   async function finger(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, hold: number, check?: () => Promise<void>) {
     const cdp = await page.context().newCDPSession(page);
@@ -157,5 +168,75 @@ test.describe('on a touch screen', () => {
       await expect(rug(page), 'held, it is picked up').toHaveAttribute('data-holding', '');
     });
     expect(await page.evaluate(() => scrollY), 'and the page stays put').toBe(still);
+  });
+
+  test('set off sideways, it is picked up at once; a tap lifts the corner and lays it back', async ({ page }) => {
+    await settled(page.context());
+    const problems = await watch(page);
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await arrive(page);
+    const { middle } = await corner(page);
+    const still = await page.evaluate(() => scrollY);
+    await finger(page, middle, { x: middle.x - 120, y: middle.y + 10 }, 0, async () => {
+      await expect(rug(page), 'drawn sideways without waiting, it is picked up').toHaveAttribute('data-holding', '');
+    });
+    expect(await page.evaluate(() => scrollY), 'and the page stays put').toBe(still);
+    await resting(page);
+
+    const button = page.locator('[data-rug-button]');
+    await tap(page, (await corner(page)).middle);
+    await expect(rug(page), 'a tap lifts the corner').toHaveAttribute('data-lifted', '');
+    await expect(button).toHaveText('Lay it back');
+    await resting(page);
+    await tap(page, (await corner(page)).middle);
+    await expect(rug(page), 'and another lays it back').not.toHaveAttribute('data-lifted', '');
+    await expect(button).toHaveText('Lift the rug');
+    expect(problems).toEqual([]);
+  });
+
+  test('two fingers on it still zoom the page', async ({ page }) => {
+    await settled(page.context());
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await arrive(page);
+    const { middle } = await corner(page);
+    const cdp = await page.context().newCDPSession(page);
+    const fingers = (type: 'touchStart' | 'touchMove' | 'touchEnd', apart: number) =>
+      cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints:
+          type === 'touchEnd'
+            ? []
+            : [
+                { x: middle.x - apart, y: middle.y, id: 0 },
+                { x: middle.x + apart, y: middle.y, id: 1 },
+              ],
+      });
+    await fingers('touchStart', 20);
+    for (let apart = 24; apart <= 100; apart += 4) {
+      await fingers('touchMove', apart);
+      await page.waitForTimeout(16);
+    }
+    await fingers('touchEnd', 0);
+    await expect.poll(() => page.evaluate(() => visualViewport!.scale)).toBeGreaterThan(1.5);
+    await expect(rug(page)).not.toHaveAttribute('data-holding', '');
+  });
+
+  test('with reduced motion, a tap still lifts it, at once', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settled(page.context());
+    const problems = await watch(page);
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await rug(page).scrollIntoViewIfNeeded();
+    await expect(rug(page)).toHaveAttribute('data-live', '');
+    await page.waitForTimeout(500);
+    const before = await picture(page);
+    const { middle } = await corner(page);
+    await tap(page, middle);
+    await expect(rug(page)).toHaveAttribute('data-lifted', '');
+    await expect.poll(async () => difference(before, await picture(page)), { message: 'the corner is folded over' }).toBeGreaterThan(0.01);
+    await tap(page, middle);
+    await expect(rug(page)).not.toHaveAttribute('data-lifted', '');
+    await expect.poll(async () => difference(before, await picture(page)), { message: 'and laid back' }).toBeLessThan(0.002);
+    expect(problems).toEqual([]);
   });
 });

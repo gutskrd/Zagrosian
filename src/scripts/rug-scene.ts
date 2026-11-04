@@ -18,8 +18,9 @@
  *   turned up, as a rug's often is. The corner is worked out before the rug
  *   is shown (a few steps at a time, so the page never waits), so nothing
  *   moves into place in front of you.
- * - Hover shows a hand; press and drag (on a touch screen, press and hold
- *   first, so scrolling stays scrolling).
+ * - Hover shows a hand; press and drag. On a touch screen, press and hold,
+ *   or set off sideways, so a swipe up or down still scrolls; a tap lifts
+ *   the corner, as the "Lift the rug" button does.
  *
  * It simulates and draws only while something moves; at rest it costs
  * nothing. Played with and scrolled away, it is laid straight again. For
@@ -462,8 +463,19 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const positionTexture = floatTexture();
   const normalTexture = floatTexture();
   const upload = new Float32Array(cloth.count * 4);
-  const send = (texture: WebGLTexture | null, values: Float32Array) => {
-    for (let i = 0; i < cloth.count; i++) upload.set(values.subarray(i * 3, i * 3 + 3), i * 4);
+  /** The cloth as it was before its last step: it is drawn between the two (see `loop`). */
+  const before = { position: new Float32Array(cloth.position), normal: new Float32Array(cloth.normal) };
+  const keepBefore = () => {
+    before.position.set(cloth.position);
+    before.normal.set(cloth.normal);
+  };
+  /** Sends `values` to the GPU, or a share `t` of the way to them from `from`. */
+  const send = (texture: WebGLTexture | null, values: Float32Array, from: Float32Array, t: number) => {
+    for (let i = 0, j = 0; i < values.length; i += 3, j += 4) {
+      upload[j] = from[i] + (values[i] - from[i]) * t;
+      upload[j + 1] = from[i + 1] + (values[i + 1] - from[i + 1]) * t;
+      upload[j + 2] = from[i + 2] + (values[i + 2] - from[i + 2]) * t;
+    }
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, COLUMNS, ROWS, gl.RGBA, gl.FLOAT, upload);
   };
@@ -569,9 +581,10 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return [box[0] - margin, box[1] - margin, box[2] + margin, box[3] + margin];
   };
 
-  const draw = () => {
-    send(positionTexture, cloth.position);
-    send(normalTexture, cloth.normal);
+  /** Draws the rug: as it is, or a share `t` of the way to it from before its last step. */
+  const draw = (t = 1) => {
+    send(positionTexture, cloth.position, before.position, t);
+    send(normalTexture, cloth.normal, before.normal, t);
 
     const bindCloth = (program: ReturnType<typeof compile>) => {
       gl.uniform1i(program.at('uPositions'), 0);
@@ -657,10 +670,14 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return [nx * view.tan * view.aspect * t, height, -ny * view.tan * t];
   };
 
-  /** The particle under a point on the screen, the uppermost if layers overlap. */
-  const particleAt = (clientX: number, clientY: number) => {
+  /**
+   * The particle under a point on the screen, the uppermost if layers
+   * overlap; within `near` pixels of the rug's edge counts (a fingertip is
+   * wider than a mouse pointer's tip).
+   */
+  const particleAt = (clientX: number, clientY: number, near = 14) => {
     const box = canvas.getBoundingClientRect();
-    const reach = Math.max(14, (box.width * share) / (COLUMNS - 1)) ** 2;
+    const reach = Math.max(near, (box.width * share) / (COLUMNS - 1)) ** 2;
     let best = -1;
     let bestHeight = -1;
     let bestDistance = Infinity;
@@ -764,9 +781,39 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     cloth.hold(null);
   };
 
+  /** One step of the cloth, and of whatever leads it: a hand, a move made for the visitor, or the corner's curl. */
+  const advance = () => {
+    if (hold.pointer >= 0) {
+      // Lift what is held, smoothly, to a hand's height.
+      hold.lifted = Math.min(1, hold.lifted + STEP / 0.15);
+      const eased = 1 - (1 - hold.lifted) ** 3;
+      cloth.target[1] = hold.from + (LIFT - hold.from) * eased;
+    } else if (script) {
+      // The corner along its path: eased, and raised in an arc on the way.
+      script.t = Math.min(1, script.t + STEP / script.duration);
+      const e = script.t < 0.5 ? 4 * script.t ** 3 : 1 - (-2 * script.t + 2) ** 3 / 2;
+      for (let d = 0; d < 3; d++) cloth.target[d] = script.from[d] + (script.to[d] - script.from[d]) * e;
+      cloth.target[1] += script.peak * Math.sin(Math.PI * e);
+      if (script.t >= 1) {
+        const { done, keep } = script;
+        script = null;
+        if (!keep) cloth.release(0, 0, 0, STEP);
+        done();
+      }
+    } else if (curl.on) {
+      // The turned-up corner eases to its height, slowly, as a heavy rug's would.
+      curl.level += (curl.goal - curl.level) * 0.04;
+      curlTo(curl.level);
+    }
+    keepBefore();
+    cloth.step(STEP);
+  };
+
   const loop = (time: number) => {
     frame = 0;
     if (document.hidden) return;
+    // Starting again: nothing to draw between yet.
+    if (!last) keepBefore();
     const dt = Math.min((time - (last || time)) / 1000, 0.05);
     // The time that has really passed: where frames are slow, the cloth falls
     // behind it, but its rest is still counted in seconds as they pass.
@@ -775,35 +822,17 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     behind += dt;
     let steps = 0;
     while (behind >= STEP && steps < 2) {
-      if (hold.pointer >= 0) {
-        // Lift what is held, smoothly, to a hand's height.
-        hold.lifted = Math.min(1, hold.lifted + STEP / 0.15);
-        const eased = 1 - (1 - hold.lifted) ** 3;
-        cloth.target[1] = hold.from + (LIFT - hold.from) * eased;
-      } else if (script) {
-        // The corner along its path: eased, and raised in an arc on the way.
-        script.t = Math.min(1, script.t + STEP / script.duration);
-        const e = script.t < 0.5 ? 4 * script.t ** 3 : 1 - (-2 * script.t + 2) ** 3 / 2;
-        for (let d = 0; d < 3; d++) cloth.target[d] = script.from[d] + (script.to[d] - script.from[d]) * e;
-        cloth.target[1] += script.peak * Math.sin(Math.PI * e);
-        if (script.t >= 1) {
-          const { done, keep } = script;
-          script = null;
-          if (!keep) cloth.release(0, 0, 0, STEP);
-          done();
-        }
-      } else if (curl.on) {
-        // The turned-up corner eases to its height, slowly, as a heavy rug's would.
-        curl.level += (curl.goal - curl.level) * 0.04;
-        curlTo(curl.level);
-      }
-      cloth.step(STEP);
+      advance();
       behind -= STEP;
       steps++;
     }
     idle = hold.pointer < 0 && !script ? idle + passed : 0;
     if (steps === 2) behind = 0;
-    draw();
+    // The cloth moves in steps of a sixtieth of a second; it is drawn between
+    // the last two, as far as the time has gone into the next, so it moves
+    // evenly on a screen of any rate (90 or 120 a second, as many phones'
+    // are), not by fits and starts.
+    draw(behind / STEP);
     // At rest when nothing has moved more than about half a pixel a frame for
     // a third of a second, or, after five seconds untouched, when nothing is
     // visibly moving at all: folded double, the layers can keep a tremor too
@@ -816,6 +845,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     if (quiet > 0.33 || (idle > 2.5 && cloth.motion < 0.006)) {
       last = 0;
       behind = 0;
+      // At rest, drawn as it is.
+      draw();
       setState('resting');
       return;
     }
@@ -879,11 +910,40 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
    * the middle, so what is written under it shows; pressed again, it is put
    * back where it was.
    */
+  /** With reduced motion, the fold being worked out out of sight. */
+  let folding = false;
   const toggleLift = () => {
     if (!ready || hold.pointer >= 0 || script) return;
     if (still.matches) {
-      // Without motion, the flat picture is moved aside instead (Rug.astro).
-      setLifted(!lifted);
+      // Without motion: laid straight again at once, or folded over in the
+      // same way, worked out out of sight (a step at a time, so the page
+      // never waits) and shown when it has settled.
+      if (folding) return;
+      if (lifted) {
+        void rest().then(() => draw());
+        return;
+      }
+      folding = true;
+      findCorner();
+      cloth.hold(curl.corner);
+      const from = Array.from(cloth.position.subarray(curl.corner * 3, curl.corner * 3 + 3));
+      script = { from, to: [from[0] * -0.22, 0.025, from[2] * -0.22], peak: 0.24, t: 0, duration: 1.35, keep: true, done: () => undefined };
+      disturbed = true;
+      setLifted(true);
+      void (async () => {
+        // The move, then a second and a half for the cloth to settle.
+        let settle = 90;
+        let slice = performance.now();
+        for (let n = 0; n < 400 && (script || settle-- > 0); n++) {
+          advance();
+          if (performance.now() - slice > 8) {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            slice = performance.now();
+          }
+        }
+        folding = false;
+        draw();
+      })();
       return;
     }
     if (!lifted) {
@@ -930,21 +990,21 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     while (hold.trail.length > 2 && now - hold.trail[0].t > 80) hold.trail.shift();
   };
 
-  const pickUp = (event: PointerEvent, particle: number) => {
+  const pickUp = (pointerId: number, clientX: number, clientY: number, particle: number) => {
     if (particle < 0 || script) return;
     uncurl();
     // Taken in hand, a corner laid over is not held there any more.
     if (lifted) setLifted(false);
     idle = 0;
     cloth.hold(particle);
-    hold.pointer = event.pointerId;
+    hold.pointer = pointerId;
     hold.lifted = 0;
     hold.from = cloth.position[particle * 3 + 1];
     hold.trail = [];
-    const p = onPlane(event.clientX, event.clientY, hold.from);
+    const p = onPlane(clientX, clientY, hold.from);
     hold.offset = [cloth.position[particle * 3] - p[0], cloth.position[particle * 3 + 2] - p[2]];
     try {
-      canvas.setPointerCapture(event.pointerId);
+      canvas.setPointerCapture(pointerId);
     } catch {
       // The pointer may already be gone.
     }
@@ -972,31 +1032,67 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     wake();
   };
 
-  let press = 0;
-  let pressAt = [0, 0];
+  /**
+   * On a touch screen a finger on the rug may mean to scroll the page, so
+   * the rug waits to see: a press that stays put picks it up after a moment
+   * (HOLD), and one that sets off sideways picks it up at once (the page
+   * never scrolls sideways); one that sets off up or down is a scroll, and
+   * the rug lets it be. A tap lifts the corner, as the button does.
+   */
+  const HOLD = 260;
+  /** How far a finger may wander, in pixels, and still be pressing, not moving. */
+  const SLOP = 8;
+  /** How near the rug's edge a fingertip may land and still take hold of it. */
+  const FINGER = 24;
+  /** A finger down on the rug, not yet holding it: where it came down, and where it is now. */
+  let press: { id: number; x: number; y: number; nowX: number; nowY: number; timer: number } | null = null;
+  let tapped = false;
+  const unpress = () => {
+    if (press) window.clearTimeout(press.timer);
+    press = null;
+  };
   canvas.addEventListener('pointerdown', (event) => {
-    if (still.matches || !ready || hold.pointer >= 0 || event.button > 0) return;
-    const particle = particleAt(event.clientX, event.clientY);
+    tapped = false;
+    if (!ready || hold.pointer >= 0 || event.button > 0) return;
+    const touch = event.pointerType === 'touch';
+    // With reduced motion it is not picked up, but a tap still lifts it.
+    if (still.matches && !touch) return;
+    const particle = particleAt(event.clientX, event.clientY, touch ? FINGER : 14);
     if (particle < 0) return;
-    if (event.pointerType === 'touch') {
-      // On a touch screen, press and hold to pick it up; a swipe still scrolls.
-      pressAt = [event.clientX, event.clientY];
-      window.clearTimeout(press);
-      press = window.setTimeout(() => {
-        press = 0;
-        pickUp(event, particleAt(pressAt[0], pressAt[1]));
-      }, 260);
+    if (touch) {
+      unpress();
+      const { pointerId, clientX: x, clientY: y } = event;
+      press = {
+        id: pointerId,
+        x,
+        y,
+        nowX: x,
+        nowY: y,
+        timer: window.setTimeout(() => {
+          if (!press || still.matches) return;
+          const { nowX, nowY } = press;
+          press = null;
+          pickUp(pointerId, nowX, nowY, particleAt(nowX, nowY, FINGER));
+        }, HOLD),
+      };
       return;
     }
     event.preventDefault();
-    pickUp(event, particle);
+    pickUp(event.pointerId, event.clientX, event.clientY, particle);
   });
   canvas.addEventListener('pointermove', (event) => {
-    if (press && Math.hypot(event.clientX - pressAt[0], event.clientY - pressAt[1]) > 8) {
-      window.clearTimeout(press);
-      press = 0;
+    if (press && event.pointerId === press.id) {
+      press.nowX = event.clientX;
+      press.nowY = event.clientY;
+      const dx = event.clientX - press.x;
+      const dy = event.clientY - press.y;
+      if (Math.hypot(dx, dy) > SLOP) {
+        const { x, y } = press;
+        unpress();
+        // Sideways: taken up from where the finger came down, and led on from there.
+        if (Math.abs(dx) > Math.abs(dy) && !still.matches) pickUp(event.pointerId, x, y, particleAt(x, y, FINGER));
+      }
     }
-    pressAt = [event.clientX, event.clientY];
     if (event.pointerId === hold.pointer) {
       lead(event);
       wake();
@@ -1016,10 +1112,20 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     }
   });
   const end = (event: PointerEvent) => {
-    window.clearTimeout(press);
-    press = 0;
+    // Let go before the press became a hold, without moving: a tap (the
+    // click that follows says so; a tap that only stopped the page
+    // scrolling has none).
+    if (press && event.pointerId === press.id) tapped = event.type === 'pointerup';
+    unpress();
     if (event.pointerId === hold.pointer) letGo();
   };
+  canvas.addEventListener('click', () => {
+    if (!tapped) return;
+    tapped = false;
+    // Someone has looked under the rug (the paper plane, plane.ts, then flies).
+    if (!lifted) stage.setAttribute('data-looked', '');
+    toggleLift();
+  });
   canvas.addEventListener('pointerup', end);
   canvas.addEventListener('pointercancel', end);
   canvas.addEventListener('lostpointercapture', end);
@@ -1052,7 +1158,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     window.clearTimeout(relayTimer);
     if (!relay) return;
     relay = false;
-    if (!inSight && ready && disturbed && hold.pointer < 0 && !script) void rest().then(draw);
+    if (!inSight && ready && disturbed && hold.pointer < 0 && !script) void rest().then(() => draw());
   };
   const relayLater = () => {
     window.clearTimeout(relayTimer);

@@ -326,9 +326,13 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): the first thing on the
   homepage, the rug lies in the late sun, its beams across it and the floor, its nearest corner
   turned up (worked out before it is shown, so nothing moves into place), and that corner rises
-  slowly to meet a mouse that comes near. It is heavy cloth: pick it up anywhere, fold it, drag it, twist it (on a touch screen, press and hold first, so
-  a swipe still scrolls). *Lift the rug* folds the corner back for keyboards, screen readers and
-  reduced motion; without WebGL the flat picture is drawn back instead.
+  slowly to meet a mouse that comes near. It is heavy cloth: pick it up anywhere, fold it, drag it,
+  twist it. On a touch screen, press and hold it, or set off sideways, and it comes up at once; a
+  swipe up or down still scrolls the page, two fingers still zoom it, a fingertip near the rug's
+  edge still takes hold, and a tap lifts the corner and lays it back. It moves in steps of a
+  sixtieth of a second and is drawn between them, so it moves evenly on 90 and 120 Hz screens too.
+  *Lift the rug* folds the corner back for keyboards and screen readers; with reduced motion the
+  same fold is shown at once (a tap does it too), and without WebGL the flat picture is drawn back.
 - **The paper plane** ([`Proverb.astro`](src/components/Proverb.astro),
   [`plane.ts`](src/scripts/plane.ts), [`plane-folds.ts`](src/scripts/plane-folds.ts)): under the rug
   lies a paper plane, its nose just showing. It stays there until it is found (the rug lifted, by the button
