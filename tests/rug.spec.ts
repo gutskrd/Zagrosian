@@ -197,32 +197,36 @@ test.describe('on a touch screen', () => {
   });
 
   // Whether the page then zooms is the browser's to do, and not every test
-  // browser emulates a pinch: what is checked is that the rug lets it.
+  // browser emulates a pinch: what is checked is that the rug lets it, and,
+  // with two fingers on it drawn apart sideways (sent to it directly, as a
+  // browser that does not take the pinch itself would), is not picked up.
   test('two fingers on it are left to zoom the page', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
     expect(await rug(page).evaluate((element) => getComputedStyle(element).touchAction)).toBe('pan-y pinch-zoom');
-    const { middle } = await corner(page);
-    const cdp = await page.context().newCDPSession(page);
-    const fingers = (type: 'touchStart' | 'touchMove' | 'touchEnd', apart: number) =>
-      cdp.send('Input.dispatchTouchEvent', {
-        type,
-        touchPoints:
-          type === 'touchEnd'
-            ? []
-            : [
-                { x: middle.x - apart, y: middle.y, id: 0 },
-                { x: middle.x + apart, y: middle.y, id: 1 },
-              ],
-      });
-    await fingers('touchStart', 20);
-    for (let apart = 24; apart <= 100; apart += 4) {
-      await fingers('touchMove', apart);
-      await page.waitForTimeout(16);
-    }
-    await expect(rug(page), 'a pinch does not pick it up').not.toHaveAttribute('data-holding', '');
-    await fingers('touchEnd', 0);
+    const held = await page.locator('.rug__canvas').evaluate(async (canvas) => {
+      const box = canvas.getBoundingClientRect();
+      const [x, y] = [box.left + box.width / 2, box.top + box.height / 2];
+      const send = (type: string, id: number, at: number) =>
+        canvas.dispatchEvent(
+          new PointerEvent(type, { pointerId: id, pointerType: 'touch', isPrimary: id === 1, clientX: at, clientY: y, bubbles: true }),
+        );
+      send('pointerdown', 1, x - 20);
+      send('pointerdown', 2, x + 20);
+      for (let apart = 24; apart <= 100; apart += 4) {
+        send('pointermove', 1, x - apart);
+        send('pointermove', 2, x + apart);
+        await new Promise((resolve) => setTimeout(resolve, 16));
+      }
+      // Longer than a press takes to become a hold.
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      const holding = canvas.parentElement!.hasAttribute('data-holding');
+      send('pointerup', 1, x - 100);
+      send('pointerup', 2, x + 100);
+      return holding;
+    });
+    expect(held, 'a pinch does not pick it up').toBe(false);
   });
 
   test('with reduced motion, a tap still lifts it, at once', async ({ page }) => {

@@ -1047,14 +1047,29 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   /** A finger down on the rug, not yet holding it: where it came down, and where it is now. */
   let press: { id: number; x: number; y: number; nowX: number; nowY: number; timer: number } | null = null;
   let tapped = false;
+  /**
+   * The fingers on it now. Two or more are a pinch, to zoom the page: the
+   * browser's to do, so the rug is not picked up (a pinch drawn out sideways
+   * would otherwise be taken for a sideways start, and held, stop the zoom).
+   */
+  const fingers = new Set<number>();
   const unpress = () => {
     if (press) window.clearTimeout(press.timer);
     press = null;
   };
   canvas.addEventListener('pointerdown', (event) => {
     tapped = false;
-    if (!ready || hold.pointer >= 0 || event.button > 0) return;
     const touch = event.pointerType === 'touch';
+    if (touch) {
+      // The first finger of a new touch starts the count afresh.
+      if (event.isPrimary) fingers.clear();
+      fingers.add(event.pointerId);
+      if (fingers.size > 1) {
+        unpress();
+        return;
+      }
+    }
+    if (!ready || hold.pointer >= 0 || event.button > 0) return;
     // With reduced motion it is not picked up, but a tap still lifts it.
     if (still.matches && !touch) return;
     const particle = particleAt(event.clientX, event.clientY, touch ? FINGER : 14);
@@ -1069,7 +1084,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
         nowX: x,
         nowY: y,
         timer: window.setTimeout(() => {
-          if (!press || still.matches) return;
+          if (!press || still.matches || fingers.size > 1) return;
           const { nowX, nowY } = press;
           press = null;
           pickUp(pointerId, nowX, nowY, particleAt(nowX, nowY, FINGER));
@@ -1090,7 +1105,9 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
         const { x, y } = press;
         unpress();
         // Sideways: taken up from where the finger came down, and led on from there.
-        if (Math.abs(dx) > Math.abs(dy) && !still.matches) pickUp(event.pointerId, x, y, particleAt(x, y, FINGER));
+        if (Math.abs(dx) > Math.abs(dy) && !still.matches && fingers.size === 1) {
+          pickUp(event.pointerId, x, y, particleAt(x, y, FINGER));
+        }
       }
     }
     if (event.pointerId === hold.pointer) {
@@ -1116,6 +1133,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     // click that follows says so; a tap that only stopped the page
     // scrolling has none).
     if (press && event.pointerId === press.id) tapped = event.type === 'pointerup';
+    fingers.delete(event.pointerId);
     unpress();
     if (event.pointerId === hold.pointer) letGo();
   };
