@@ -173,7 +173,7 @@ export function initStory() {
   const perspective = parseFloat(getComputedStyle(art).perspective) || 1280;
   const sunPerspective = parseFloat(getComputedStyle(sunrise).perspective) || 960;
   let start = { x: 0, y: 0, size: 1 };
-  /** Where the hero is on the page: the logo travels from it once it reaches the top of the screen. */
+  /** How far the page is scrolled when the hero reaches the top (under the header): the logo travels from it then. */
   let heroTop = 0;
   let storyTop = 0;
   let pinned = 1;
@@ -194,7 +194,8 @@ export function initStory() {
     stageHeight = stage.offsetHeight;
     view = stage.clientHeight - parseFloat(getComputedStyle(stage).paddingBottom);
     start = { x: hero.x + hero.width / 2, y: hero.y + hero.width / 2, size: hero.width };
-    heroTop = place(from.closest<HTMLElement>('.hero') ?? from).y;
+    const header = document.querySelector<HTMLElement>('[data-site-header]')?.offsetHeight ?? 0;
+    heroTop = Math.max(0, place(from.closest<HTMLElement>('.hero') ?? from).y - header);
     storyTop = place(story).y;
     pinned = Math.max(1, story.offsetHeight - stageHeight);
     rest = { x: spot.x - top.x + spot.width / 2, y: spot.y - top.y + spot.width / 2, size: spot.width || hero.width };
@@ -256,8 +257,8 @@ export function initStory() {
     const middleY = view / 2;
 
     // ---- The glass logo: down from the hero, beside the values, to the
-    // middle, and in. Until the hero reaches the top of the screen (the rug
-    // comes first, Underneath.astro), the logo goes up the screen with it.
+    // middle, and in. Should anything come before the hero, the logo goes up
+    // the screen with it until the hero reaches the top.
     const glide = ease(heroTop, storyTop, scroll);
     const risen = VALUES.map((at) => ease(at, at + RISE, q));
     const turned = risen.reduce((sum, value) => sum + value, 0);

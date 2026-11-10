@@ -74,6 +74,14 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     overflow-x: clip;
   }
 
+  /* On a computer whose screen is short (1280 by 720, 1366 by 768), less air
+     above, so the headline, the words and both buttons fit the first screen. */
+  @media (min-width: 64rem) and (max-height: 50rem) {
+    .hero {
+      padding-top: max(2rem, 12vh - 1rem);
+    }
+  }
+
   /*
    * Dim late sun through a window, on the wall behind the logo: two broad
    * soft beams and a narrow one, as in the photographs of Hevalo's kilims; the light the rug lies in further down, and that crosses

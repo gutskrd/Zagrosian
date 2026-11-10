@@ -25,7 +25,7 @@ const sizes = '(max-width: 39.99rem) 50vw, (max-width: 63.99rem) 36vw, 25vw';
   {/* The paper plane, while it lies here (plane.ts): under the rug, and part of the floor, so it scrolls with it exactly. */}
   <canvas class="rug__plane" aria-hidden="true" data-plane-rest hidden></canvas>
   <div class="rug__flat" aria-hidden="true">
-    {/* The first thing on the homepage: fetched at once. */}
+    {/* Far down the page: fetched as it comes near. */}
     <img
       src={rugPicture}
       srcset={`${rugSmall} 606w, ${rugPicture} 1010w`}
@@ -33,7 +33,7 @@ const sizes = '(max-width: 39.99rem) 50vw, (max-width: 63.99rem) 36vw, 25vw';
       alt=""
       width="1010"
       height="1730"
-      fetchpriority="high"
+      loading="lazy"
       decoding="async"
     />
   </div>
@@ -42,8 +42,8 @@ const sizes = '(max-width: 39.99rem) 50vw, (max-width: 63.99rem) 36vw, 25vw';
 
 <style>
   /* The floor, with room around the rug for the light, and to move and fold
-     it; on a computer low enough that the hint and the button below it are
-     on the first screen too. Lying turned, the rug (fringe and shadow
+     it; on a computer low enough that the rug, the hint and the button below
+     it fit one screen. Lying turned, the rug (fringe and shadow
      included) is never more than nine tenths of the floor's height: its
      canvas would cut them off in a straight line. */
   .rug {
@@ -80,7 +80,7 @@ const sizes = '(max-width: 39.99rem) 50vw, (max-width: 63.99rem) 36vw, 25vw';
 
   /* On a computer whose screen is short (1280 by 720, 1366 by 768), the
      floor is lower and the rug a little smaller, so the rug and its button
-     still fit the first screen; shorter still, smaller again. */
+     still fit one screen; shorter still, smaller again. */
   @media (min-width: 64rem) and (max-height: 56.24rem) {
     .rug {
       --rug-share: 0.2;

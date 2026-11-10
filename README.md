@@ -323,8 +323,8 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
   (`data-rise`), and the late sun comes across it as it does: a copy of the word in the light's
   colours, in broad soft beams, inside the window's soft patch.
 - **The rug** ([`Rug.astro`](src/components/Rug.astro), [`rug-scene.ts`](src/scripts/rug-scene.ts),
-  [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): the first thing on the
-  homepage, the rug lies in the late sun, its beams across it and the floor, its nearest corner
+  [`rug-cloth.ts`](src/scripts/rug-cloth.ts); WebGL 2, no libraries): after the studio, before the
+  questions, the rug lies in the late sun, its beams across it and the floor, its nearest corner
   turned up (worked out before it is shown, so nothing moves into place), and that corner rises
   slowly to meet a mouse that comes near. It is heavy cloth: pick it up anywhere, fold it, drag it,
   twist it. On a touch screen, press and hold it, or set off sideways, and it comes up at once; a

@@ -1,5 +1,5 @@
 /**
- * The rug at the top of the homepage: drawn in 3D, without errors, simply
+ * The rug on the homepage: drawn in 3D, without errors, simply
  * lying there (never woven or settling in front of you) and at rest; a
  * corner can be picked up with the mouse and folded over, and it stays folded
  * when let go; scrolled away and back, it lies straight again. On a touch
@@ -134,13 +134,25 @@ test.describe('on a touch screen', () => {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   }
 
-  /** A finger: down at `from`, held for `hold` ms, then drawn to `to`, and up. */
-  async function finger(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, hold: number, check?: () => Promise<void>) {
+  /**
+   * A finger: down at `from`, held for `hold` ms (and, if given, until `held`
+   * is met: the page's own hold timer may run late on a busy machine), then
+   * drawn to `to`, and up.
+   */
+  async function finger(
+    page: Page,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    hold: number,
+    check?: () => Promise<void>,
+    held?: () => Promise<void>,
+  ) {
     const cdp = await page.context().newCDPSession(page);
     const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
       cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
     await touch('touchStart', from.x, from.y);
     await page.waitForTimeout(hold);
+    await held?.();
     for (let step = 1; step <= 12; step++) {
       await touch('touchMove', from.x + ((to.x - from.x) * step) / 12, from.y + ((to.y - from.y) * step) / 12);
       await page.waitForTimeout(16);
@@ -164,9 +176,18 @@ test.describe('on a touch screen', () => {
     await resting(page);
     const held = await corner(page);
     const still = await page.evaluate(() => scrollY);
-    await finger(page, held, held.middle, 450, async () => {
-      await expect(rug(page), 'held, it is picked up').toHaveAttribute('data-holding', '');
-    });
+    await finger(
+      page,
+      held,
+      held.middle,
+      450,
+      async () => {
+        await expect(rug(page), 'drawn on, it is still held').toHaveAttribute('data-holding', '');
+      },
+      async () => {
+        await expect(rug(page), 'held, it is picked up').toHaveAttribute('data-holding', '');
+      },
+    );
     expect(await page.evaluate(() => scrollY), 'and the page stays put').toBe(still);
   });
 

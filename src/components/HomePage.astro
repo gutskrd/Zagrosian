@@ -25,13 +25,14 @@ import shadowDark from '../assets/brand/lifted-logo-shadow-dark.webp?url';
     <link rel="preload" as="image" href={shadowLight} media="(prefers-color-scheme: light)" />
     <link rel="preload" as="image" href={shadowDark} media="(prefers-color-scheme: dark)" />
   </Fragment>
-  {/* First, the rug with the paper plane under it, and the sheet it opens into. */}
-  <Underneath />
-  <Proverb />
+  {/* First, who we are; then the story, Hevalo and the studio; then the rug
+     with the paper plane under it, and the sheet it opens into. */}
   <Hero />
   <Story />
   <ProductShowcase />
   <About />
+  <Underneath />
+  <Proverb />
   <Faq />
   <Contact />
 </BaseLayout>
