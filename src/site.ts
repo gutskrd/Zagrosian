@@ -28,11 +28,13 @@ export interface Registration {
   kvk?: string;
   /** The VAT identification number (btw-id), such as "NL000000000B01". */
   vat?: string;
+  /** The telephone number in the trade register, written in international form ("+31 6 12345678"). */
+  phone?: string;
 }
 
 export const site = {
   name: 'Zagrosian',
-  /** Name used in legal documents. Update when the company is registered. */
+  /** Name used in legal documents: the trade name in the trade register (KvK). */
   legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
   /**
@@ -70,8 +72,19 @@ export const site = {
  * until then nothing is shown. Fill in only what the Chamber of Commerce (KVK)
  * and the tax office have issued, and update `site.legalName` to the registered
  * name with them.
+ *
+ * Zagrosian is a sole proprietorship (eenmanszaak) in the trade register, with
+ * Zagrosian and Hevalo as its trade names; these are its registered address
+ * and number. The tax office has not issued the VAT identification number
+ * (btw-id) yet, so it is left out until it has. Should the address one day be
+ * shielded in the register, this must change with it to the public postal
+ * address registered in its place.
  */
-export const registration: Registration = {};
+export const registration: Registration = {
+  address: { street: 'Westerengstraat 7', postalCode: '6669 BE', city: 'Dodewaard' },
+  kvk: '42217689',
+  phone: '+31 6 38066158',
+};
 
 export const hevalo = {
   name: 'Hevalo',

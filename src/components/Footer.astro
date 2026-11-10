@@ -9,13 +9,26 @@ const { locale, t } = i18n(Astro.url);
 const nav = navigation(locale);
 const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
-// The company's registered details, those that are filled in (src/site.ts).
-const { address, kvk, vat } = registration;
-const registered = [
-  address && `${address.street}, ${address.postalCode} ${address.city}`,
-  kvk && `${t.footer.kvk} ${kvk}`,
-  vat && `${t.footer.vat} ${vat}`,
-].filter((detail): detail is string => !!detail);
+// The company's registered details, those that are filled in (src/site.ts),
+// with the ways to reach it that Dutch law asks to sit beside them: the email
+// address and, as registered, the telephone number, each a link that opens it.
+const { address, kvk, vat, phone } = registration;
+// Each detail is kept in one piece (the address in two: the street, then the
+// postcode with the place), so a narrow screen breaks the line between them
+// rather than through them, in either direction of reading.
+type Detail = { parts: string[]; href?: string };
+const filled = [
+  address && { parts: [`${address.street},`, `${address.postalCode} ${address.city}`] },
+  kvk && { parts: [`${t.footer.kvk} ${kvk}`] },
+  vat && { parts: [`${t.footer.vat} ${vat}`] },
+];
+const registered = filled.some(Boolean)
+  ? [
+      ...filled,
+      phone && { parts: [phone], href: `tel:${phone.replace(/[^+\d]/g, '')}` },
+      { parts: [site.emails.contact], href: `mailto:${site.emails.contact}` },
+    ].filter((detail): detail is Detail => !!detail)
+  : [];
 ---
 
 <footer class="site-footer">
@@ -105,7 +118,20 @@ const registered = [
           {registered.map((detail) => (
             <>
               {' · '}
-              <bdi>{detail}</bdi>
+              <bdi>
+                {detail.href ? (
+                  <a class="site-footer__contact site-footer__whole" href={detail.href} dir="ltr">
+                    {detail.parts.join(' ')}
+                  </a>
+                ) : (
+                  detail.parts.map((part, i) => (
+                    <>
+                      {i > 0 && ' '}
+                      <span class="site-footer__whole">{part}</span>
+                    </>
+                  ))
+                )}
+              </bdi>
             </>
           ))}
         </address>
@@ -348,6 +374,27 @@ const registered = [
     padding-top: 0.5rem;
     color: var(--color-muted);
     font-style: normal;
+  }
+
+  .site-footer__whole {
+    white-space: nowrap;
+  }
+
+  /* The telephone number and email in the registration line: the line's own
+     quiet colour, a finger's height to tap, and lit only when reached for. */
+  .site-footer__contact {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .site-footer__contact:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   .site-footer__legal {

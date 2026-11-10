@@ -15,7 +15,7 @@ const english = messages('en');
 const home = `${site.url}/`;
 
 /** The company's registered details, those that are filled in (src/site.ts). */
-const { address, kvk, vat } = registration;
+const { address, kvk, vat, phone } = registration;
 
 const ids = {
   website: `${home}#website`,
@@ -63,6 +63,7 @@ export function structuredData(page: PageData) {
       description: english.meta.description,
       slogan: english.meta.tagline,
       email: site.emails.contact,
+      ...(phone && { telephone: phone }),
       address: {
         '@type': 'PostalAddress',
         ...(address && { streetAddress: address.street, postalCode: address.postalCode, addressLocality: address.city }),
