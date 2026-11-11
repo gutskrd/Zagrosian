@@ -161,6 +161,36 @@ test.describe('on a touch screen', () => {
     await touch('touchEnd', to.x, to.y);
   }
 
+  /**
+   * Where the page is scrolled, once it has stopped: a swipe's fling can
+   * still be coasting when a test moves on.
+   */
+  async function scrolled(page: Page) {
+    let last = NaN;
+    await expect
+      .poll(
+        async () => {
+          const now = await page.evaluate(() => scrollY);
+          const same = now === last;
+          last = now;
+          return same;
+        },
+        { message: 'the page comes to a stop', intervals: [250], timeout: 10_000 },
+      )
+      .toBe(true);
+    return last;
+  }
+
+  /**
+   * That the page has not scrolled since `still`. Scrolled with the finger, it
+   * would move by the stroke's height (here 10 to 150 pixels); one pixel is
+   * the browser rounding a position that falls between two (the page's
+   * layout is in fractions of a pixel), as CI's browser now and then does.
+   */
+  async function stayedPut(page: Page, still: number) {
+    expect(Math.abs((await page.evaluate(() => scrollY)) - still), 'and the page stays put').toBeLessThanOrEqual(1);
+  }
+
   test('a swipe over it scrolls the page; pressing and holding picks it up', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -175,7 +205,7 @@ test.describe('on a touch screen', () => {
     await rug(page).scrollIntoViewIfNeeded();
     await resting(page);
     const held = await corner(page);
-    const still = await page.evaluate(() => scrollY);
+    const still = await scrolled(page);
     await finger(
       page,
       held,
@@ -188,7 +218,7 @@ test.describe('on a touch screen', () => {
         await expect(rug(page), 'held, it is picked up').toHaveAttribute('data-holding', '');
       },
     );
-    expect(await page.evaluate(() => scrollY), 'and the page stays put').toBe(still);
+    await stayedPut(page, still);
   });
 
   test('set off sideways, it is picked up at once; a tap lifts the corner and lays it back', async ({ page }) => {
@@ -197,11 +227,11 @@ test.describe('on a touch screen', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
     const { middle } = await corner(page);
-    const still = await page.evaluate(() => scrollY);
+    const still = await scrolled(page);
     await finger(page, middle, { x: middle.x - 120, y: middle.y + 10 }, 0, async () => {
       await expect(rug(page), 'drawn sideways without waiting, it is picked up').toHaveAttribute('data-holding', '');
     });
-    expect(await page.evaluate(() => scrollY), 'and the page stays put').toBe(still);
+    await stayedPut(page, still);
     await resting(page);
 
     const button = page.locator('[data-rug-button]');
