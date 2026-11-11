@@ -20,6 +20,25 @@ test('every page is built, and the sitemap lists every page', () => {
   expect(sitemap.match(/<loc>/g)?.length).toBe(pages.length);
 });
 
+test('the tab icon is black on a light browser and white on a dark one', async ({ page }) => {
+  const html = readFileSync(join(dist, 'index.html'), 'utf8');
+  const icons = [...html.matchAll(/<link rel="icon"[^>]*>/g)].map(([link]) => link);
+  // Declared 16 by 16, the black-only ICO is an exact fit, and Chrome takes it
+  // over the SVG: a dark tab strip then shows the black logo.
+  expect(icons.find((link) => link.includes('/favicon.ico'))).toContain('sizes="32x32"');
+  expect(icons.find((link) => link.includes('/favicon.svg'))).toContain('type="image/svg+xml"');
+  expect(icons.find((link) => link.includes('/favicon-96-dark.png'))).toContain('media="(prefers-color-scheme: dark)"');
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme });
+    await page.goto('/favicon.svg');
+    const shown = await page.evaluate(() =>
+      [...document.querySelectorAll('path')].filter((path) => getComputedStyle(path).display !== 'none').map((path) => path.getAttribute('fill')),
+    );
+    expect(shown, colorScheme).toEqual([colorScheme === 'dark' ? '#fff' : '#000']);
+  }
+});
+
 for (const file of built) {
   test(`metadata: ${file}`, () => {
     const html = readFileSync(join(dist, file), 'utf8');

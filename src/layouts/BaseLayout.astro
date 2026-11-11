@@ -80,10 +80,16 @@ const jsonLd = noindex
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* The tab's icon: black on a light browser, white on a dark one. The SVG
+       holds both logos and shows the one for the browser's colour scheme; a
+       browser that cannot show an SVG icon takes the PNG for its scheme, and
+       the oldest the ICO (black only). The ICO is declared 32 by 32 only:
+       declared 16 by 16 as well, Chrome takes it over the SVG as an exact fit,
+       and a dark tab strip shows the black logo. */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/favicon-96-dark.png" type="image/png" sizes="96x96" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     {/* The name under the icon when the site is added to a home screen (the title is too long for it). */}
