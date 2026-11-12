@@ -36,12 +36,12 @@ Requires Node 22.12 or later.
 
   | Address                 | Where it appears                                       |
   | ----------------------- | ------------------------------------------------------ |
-  | `contact@zagrosian.com` | Contact section, security policy and `security.txt`   |
-  | `press@zagrosian.com`   | Contact section (one line for journalists)             |
+  | `contact@zagrosian.com` | Contact section, FAQ, terms of use, privacy policy (job applications), security policy and `security.txt` |
   | `privacy@zagrosian.com` | Privacy policy                                         |
-  | `legal@zagrosian.com`   | Terms of use                                           |
-  | `careers@zagrosian.com` | Privacy policy (job applications); add it to a careers page when you have one |
-  | `hello@zagrosian.com`   | Not on the site                                        |
+
+  These are the two addresses with an inbox. Publish no other address before it has one: mail to
+  an address nobody reads is a question left unanswered, and a request about personal data has a
+  one-month deadline in law.
 
 - Social profiles (Instagram [@zagrosian_official](https://www.instagram.com/zagrosian_official/), TikTok
   [@zagrosianofficial](https://www.tiktok.com/@zagrosianofficial)) are listed in `socialProfiles` in

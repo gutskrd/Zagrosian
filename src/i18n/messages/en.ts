@@ -116,7 +116,7 @@ export const en = {
   /**
    * Questions and answers, before Contact (Faq.astro), also in the Markdown
    * version and as FAQPage structured data. Answers may contain {hevalo},
-   * {privacy}, {contact}, {press} and {security}, which become links:
+   * {privacy}, {contact} and {security}, which become links:
    * {privacy} reads `privacyLink`, {security} reads `contact.security.link`.
    */
   faq: {
@@ -154,7 +154,7 @@ export const en = {
       {
         question: 'How can I contact Zagrosian?',
         answer:
-          'Email {contact} for general enquiries and partnerships, or {press} for press enquiries. To report a security issue, please see our {security}.',
+          'Email {contact} for general enquiries, partnerships and press enquiries. To report a security issue, please see our {security}.',
       },
     ],
   },
@@ -167,7 +167,6 @@ export const en = {
     copied: 'Copied',
     copiedStatus: '{email} copied to the clipboard.',
     copyFailed: 'Could not copy. Select {email} to copy it instead.',
-    press: 'Press enquiries:',
     /** "To report a security issue, please see our [security policy]." */
     security: { before: 'To report a security issue, please see our', link: 'security policy', after: '.' },
   },

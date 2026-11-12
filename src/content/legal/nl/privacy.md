@@ -1,7 +1,7 @@
 ---
 title: Privacyverklaring
 description: Hoe Zagrosian omgaat met persoonsgegevens wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 Deze verklaring legt uit welke persoonsgegevens wij verwerken wanneer u zagrosian.com bezoekt, contact met ons opneemt of onze socialemediaprofielen bekijkt, waarom wij dat doen en welke rechten u heeft. Omdat wij heel weinig gegevens verzamelen, is deze verklaring kort.
@@ -41,7 +41,7 @@ Als u naar een van onze adressen mailt, verwerken wij uw e-mailadres, uw naam al
 
 ### Als u solliciteert
 
-Als u een sollicitatie stuurt naar [careers@zagrosian.com](mailto:careers@zagrosian.com), verwerken wij uw contactgegevens, uw cv en alles wat u verder meestuurt, uitsluitend om uw sollicitatie te beoordelen en daarover met u te communiceren. Stuur ons geen bijzondere persoonsgegevens, zoals gegevens over uw gezondheid, tenzij wij daarom vragen.
+Als u een sollicitatie stuurt naar [contact@zagrosian.com](mailto:contact@zagrosian.com), verwerken wij uw contactgegevens, uw cv en alles wat u verder meestuurt, uitsluitend om uw sollicitatie te beoordelen en daarover met u te communiceren. Stuur ons geen bijzondere persoonsgegevens, zoals gegevens over uw gezondheid, tenzij wij daarom vragen.
 
 **Grondslag:** het op uw verzoek nemen van maatregelen voorafgaand aan het sluiten van een arbeids- of andere werkovereenkomst (artikel 6, lid 1, onder b, AVG).
 

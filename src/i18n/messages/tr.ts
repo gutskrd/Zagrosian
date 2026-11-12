@@ -130,7 +130,7 @@ export const tr: Messages = {
       {
         question: 'Zagrosian ile nasıl iletişime geçebilirim?',
         answer:
-          'Genel sorular ve iş birlikleri için {contact}, basın talepleri için {press} adresine e-posta gönderin. Bir güvenlik sorununu bildirmek için lütfen {security} bakın.',
+          'Genel sorular, iş birlikleri ve basın talepleri için {contact} adresine e-posta gönderin. Bir güvenlik sorununu bildirmek için lütfen {security} bakın.',
       },
     ],
   },
@@ -143,7 +143,6 @@ export const tr: Messages = {
     copied: 'Kopyalandı',
     copiedStatus: '{email} panoya kopyalandı.',
     copyFailed: 'Kopyalanamadı. Kopyalamak için {email} adresini seçin.',
-    press: 'Basın talepleri:',
     security: {
       before: 'Bir güvenlik sorununu bildirmek için lütfen',
       link: 'güvenlik politikamıza',

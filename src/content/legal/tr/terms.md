@@ -1,7 +1,7 @@
 ---
 title: Kullanım Koşulları
 description: zagrosian.com’u kullanırken geçerli olan koşullar.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 Bu koşullar, Hollanda merkezli Zagrosian tarafından işletilen zagrosian.com’u (“web sitesi”) kullanımınız için geçerlidir. Web sitesini kullanarak bu koşulları kabul etmiş olursunuz. Kabul etmiyorsanız lütfen web sitesini kullanmayın.
@@ -49,4 +49,4 @@ Bu koşullar Hollanda hukukuna tabidir. Uyuşmazlıklar Hollanda’daki yetkili 
 
 ## İletişim
 
-Bu koşullar veya diğer hukuki konularla ilgili sorularınız için [legal@zagrosian.com](mailto:legal@zagrosian.com) adresine yazın.
+Bu koşullar veya diğer hukuki konularla ilgili sorularınız için [contact@zagrosian.com](mailto:contact@zagrosian.com) adresine yazın.

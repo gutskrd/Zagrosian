@@ -1,7 +1,7 @@
 ---
 title: Política de privacidad
 description: Cómo trata Zagrosian los datos personales cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 Esta política explica qué datos personales tratamos cuando visitas zagrosian.com, te pones en contacto con nosotros o visitas nuestros perfiles en redes sociales, por qué los tratamos y qué derechos tienes. Como recogemos muy pocos datos, es breve.
@@ -41,7 +41,7 @@ Si escribes a cualquiera de nuestras direcciones, tratamos tu dirección de corr
 
 ### Cuando solicitas un empleo
 
-Si envías una candidatura a [careers@zagrosian.com](mailto:careers@zagrosian.com), tratamos tus datos de contacto, tu currículum y cualquier otra información que incluyas, únicamente para evaluar tu candidatura y comunicarnos contigo sobre ella. No nos envíes categorías especiales de datos personales, como información sobre tu salud, salvo que te lo pidamos.
+Si envías una candidatura a [contact@zagrosian.com](mailto:contact@zagrosian.com), tratamos tus datos de contacto, tu currículum y cualquier otra información que incluyas, únicamente para evaluar tu candidatura y comunicarnos contigo sobre ella. No nos envíes categorías especiales de datos personales, como información sobre tu salud, salvo que te lo pidamos.
 
 **Base jurídica:** la aplicación a petición tuya de medidas precontractuales antes de celebrar un contrato laboral o de otro tipo de colaboración (artículo 6.1.b) del RGPD).
 

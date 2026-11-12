@@ -75,7 +75,7 @@ export function structuredData(page: PageData) {
       knowsLanguage: locales.map((locale) => locale.code),
       contactPoint: [
         { '@type': 'ContactPoint', contactType: 'general inquiries', email: site.emails.contact },
-        { '@type': 'ContactPoint', contactType: 'press', email: site.emails.press },
+        { '@type': 'ContactPoint', contactType: 'press', email: site.emails.contact },
       ],
       sameAs: socialProfiles.map((profile) => profile.url),
       brand: { '@id': ids.hevalo },

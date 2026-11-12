@@ -4,7 +4,7 @@
  * FAQPage structured data, so the three always say the same thing.
  *
  * Answers (and the closing line, `faq.more`) in the message files may contain
- * {hevalo}, {privacy}, {contact}, {press} and {security}; each becomes a link.
+ * {hevalo}, {privacy}, {contact} and {security}; each becomes a link.
  */
 import { localizePath, messages, type Locale } from '../i18n';
 import { hevalo, site } from '../site';
@@ -31,7 +31,6 @@ function linker(locale: Locale) {
     privacy: { text: t.faq.privacyLink, href: localizePath(locale, '/privacy') },
     security: { text: t.contact.security.link, href: localizePath(locale, '/security') },
     contact: { text: site.emails.contact, href: `mailto:${site.emails.contact}`, ltr: true },
-    press: { text: site.emails.press, href: `mailto:${site.emails.press}`, ltr: true },
   };
 
   return (text: string): FaqPart[] =>

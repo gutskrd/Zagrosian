@@ -1,7 +1,7 @@
 ---
 title: Condiciones de uso
 description: Las condiciones que se aplican cuando usas zagrosian.com.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 Estas condiciones se aplican al uso que hagas de zagrosian.com (el «sitio web»), gestionado por Zagrosian, con sede en los Países Bajos. Al usar el sitio web, aceptas estas condiciones. Si no las aceptas, no lo uses.
@@ -49,4 +49,4 @@ Estas condiciones se rigen por la legislación de los Países Bajos. Los conflic
 
 ## Contacto
 
-Para cualquier pregunta sobre estas condiciones u otros asuntos legales, escribe a [legal@zagrosian.com](mailto:legal@zagrosian.com).
+Para cualquier pregunta sobre estas condiciones u otros asuntos legales, escribe a [contact@zagrosian.com](mailto:contact@zagrosian.com).

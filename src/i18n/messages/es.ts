@@ -130,7 +130,7 @@ export const es: Messages = {
       {
         question: '¿Cómo puedo contactar con Zagrosian?',
         answer:
-          'Escribe a {contact} para consultas generales y colaboraciones, o a {press} para consultas de prensa. Para informar de un problema de seguridad, consulta nuestra {security}.',
+          'Escribe a {contact} para consultas generales, colaboraciones y consultas de prensa. Para informar de un problema de seguridad, consulta nuestra {security}.',
       },
     ],
   },
@@ -143,7 +143,6 @@ export const es: Messages = {
     copied: 'Copiada',
     copiedStatus: '{email} se ha copiado al portapapeles.',
     copyFailed: 'No se ha podido copiar. Selecciona {email} para copiar la dirección.',
-    press: 'Prensa:',
     security: {
       before: 'Para informar de un problema de seguridad, consulta nuestra',
       link: 'política de seguridad',

@@ -1,7 +1,7 @@
 ---
 title: Polîtîkaya nepeniyê
 description: Zagrosian çawa daneyên kesane pêvajo dike dema ku hûn serdana zagrosian.com dikin, bi me re têkilî datînin an serdana profîlên me yên medyaya civakî dikin.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 Ev polîtîka rave dike ka em kîjan daneyên kesane pêvajo dikin dema ku hûn serdana zagrosian.com dikin, bi me re têkilî datînin an serdana profîlên me yên medyaya civakî dikin, em çima wan pêvajo dikin û mafên we çi ne. Em pir hindik dane berhev dikin, ji ber vê yekê ev polîtîka kurt e.
@@ -41,7 +41,7 @@ Heke hûn ji yek ji navnîşanên me re binivîsin, em navnîşana e-nameya we, 
 
 ### Dema ku hûn ji bo karekî serlêdanê dikin
 
-Heke hûn serlêdanekê ji [careers@zagrosian.com](mailto:careers@zagrosian.com) re bişînin, em agahiyên we yên têkiliyê, CVya we û her tiştê din ê ku hûn lê zêde bikin tenê ji bo nirxandina serlêdana we û ji bo têkiliya bi we re li ser wê pêvajo dikin. Ji kerema xwe kategoriyên taybet ên daneyên kesane, wekî agahiyên tenduristiyê, ji me re neşînin, heke em wan ji we nexwazin.
+Heke hûn serlêdanekê ji [contact@zagrosian.com](mailto:contact@zagrosian.com) re bişînin, em agahiyên we yên têkiliyê, CVya we û her tiştê din ê ku hûn lê zêde bikin tenê ji bo nirxandina serlêdana we û ji bo têkiliya bi we re li ser wê pêvajo dikin. Ji kerema xwe kategoriyên taybet ên daneyên kesane, wekî agahiyên tenduristiyê, ji me re neşînin, heke em wan ji we nexwazin.
 
 **Bingeha hiqûqî:** avêtina gavan li ser daxwaza we berî girêdana peymana kar an peymaneke din a xebatê (xala 6(1)(b) ya GDPRê).
 

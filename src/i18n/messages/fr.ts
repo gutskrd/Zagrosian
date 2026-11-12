@@ -131,7 +131,7 @@ export const fr: Messages = {
       {
         question: 'Comment contacter Zagrosian ?',
         answer:
-          'Écrivez à {contact} pour toute demande générale ou proposition de partenariat, ou à {press} pour les demandes de la presse. Pour signaler un problème de sécurité, consultez notre {security}.',
+          'Écrivez à {contact} pour toute demande générale, proposition de partenariat ou demande de la presse. Pour signaler un problème de sécurité, consultez notre {security}.',
       },
     ],
   },
@@ -144,7 +144,6 @@ export const fr: Messages = {
     copied: 'Copiée',
     copiedStatus: 'L’adresse {email} a été copiée dans le presse-papiers.',
     copyFailed: 'Copie impossible. Sélectionnez {email} pour copier l’adresse.',
-    press: 'Presse :',
     security: {
       before: 'Pour signaler un problème de sécurité, consultez notre',
       link: 'politique de sécurité',

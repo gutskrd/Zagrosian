@@ -1,7 +1,7 @@
 ---
 title: Terms of Use
 description: The terms that apply when you use zagrosian.com.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 These terms apply to your use of zagrosian.com (the "website"), which is operated by Zagrosian, based in the Netherlands. By using the website, you agree to these terms. If you do not agree, please do not use it.
@@ -49,4 +49,4 @@ These terms are governed by the laws of the Netherlands. Disputes will be submit
 
 ## Contact
 
-For questions about these terms or other legal matters, email [legal@zagrosian.com](mailto:legal@zagrosian.com).
+For questions about these terms or other legal matters, email [contact@zagrosian.com](mailto:contact@zagrosian.com).
