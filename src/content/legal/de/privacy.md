@@ -1,7 +1,7 @@
 ---
 title: Datenschutzerklärung
 description: Wie Zagrosian personenbezogene Daten verarbeitet, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 Diese Erklärung beschreibt, welche personenbezogenen Daten wir verarbeiten, wenn Sie zagrosian.com besuchen, uns kontaktieren oder unsere Social-Media-Profile aufrufen, zu welchem Zweck wir das tun und welche Rechte Sie haben. Da wir nur sehr wenige Daten erheben, ist sie kurz.
@@ -41,7 +41,7 @@ Wenn Sie an eine unserer Adressen schreiben, verarbeiten wir Ihre E-Mail-Adresse
 
 ### Wenn Sie sich bei uns bewerben
 
-Wenn Sie eine Bewerbung an [careers@zagrosian.com](mailto:careers@zagrosian.com) senden, verarbeiten wir Ihre Kontaktdaten, Ihren Lebenslauf und alle weiteren Angaben ausschließlich, um Ihre Bewerbung zu prüfen und mit Ihnen darüber zu kommunizieren. Bitte senden Sie uns keine besonderen Kategorien personenbezogener Daten, etwa Gesundheitsdaten, sofern wir nicht ausdrücklich darum bitten.
+Wenn Sie eine Bewerbung an [contact@zagrosian.com](mailto:contact@zagrosian.com) senden, verarbeiten wir Ihre Kontaktdaten, Ihren Lebenslauf und alle weiteren Angaben ausschließlich, um Ihre Bewerbung zu prüfen und mit Ihnen darüber zu kommunizieren. Bitte senden Sie uns keine besonderen Kategorien personenbezogener Daten, etwa Gesundheitsdaten, sofern wir nicht ausdrücklich darum bitten.
 
 **Rechtsgrundlage:** die Durchführung vorvertraglicher Maßnahmen auf Ihre Anfrage vor dem Abschluss eines Arbeits- oder sonstigen Beschäftigungsvertrags (Art. 6 Abs. 1 lit. b DSGVO).
 

@@ -1,7 +1,7 @@
 ---
 title: Şertên bikaranînê
 description: Şertên ku dema hûn zagrosian.com bi kar tînin derbasdar in.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 Ev şert ji bo bikaranîna we ya zagrosian.com (“malper”) derbasdar in. Malper ji aliyê Zagrosian ve tê birêvebirin, ku navenda wê li Holendayê ye. Bi bikaranîna malperê, hûn van şertan qebûl dikin. Heke hûn wan qebûl nakin, ji kerema xwe malperê bi kar neynin.
@@ -49,4 +49,4 @@ Ev şert girêdayî qanûnên Holendayê ne. Nakokî dê pêşkêşî dadgeha be
 
 ## Têkilî
 
-Ji bo pirsên li ser van şertan an mijarên din ên hiqûqî, e-nameyekê ji [legal@zagrosian.com](mailto:legal@zagrosian.com) re bişînin.
+Ji bo pirsên li ser van şertan an mijarên din ên hiqûqî, e-nameyekê ji [contact@zagrosian.com](mailto:contact@zagrosian.com) re bişînin.

@@ -130,7 +130,7 @@ export const de: Messages = {
       {
         question: 'Wie erreiche ich Zagrosian?',
         answer:
-          'Schreiben Sie bei allgemeinen Anfragen und für Partnerschaften an {contact}, bei Presseanfragen an {press}. Wenn Sie eine Sicherheitslücke melden möchten, lesen Sie bitte unsere {security}.',
+          'Schreiben Sie bei allgemeinen Anfragen, für Partnerschaften und bei Presseanfragen an {contact}. Wenn Sie eine Sicherheitslücke melden möchten, lesen Sie bitte unsere {security}.',
       },
     ],
   },
@@ -143,7 +143,6 @@ export const de: Messages = {
     copied: 'Kopiert',
     copiedStatus: '{email} wurde in die Zwischenablage kopiert.',
     copyFailed: 'Kopieren nicht möglich. Markieren Sie {email}, um die Adresse zu kopieren.',
-    press: 'Presseanfragen:',
     security: {
       before: 'Wenn Sie eine Sicherheitslücke melden möchten, lesen Sie bitte unsere',
       link: 'Sicherheitsrichtlinie',

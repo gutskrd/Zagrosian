@@ -1,7 +1,7 @@
 ---
 title: Gizlilik Politikası
 description: zagrosian.com’u ziyaret ettiğinizde, bizimle iletişime geçtiğinizde veya sosyal medya profillerimizi ziyaret ettiğinizde Zagrosian’ın kişisel verileri nasıl işlediği.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 Bu politika, zagrosian.com’u ziyaret ettiğinizde, bizimle iletişime geçtiğinizde veya sosyal medya profillerimizi ziyaret ettiğinizde hangi kişisel verileri işlediğimizi, bunları neden işlediğimizi ve hangi haklara sahip olduğunuzu açıklar. Çok az veri topladığımız için kısadır.
@@ -41,7 +41,7 @@ Adreslerimizden herhangi birine e-posta gönderirseniz e-posta adresinizi, belir
 
 ### Bir iş için başvurduğunuzda
 
-[careers@zagrosian.com](mailto:careers@zagrosian.com) adresine başvuru gönderirseniz iletişim bilgilerinizi, özgeçmişinizi ve eklediğiniz diğer her şeyi yalnızca başvurunuzu değerlendirmek ve bu konuda sizinle iletişim kurmak için işleriz. Biz istemedikçe lütfen sağlık bilgileri gibi özel nitelikli kişisel veriler göndermeyin.
+[contact@zagrosian.com](mailto:contact@zagrosian.com) adresine başvuru gönderirseniz iletişim bilgilerinizi, özgeçmişinizi ve eklediğiniz diğer her şeyi yalnızca başvurunuzu değerlendirmek ve bu konuda sizinle iletişim kurmak için işleriz. Biz istemedikçe lütfen sağlık bilgileri gibi özel nitelikli kişisel veriler göndermeyin.
 
 **Hukuki dayanak:** bir iş sözleşmesi veya başka bir çalışma sözleşmesi yapılmadan önce sizin talebiniz üzerine gerekli adımların atılması (GDPR madde 6/1-b).
 

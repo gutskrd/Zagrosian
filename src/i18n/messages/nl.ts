@@ -129,7 +129,7 @@ export const nl: Messages = {
       {
         question: 'Hoe neem ik contact op met Zagrosian?',
         answer:
-          'Mail naar {contact} voor algemene vragen en samenwerkingen, of naar {press} voor persvragen. Wilt u een beveiligingsprobleem melden? Lees dan ons {security}.',
+          'Mail naar {contact} voor algemene vragen, samenwerkingen en persvragen. Wilt u een beveiligingsprobleem melden? Lees dan ons {security}.',
       },
     ],
   },
@@ -142,7 +142,6 @@ export const nl: Messages = {
     copied: 'Gekopieerd',
     copiedStatus: '{email} is naar het klembord gekopieerd.',
     copyFailed: 'Kopiëren is niet gelukt. Selecteer {email} om het adres te kopiëren.',
-    press: 'Persvragen:',
     security: {
       before: 'Wilt u een beveiligingsprobleem melden? Lees dan ons',
       link: 'beveiligingsbeleid',

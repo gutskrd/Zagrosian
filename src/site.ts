@@ -53,13 +53,15 @@ export const site = {
   /** The headquarters' time zone, for the local time shown in About. */
   timeZone: 'Europe/Amsterdam',
   /**
-   * Addresses shown on the site. privacy@, legal@ and careers@ appear only in the
-   * legal pages (src/content/legal), where they are written out.
+   * The address shown on the site. Every address the site gives is one somebody
+   * reads: this one, for everything (general, partnerships, press, legal
+   * questions, job applications and security reports), and privacy@, which
+   * appears only in the privacy policy (src/content/legal), where it is written
+   * out, because a request about personal data has a deadline in law.
    */
   emails: {
     /** Main contact: shown in the Contact section and used for security reports. */
     contact: 'contact@zagrosian.com',
-    press: 'press@zagrosian.com',
   },
 };
 

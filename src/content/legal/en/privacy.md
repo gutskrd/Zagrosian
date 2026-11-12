@@ -1,7 +1,7 @@
 ---
 title: Privacy Policy
 description: How Zagrosian handles personal data when you visit zagrosian.com, contact us or visit our social media profiles.
-updated: 2026-10-02
+updated: 2026-11-12
 ---
 
 This policy explains what personal data we process when you visit zagrosian.com, contact us or visit our social media profiles, why we process it, and what rights you have. We collect very little, so it is short.
@@ -41,7 +41,7 @@ If you email any of our addresses, we process your email address, your name if y
 
 ### When you apply for a job
 
-If you send an application to [careers@zagrosian.com](mailto:careers@zagrosian.com), we process your contact details, your CV and anything else you include, only to assess your application and to communicate with you about it. Please do not send us special categories of personal data, such as health information, unless we ask for it.
+If you send an application to [contact@zagrosian.com](mailto:contact@zagrosian.com), we process your contact details, your CV and anything else you include, only to assess your application and to communicate with you about it. Please do not send us special categories of personal data, such as health information, unless we ask for it.
 
 **Legal basis:** taking steps at your request before entering into an employment or other working agreement (Article 6(1)(b) GDPR).
 

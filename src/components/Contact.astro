@@ -5,7 +5,7 @@ import Arrow from './Arrow.astro';
 import SplitText from './SplitText.astro';
 
 const { t, localize } = i18n(Astro.url);
-const { contact, press } = site.emails;
+const { contact } = site.emails;
 ---
 
 <section id="contact" class="contact section" aria-labelledby="contact-title">
@@ -39,7 +39,6 @@ const { contact, press } = site.emails;
       </div>
 
       <p class="contact__note">
-        {t.contact.press} <a href={`mailto:${press}`} dir="ltr">{press}</a><br />
         {t.contact.security.before} <a href={localize('/security')}>{t.contact.security.link}</a>{t.contact.security.after}
       </p>
     </address>

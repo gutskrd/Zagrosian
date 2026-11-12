@@ -94,7 +94,6 @@ ${answerMarkdown(faqMore(locale))}
 ${t.contact.lead}
 
 - ${t.contact.general} [${site.emails.contact}](mailto:${site.emails.contact})
-- ${t.contact.press} [${site.emails.press}](mailto:${site.emails.press})
 - ${security.before} [${security.link}](${absolute(localizePath(locale, '/security'))})${security.after}
 
 ## ${t.common.socialNav}
@@ -169,7 +168,7 @@ export async function llmsTxt(): Promise<string> {
 
 - Headquarters: ${t.about.headquarters}
 - Products: ${hevalo.name} (${hevalo.url}): ${t.hevalo.category}. Website: ${hevalo.domain}; iOS and Android apps coming soon.
-- Contact: ${site.emails.contact} (general), ${site.emails.press} (press)
+- Contact: ${site.emails.contact} (general and press)
 - Social media: ${social}
 - Languages: ${locales.map((locale) => locale.englishName).join(', ')}
 

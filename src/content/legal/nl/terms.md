@@ -1,7 +1,7 @@
 ---
 title: Gebruiksvoorwaarden
 description: De voorwaarden die gelden wanneer u zagrosian.com gebruikt.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 Deze voorwaarden gelden voor uw gebruik van zagrosian.com (de „website”), die wordt beheerd door Zagrosian, gevestigd in Nederland. Door de website te gebruiken, gaat u akkoord met deze voorwaarden. Als u niet akkoord gaat, gebruik de website dan niet.
@@ -49,4 +49,4 @@ Op deze voorwaarden is Nederlands recht van toepassing. Geschillen worden voorge
 
 ## Contact
 
-Voor vragen over deze voorwaarden of andere juridische zaken kunt u mailen naar [legal@zagrosian.com](mailto:legal@zagrosian.com).
+Voor vragen over deze voorwaarden of andere juridische zaken kunt u mailen naar [contact@zagrosian.com](mailto:contact@zagrosian.com).

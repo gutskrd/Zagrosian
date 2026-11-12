@@ -1,7 +1,7 @@
 ---
 title: Nutzungsbedingungen
 description: Die Bedingungen, die für die Nutzung von zagrosian.com gelten.
-updated: 2026-09-28
+updated: 2026-11-12
 ---
 
 Diese Bedingungen gelten für Ihre Nutzung von zagrosian.com (die „Website“), die von Zagrosian mit Sitz in den Niederlanden betrieben wird. Indem Sie die Website nutzen, erklären Sie sich mit diesen Bedingungen einverstanden. Wenn Sie nicht einverstanden sind, nutzen Sie die Website bitte nicht.
@@ -49,4 +49,4 @@ Diese Bedingungen unterliegen niederländischem Recht. Für Streitigkeiten ist d
 
 ## Kontakt
 
-Bei Fragen zu diesen Bedingungen oder zu anderen rechtlichen Angelegenheiten schreiben Sie an [legal@zagrosian.com](mailto:legal@zagrosian.com).
+Bei Fragen zu diesen Bedingungen oder zu anderen rechtlichen Angelegenheiten schreiben Sie an [contact@zagrosian.com](mailto:contact@zagrosian.com).

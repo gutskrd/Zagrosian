@@ -133,7 +133,7 @@ export const ku: Messages = {
       {
         question: 'Ez çawa dikarim bi Zagrosian re têkilî daynim?',
         answer:
-          'Ji bo pirsên giştî û hevkariyan e-nameyê ji {contact} re bişînin, ji bo pirsên çapemeniyê jî ji {press} re. Ji bo ragihandina pirsgirêkeke ewlekariyê, ji kerema xwe li {security} binêrin.',
+          'Ji bo pirsên giştî, hevkariyan û pirsên çapemeniyê e-nameyê ji {contact} re bişînin. Ji bo ragihandina pirsgirêkeke ewlekariyê, ji kerema xwe li {security} binêrin.',
       },
     ],
   },
@@ -146,7 +146,6 @@ export const ku: Messages = {
     copied: 'Hat kopîkirin',
     copiedStatus: '{email} hat kopîkirin.',
     copyFailed: 'Kopîkirin pêk nehat. Ji bo kopîkirinê {email} hilbijêrin.',
-    press: 'Pirsên çapemeniyê:',
     security: {
       before: 'Ji bo ragihandina pirsgirêkeke ewlekariyê, ji kerema xwe li',
       link: 'polîtîkaya me ya ewlekariyê',
