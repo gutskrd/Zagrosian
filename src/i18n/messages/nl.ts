@@ -207,6 +207,7 @@ export const nl: Messages = {
     zoomIn: 'Inzoomen',
     zoomOut: 'Uitzoomen',
     fit: 'Passend maken',
+    scrollView: 'Doorlopend',
     textView: 'Tekst',
     fullView: 'Volledig scherm',
     keysHint: 'Met de pijltjestoetsen sla je om; [ en ] gaan naar het vorige of volgende hoofdstuk; + en − zoomen in en uit.',

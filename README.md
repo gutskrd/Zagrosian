@@ -503,9 +503,12 @@ same code as hevalo.app's own download; which chapters it holds is the owner's d
     ([`book-zoom.ts`](src/scripts/book-zoom.ts)), with a finger either way; the zoom stays as the pages
     turn, each new page shown from its top left, and a tap at the edge or a swipe beyond it turns the
     page once the pages are scrolled to that edge. The browser's own pinch is never taken.
-  - **The text view** shows the whole book as text, in the legal pages' reading style, with the bars
-    following the page being read (its number, its chapter, the slider and the address); the slider
-    takes the text to a page. **Full view** lays the book over the whole window, the site's header
+  - **The scroll view** lays every page out in one column to scroll through, as wide as a page reads
+    well (the whole width on a phone), each picture loaded as it comes near; **the text view** does
+    the same with the words alone, in the legal pages' reading style. In either the bars stay at hand
+    and follow the page being read (its number, its chapter, the slider and the address); the arrows
+    and `[` `]` scroll to the next page or chapter, the slider and the contents to their page, and
+    leaving the column opens the book at the page being read. **Full view** lays the book over the whole window, the site's header
     included, with the focus going round its own controls as in a dialog.
   - On a touch screen a hint takes the place of the bar under the book for a few seconds once the
     book is in view ("Tap the edges or swipe to turn", "Double-tap to zoom"); the keyboard's keys are
@@ -520,7 +523,7 @@ same code as hevalo.app's own download; which chapters it holds is the owner's d
   on the last page) says so (`aria-disabled`) and keeps the focus. Reading never waits for a leaf: a
   turn waits at most 120 ms for pictures not fetched yet, and if turning fails the page simply
   changes; if the reader cannot start, the page shows the column of pages it shows without
-  JavaScript. With *reduce motion*, zoomed in or in the text view, pages change at once. Only the
+  JavaScript. With *reduce motion*, zoomed in or in a column, pages change at once. Only the
   cover's picture loads with the page; the next pages' follow once it is in. A picture that will not
   load (offline, or a new edition published under the reader) brings a note with a way to reload.
   Nothing is stored: there is no "keep my place" (see [TODO.md](TODO.md)).
@@ -529,8 +532,12 @@ same code as hevalo.app's own download; which chapters it holds is the owner's d
   page as one line ("1 · Silav · Hello · 9"), without the page's furniture or its number badges. The
   build stops if a picture, a chapter's name in any language, or a plural form for "192 pages" is
   missing, or if the PDF is not the size the edition says ([`src/lib/book.ts`](src/lib/book.ts)). The
-  PDF is served as an attachment, kept out of search results, in Kurmanji and English
-  (`public/_headers`), and is never prerendered (`speculation-rules.json`). The book has its own
+  PDF is served as an attachment and as plain bytes (`application/octet-stream`), so a browser that
+  can show a PDF itself saves this one rather than opening it, kept out of search results, in Kurmanji
+  and English (`public/_headers`), and is never prerendered (`speculation-rules.json`). The bars'
+  labels stand beside their icons only where every language fits, and on the narrowest phones the
+  bar's download moves to the foot of the contents (a test measures every language from 320 to 1440
+  pixels). The book has its own
   social image (`public/og/book.jpg`, a JPEG of about 80 KB, well under what chat apps show a preview
   for) and structured data (a `Book` with its PDF and its chapters, published on the day of its first
   edition here, `book.published` in `src/site.ts`, and modified with each edition since).

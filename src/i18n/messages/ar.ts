@@ -208,6 +208,7 @@ export const ar: Messages = {
     zoomIn: 'تكبير',
     zoomOut: 'تصغير',
     fit: 'ملاءمة الشاشة',
+    scrollView: 'تمرير',
     textView: 'النص',
     fullView: 'ملء الشاشة',
     keysHint: 'تقلّب مفاتيح الأسهم الصفحات؛ وتنتقل [ و ] إلى الفصل السابق أو التالي؛ ويكبّر + ويصغّر −.',

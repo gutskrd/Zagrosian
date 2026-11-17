@@ -15,11 +15,12 @@
  *   finger (book-turn.ts draws the leaf). Clicks in quick succession each
  *   count. [ and ] and the contents go from chapter to chapter, a few leaves
  *   at once; the slider goes straight there. With reduced motion, zoomed in
- *   or reading the text, pages change at once; zoomed in, the zoom stays, and
+ *   or reading a column, pages change at once; zoomed in, the zoom stays, and
  *   a tap at the edge or a swipe beyond it turns the page once the page is
  *   scrolled to that edge.
- * - Text view: the whole book as text, with the bars following the page
- *   being read; full view: the book over the window; zoom (book-zoom.ts).
+ * - The book as one column to scroll: its pages, one under the other (the
+ *   scroll view), or its words (the text view), with the bars following the
+ *   page being read; full view: the book over the window; zoom (book-zoom.ts).
  * - The address follows the page (#page-12), without filling the history, so
  *   Back leaves the book; an address with #page-N or #chapter-N opens there.
  * - Numbers are written in the page's own digits, as the build wrote them
@@ -41,6 +42,8 @@ import { play } from './sound';
 
 type Item = number | 'end';
 type View = Item[];
+/** What a column of the book holds: its pages as pictures (the scroll view), or its words (the text view). */
+type ColumnKind = 'pages' | 'text';
 
 /** Turns asked for one after another start this far apart, so no more than three leaves are ever in the air. */
 const CHAIN_MS = 190;
@@ -92,6 +95,7 @@ function setUp(root: HTMLElement) {
   const prevButton = $<HTMLButtonElement>('[data-book-prev]');
   const nextButton = $<HTMLButtonElement>('[data-book-next]');
   const textButton = $<HTMLButtonElement>('[data-book-text-toggle]');
+  const scrollButton = $<HTMLButtonElement>('[data-book-scroll-toggle]');
   const fullButton = $<HTMLButtonElement>('[data-book-full-toggle]');
   const zoomButtons = {
     in: $<HTMLButtonElement>('[data-book-zoom="in"]'),
@@ -142,8 +146,10 @@ function setUp(root: HTMLElement) {
   let requests = 0;
   let heading = 0;
   let shown = new Set<HTMLElement>([pageOf(1)]);
-  let textMode = false;
-  /** In the text view, the page being read: the last whose heading is above the middle of the window. */
+  /** Whether the book is read as one column to scroll (its pages or its words) rather than turned. */
+  let column = false;
+  let columnKind: ColumnKind = 'pages';
+  /** In a column, the page being read: the last whose top is above the middle of the window. */
   let reading = 1;
   let anyTurn = false;
 
@@ -164,9 +170,9 @@ function setUp(root: HTMLElement) {
   // ---- Words ---------------------------------------------------------------
 
   const zoomControls = () => {
-    setDisabled(zoomButtons.out, textMode || zoom.level === 1);
-    setDisabled(zoomButtons.fit, textMode || zoom.level === 1);
-    setDisabled(zoomButtons.in, textMode || zoom.level === 3);
+    setDisabled(zoomButtons.out, column || zoom.level === 1);
+    setDisabled(zoomButtons.fit, column || zoom.level === 1);
+    setDisabled(zoomButtons.in, column || zoom.level === 3);
   };
   const zoom = new Zoom(root, stage, spread, () => {
     zoomControls();
@@ -191,9 +197,9 @@ function setUp(root: HTMLElement) {
   };
 
   let announce: number | undefined;
-  /** The bars say where the reader is: the pages open, or in the text view the page being read. */
+  /** The bars say where the reader is: the pages open, or in a column the page being read. */
   const describe = () => {
-    const view: View = textMode ? [reading] : views[index]!;
+    const view: View = column ? [reading] : views[index]!;
     // both, written out and short: the stylesheet shows the one the width has room for
     counterShort.textContent = counterText(view, true);
     counterLong.textContent = counterText(view, false);
@@ -202,21 +208,21 @@ function setUp(root: HTMLElement) {
     const right = view[1];
     const lead = typeof right === 'number' && chapterLinks.some((link) => Number(link.dataset.start) === right) ? pageOf(right) : first;
     where.textContent = lead.dataset.short || root.dataset.coverLabel || '';
-    const at = textMode ? viewIndexOf(reading) : index;
+    const at = column ? viewIndexOf(reading) : index;
     range.min = twoPages ? '0' : '1';
     range.max = String(twoPages ? views.length - 1 : views.length);
     range.value = String(twoPages ? at : at + 1);
     range.setAttribute('aria-valuetext', statusText(view));
-    setDisabled(prevButton, textMode ? reading === 1 : index === 0);
-    setDisabled(nextButton, textMode ? reading === pageCount : index === views.length - 1);
+    setDisabled(prevButton, column ? reading === 1 : index === 0);
+    setDisabled(nextButton, column ? reading === pageCount : index === views.length - 1);
     const chapter = Number(lead.dataset.chapter ?? 0);
     for (const link of chapterLinks) {
       if (Number(link.dataset.bookChapter) === chapter) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
     }
     window.clearTimeout(announce);
-    // in the text view the words themselves are read; turning pages, where they went is said
-    if (!textMode) announce = window.setTimeout(() => (status.textContent = statusText(views[index]!)), 500);
+    // in a column the pages themselves are read on; turning pages, where they went is said
+    if (!column) announce = window.setTimeout(() => (status.textContent = statusText(views[index]!)), 500);
   };
 
   // ---- Showing a view ------------------------------------------------------------
@@ -240,8 +246,8 @@ function setUp(root: HTMLElement) {
 
   /** The address follows the page (the left one of two, or the one being read), without adding to the history; the cover has none. */
   const address = () => {
-    const page = textMode ? reading : firstPage(views[index]!);
-    const hash = !textMode && index === 0 ? '' : `#page-${Math.min(page, pageCount)}`;
+    const page = column ? reading : firstPage(views[index]!);
+    const hash = !column && index === 0 ? '' : `#page-${Math.min(page, pageCount)}`;
     if (location.hash === hash) return;
     try {
       history.replaceState(history.state, '', hash || `${location.pathname}${location.search}`);
@@ -278,7 +284,7 @@ function setUp(root: HTMLElement) {
 
   // ---- Turning ---------------------------------------------------------------
 
-  const leafMotion = () => !reduceMotion.matches && zoom.level === 1 && !textMode;
+  const leafMotion = () => !reduceMotion.matches && zoom.level === 1 && !column;
 
   /** The leaves for a turn from one view to another: one, or three for a chapter away. */
   const specFor = (from: number, to: number, leaves: 1 | 3): TurnSpec => {
@@ -383,7 +389,7 @@ function setUp(root: HTMLElement) {
    * so the book stops when the key is let go.
    */
   const step = (by: 1 | -1, repeat = false) => {
-    if (textMode) return textStep(by);
+    if (column) return columnStep(by);
     if (!leafMotion()) {
       cancelQueue();
       void go(heading + by);
@@ -400,12 +406,12 @@ function setUp(root: HTMLElement) {
     runQueue();
   };
 
-  /** To the next chapter's opening, or the one before, from where the book is heading (or, in the text view, the page being read). */
+  /** To the next chapter's opening, or the one before, from where the book is heading (or, in a column, the page being read). */
   const chapterStep = (by: 1 | -1) => {
     cancelQueue();
-    if (textMode) {
+    if (column) {
       const target = by === 1 ? chapterStarts.find((start) => start > reading) : [...chapterStarts].reverse().find((start) => start < reading);
-      if (target !== undefined) textGoTo(target);
+      if (target !== undefined) columnGoTo(target);
       return;
     }
     const target =
@@ -422,7 +428,7 @@ function setUp(root: HTMLElement) {
   zoomButtons.fit.addEventListener('click', () => usable(zoomButtons.fit) && zoom.fit());
 
   // The slider: the way along, with where it would open in a bubble while it is dragged; it opens there at once
-  // (in the text view, the text scrolls to that page).
+  // (in a column, the column scrolls to that page).
   const valueToIndex = () => Number(range.value) - (twoPages ? 0 : 1);
   const placeBubble = () => {
     const i = valueToIndex();
@@ -440,7 +446,7 @@ function setUp(root: HTMLElement) {
   };
   const goToValue = () => {
     const i = Math.max(0, Math.min(views.length - 1, valueToIndex()));
-    if (textMode) textGoTo(Math.min(pageCount, firstPage(views[i]!)), 'instant');
+    if (column) columnGoTo(Math.min(pageCount, firstPage(views[i]!)), 'instant');
     else void go(i, 'instant');
   };
   range.addEventListener('pointerdown', () => {
@@ -458,15 +464,15 @@ function setUp(root: HTMLElement) {
   for (const type of ['pointerup', 'pointercancel', 'blur'] as const) range.addEventListener(type, () => scrub.removeAttribute('data-dragging'));
 
   // The contents, in the menu, in the page, and the closing card: a few leaves to the chapter, then the book has the
-  // focus. In the text view, the text scrolls there.
+  // focus. In a column, the column scrolls there.
   document.addEventListener('click', (event) => {
     const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-book-jump]') : null;
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     const page = Number(link.dataset.bookJump);
     if (menu.matches(':popover-open')) menu.hidePopover();
-    if (textMode) {
-      textGoTo(page);
+    if (column) {
+      columnGoTo(page);
       return;
     }
     const fromOutside = !root.contains(link) || link.closest('.book__end') === null;
@@ -475,11 +481,16 @@ function setUp(root: HTMLElement) {
     stage.focus({ preventScroll: true });
   });
 
-  // "Start reading", and the cover beside the introduction: to the book, with the focus on it.
+  // "Start reading", and the cover beside the introduction: to the book, with the focus on it; in the scroll view, to
+  // its first page, since the reader chose to scroll.
   for (const start of document.querySelectorAll('[data-book-start-reading]')) {
     start.addEventListener('click', (event) => {
       event.preventDefault();
-      if (textMode) setText(false);
+      if (column && columnKind === 'pages') {
+        columnGoTo(1);
+        return;
+      }
+      if (column) setColumn(null);
       root.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'instant' : 'smooth' });
       stage.focus({ preventScroll: true });
     });
@@ -508,7 +519,7 @@ function setUp(root: HTMLElement) {
       else handled = false;
     } else if (key === 'ArrowRight') step(1, event.repeat);
     else if (key === 'ArrowLeft') step(-1, event.repeat);
-    else if (textMode) handled = false;
+    else if (column) handled = false;
     else if (key === 'PageDown' || (key === ' ' && !event.shiftKey && !control)) step(1, event.repeat);
     else if (key === 'PageUp' || (key === ' ' && event.shiftKey && !control)) step(-1, event.repeat);
     else if (key === 'Home') void go(0);
@@ -534,7 +545,7 @@ function setUp(root: HTMLElement) {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
     const active = document.activeElement;
     if (active && active !== document.body && active !== document.documentElement) return;
-    if (textMode || stageInView < 0.5 || somethingOpen()) return;
+    if (column || stageInView < 0.5 || somethingOpen()) return;
     event.preventDefault();
     stage.focus({ preventScroll: true });
     step(event.key === 'ArrowRight' ? 1 : -1, event.repeat);
@@ -547,7 +558,7 @@ function setUp(root: HTMLElement) {
   stage.addEventListener(
     'wheel',
     (event) => {
-      if (textMode || zoom.level > 1 || event.ctrlKey) return;
+      if (column || zoom.level > 1 || event.ctrlKey) return;
       const now = performance.now();
       // a pause ends a swipe, with the glide a trackpad adds after it
       if (now - wheelLast > 250) {
@@ -634,7 +645,7 @@ function setUp(root: HTMLElement) {
   };
 
   stage.addEventListener('pointerdown', (event) => {
-    if (textMode || event.button !== 0) return;
+    if (column || event.button !== 0) return;
     // zoomed in, a mouse moves the pages about (book-zoom.ts) and a finger scrolls them; a tap still counts
     if (zoom.level > 1 && event.pointerType === 'mouse') return;
     if ((event.target as Element).closest('a, button, input')) return;
@@ -651,7 +662,7 @@ function setUp(root: HTMLElement) {
   stage.addEventListener('pointermove', (event) => {
     if (!press) {
       // the outer bottom corner lifts to meet a mouse that comes near
-      if (event.pointerType !== 'mouse' || !fine.matches || event.buttons !== 0 || textMode) return;
+      if (event.pointerType !== 'mouse' || !fine.matches || event.buttons !== 0 || column) return;
       cornerLift(event);
       return;
     }
@@ -799,24 +810,43 @@ function setUp(root: HTMLElement) {
     seen.observe(stage);
   }
 
-  // ---- Text view ---------------------------------------------------------------
+  // ---- A column: the scroll view and the text view ----------------------------------
 
+  // Where each page starts in a column: in the scroll view its picture, in the text view its heading (the picture is
+  // not shown there, and the heading is).
   const headings = pages.map((page) => page.querySelector<HTMLElement>('.book__page-title')!);
+  const tops = () => (columnKind === 'text' ? headings : pages);
 
-  /** The page whose heading is the last above the middle of the window: the one being read. */
+  /**
+   * While the column glides to a page it was sent to, the pages it passes are
+   * not the one being read: the bars keep the page it is going to until it
+   * has stopped (or a second has passed, where the end of a scroll is not
+   * told).
+   */
+  let gliding = 0;
+  const landed = () => {
+    if (!gliding) return;
+    window.clearTimeout(gliding);
+    gliding = 0;
+    followReading();
+  };
+  addEventListener('scrollend', landed);
+
+  /** The page whose top is the last above the middle of the window: the one being read. */
   let readingFrame = 0;
   const followReading = () => {
-    if (readingFrame) return;
+    if (readingFrame || gliding) return;
     readingFrame = requestAnimationFrame(() => {
       readingFrame = 0;
-      if (!textMode) return;
+      if (!column || gliding) return;
+      const marks = tops();
       const line = window.innerHeight * 0.45;
       let low = 0;
-      let high = headings.length - 1;
+      let high = marks.length - 1;
       let found = 0;
       while (low <= high) {
         const mid = (low + high) >> 1;
-        if (headings[mid]!.getBoundingClientRect().top <= line) {
+        if (marks[mid]!.getBoundingClientRect().top <= line) {
           found = mid;
           low = mid + 1;
         } else high = mid - 1;
@@ -828,27 +858,41 @@ function setUp(root: HTMLElement) {
     });
   };
 
-  /** In the text view, to a page's heading. */
-  const textGoTo = (page: number, behavior: ScrollBehavior = reduceMotion.matches ? 'instant' : 'smooth') => {
+  /** In a column, to the top of a page. */
+  const columnGoTo = (page: number, behavior: ScrollBehavior = reduceMotion.matches ? 'instant' : 'smooth') => {
     reading = Math.max(1, Math.min(pageCount, page));
     describe();
     address();
-    headings[reading - 1]!.scrollIntoView({ block: 'start', behavior });
+    if (behavior === 'smooth') {
+      window.clearTimeout(gliding);
+      gliding = window.setTimeout(landed, 1000);
+    }
+    tops()[reading - 1]!.scrollIntoView({ block: 'start', behavior });
   };
 
-  const setText = (on: boolean) => {
-    if (on === textMode) return;
-    if (on && root.hasAttribute('data-full')) setFull(false);
-    const page = Math.min(firstPage(views[index]!), pageCount);
-    if (on && zoom.level > 1) zoom.fit();
+  /**
+   * Into a column (its pages, or its words) or back to the book, at the same
+   * page: the one open, the one being read in the column, or from one column
+   * to the other, the one being read in it.
+   */
+  const setColumn = (kind: ColumnKind | null) => {
+    if (kind === null ? !column : column && kind === columnKind) return;
+    if (kind && root.hasAttribute('data-full')) setFull(false);
+    const page = column ? reading : Math.min(firstPage(views[index]!), pageCount);
+    if (kind && zoom.level > 1) zoom.fit();
     cancelQueue();
-    textMode = on;
-    root.toggleAttribute('data-text', on);
-    textButton.setAttribute('aria-pressed', String(on));
-    if (on) {
+    column = kind !== null;
+    if (kind) columnKind = kind;
+    root.toggleAttribute('data-scroll', kind === 'pages');
+    root.toggleAttribute('data-text', kind === 'text');
+    scrollButton.setAttribute('aria-pressed', String(kind === 'pages'));
+    textButton.setAttribute('aria-pressed', String(kind === 'text'));
+    window.clearTimeout(gliding);
+    gliding = 0;
+    if (kind) {
       reading = page;
       addEventListener('scroll', followReading, { passive: true });
-      headings[page - 1]!.scrollIntoView({ block: 'start', behavior: 'instant' });
+      tops()[page - 1]!.scrollIntoView({ block: 'start', behavior: 'instant' });
     } else {
       removeEventListener('scroll', followReading);
       show(viewIndexOf(reading));
@@ -859,10 +903,11 @@ function setUp(root: HTMLElement) {
     address();
   };
 
-  /** In the text view, the arrows go from page heading to page heading. */
-  const textStep = (by: 1 | -1) => textGoTo(reading + by);
+  /** In a column, the arrows go from page to page. */
+  const columnStep = (by: 1 | -1) => columnGoTo(reading + by);
 
-  textButton.addEventListener('click', () => setText(!textMode));
+  scrollButton.addEventListener('click', () => setColumn(column && columnKind === 'pages' ? null : 'pages'));
+  textButton.addEventListener('click', () => setColumn(column && columnKind === 'text' ? null : 'text'));
 
   // ---- Full view ---------------------------------------------------------------
 
@@ -899,7 +944,7 @@ function setUp(root: HTMLElement) {
   let inerted: Element[] = [];
   const setFull = (on: boolean) => {
     if (on === root.hasAttribute('data-full')) return;
-    if (on && textMode) setText(false);
+    if (on && column) setColumn(null);
     root.toggleAttribute('data-full', on);
     root.removeAttribute('data-bars-hidden');
     fullButton.setAttribute('aria-pressed', String(on));
@@ -964,7 +1009,7 @@ function setUp(root: HTMLElement) {
   addEventListener('hashchange', () => {
     const page = fromHash();
     if (page === null) return;
-    if (textMode) textGoTo(page, 'instant');
+    if (column) columnGoTo(page, 'instant');
     else void go(viewIndexOf(page), 'instant');
   });
 

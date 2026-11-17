@@ -211,6 +211,7 @@ export const ku: Messages = {
     zoomIn: 'Mezin bike',
     zoomOut: 'Biçûk bike',
     fit: 'Li gorî ekranê',
+    scrollView: 'Gerandin',
     textView: 'Nivîs',
     fullView: 'Ekrana tijî',
     keysHint: 'Bi bişkokên tîran rûpelan biguhêze; [ û ] diçin beşa berê an ya din; + û − mezin û biçûk dikin.',

@@ -5,10 +5,12 @@
  * [ and ] with AltGr), a click, quick clicks that each count, a drag, a swipe
  * or a tap at the edge, a chapter at a time from the contents; at once with
  * reduced motion; the right way round on right-to-left pages, in the page's
- * own digits. Zoom, the text view (its bar following the page being read) and
+ * own digits. Zoom, the scroll view (every page in a column, its bar
+ * following the page being read), the text view (the same, in words) and
  * full view (over the site's header, keeping the focus); the focus stays in
  * the book on its last page; only the pages near the reader are fetched, all
- * from this site; the download is the book, under its own name, from the
+ * from this site; the bars hold every control apart, and the chapter’s name
+ * whole, in every language at every width; the download is the book, under its own name, from the
  * phone's bar too. Without JavaScript the pages are a column; a picture gone
  * and a reader that cannot start both leave the book readable.
  */
@@ -235,6 +237,60 @@ test.describe('on a computer', () => {
     await expect.poll(() => shown(page)).toContain('14');
   });
 
+  test('the scroll view: every page in one column, the bar following the page being read, and back to it', async ({ page }) => {
+    await open(page, '/book#page-10');
+    const toggle = page.locator('[data-book-scroll-toggle]');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(reader(page)).toHaveAttribute('data-scroll', '');
+    // the page that was open is at the top, under the bars, and every page is there, one under the other
+    await expect.poll(() => new URL(page.url()).hash).toBe('#page-10');
+    await expect(page.locator('#page-10 img')).toBeInViewport();
+    const boxes = await page.locator('.book__page').evaluateAll((items) => items.map((item) => item.getBoundingClientRect()).map(({ top, height, width }) => ({ top, height, width })));
+    expect(boxes).toHaveLength(manifest.pageCount);
+    for (let i = 1; i < boxes.length; i++) expect(boxes[i]!.top).toBeGreaterThan(boxes[i - 1]!.top + boxes[i - 1]!.height - 1);
+    // each a whole page, its picture in proportion before it has loaded, and no wider than the screen
+    for (const box of boxes) expect(box.height / box.width).toBeCloseTo(595.28 / 419.53, 1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator('[data-book-zoom="in"]')).toHaveAttribute('aria-disabled', 'true');
+    // scrolling on to page 14: the bar and the address follow
+    await page.locator('#page-14').evaluate((item) => item.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page 14 of ${manifest.pageCount}`);
+    await expect.poll(() => new URL(page.url()).hash).toBe('#page-14');
+    await expect(page.locator('#page-14 img')).toHaveJSProperty('complete', true);
+    // the arrows and ] go from page to page and chapter to chapter, the column scrolling there
+    await page.locator('[data-book-next]').click();
+    await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page 15 of ${manifest.pageCount}`);
+    await expect(page.locator('#page-15 img')).toBeInViewport();
+    await page.keyboard.press(']');
+    const next = manifest.chapters.find((item) => item.start > 15)!.start;
+    await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page ${next} of ${manifest.pageCount}`);
+    // from the scroll view to the text view and back to the book, at the same page
+    await page.locator('[data-book-text-toggle]').click();
+    await expect(reader(page)).toHaveAttribute('data-text', '');
+    await expect(reader(page)).not.toHaveAttribute('data-scroll', '');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator(`#page-${next}-title`)).toBeInViewport();
+    await page.locator('[data-book-text-toggle]').click();
+    await expect.poll(() => shown(page)).toContain(String(next));
+  });
+
+  test('the scroll view on a phone: whole pages across the screen, the bars at hand', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    const page = await context.newPage();
+    await open(page, '/book#page-20');
+    await page.locator('[data-book-scroll-toggle]').click();
+    const box = (await page.locator('#page-20').boundingBox())!;
+    expect(box.width).toBeGreaterThan(340);
+    expect(box.width).toBeLessThanOrEqual(390);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    // the bars stay in view while the column scrolls past them
+    await page.evaluate(() => scrollBy(0, 3000));
+    await expect(page.locator('[data-book-scroll-toggle]')).toBeInViewport();
+    await expect(page.locator('[data-book-next]')).toBeInViewport();
+    await context.close();
+  });
+
   test('full view: over the site’s header, the focus stays in the book, Escape gives it back, and the page behind holds still', async ({ page }) => {
     await open(page);
     const toggle = page.locator('[data-book-full-toggle]');
@@ -300,11 +356,42 @@ test.describe('on a computer', () => {
     expect(download.suggestedFilename()).toBe('Reya-Kurmanci-Pirtuka-Hevalo.pdf');
     const response = await request.get('/book/reya-kurmanci.pdf');
     const headers = response.headers();
-    expect(headers['content-type']).toBe('application/pdf');
+    // plain bytes, so a browser that shows PDFs itself saves the book instead of opening it
+    expect(headers['content-type']).toBe('application/octet-stream');
     expect(headers['content-disposition']).toContain('attachment');
     expect(headers['x-robots-tag']).toBe('noindex');
     expect((await response.body()).length).toBe(manifest.pdf.bytes);
     await expect(page.locator('.book-intro .book-download__facts')).toContainText(`${(manifest.pdf.bytes / 1e6).toFixed(1)} MB`);
+  });
+});
+
+test.describe('the bars', () => {
+  test('hold every control apart, and the contents’ name whole, in every language from the narrowest phone to a wide screen', async ({ page }) => {
+    test.setTimeout(120_000);
+    const problems: string[] = [];
+    for (const code of ['', 'ku', 'ckb', 'ar', 'fa', 'tr', 'de', 'fr', 'es', 'nl']) {
+      await open(page, code ? `/${code}/book` : '/book');
+      for (const width of [320, 360, 375, 420, 600, 700, 768, 900, 1000, 1199, 1280, 1360, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        const found = await page.evaluate(() => {
+          const bars = [...document.querySelectorAll<HTMLElement>('[data-book] .book__bar')];
+          const boxes = bars.map((bar) =>
+            [...bar.children]
+              .filter((child) => child.checkVisibility() && getComputedStyle(child).position !== 'absolute')
+              .map((child) => child.getBoundingClientRect())
+              .filter((box) => box.width > 0),
+          );
+          // the contents' button sits a little past its bar's edge on purpose, so a few pixels of touching are allowed
+          const apart = boxes.every((one, i) =>
+            boxes.slice(i + 1).every((other) => one.every((a) => other.every((b) => a.right - 10 <= b.left || b.right - 10 <= a.left || a.bottom - 1 <= b.top || b.bottom - 1 <= a.top))),
+          );
+          const name = document.querySelector<HTMLElement>('[data-book] .book__where-text')!;
+          return { apart, cut: name.scrollWidth > name.clientWidth + 1, wide: document.documentElement.scrollWidth > innerWidth };
+        });
+        if (!found.apart || found.cut || found.wide) problems.push(`${code || 'en'} at ${width}: ${JSON.stringify(found)}`);
+      }
+    }
+    expect(problems).toEqual([]);
   });
 });
 

@@ -7,8 +7,9 @@
  * bar a round one with only its icon.
  *
  * A plain link with `download`, so it works without JavaScript; the server
- * sends the file as an attachment too (public/_headers), for browsers that
- * ignore the attribute.
+ * sends the file as an attachment too, for browsers that ignore the
+ * attribute, and as plain bytes rather than as a PDF, so a browser that can
+ * show a PDF itself saves this one instead of opening it (public/_headers).
  */
 import { format, i18n } from '../i18n';
 import { pageCountText, pdfSize } from '../lib/book';

@@ -209,6 +209,7 @@ export const es: Messages = {
     zoomIn: 'Acercar',
     zoomOut: 'Alejar',
     fit: 'Ajustar a la pantalla',
+    scrollView: 'Continuo',
     textView: 'Texto',
     fullView: 'Pantalla completa',
     keysHint: 'Las flechas pasan las páginas; [ y ] van al capítulo anterior o al siguiente; + y − acercan y alejan.',
