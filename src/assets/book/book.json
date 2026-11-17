@@ -1,5 +1,5 @@
 {
-  "edition": "2026-11-17.e6c67543dabe",
+  "edition": "2026-11-17.b87b0f17907a",
   "date": "2026-11-17",
   "title": {
     "ku": "Rêya Kurmancî",
@@ -16,8 +16,8 @@
   ],
   "pdf": {
     "file": "Reya-Kurmanci-Pirtuka-Hevalo.pdf",
-    "bytes": 3536406,
-    "sha256": "2b505850e84941f6de8041b7992062465e620863773b61a34123cea1ab565389"
+    "bytes": 3320864,
+    "sha256": "25592d220466c1e9b694cbd62e24c6b3329e169368cc7818f47e4b457403a0a0"
   },
   "sections": [
     {
