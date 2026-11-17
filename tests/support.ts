@@ -9,8 +9,8 @@ export { locales };
 /** A language's URL prefix: none for English. */
 export const prefix = (code: string) => (code === defaultLocale ? '' : `/${code}`);
 
-/** A language's pages: the homepage and the legal pages. */
-export const pagesIn = (code: string) => [prefix(code) || '/', `${prefix(code)}/privacy`, `${prefix(code)}/terms`, `${prefix(code)}/security`];
+/** A language's pages: the homepage, Hevalo's book and the legal pages. */
+export const pagesIn = (code: string) => [prefix(code) || '/', `${prefix(code)}/book`, `${prefix(code)}/privacy`, `${prefix(code)}/terms`, `${prefix(code)}/security`];
 
 /** Every page in every language. */
 export const pages = locales.flatMap(({ code }) => pagesIn(code));

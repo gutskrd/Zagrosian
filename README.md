@@ -52,7 +52,9 @@ Requires Node 22.12 or later.
 - Kurdish phrases (marked `lang="ku"`, so screen readers and search engines treat them as Kurdish):
   *Jiyan bi kurdî xweştire.* ("Life is sweeter in Kurdish", Hevalo's motto) is the large statement at
   the end of the homepage story, in [`Story.astro`](src/components/Story.astro), with a translation
-  underneath in every language except Kurmanji (`motto` in the message files). The site closes with
+  underneath in every language except Kurmanji (`motto` in the message files). The title of Hevalo's
+  book, *Rêya Kurmancî* ("The Kurmanji Road"), heads its page in every language (`kurdish.book`, with
+  its meaning in `book.subtitle`). The site closes with
   *Mala we ava.* ("Thank you", literally "may your home prosper", in the footer). The sheet the paper plane unfolds into carries a proverb, one of the
   *gotinên pêşiyan* ("sayings of the forebears", as Kurdish proverbs are called), and credits it as
   one: *Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.* ("A tree thrives through its roots;
@@ -65,7 +67,8 @@ Requires Node 22.12 or later.
 - The Hevalo section ends with a *Coming soon* note for the iOS and Android apps, in
   [`ProductShowcase.astro`](src/components/ProductShowcase.astro) (text: `hevalo.comingSoon*` in the
   message files). When the apps are out, replace it with links to the App Store and Google Play.
-- [`src/components/`](src/components/): homepage sections.
+- [`src/components/`](src/components/): homepage sections, and the book's page (`Book*.astro`; see
+  **Hevalo's book** below).
 - [`src/content/legal/`](src/content/legal/): the privacy policy, terms of use and security policy,
   written in Markdown, with one folder per language (`en/privacy.md`, `de/privacy.md`, …). English is
   the original; each translated page says so and links to it. When you change a page, change every
@@ -75,28 +78,32 @@ Requires Node 22.12 or later.
 ## Structure
 
 ```
-public/            Favicons, logo, social images (og.png and og/<language>.png), manifest,
-                   robots.txt and Cloudflare _headers
+public/            Favicons, logo, social images (og.png, og/<language>.png and og/book.jpg), manifest,
+                   robots.txt, Cloudflare _headers, and book/reya-kurmanci.pdf (Hevalo's book)
 src/
+  assets/book/     Hevalo's book, as scripts/book.mjs brings it in: book.json (the edition), text.json
+                   (each page's words) and pages/ (every page at 720 and 1440 pixels, WebP)
   assets/brand/    The Zagrosian logos (black, white and lifted: source PNGs, traced SVGs and WebP
                    sizes), the 21-ray sun, the
                    Hevalo app icon and (deer/) its 3D deer's layers
   assets/fonts/    Inter subset with the Turkish and Kurmanji letters Ğ ğ İ Ş ş
   components/      Header, Footer, Hero, Story, ProductShowcase, About, Faq, Contact,
-                   CommandMenu, LanguagePicker, LanguageSuggestion, ThemeSwitch, …
+                   CommandMenu, LanguagePicker, LanguageSuggestion, ThemeSwitch, …, and the book's
+                   page: BookPage, BookReader, BookLeaf, BookContents, BookDownload, BookPageText
   content/legal/   Legal pages in Markdown, one folder per language
   i18n/            locales.ts (the languages), index.ts (URL helpers) and messages/ (the text)
   layouts/         BaseLayout (document, SEO and structured data), LegalLayout (legal pages),
                    NoticeLayout (404)
-  lib/             structured-data.ts (JSON-LD), pages.ts (Markdown versions and llms.txt) and
-                   faq.ts (the questions and answers, with their links)
-  pages/           English pages at the root, other languages under [lang]/; sitemap.xml, llms.txt,
+  lib/             structured-data.ts (JSON-LD), pages.ts (Markdown versions and llms.txt),
+                   faq.ts (the questions and answers, with their links) and book.ts (the book's edition)
+  pages/           English pages at the root (index, book and the legal pages), other languages under [lang]/; sitemap.xml, llms.txt,
                    llms-full.txt, the Markdown versions ([page].md.ts) and .well-known/security.txt
   scripts/         site.ts (header, site menu, section highlighting, scroll reveals, copy button,
                    local time, legal page tools), command.ts (quick navigation), motion.ts,
                    story.ts (the homepage story), eyes.ts and deer.ts
                    (Hevalo's eyes, and the 3D deer's blinks and twitches), sound.ts, text.ts,
-                   language.ts, theme.ts and theme-init.js
+                   language.ts, theme.ts and theme-init.js; book.ts, book-turn.ts and book-zoom.ts
+                   (the book's reader)
   styles/          Fonts, design tokens and base styles
   site.ts          Facts that are the same in every language
 worker/            The small Worker in front of the static files: http to https, www to the bare
@@ -150,7 +157,8 @@ worker/            The small Worker in front of the static files: http to https,
 - **One colour, and one ornament:** the pages are black and white, with their words, the logo, the
   sun and the product. The one colour is late sun through a window, in broad soft beams, from the photographs
   of Hevalo's kilims (`--color-sun` and `--sun` in `global.css`): a faint patch of it on the wall
-  behind the hero's logo, the light the rug lies in, and the last of it across the footer's wordmark.
+  behind the hero's logo and, still, behind Hevalo's book, the light the rug lies in, and the last of
+  it across the footer's wordmark.
   The one ornament is the rug. There are no photographs yet (see [TODO.md](TODO.md)).
 - **Rug** (`src/assets/rug/rug.webp`): a pile rug after those of Bijar and Senneh, Kurdish weaving
   towns in the Zagros: a madder field, a lobed indigo medallion with pendants, ivory corners, an
@@ -379,7 +387,10 @@ the Web Animations API, IntersectionObserver and a single requestAnimationFrame 
 
 Rules the code follows:
 
-- Only `transform`, `opacity` and colour change, so animations stay smooth on the compositor.
+- Only `transform`, `opacity` and colour change, so animations stay smooth on the compositor. (One
+  exception, which is never seen: a turning leaf of Hevalo's book changes its stacking order once, at
+  the moment it stands on its edge, so leaves that overlap lie in the right order; see
+  [`book-turn.ts`](src/scripts/book-turn.ts).)
 - Everything is visible without JavaScript, and nothing moves when the visitor has turned on
   *reduce motion*.
 - No HTML is generated in the browser and no `style` attributes are written (styles are set through
@@ -449,6 +460,102 @@ reduced motion, and the site works fully without it.
   last like a card laid on top while the old one sinks back and darkens. Every page shares the
   header, footer, menu, theme and sound, so they behave the same everywhere.
 
+## Hevalo's book
+
+[`/book`](https://zagrosian.com/book) (and `/de/book`, `/ar/book`, …) carries *Rêya Kurmancî*,
+Hevalo's free course book: twelve chapters of Kurmanji with English beside every line, with Hamo,
+Xezal and Hevalo and their drawings. It can be read on the page, page by page, and downloaded as a
+PDF (`public/book/reya-kurmanci.pdf`, saved as `Reya-Kurmanci-Pirtuka-Hevalo.pdf`), printed by the
+same code as hevalo.app's own download; which chapters it holds is the owner's decision (see
+[TODO.md](TODO.md)). The site's menu, footer, quick navigation and the products section link to it.
+
+- **The page** ([`BookPage.astro`](src/components/BookPage.astro)): the title (in Kurmanji in every
+  language, like the motto) with what it means, a line on what the book is, the download with its
+  size and pages (and, in an app's own browser, which often cannot download, a line under it saying
+  to open the page in the browser), and on a wide screen the cover beside them, which opens the
+  reader; then the book, what is inside it (also the contents without JavaScript), the download
+  again, and a note with the edition's date and how the book may be used.
+- **The reader** ([`BookReader.astro`](src/components/BookReader.astro),
+  [`book.ts`](src/scripts/book.ts)): the closed book shows its cover alone in the middle; opened, two
+  pages lie side by side where the stage is at least 600 pixels wide and wider than tall (decided by a
+  container query; on a phone on its side too, each page as tall as one alone would be) and one at a
+  time where it is not, 16 pixels from a phone's edges, clear of its back gesture. On a phone on its
+  side the bars are one row under the book, so the book and its controls fit the screen.
+  - **Turning:** the arrows under the book, the arrow keys (also before the book has the focus, while
+    it is at least half in view; Page Up and Down and the space bar too once it has the focus), a
+    sideways swipe on a trackpad (one page a swipe, never the browser's Back), a click on a page, a
+    tap at its outer edge, or the page drawn across by hand, its edge kept under the finger (on past a
+    third of the way or with a flick, back otherwise). Quick clicks each count, up to eight waiting;
+    a key held down turns at the pace of the leaves and stops when it is let go. `[` and `]` (also
+    typed with AltGr) and the contents go a chapter at a time, the slider (with the chapters marked)
+    straight to a page.
+  - **A turn** is a leaf of paper in 3D ([`book-turn.ts`](src/scripts/book-turn.ts),
+    [`BookLeaf.astro`](src/components/BookLeaf.astro)), in 550 ms: it comes off the page in the
+    frame it is asked for (the next pages' pictures are fetched and decoded ahead), crosses and
+    settles; two pieces hinged so it curls as it lifts, leads across and trails as it lands; a light
+    along the fold; the page under it coming out of its shadow; and, with sound on, the paper's
+    rustle. One page at a time it turns about the page's left edge to just past standing on it, its
+    way spread over the turn, and fades as it goes over, so the whole of its movement is on the
+    screen. There is room above and below the pages for a leaf that grows as it comes nearer. Under a
+    mouse the corner of the page lifts as the pointer comes near (about 20 degrees, curling), as the
+    rug's does.
+  - **Zoom** (1.5, 2 and 3 times; a double tap on a phone) lays the pages out larger and scrolls
+    ([`book-zoom.ts`](src/scripts/book-zoom.ts)), with a finger either way; the zoom stays as the pages
+    turn, each new page shown from its top left, and a tap at the edge or a swipe beyond it turns the
+    page once the pages are scrolled to that edge. The browser's own pinch is never taken.
+  - **The text view** shows the whole book as text, in the legal pages' reading style, with the bars
+    following the page being read (its number, its chapter, the slider and the address); the slider
+    takes the text to a page. **Full view** lays the book over the whole window, the site's header
+    included, with the focus going round its own controls as in a dialog.
+  - On a touch screen a hint takes the place of the bar under the book for a few seconds once the
+    book is in view ("Tap the edges or swipe to turn", "Double-tap to zoom"); the keyboard's keys are
+    shown for a few seconds when the book takes the keyboard's focus, and the focus is drawn round the
+    pages open. The address follows the page (`#page-12`, `#chapter-3`) without filling the history.
+    The sound card steps aside once the book is in view. Numbers are written in the page's own digits
+    as the build wrote them (`data-digits`), whatever the browser's own formats know.
+- **Its rules:** every page is in the HTML as an article with its number as a heading, its picture
+  (`alt=""`) and its words as text, Kurmanji marked `lang="ku"`, so screen readers, search engines
+  and translation tools read the book; only the pages open are displayed, so a screen reader is on
+  them, and the turning leaves are hidden from it. A control that cannot be used for the moment (Next
+  on the last page) says so (`aria-disabled`) and keeps the focus. Reading never waits for a leaf: a
+  turn waits at most 120 ms for pictures not fetched yet, and if turning fails the page simply
+  changes; if the reader cannot start, the page shows the column of pages it shows without
+  JavaScript. With *reduce motion*, zoomed in or in the text view, pages change at once. Only the
+  cover's picture loads with the page; the next pages' follow once it is in. A picture that will not
+  load (offline, or a new edition published under the reader) brings a note with a way to reload.
+  Nothing is stored: there is no "keep my place" (see [TODO.md](TODO.md)).
+- **Its files:** every page is a picture at 720 and 1440 pixels (WebP), imported as assets so they are
+  fingerprinted under `/_astro/` and cached for a year; their words are in `text.json`, a row of the
+  page as one line ("1 · Silav · Hello · 9"), without the page's furniture or its number badges. The
+  build stops if a picture, a chapter's name in any language, or a plural form for "192 pages" is
+  missing, or if the PDF is not the size the edition says ([`src/lib/book.ts`](src/lib/book.ts)). The
+  PDF is served as an attachment, kept out of search results, in Kurmanji and English
+  (`public/_headers`), and is never prerendered (`speculation-rules.json`). The book has its own
+  social image (`public/og/book.jpg`, a JPEG of about 80 KB, well under what chat apps show a preview
+  for) and structured data (a `Book` with its PDF and its chapters, published on the day of its first
+  edition here, `book.published` in `src/site.ts`, and modified with each edition since).
+
+**A new edition**, after the book changes in Hevalo:
+
+1. In Hevalo's repository, export it: `npm run book:export --workspace api -- --out <dir>` (every
+   chapter written so far; add chapter numbers to export only those, and it says which of them are
+   not written yet). It checks that every word a PDF reader finds on each page is in the words it
+   took, and prints the pages, the pictures' weight and the edition. It needs poppler (`apt-get install
+   poppler-utils`, or `brew install poppler`). Export every edition on the same machine: another
+   version of poppler or of the WebP encoder draws the same pages a little differently, and every
+   picture would change.
+2. Here, bring it in: `node scripts/book.mjs <dir>` ([`scripts/book.mjs`](scripts/book.mjs)). It
+   checks the edition and stops at anything wrong, does nothing if the pages, the words and the PDF
+   are the ones already here (the edition's name says so: it is a hash of all three, the PDF without
+   the moment it was printed), and otherwise replaces `src/assets/book/` whole, copies the PDF to
+   `public/book/`, says which pages changed and draws `public/og/book.jpg` again (in a headless
+   browser, as `logo-shadows.mjs` does).
+3. If a chapter was added or renamed, add its name to `book.chapters` in every message file (the build
+   says which are missing). Then `npm run build` and `npm test`, and commit the edition with the code.
+
+Each edition adds about 45 MB to the repository (the pictures and the PDF); keep editions few, and if
+it grows, move the pictures to R2 on the same origin.
+
 ## Readable by machines
 
 Besides the pages themselves, the site describes itself in formats that search engines, AI assistants
@@ -475,10 +582,12 @@ and other tools read directly:
   (`<meta name="robots" content="… max-image-preview:large, max-snippet:-1 …">`).
 - **Markdown versions:** every page, in every language, is also published as Markdown (`/index.md`,
   `/privacy.md`, `/de/index.md`, `/de/privacy.md`, …) and linked from the page with
-  `<link rel="alternate" type="text/markdown">`.
+  `<link rel="alternate" type="text/markdown">`. Hevalo's book in English (`/book.md`) has its whole
+  text, page by page; the other languages introduce it and link there.
 - **llms.txt:** [`/llms.txt`](https://zagrosian.com/llms.txt) is a short overview for language models
   in the [llms.txt](https://llmstxt.org) format, with links to every language, and `/llms-full.txt` has
-  the text of every English page in one file. Both are built from the same content as the pages
+  the text of every English page in one file (for Hevalo's book, its introduction and contents; the
+  whole book is in `/book.md`). Both are built from the same content as the pages
   ([`src/lib/pages.ts`](src/lib/pages.ts)).
 - **Sitemap, robots.txt, web app manifest and security.txt** complete the picture. `robots.txt`
   welcomes every crawler, AI assistants included, and points them to `llms.txt`, `llms-full.txt` and
@@ -554,7 +663,9 @@ pages are fully static and every language can be indexed.
 - **Right to left:** Arabic, Sorani and Persian pages set `dir="rtl"`. Layout uses logical CSS properties, so
   it mirrors by itself; arrows flip, and Arabic script gets no letter-spacing and taller lines. Latin
   text inside them (brand names, email addresses, the Kurmanji motto) keeps its own direction and
-  spacing.
+  spacing. The one exception to arrows flipping is Hevalo's book: it is a book in Kurmanji, read left
+  to right, so its pages, its slider and the arrows under it keep left to right on every page (next is
+  on the right and points right), while its other controls follow the page.
 - **Persian:** written in formal Persian with Persian letters (ی، ک), zero-width non-joiners where
   Persian needs them (می‌کنیم، داده‌ها) and Persian digits. Dates use the Solar Hijri calendar, with the
   Gregorian date of the English original in brackets on legal pages. Browsers set to Dari (`prs`) are
@@ -613,12 +724,13 @@ as Cloudflare serves it, with the headers from `public/_headers`
 | `accessibility.spec.ts` | Every page and 404 page in every language, light and dark, on a computer and a phone, with [axe](https://github.com/dequelabs/axe-core) against WCAG 2.2 AA and its best practices |
 | `layout.spec.ts`        | Every page at six widths from 320 to 1920 pixels: nothing runs off the screen or is cut off, and everything you tap is at least 24 by 24 pixels |
 | `seo.spec.ts`           | Every built page's title, description, canonical URL, alternate languages, main heading and structured data; the 404 pages are kept out of search; the sitemap lists every page |
-| `stability.spec.ts`     | No layout shift while the homepage loads, or while it is scrolled down and up, left to right and right to left |
+| `stability.spec.ts`     | No layout shift while the homepage or Hevalo's book loads, or while the homepage is scrolled down and up, left to right and right to left |
 | `interactions.spec.ts`  | The language menu, the language suggestion, the site menu on a phone, the theme (chosen in the menu) and Share |
 | `menu.spec.ts`          | The site menu is in the page's colours in both themes, also when opened over the story; nothing in it or the language menu overlaps, runs off or is cut off, in any language or with every word 40% longer, at six widths |
 | `deer.spec.ts`          | The deer climbs out of its icon as it scrolls into view, and back in |
 | `rug.spec.ts`           | The rug lies there, can be folded with a mouse and picked up by pressing and holding, lies straight again when scrolled away and back, and lies still with reduced motion |
 | `plane.spec.ts`         | The paper plane stays under the rug until it is found; found, it flies to the proverb and back, on a computer and a phone, landing with the sheet whole on the screen, without the page scrolling sideways; the proverb stays in the page; the button lifts the rug |
+| `book.spec.ts`          | Hevalo's book: the cover alone in the middle, then two pages on a computer and one on a phone; turning by button, key (also before the book has the focus), quick clicks that each count, click, drag (on past a third, back before it), swipe and tap; chapters by key (also with AltGr) and contents; the focus kept on the last page; the address and the status; at once with reduced motion; right to left, in the page's own digits; zoom with the sharper picture, and moved sideways by a finger; the text view with its bar following the page read; full view over the header, keeping the focus; the hint on a narrow phone in Kurmanji; the few pictures fetched, all from the site; the download under its name, also from the phone's bar; without JavaScript; a missing picture and a reader that cannot start |
 
 ```sh
 npm run build
@@ -629,7 +741,7 @@ npx playwright test tests/seo.spec.ts  # one file
 The first time, install the browser with `npx playwright install chromium`. `npm test` starts the
 server itself, on port 8788.
 
-On every push, GitHub Actions runs the same tests, and Lighthouse on five pages
+On every push, GitHub Actions runs the same tests, and Lighthouse on seven pages
 ([`.github/workflows/checks.yml`](.github/workflows/checks.yml)). Accessibility, best practices and
 SEO must score 100 ([`lighthouserc.json`](lighthouserc.json)); a performance score under 90 is reported
 as a warning, as the machines GitHub runs it on vary in speed. When a run fails, its report is kept with

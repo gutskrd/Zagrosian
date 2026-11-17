@@ -1,0 +1,53 @@
+---
+/**
+ * The words of one page of Hevalo's book, as text: what a screen reader,
+ * search engine or translation tool reads instead of the page's picture, and
+ * what the reader's text view shows. The book's own headings are h4 (under
+ * the page's h3), its Kurmanji is marked `lang="ku"` (the rest is English,
+ * the language of the block around it), and a speaker is set in bold before
+ * what they say, on the same line. A row of the page reads as one line, its
+ * pieces apart by " · " ("1 · Silav · Hello · 9").
+ */
+import type { TextBlock, TextSpan } from '../lib/book';
+
+interface Props {
+  blocks: TextBlock[];
+}
+
+const { blocks } = Astro.props;
+
+// A speaker and the line after it are one paragraph. What stands on one row
+// of the page is one block already (Hevalo's export joins it), and the
+// export leaves the book's number badges out; a badge that still came
+// through (a number alone, set as a label) says nothing, and is left out too.
+const badge = (block: TextBlock) => block.kind === 'label' && /^[\d\s]+$/.test(block.spans.map((span) => span.text).join(''));
+type Row = { kind: TextBlock['kind']; spans: TextSpan[]; speaker?: TextSpan[] };
+const rows: Row[] = [];
+for (let i = 0; i < blocks.length; i++) {
+  const block = blocks[i]!;
+  if (badge(block)) continue;
+  const next = blocks[i + 1];
+  if (block.kind === 'speaker' && next && next.kind === 'text') {
+    rows.push({ kind: 'text', spans: next.spans, speaker: block.spans });
+    i += 1;
+  } else rows.push({ kind: block.kind, spans: block.spans });
+}
+---
+
+{
+  rows.map((row) => {
+    const Tag = row.kind === 'heading' ? 'h4' : 'p';
+    return (
+      <Tag class:list={[row.kind === 'label' && 'book__label', row.kind === 'speaker' && 'book__label']}>
+        {row.speaker && (
+          <>
+            <b>
+              {row.speaker.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
+            </b>{' '}
+          </>
+        )}
+        {row.spans.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
+      </Tag>
+    );
+  })
+}

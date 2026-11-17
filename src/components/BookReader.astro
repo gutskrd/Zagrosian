@@ -1,0 +1,1453 @@
+---
+/**
+ * Hevalo's book to read on the page, as a book: the cover alone, then two
+ * pages side by side where the screen is wide enough and one at a time where
+ * it is not, turned like paper (src/scripts/book.ts, book-turn.ts and
+ * book-zoom.ts).
+ *
+ * Everything is in the HTML from the start, in order: each of the book's
+ * pages is an article with its number as a heading, its picture (alt="",
+ * because its words follow it) and its words as text (BookPageText), Kurmanji
+ * marked as such. Without JavaScript that is what the page shows: a column of
+ * pages, loaded as they come into view. With it (the theme script marks the
+ * page before the first paint, so the layout is final from the start), only
+ * the pages open in front of the reader are displayed, so a screen reader
+ * meets them and no others, and their pictures alone are downloaded.
+ *
+ * The stage describes the physical book and runs left to right in every
+ * language: page 1 is on the right, the next page is to the right, and the
+ * arrows and the slider under it point the way the pages go. The rest of the
+ * controls follow the page's own direction.
+ *
+ * Styles are global (`is:global`): the reader builds the copies of pages it
+ * turns with the DOM API, and they must be styled as the pages are.
+ */
+import { format, i18n } from '../i18n';
+import { book, chapterName, chapters, formatNumber, pageSizes, pages, type BookPage } from '../lib/book';
+import { hevalo, kurdish } from '../site';
+import Arrow from './Arrow.astro';
+import BookContents from './BookContents.astro';
+import BookDownload from './BookDownload.astro';
+import BookLeaf from './BookLeaf.astro';
+import BookPageText from './BookPageText.astro';
+
+const { locale, t } = i18n(Astro.url);
+
+// The page's own digits, as the build writes numbers: the reader writes the numbers it changes with them.
+const digits = Array.from({ length: 10 }, (_, d) => formatNumber(locale, d)).join('');
+
+const label = (page: BookPage) => {
+  if (page.chapter) return format(t.book.chapterLabel, { n: formatNumber(locale, page.chapter.number), name: chapterName(locale, page.chapter) });
+  return page.section ? t.book.sections[page.section.key] : '';
+};
+const short = (page: BookPage) => (page.chapter ? `${formatNumber(locale, page.chapter.number)} · ${page.chapter.titleKu}` : label(page));
+const heading = (page: BookPage) => {
+  const number = format(t.book.pageLabel, { n: formatNumber(locale, page.n) });
+  return page.opens ? `${number}. ${label(page)}` : number;
+};
+// The slider's chapter marks, by where each chapter begins along the book.
+const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.start - 1) / (book.pageCount - 1)) * 100).toFixed(2)}%` }));
+---
+
+<section
+  class="book"
+  id="reader"
+  aria-labelledby="book-reader-title"
+  data-book
+  data-closed
+  data-digits={digits}
+  data-page-count={book.pageCount}
+  data-counter-spread={t.book.counterSpread}
+  data-counter-page={t.book.counterPage}
+  data-counter-short={t.book.counterShort}
+  data-status={t.book.status}
+  data-end-title={t.book.endTitle}
+  data-cover-label={t.book.sections.cover}
+>
+  <h2 id="book-reader-title" class="visually-hidden">{t.book.readerTitle}</h2>
+
+  <div class="book__body">
+  <div class="book__bar book__bar--start">
+    <button class="book__button book__where" type="button" popovertarget="book-contents">
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3.5 5h13M3.5 10h13M3.5 15h8"></path></svg>
+      <span class="visually-hidden">{t.book.contents}:</span>
+      <span class="book__where-text" data-book-where>{t.book.sections.cover}</span>
+      <svg class="book__chevron" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 4.5 6 7.5l3-3"></path></svg>
+    </button>
+  </div>
+
+  <div class="book__bar book__bar--end">
+    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="out" aria-disabled="true">
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.25"></circle><path d="M12.5 12.5l4 4M6 8.5h5"></path></svg>
+      <span class="visually-hidden">{t.book.zoomOut}</span>
+    </button>
+    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="in">
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.25"></circle><path d="M12.5 12.5l4 4M6 8.5h5M8.5 6v5"></path></svg>
+      <span class="visually-hidden">{t.book.zoomIn}</span>
+    </button>
+    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="fit" aria-disabled="true">
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 3.5v4h-4M12.5 3.5v4h4M16.5 12.5h-4v4M3.5 12.5h4v4"></path></svg>
+      <span class="visually-hidden">{t.book.fit}</span>
+    </button>
+    <button class="book__button book__text-toggle" type="button" aria-pressed="false" data-book-text-toggle>
+      {/* a page of text, so it does not look like the contents' list */}
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h6.25l3 3v11.5H5.5zM11.75 2.75v3h3M8 9.5h4.5M8 12.25h4.5M8 15h2.75"></path></svg>
+      <span class="book__label-text" aria-hidden="true">{t.book.textView}</span>
+      <span class="visually-hidden">{t.book.textView}</span>
+    </button>
+    <button class="book__button book__full-toggle" type="button" aria-pressed="false" data-book-full-toggle>
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3.5 7.5v-4h4M12.5 3.5h4v4M16.5 12.5v4h-4M7.5 16.5h-4v-4"></path></svg>
+      <span class="book__label-text" aria-hidden="true">{t.book.fullView}</span>
+      <span class="visually-hidden">{t.book.fullView}</span>
+    </button>
+    <BookDownload variant="small" class="book__wide" />
+    <BookDownload variant="icon" class="book__narrow" />
+  </div>
+
+  <div class="book__frame">
+    <div class="book__stage" tabindex="0" role="group" aria-label={kurdish.book} aria-describedby="book-keys" dir="ltr" data-book-stage>
+      <div class="book__spread" data-book-spread>
+        <div class="book__edges" aria-hidden="true">
+          <span class="book__edge book__edge--left"></span>
+          <span class="book__edge book__edge--right"></span>
+        </div>
+        <ol class="book__pages" data-book-pages>
+          {
+            pages.map((page) => (
+              <li
+                id={`page-${page.n}`}
+                class="book__page"
+                data-n={page.n}
+                data-side={page.side}
+                data-chapter={page.chapter?.number}
+                data-label={label(page)}
+                data-short={short(page)}
+                data-shown={page.n === 1 ? '' : undefined}
+              >
+                <article class="book__sheet" aria-labelledby={`page-${page.n}-title`}>
+                  <h3 id={`page-${page.n}-title`} class="visually-hidden book__page-title">
+                    {heading(page)}
+                  </h3>
+                  {page.opens && <span id={`chapter-${page.opens.number}`} class="book__anchor" />}
+                  <div class="book__paper">
+                    <img
+                      src={page.images[720].src}
+                      srcset={`${page.images[720].src} 720w, ${page.images[1440].src} 1440w`}
+                      sizes={pageSizes}
+                      width="720"
+                      height={page.images[720].height}
+                      alt=""
+                      loading={page.n === 1 ? 'eager' : 'lazy'}
+                      fetchpriority={page.n === 1 ? 'high' : undefined}
+                      decoding="async"
+                      draggable="false"
+                    />
+                  </div>
+                  <div class="book__text visually-hidden" dir="ltr" lang="en">
+                    <BookPageText blocks={page.blocks} />
+                  </div>
+                </article>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="book__end" data-book-end>
+          <p class="book__end-title">{t.book.endTitle}</p>
+          <BookDownload />
+          <a class="book__end-link" href={hevalo.url}>
+            {t.book.endLearn}
+            <Arrow direction="up-right" />
+          </a>
+          <a class="book__end-link" href="#page-1" data-book-jump="1">
+            {t.book.backToStart}
+          </a>
+        </div>
+        <div class="book__leaves" aria-hidden="true" inert data-book-leaves>
+          <div class="book__hold" data-hold="left"></div>
+          <div class="book__hold" data-hold="right"></div>
+          <div class="book__cast" data-book-cast></div>
+          <BookLeaf />
+          <BookLeaf />
+          <BookLeaf />
+        </div>
+      </div>
+      <div class="book__notice" role="alert" data-book-notice hidden>
+        <p>{t.book.loadFailed}</p>
+        <button class="book__button book__button--solid" type="button" data-book-reload>{t.book.reload}</button>
+      </div>
+    </div>
+    <p id="book-keys" class="book__keys">{t.book.keysHint}</p>
+  </div>
+
+  <div class="book__bar book__bar--nav" dir="ltr">
+    <button class="book__button book__button--round" type="button" data-book-prev aria-disabled="true">
+      <Arrow direction="left" />
+      <span class="visually-hidden">{t.book.previous}</span>
+    </button>
+    <div class="book__scrub" data-book-scrub>
+      <svg class="book__marks" aria-hidden="true" focusable="false">
+        {marks.map((mark) => <rect x={mark.x} y="0" width="1" height="100%" data-mark={mark.n} />)}
+      </svg>
+      <input
+        class="book__range"
+        type="range"
+        dir="ltr"
+        min="0"
+        max={Math.ceil(book.pageCount / 2)}
+        step="1"
+        value="0"
+        aria-label={t.book.slider}
+        aria-valuetext={format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}
+        data-book-range
+      />
+      <span class="book__bubble" aria-hidden="true" data-book-bubble></span>
+    </div>
+    <p class="book__counter" aria-hidden="true" data-book-counter>
+      <bdi class="book__counter-short" data-book-counter-short>{format(t.book.counterShort, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}</bdi>
+      <bdi class="book__counter-long" data-book-counter-long>{format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}</bdi>
+    </p>
+    <button class="book__button book__button--round" type="button" data-book-next>
+      <Arrow direction="right" />
+      <span class="visually-hidden">{t.book.next}</span>
+    </button>
+    {/* For a moment on a touch screen, over the bar under the book: how to turn and zoom. */}
+    <p class="book__hint" dir="auto" data-book-hint hidden>
+      <span>{t.book.swipeHint}</span>
+      <span>{t.book.zoomHint}</span>
+    </p>
+  </div>
+  </div>
+
+  <p class="visually-hidden" role="status" data-book-status></p>
+
+  <nav id="book-contents" class="book__menu" popover aria-label={t.book.contents}>
+    <div class="book__menu-head">
+      <p class="book__menu-title">{t.book.contents}</p>
+      <button class="book__button book__button--round" type="button" popovertarget="book-contents" popovertargetaction="hide">
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5 5 15"></path></svg>
+        <span class="visually-hidden">{t.common.close}</span>
+      </button>
+    </div>
+    <BookContents variant="menu" />
+    <div class="book__menu-foot">
+      <BookDownload variant="small" />
+    </div>
+  </nav>
+</section>
+
+<script>
+  import { initBook } from '../scripts/book';
+
+  initBook();
+</script>
+
+<style is:global>
+  /* ==========================================================================
+     The reader (BookReader.astro)
+     ========================================================================== */
+
+  .book {
+    /* A page is 419.53 by 595.28 points (A5): its width over its height. */
+    --page-ratio: 0.70476;
+    /* The book's own paper, under the pictures while they load. */
+    --paper: #fbf6ec;
+    /* What the bars outside the stage take of the screen's height. */
+    --book-bars: 4.25rem;
+    /* Room above and below the pages, for a leaf that grows as it comes nearer mid-turn. */
+    --room-y: 1.75rem;
+    /* The least the stage is tall, whatever the screen. */
+    --stage-min: 360px;
+    position: relative;
+    container: reader / inline-size;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  /* ---- Without JavaScript: the pages in a column ---- */
+
+  .book__stage {
+    position: relative;
+  }
+
+  .book__stage:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .book__pages {
+    display: grid;
+    gap: 1.5rem;
+    width: min(100% - 2rem, 45rem);
+    margin-inline: auto;
+  }
+
+  .book__paper {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.08),
+      0 18px 40px -22px rgb(0 0 0 / 0.45);
+  }
+
+  .book__paper img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* The paper in the dark theme: dimmed a little, never inverted. */
+  :root[data-theme='dark'] .book__paper::after,
+  :root[data-theme='dark'] .leaf__page::after,
+  :root[data-theme='dark'] .book__hold-page::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  .book__end {
+    display: grid;
+    justify-items: start;
+    align-content: center;
+    gap: 1.25rem;
+    width: min(100% - 2rem, 45rem);
+    margin: 2.5rem auto 0;
+  }
+
+  .book__end-title {
+    font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.875rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .book__end-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .book__end-link:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--color-underline);
+    }
+  }
+
+  .book__anchor {
+    position: absolute;
+  }
+
+  .book__bar,
+  .book__leaves,
+  .book__edges,
+  .book__keys {
+    display: none;
+  }
+
+  /* ---- The book, paged (when the reader's script can run) ---- */
+
+  :root[data-theme] .book:not([data-book='off']) {
+    --book-bars: 6.5rem;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'start end'
+      'stage stage'
+      'nav nav';
+    /* The keyboard goes through the bars and the book in the order they stand, in every layout below. */
+    reading-flow: grid-rows;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    padding-inline: 1rem;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__bar--start {
+    grid-area: start;
+    height: 3.25rem;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__bar--end {
+    grid-area: end;
+    justify-content: flex-end;
+    height: 3.25rem;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__bar--nav {
+    position: relative;
+    grid-area: nav;
+    height: 3.25rem;
+    gap: 0.5rem;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__frame {
+    grid-area: stage;
+    position: relative;
+  }
+
+  /* The stage: as tall as the screen leaves under the header and the bars,
+     and a container, so the book is sized to it and two pages lie open
+     where there is room for them. */
+  :root[data-theme] .book:not([data-book='off']) .book__stage {
+    display: flex;
+    height: max(var(--stage-min), calc(100svh - var(--header-height) - var(--book-bars)));
+    /* A turning leaf may reach a little past the stage, rather than be cut off flat. */
+    overflow: clip;
+    overflow-clip-margin: 1.5rem;
+    container: book / size;
+    touch-action: pan-y pinch-zoom;
+    /* A sideways swipe on a trackpad turns a page (book.ts), never the browser's history. */
+    overscroll-behavior-x: none;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  /* The focus is drawn round the pages open, not round the whole stage. */
+  :root[data-theme] .book:not([data-book='off']) .book__stage:focus-visible {
+    outline: none;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__spread::after {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    inset: -0.5rem;
+    /* closed, only the cover is there to be drawn round */
+    inset-inline-start: calc(var(--page-w) * var(--book-spread) * var(--closed, 0) - 0.5rem);
+    border-radius: 0.375rem;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  :root[data-theme] .book[data-closed]:not([data-book='off']) {
+    --closed: 1;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__stage:focus-visible .book__spread::after {
+    outline: 2px solid var(--focus-ring);
+    visibility: visible;
+  }
+
+  /* On a phone the stage hugs the page, so the bars sit close to it. */
+  @container reader (max-width: 599.98px) {
+    :root[data-theme] .book:not([data-book='off']) .book__stage {
+      height: max(
+        var(--stage-min),
+        min(calc(100svh - var(--header-height) - var(--book-bars)), calc((100cqw - 2rem) / var(--page-ratio) + 2 * var(--room-y)))
+      );
+    }
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__spread {
+    --book-spread: 0;
+    --page-h: calc(min(calc(100cqh - 2 * var(--room-y)), calc((100cqw - 2rem) / var(--page-ratio))) * var(--zoom, 1));
+    --page-w: calc(var(--page-h) * var(--page-ratio));
+    position: relative;
+    flex: none;
+    width: calc(var(--page-w) * (1 + var(--book-spread)));
+    height: var(--page-h);
+    margin: auto;
+    transition: none;
+  }
+
+  /* A mouse can click a page to turn it. */
+  @media (hover: hover) and (pointer: fine) {
+    :root[data-theme] .book:not([data-book='off'], [data-zoom], [data-text]) .book__spread {
+      cursor: pointer;
+    }
+  }
+
+  /* Two pages side by side: where the stage is at least 600 pixels wide and wider than it is tall (on a phone on
+     its side too, where it is not tall: each page is as tall as one alone would be). */
+  @container book (min-width: 600px) and (min-aspect-ratio: 5/4) {
+    :root[data-theme] .book:not([data-book='off']) .book__spread {
+      --book-spread: 1;
+      --page-h: calc(min(calc(100cqh - 2 * var(--room-y)), calc((100cqw - 4rem) / 2 / var(--page-ratio))) * var(--zoom, 1));
+    }
+  }
+
+  /* The closed book: the cover alone, in the middle (it glides across as it opens). */
+  :root[data-theme] .book[data-closed]:not([data-book='off']) .book__spread {
+    transform: translateX(calc(var(--page-w) * var(--book-spread) * -0.5));
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__pages {
+    display: block;
+    width: auto;
+    margin: 0;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__page,
+  :root[data-theme] .book:not([data-book='off']) .book__end {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--page-w);
+    height: var(--page-h);
+    margin: 0;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) :is(.book__page[data-side='right'], .book__end) {
+    left: calc(var(--page-w) * var(--book-spread));
+  }
+
+  :root[data-theme] .book:not([data-book='off']) :is(.book__page, .book__end):not([data-shown]) {
+    display: none;
+  }
+
+  /* While a page turns, what is seen is drawn by the leaves and the copies under them; the pages stay readable to assistive technology. */
+  :root[data-theme] .book[data-turning]:not([data-book='off']) :is(.book__page, .book__end) {
+    opacity: 0;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__sheet,
+  :root[data-theme] .book:not([data-book='off']) .book__paper {
+    height: 100%;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__paper img {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The fold in the middle: each page darkens a little towards the spine. */
+  :root[data-theme] .book:not([data-book='off']) .book__paper::before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__page[data-side='left'] .book__paper::before {
+    background: linear-gradient(to left, rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.04) 4%, transparent 9%);
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__page[data-side='right'] .book__paper::before,
+  .book__end::before {
+    background: linear-gradient(to right, rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.03) 4%, transparent 9%);
+  }
+
+  /* The closing card is a page of the book: its paper and its dark ink, in either theme (and dimmed like the pages in
+     the dark one). */
+  :root[data-theme] .book:not([data-book='off']) .book__end,
+  .leaf__page .book__end,
+  .book__hold-page .book__end {
+    --color-ink: #1f1c17;
+    --color-ink-soft: #3e3a33;
+    --color-muted: #5f594f;
+    --color-paper: var(--paper);
+    --color-line: #e6dcc8;
+    --color-line-strong: #d3c7af;
+    --color-underline: #b2a68f;
+    --color-surface: #f1e8d6;
+    --color-solid-hover: #3b372f;
+    --focus-ring: #1f1c17;
+    background: var(--paper);
+    color: var(--color-ink);
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__end {
+    align-content: center;
+    padding: clamp(1.5rem, 8%, 3rem);
+    box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.45);
+  }
+
+  :root[data-theme='dark'] .book:not([data-book='off']) .book__end::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #000;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  :root[data-theme] .book:not([data-book='off']) .book__end::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* The edges of the pages read and still to read, at the book's outer sides. */
+  :root[data-theme] .book:not([data-book='off']) .book__edges {
+    display: block;
+  }
+
+  .book__edge {
+    position: absolute;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    width: 0.375rem;
+    background: repeating-linear-gradient(90deg, #e9e1d0 0 1px, #f7f1e4 1px 2px);
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.5);
+  }
+
+  /* dimmed in the dark theme, as the pages are */
+  :root[data-theme='dark'] .book__edge {
+    background: repeating-linear-gradient(90deg, #cdc6b7 0 1px, #d9d4c8 1px 2px);
+  }
+
+  .book__edge--left {
+    right: 100%;
+    transform-origin: right;
+    transform: scaleX(var(--read, 0));
+  }
+
+  .book__edge--right {
+    left: 100%;
+    transform-origin: left;
+    transform: scaleX(calc(1 - var(--read, 0)));
+  }
+
+  @container book (max-width: 599.98px) {
+    .book__edges {
+      visibility: hidden;
+    }
+  }
+
+  .book[data-closed] .book__edge--left {
+    visibility: hidden;
+  }
+
+  /* ---- The leaves ---- */
+
+  :root[data-theme] .book:not([data-book='off']) .book__leaves {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .book__hold {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--page-w);
+    height: 100%;
+  }
+
+  .book__hold-stack {
+    position: absolute;
+    inset: 0;
+  }
+
+  .book__hold[data-hold='right'] {
+    left: calc(var(--page-w) * var(--book-spread));
+  }
+
+  .book__hold-page,
+  .leaf__page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--page-w);
+    height: 100%;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .book__hold-page img,
+  .leaf__page img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .leaf__page .book__end,
+  .book__hold-page .book__end {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: clamp(1.5rem, 8%, 3rem);
+  }
+
+  /* Plain paper, for the backs of pages turned one at a time and the leaves between chapters: printed lines, faintly,
+     so a riffle of them reads as pages. */
+  .leaf__page--plain {
+    background:
+      linear-gradient(rgb(40 32 20 / 0.1), rgb(40 32 20 / 0.1)) 14% 11% / 38% calc(var(--page-h) * 0.012) no-repeat,
+      repeating-linear-gradient(
+          to bottom,
+          rgb(40 32 20 / 0.065) 0 calc(var(--page-h) * 0.006),
+          transparent calc(var(--page-h) * 0.006) calc(var(--page-h) * 0.024)
+        )
+        14% 18% / 72% 68% no-repeat,
+      var(--paper);
+  }
+
+  .book__cast {
+    position: absolute;
+    top: 0;
+    left: calc(var(--page-w) * var(--book-spread));
+    width: var(--page-w);
+    height: 100%;
+    opacity: 0;
+    background: linear-gradient(to right, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.08) 45%, transparent 80%);
+  }
+
+  .book__cast[data-side='left'] {
+    left: 0;
+    background: linear-gradient(to left, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.08) 45%, transparent 80%);
+  }
+
+  /* Each leaf is drawn in 3D on its own, seen from in front of the spine, and
+     laid over the others as a flat layer (book-turn.ts orders them). */
+  .leaf {
+    position: absolute;
+    top: 0;
+    left: calc(var(--page-w) * var(--book-spread));
+    width: var(--page-w);
+    height: 100%;
+    /* far enough that a leaf on its edge grows by a seventh, within the room above and below the pages */
+    perspective: calc(var(--page-w) * 8);
+    perspective-origin: 0 50%;
+    visibility: hidden;
+  }
+
+  .leaf[data-active] {
+    visibility: visible;
+  }
+
+  .leaf__inner {
+    position: absolute;
+    inset: 0 40% 0 0;
+    transform-origin: 0 50%;
+    transform-style: preserve-3d;
+  }
+
+  .leaf__outer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 66.667%;
+    transform-origin: 0 50%;
+    transform-style: preserve-3d;
+  }
+
+  .leaf__face {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .leaf__face--back {
+    transform: rotateY(180deg);
+  }
+
+  /* Where each piece of a page is, within its face (see book-turn.ts). */
+  .leaf__face[data-face='outer-front'] .leaf__page {
+    left: calc(var(--page-w) * -0.6);
+  }
+
+  .leaf__face[data-face='inner-back'] .leaf__page {
+    left: calc(var(--page-w) * -0.4);
+  }
+
+  /* The light along the fold, and the shade of the page's own curve. */
+  .leaf__fold {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 88%;
+    width: 30%;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5) 45%, rgb(0 0 0 / 0.12) 70%, transparent);
+    transform: translateZ(0.5px);
+  }
+
+  /* ---- The controls ---- */
+
+  .book__button {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.875rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .book__button--round {
+    padding: 0;
+  }
+
+  .book__button--solid {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* Not to be used for the moment (Next on the last page), and still able to hold the focus. */
+  .book__button:is(:disabled, [aria-disabled='true']) {
+    color: var(--color-dim);
+    cursor: default;
+  }
+
+  @media (hover: hover) {
+    .book__button:not(:disabled, [aria-disabled='true'], .book__button--solid, [aria-pressed='true']):hover {
+      background: var(--color-surface);
+    }
+  }
+
+  .book__button[aria-pressed='true'] {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .book__icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .book__button .arrow {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  /* The way the pages go: on every page, next is to the right and points right. */
+  .book__bar--nav[dir='ltr'] .arrow {
+    scale: none;
+  }
+
+  .book__where {
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 0.75rem 0.875rem;
+    margin-inline-start: -0.5rem;
+  }
+
+  .book__where-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .book__chevron {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The slider: a hairline with the chapters marked on it, in a 44-pixel target. */
+  .book__scrub {
+    position: relative;
+    flex: 1;
+    min-width: 5rem;
+    height: 2.75rem;
+  }
+
+  .book__marks {
+    position: absolute;
+    top: calc(50% - 0.25rem);
+    left: 0.4375rem;
+    width: calc(100% - 0.875rem);
+    height: 0.5rem;
+    overflow: visible;
+    fill: var(--color-line-strong);
+  }
+
+  .book__range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .book__range::-webkit-slider-runnable-track {
+    height: 2px;
+    border-radius: 1px;
+    background: var(--color-line-strong);
+  }
+
+  .book__range::-moz-range-track {
+    height: 2px;
+    background: var(--color-line-strong);
+  }
+
+  .book__range::-webkit-slider-thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-top: -0.375rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-ink);
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .book__range::-moz-range-thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-ink);
+  }
+
+  .book__range:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .book__bubble {
+    position: absolute;
+    bottom: calc(100% + 0.25rem);
+    left: 0;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.5rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: var(--text-xs);
+    white-space: nowrap;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .book__scrub[data-dragging] .book__bubble {
+    visibility: visible;
+  }
+
+  .book__counter {
+    flex: none;
+    min-width: 4.5rem;
+    white-space: nowrap;
+    font-size: var(--text-xs);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    color: var(--color-muted);
+  }
+
+  /* On a narrow reader the tools are icons, each its own (the text view's a page of text, not a list like the
+     contents'); zoom is a double tap, and the download a round button. The two bars above the book share the room
+     between them, so the chapter's name has as much of it as it can. */
+  .book__wide {
+    display: none !important;
+  }
+
+  @container reader (max-width: 419.98px) {
+    .book__label-text {
+      display: none;
+    }
+
+    .book__bar--end .book__button {
+      padding: 0;
+    }
+  }
+
+  /* on the narrowest phones the contents' button holds its words a little tighter */
+  @container reader (max-width: 359.98px) {
+    .book__where {
+      gap: 0.375rem;
+      padding-inline: 0.5rem;
+    }
+  }
+
+  @container reader (max-width: 999.98px) {
+    :root[data-theme] .book:not([data-book='off']) .book__bar--start {
+      padding-inline-end: 0.25rem;
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__bar--end {
+      padding-inline-start: 0;
+    }
+  }
+
+  .book__counter-long {
+    display: none;
+  }
+
+  /* From a tablet's width, the zoom and the download join the tools, and the counter is written out. */
+  @container reader (min-width: 600px) {
+    .book__wide {
+      display: inline-flex !important;
+    }
+
+    .book__narrow {
+      display: none !important;
+    }
+
+    .book__counter-long {
+      display: inline;
+    }
+
+    .book__counter-short {
+      display: none;
+    }
+
+    .book__counter {
+      min-width: 9rem;
+    }
+  }
+
+  /* Wide: one bar under the stage, in the order the controls are used. */
+  @container reader (min-width: 1000px) {
+    :root[data-theme] .book:not([data-book='off']) .book__body {
+      grid-template-columns: minmax(min-content, 16rem) minmax(0, 1fr) auto;
+      grid-template-areas:
+        'stage stage stage'
+        'start nav end';
+      --book-bars: 4.25rem;
+      padding-inline: clamp(1rem, 0.5rem + 2vw, 3rem);
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__frame {
+      margin-inline: calc(-1 * clamp(1rem, 0.5rem + 2vw, 3rem));
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__bar {
+      height: 4.25rem;
+      padding-inline: 0;
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__bar--nav {
+      max-width: 42rem;
+      justify-self: center;
+      width: 100%;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  /* A phone on its side: one row of bars under the book, and the stage as tall as the screen leaves (full view leaves
+     more). Two pages lie open, each as tall as one alone would be. */
+  @media (orientation: landscape) and (max-height: 499.98px) {
+    :root[data-theme] .book:not([data-book='off']) {
+      --book-bars: 3.25rem;
+      --room-y: 1rem;
+      --stage-min: 12rem;
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__body {
+      grid-template-columns: minmax(0, 13rem) minmax(0, 1fr) auto;
+      grid-template-areas:
+        'stage stage stage'
+        'start nav end';
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__bar {
+      padding-inline: 0.5rem;
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__bar--nav {
+      padding-inline: 0.25rem;
+    }
+
+    .book .book__wide,
+    .book .book__label-text {
+      display: none !important;
+    }
+
+    .book .book__narrow {
+      display: inline-flex !important;
+    }
+
+    .book .book__bar--end .book__button {
+      padding: 0;
+    }
+
+    .book .book__counter-long {
+      display: none;
+    }
+
+    .book .book__counter-short {
+      display: inline;
+    }
+
+    .book .book__counter {
+      min-width: 4.5rem;
+    }
+  }
+
+  /* The keyboard's keys, shown for a few seconds when the book takes the keyboard's focus, over a page turning too. */
+  :root[data-theme] .book:not([data-book='off']) .book__keys {
+    display: block;
+    position: absolute;
+    z-index: 4;
+    top: 0.75rem;
+    left: 50%;
+    max-width: min(36rem, 100% - 2rem);
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.75rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: var(--text-xs);
+    text-align: center;
+    transform: translateX(-50%);
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  :root[data-theme] .book:not([data-book='off']):has(.book__stage:focus-visible) .book__keys {
+    visibility: visible;
+    animation: book-keys 4.5s forwards;
+  }
+
+  @keyframes book-keys {
+    0%,
+    88% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  /* For a moment on a touch screen, in the place of the bar under the book (never over the page): how to turn and
+     how to zoom. */
+  .book__hint {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    padding-inline: 1rem;
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+    font-size: var(--text-xs);
+    line-height: 1.3;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .book__hint[hidden] {
+    display: none;
+  }
+
+  .book__hint[data-going],
+  .book[data-zoom] .book__hint {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book__hint {
+      transition: none;
+    }
+  }
+
+  .book__notice {
+    position: absolute;
+    inset: auto 1rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 1rem;
+    background: var(--color-paper);
+    font-size: var(--text-sm);
+  }
+
+  /* ---- Zoomed in: the pages laid out larger, panned by scrolling (a finger moves them either way) ---- */
+
+  :root[data-theme] .book[data-zoom]:not([data-book='off']) .book__stage {
+    overflow: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y pinch-zoom;
+    cursor: grab;
+  }
+
+  :root[data-theme] .book[data-zoom]:not([data-book='off']) .book__stage[data-panning] {
+    cursor: grabbing;
+  }
+
+  /* ---- The whole book as text ---- */
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__stage {
+    display: block;
+    height: auto;
+    overflow: visible;
+    container-type: normal;
+    user-select: text;
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__spread {
+    width: min(100% - 2rem, 42rem);
+    height: auto;
+    margin: 0 auto;
+    transform: none;
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__page, .book__end) {
+    display: block;
+    position: static;
+    width: auto;
+    height: auto;
+    opacity: 1;
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__paper, .book__leaves, .book__edges, .book__hint) {
+    display: none;
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__spread::after {
+    content: none;
+  }
+
+  /* The controls stay at hand while the text scrolls. */
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__bar {
+    position: sticky;
+    z-index: 2;
+    background: var(--color-paper);
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
+    top: var(--header-height);
+  }
+
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__bar--nav {
+    bottom: 0;
+  }
+
+  @container reader (min-width: 1000px) {
+    :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
+      top: auto;
+      bottom: 0;
+    }
+  }
+
+  .book[data-text] .book__page + .book__page {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .book[data-text] :is(.book__text, .book__page-title).visually-hidden {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+
+  .book[data-text] .book__page-title {
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+
+  .book[data-text] .book__text {
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+
+  .book[data-text] .book__text > * + * {
+    margin-top: 0.625rem;
+  }
+
+  .book[data-text] .book__text [lang='ku'] {
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .book[data-text] .book__text h4 {
+    margin-top: 1.25rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+
+  .book[data-text] .book__text b,
+  .book[data-text] .book__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 450;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+  }
+
+  .book[data-text] .book__end::before {
+    display: none;
+  }
+
+  .book[data-text] .book__end {
+    margin-top: 3rem;
+    padding: 2rem 0 0;
+    border-top: 1px solid var(--color-line);
+    background: none;
+    box-shadow: none;
+  }
+
+  /* ---- Full view: the book over the whole window, and over the site's header ---- */
+
+  :root[data-theme] .book[data-full]:not([data-book='off']) {
+    position: fixed;
+    z-index: 70;
+    inset: 0;
+    margin: 0;
+    background: var(--color-paper);
+  }
+
+  html:has(.book[data-full]) .site-header {
+    visibility: hidden;
+  }
+
+  :root[data-theme] .book[data-full]:not([data-book='off']) .book__body {
+    height: 100%;
+    align-content: center;
+  }
+
+  :root[data-theme] .book[data-full]:not([data-book='off']) .book__stage {
+    height: max(var(--stage-min), calc(100svh - var(--book-bars)));
+  }
+
+  :root[data-theme] .book[data-full][data-bars-hidden]:not([data-book='off']) .book__bar {
+    visibility: hidden;
+  }
+
+  :root[data-theme] .book[data-full][data-bars-hidden]:not([data-book='off']) .book__stage {
+    height: 100svh;
+  }
+
+  html:has(.book[data-full]) {
+    overflow: clip;
+  }
+
+  /* ---- The contents, as a menu ---- */
+
+  .book__menu {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: none;
+    max-height: min(80svh, 44rem);
+    margin: 0;
+    padding: 0 0.75rem 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 0 -20px 60px -20px rgb(0 0 0 / 0.45);
+  }
+
+  .book__menu::backdrop {
+    background: rgb(0 0 0 / 0.35);
+  }
+
+  @media (min-width: 40rem) {
+    .book__menu {
+      inset: 0;
+      width: min(32rem, 100% - 2rem);
+      max-height: min(85svh, 48rem);
+      margin: auto;
+      border-radius: 1.25rem;
+    }
+  }
+
+  .book__menu-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0 0.5rem 0.75rem;
+    background: var(--color-paper);
+  }
+
+  .book__menu-title {
+    font-weight: 500;
+  }
+
+  .book__menu-foot {
+    padding: 1rem 0.75rem 0;
+  }
+
+  /* ---- Preferences ---- */
+
+  @media (forced-colors: active) {
+    .book__button,
+    .book__notice {
+      border: 1px solid ButtonText;
+    }
+
+    /* the text view and full view, when on, in the system's own colours for a chosen item */
+    .book__button[aria-pressed='true'] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    :root[data-theme] .book:not([data-book='off']) .book__stage:focus-visible .book__spread::after {
+      outline-color: Highlight;
+    }
+
+    .book__range::-webkit-slider-runnable-track {
+      background: CanvasText;
+    }
+
+    .book__marks {
+      fill: CanvasText;
+    }
+
+    .book__paper img,
+    .leaf__page img {
+      forced-color-adjust: none;
+    }
+  }
+
+  @media print {
+    .book {
+      display: none !important;
+    }
+  }
+</style>

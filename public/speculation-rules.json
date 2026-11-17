@@ -6,7 +6,8 @@
           { "href_matches": "/*" },
           { "not": { "href_matches": "/*.md" } },
           { "not": { "href_matches": "/*.txt" } },
-          { "not": { "href_matches": "/*.xml" } }
+          { "not": { "href_matches": "/*.xml" } },
+          { "not": { "href_matches": "/*.pdf" } }
         ]
       },
       "eagerness": "moderate"

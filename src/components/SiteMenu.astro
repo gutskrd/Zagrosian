@@ -29,7 +29,14 @@ import Wordmark from './Wordmark.astro';
 
 const { locale, t, base, localize } = i18n(Astro.url);
 const nav = navigation(locale);
-const links = [{ label: nav.home.label, href: nav.home.href, section: undefined }, ...nav.sections.map((link) => ({ ...link, section: link.href.split('#')[1] }))];
+const sectionLinks = nav.sections.map((link) => ({ ...link, section: link.href.split('#')[1] }));
+// Hevalo's book comes after Hevalo: the page is marked as the current one while it is open.
+const links = [
+  { label: nav.home.label, href: nav.home.href, section: undefined, current: false },
+  ...sectionLinks.slice(0, 1).map((link) => ({ ...link, current: false })),
+  { label: nav.book.label, href: nav.book.href, section: undefined, current: base === '/book' },
+  ...sectionLinks.slice(1).map((link) => ({ ...link, current: false })),
+];
 const year = new Date().getFullYear();
 ---
 
@@ -47,7 +54,7 @@ const year = new Date().getFullYear();
       {
         links.map((link) => (
           <li>
-            <a class="site-menu__link" href={link.href} data-nav-section={link.section}>
+            <a class="site-menu__link" href={link.href} data-nav-section={link.section} aria-current={link.current ? 'page' : undefined}>
               <span class="site-menu__mask">
                 <span class="site-menu__text">
                   <RollText text={link.label} />
@@ -581,6 +588,10 @@ const year = new Date().getFullYear();
 
     .site-menu__links li:nth-child(5) {
       --i: 4;
+    }
+
+    .site-menu__links li:nth-child(6) {
+      --i: 5;
     }
 
     /* The rest fades up after the links. */

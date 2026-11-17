@@ -143,6 +143,16 @@
   ! Content-Language
   Content-Language: fa
 
+# Hevalo's book, as a file to keep (BookDownload.astro also asks for the
+# download): saved under its own name, kept out of search results like the
+# Markdown versions (the book's page is what is indexed), and in the book's
+# two languages, Kurmanji and English.
+/book/reya-kurmanci.pdf
+  Content-Disposition: attachment; filename="Reya-Kurmanci-Pirtuka-Hevalo.pdf"
+  X-Robots-Tag: noindex
+  ! Content-Language
+  Content-Language: ku, en
+
 # Prerender same-site pages when a visitor hovers or taps a link, so they open
 # instantly (Chrome and Edge). Sent as a header so no inline script is needed.
 /speculation-rules.json

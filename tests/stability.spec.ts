@@ -1,6 +1,6 @@
 /**
- * Nothing jumps: no layout shift while the homepage loads (as on a first
- * visit), and none while it is scrolled all the way down with a mouse wheel
+ * Nothing jumps: no layout shift while the homepage or Hevalo's book loads
+ * (as on a first visit), and none while it is scrolled all the way down with a mouse wheel
  * and back up again, through the story and the deer, left to right and right
  * to left (where the browser measures from the right); and the page keeps its
  * length all the while, so the reader's place never moves when they turn
@@ -40,7 +40,8 @@ for (const { name, ...screen } of screens) {
   test.describe(`loading, on a ${name}`, () => {
     test.use(screen);
 
-    for (const path of ['/', '/fa', '/de']) {
+    // The homepage, and Hevalo's book, whose reader starts as the page opens.
+    for (const path of ['/', '/fa', '/de', '/book', '/ar/book']) {
       test(path, async ({ page }) => {
         const shifts = await measureShifts(page);
         await page.goto(path, { waitUntil: 'networkidle' });

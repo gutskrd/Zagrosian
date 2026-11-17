@@ -3,11 +3,15 @@
  * language (/index.md, /privacy.md, /de/index.md, /de/privacy.md, …) and the
  * /llms.txt summary. The homepage text comes from the same messages as the HTML
  * page (src/i18n/messages); the legal pages are served from their Markdown
- * source (src/content/legal).
+ * source (src/content/legal). Hevalo's book (/book.md) is its introduction,
+ * its contents and, in English, its whole text page by page, from the same
+ * edition as the page (src/lib/book.ts); the other languages introduce it in
+ * their own words and link to that text.
  */
 import { getCollection } from 'astro:content';
 import {
   defaultLocale,
+  format,
   legalSlugs,
   localizePath,
   locales,
@@ -16,13 +20,14 @@ import {
   type LegalSlug,
   type Locale,
 } from '../i18n';
-import { hevalo, kurdish, site, socialProfiles } from '../site';
+import { book as bookSite, hevalo, kurdish, site, socialProfiles } from '../site';
+import { book, chapterName, chapters, editionDate, pageCountText, pages as bookPages, pdfSize, sections, type TextBlock } from './book';
 import { answerMarkdown, faq, faqMore } from './faq';
 
 export interface TextPage {
   locale: Locale;
-  /** `index` for the homepage, otherwise the legal page. */
-  slug: 'index' | LegalSlug;
+  /** `index` for the homepage, `book` for Hevalo's book, otherwise the legal page. */
+  slug: 'index' | 'book' | LegalSlug;
   title: string;
   description: string;
   /** Canonical URL of the HTML page. */
@@ -32,6 +37,8 @@ export interface TextPage {
   /** Date of the last material change, where the page records one. */
   updated?: string;
   markdown: string;
+  /** A shorter version for llms-full.txt, where the whole page would be too long. */
+  summary?: string;
 }
 
 const absolute = (path: string) => new URL(path, site.url).href;
@@ -74,6 +81,8 @@ ${t.hevalo.category}. ${t.hevalo.description}
 - ${t.hevalo.website}: [${hevalo.domain}](${hevalo.url})
 - ${t.hevalo.platformsLabel}: ${t.hevalo.comingSoon}
 
+[${t.hevalo.readBook}](${absolute(nav.book.href)})
+
 ## ${t.about.eyebrow}
 
 ${t.about.mission}
@@ -104,6 +113,65 @@ ${social.join('\n')}
 
 ${legal.join('\n')}
 `;
+}
+
+/** A page of the book's words as Markdown: its headings, who speaks, and its Kurmanji and English as they are. */
+function blocksMarkdown(blocks: TextBlock[]): string {
+  const text = (block: TextBlock) => block.spans.map((span) => span.text).join('');
+  const out: string[] = [];
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i]!;
+    const next = blocks[i + 1];
+    // the book's numbered badges, as on the page (BookPageText.astro)
+    if (block.kind === 'label' && /^[\d\s]+$/.test(text(block))) continue;
+    if (block.kind === 'speaker' && next?.kind === 'text') {
+      out.push(`**${text(block)}** ${text(next)}`);
+      i += 1;
+    } else if (block.kind === 'heading') out.push(`#### ${text(block)}`);
+    else if (block.kind === 'label' || block.kind === 'speaker') out.push(`*${text(block)}*`);
+    else out.push(text(block));
+  }
+  return out.join('\n\n');
+}
+
+/** Hevalo's book: its introduction, its contents and (in English) its whole text; the summary leaves the text out. */
+function bookMarkdown(locale: Locale): { markdown: string; summary: string } {
+  const t = messages(locale);
+  const page = (n: number) => absolute(`${localizePath(locale, '/book')}#page-${n}`);
+  const facts = format(t.book.facts, { size: pdfSize(locale), pages: pageCountText(locale) });
+  const matter = (key: 'passport' | 'alphabet' | 'people' | 'answers' | 'words' | 'author') => {
+    const section = sections.find((item) => item.key === key)!;
+    return `- [${t.book.sections[key]}](${page(section.start)})`;
+  };
+  const chapterLines = chapters.map((chapter) => {
+    const name = chapterName(locale, chapter);
+    const title = name === chapter.titleKu ? `**${chapter.titleKu}**` : `**${chapter.titleKu}** (${name})`;
+    return `${chapter.number}. [${title}](${page(chapter.start)}), ${chapter.cefr}: ${chapter.parts.map((part) => part.titleKu).join(' · ')}`;
+  });
+  const intro = `# ${kurdish.book}
+
+> ${t.book.subtitle}
+
+${t.book.lead}
+
+- [${t.book.download}](${absolute(bookSite.pdf)}): ${facts}
+- ${format(t.book.edition, { date: editionDate(locale) })}
+- ${t.book.licence}
+- [${t.book.hearHamo}](${hevalo.url})
+
+## ${t.book.inside}
+
+${[matter('passport'), matter('alphabet'), matter('people')].join('\n')}
+
+${chapterLines.join('\n')}
+
+${[matter('answers'), matter('words'), matter('author')].join('\n')}
+`;
+  if (locale !== defaultLocale) {
+    return { markdown: `${intro}\n[${t.book.textView} (English, Kurmancî)](${absolute('/book.md')})\n`, summary: intro };
+  }
+  const text = bookPages.map((item) => `### ${format(t.book.pageLabel, { n: String(item.n) })}\n\n${blocksMarkdown(item.blocks)}`);
+  return { markdown: `${intro}\n## ${t.book.readerTitle}\n\n${text.join('\n\n')}\n`, summary: intro };
 }
 
 /** Every page with a Markdown version, in every language. */
@@ -143,7 +211,20 @@ export async function textPages(): Promise<TextPage[]> {
       };
     });
 
-    return [home, ...legalPages];
+    const bookText = bookMarkdown(locale);
+    const bookPage: TextPage = {
+      locale,
+      slug: 'book',
+      title: t.book.metaTitle,
+      description: t.book.metaDescription,
+      url: absolute(localizePath(locale, bookSite.path)),
+      markdownUrl: absolute(markdownPath(locale, 'book')),
+      updated: book.date,
+      markdown: bookText.markdown,
+      summary: bookText.summary,
+    };
+
+    return [home, bookPage, ...legalPages];
   });
 }
 
@@ -154,7 +235,9 @@ export async function llmsTxt(): Promise<string> {
   const pages = english.map((page) =>
     page.slug === 'index'
       ? `- [Homepage](${page.markdownUrl}): what ${site.name} does, its products, mission, common questions and contact details`
-      : `- [${page.title}](${page.markdownUrl}): ${page.description}`,
+      : page.slug === 'book'
+        ? `- [${t.nav.book}: ${kurdish.book}](${page.markdownUrl}): ${page.description} The Markdown has the whole text, page by page.`
+        : `- [${page.title}](${page.markdownUrl}): ${page.description}`,
   );
   const languages = locales.map(
     ({ code, name, englishName }) =>
@@ -187,6 +270,7 @@ ${languages.join('\n')}
 ## Products
 
 - [${hevalo.name}](${hevalo.url}): ${t.hevalo.description}
+- [${kurdish.book}, ${t.nav.book} (PDF, ${pdfSize(defaultLocale)}, ${pageCountText(defaultLocale)})](${absolute(bookSite.pdf)}): ${t.book.metaDescription}
 
 ## Optional
 
@@ -197,5 +281,5 @@ ${languages.join('\n')}
 /** /llms-full.txt: the Markdown of every English page, in one file. */
 export async function llmsFullTxt(): Promise<string> {
   const english = (await textPages()).filter((page) => page.locale === defaultLocale);
-  return english.map((page) => page.markdown.trim()).join('\n\n---\n\n') + '\n';
+  return english.map((page) => (page.summary ?? page.markdown).trim()).join('\n\n---\n\n') + '\n';
 }

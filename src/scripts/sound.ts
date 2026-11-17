@@ -17,7 +17,8 @@
  * while the tab is hidden.
  */
 
-export type Cue = 'hover' | 'tap' | 'open' | 'close' | 'on' | 'off';
+/** The interface sounds; `page` is a leaf of Hevalo's book turning (book.ts). */
+export type Cue = 'hover' | 'tap' | 'open' | 'close' | 'on' | 'off' | 'page';
 
 type Engine = typeof import('./sound-engine');
 
@@ -180,8 +181,22 @@ function initPrompt() {
     window.setTimeout(() => (prompt.hidden = true), 700);
   };
 
+  // On the page with Hevalo's book, the card would lie over the book's own controls and the corner that lifts to
+  // turn a page: it steps aside once the book is in view, and is not offered while it is.
+  let bookInView = false;
+  const book = document.querySelector('[data-book-stage]');
+  if (book) {
+    new IntersectionObserver(
+      ([entry]) => {
+        bookInView = entry?.isIntersecting ?? false;
+        if (bookInView) hide();
+      },
+      { threshold: 0.35 },
+    ).observe(book);
+  }
+
   const show = () => {
-    if (visible || soundPreference() !== undefined) return;
+    if (visible || bookInView || soundPreference() !== undefined) return;
     // The language note uses the same corner: this card waits for it to go.
     if (suggestion && !suggestion.hidden) {
       new MutationObserver((_, observer) => {

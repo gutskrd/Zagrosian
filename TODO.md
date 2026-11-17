@@ -42,6 +42,31 @@ have. Each item says why it matters and where it goes.
    to the App Store and Google Play ([`ProductShowcase.astro`](src/components/ProductShowcase.astro)),
    and add them to the structured data.
 
+6. **Hevalo's book** (`/book`; see the README). Decisions for the owner before it goes live:
+   - **Which chapters.** The edition on the site holds all twelve chapters as they are written today.
+     Hevalo's own download serves only the chapters that are online. Either export the same set (a
+     read-only look at which chapters are online, then `npm run book:export --workspace api -- --out
+     <dir> 1 2 …`) or say the whole book is free now.
+   - **The licence line** under the book. It now reads "Free to download, print and share for learning,
+     but not for sale" (`book.licence`), which is CC BY-NC-ND 4.0 in plain words. Confirm it, or choose
+     another licence.
+   - **The author's page.** Page 191 puts the author's full name and story on zagrosian.com as text a
+     search engine indexes (and in `/book.md`). Confirm that, and whether to name the author in the
+     book's structured data (`author`, left out for now).
+   - **Remembering the reading place.** Left out on purpose: it would store the page in the browser,
+     which the privacy policy and the FAQ would have to say in all ten languages, and saving it without
+     being asked may need consent under the ePrivacy rules. If wanted, as a "keep my place" choice.
+   - **The PDF itself, before go-live** (in Hevalo's repository, `api/src/books/`, where the book is
+     printed): a bookmark for every chapter, the contents and passport pages linking to the chapters,
+     and the document's language set to Kurmanji. A 192-page book is hard to find one's way in on a
+     phone's PDF viewer without them. Then export a new edition (the edition's name changes with the
+     PDF, so `scripts/book.mjs` brings it in).
+   - **One edition, once the book is finished.** The pictures are about 45 MB, and each edition
+     committed stays in the repository's history for good: export the edition the site launches with
+     once the book's drawings and pages are final, on one machine, and commit the pictures once.
+   - **The date it came out.** `book.published` in `src/site.ts` (the structured data's
+     `datePublished`) is the day of the first edition; set it to the day the book goes live.
+
 ## Needs people
 
 1. **Native speakers.** The interface, homepage and legal pages in Kurmanji, Sorani, Dutch, German,
@@ -49,14 +74,19 @@ have. Each item says why it matters and where it goes.
    Each translated legal page says the English version applies, but text that reads as machine-made
    costs trust in the very languages Hevalo is about. Have each language read through by a native
    speaker, Kurmanji and Sorani first. New this round: the VAT label in the footer (`footer.vat`),
-   shown once a VAT number is filled in, and Share in the menu (`share`).
+   shown once a VAT number is filled in, and Share in the menu (`share`). Then Hevalo's book: every
+   `book.*` string, `nav.book` and `hevalo.readBook` in all ten languages, Kurmanji and Sorani first
+   (newest: `book.slider`, `book.zoomHint` and `book.loadFailed`), and the chapters' names in each
+   language (`book.chapters`).
 2. **A lawyer.** The privacy policy, terms and security policy were written carefully but have not
    been reviewed by a lawyer. A review is due once the company is registered (see above), and again
    whenever the site starts to collect more than it does now (analytics, forms, accounts).
 3. **Real devices and assistive technology.** The tests run in Chromium on a desktop computer. The
    site has not been tried on an iPhone (Safari), a low-end Android phone, or with VoiceOver, TalkBack
    or NVDA. Spend half an hour with each: the menu, the language menu, the story and the deer,
-   and the legal pages.
+   and the legal pages. Hevalo's book above all: turning pages by tap and swipe on an iPhone (Safari)
+   and an Android phone, the download from both (and from apps' own browsers), and reading it with
+   VoiceOver and TalkBack.
 
 ## Needs access
 

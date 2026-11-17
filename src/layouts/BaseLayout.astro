@@ -22,10 +22,15 @@ interface Props {
   breadcrumb?: string;
   /** Date of the last material change (YYYY-MM-DD). */
   dateModified?: string;
+  /** The page's own social image; by default the site's, in the page's language (og.png, og/<language>.png). */
+  image?: { url: string; type: string; width: number; height: number; alt: string };
+  /** More structured data for this page (schema.org nodes), and the one among them the page is about. */
+  nodes?: Record<string, unknown>[];
+  mainEntity?: string;
 }
 
 const { locale, info, t, base } = i18n(Astro.url);
-const { title = t.meta.title, description = t.meta.description, noindex = false, breadcrumb, dateModified } = Astro.props;
+const { title = t.meta.title, description = t.meta.description, noindex = false, breadcrumb, dateModified, image, nodes, mainEntity } = Astro.props;
 
 const absolute = (path: string) => new URL(path, site.url).href;
 // Pages build to /name.html, but are served (and should be linked) as /name.
@@ -38,7 +43,9 @@ const alternates = noindex
       ...locales.map(({ code }) => ({ hreflang: code, href: absolute(localizePath(code, base)) })),
       { hreflang: 'x-default', href: absolute(base) },
     ];
-const ogImage = absolute(locale === defaultLocale ? '/og.png' : `/og/${locale}.png`);
+const ogImage = absolute(image?.url ?? (locale === defaultLocale ? '/og.png' : `/og/${locale}.png`));
+const ogSize = { width: image?.width ?? 1200, height: image?.height ?? 630 };
+const ogAlt = image?.alt ?? `${site.name}: ${t.meta.tagline}`;
 // Every indexable page also has a Markdown version: /index.md, /de/index.md, /de/privacy.md.
 const markdown = base === '/' ? `${path === '/' ? '' : path}/index.md` : `${path}.md`;
 const jsonLd = noindex
@@ -52,6 +59,8 @@ const jsonLd = noindex
         home: { name: t.nav.home, url: absolute(localizePath(locale, '/')) },
         breadcrumb,
         dateModified,
+        nodes,
+        mainEntity,
       }),
     );
 ---
@@ -109,13 +118,13 @@ const jsonLd = noindex
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${site.name}: ${t.meta.tagline}`} />
+    <meta property="og:image:type" content={image?.type ?? 'image/png'} />
+    <meta property="og:image:width" content={String(ogSize.width)} />
+    <meta property="og:image:height" content={String(ogSize.height)} />
+    <meta property="og:image:alt" content={ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     {/* X takes the rest from the og: tags, but not the image's description. */}
-    <meta name="twitter:image:alt" content={`${site.name}: ${t.meta.tagline}`} />
+    <meta name="twitter:image:alt" content={ogAlt} />
 
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
     {

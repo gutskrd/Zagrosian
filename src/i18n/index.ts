@@ -75,12 +75,13 @@ export interface SectionLink extends NavLink {
   key: 'hevalo' | 'about' | 'faq' | 'contact';
 }
 
-/** The site's links in a language: the homepage sections and the legal pages. */
+/** The site's links in a language: the homepage sections, the book and the legal pages. */
 export function navigation(locale: Locale) {
   const t = messages(locale);
   const link = (label: string, path: string): NavLink => ({ label, href: localizePath(locale, path) });
   return {
     home: link(t.nav.home, '/'),
+    book: link(t.nav.book, '/book'),
     sections: (['hevalo', 'about', 'faq', 'contact'] as const).map(
       (key): SectionLink => ({ key, ...link(t.nav[key], `/#${key}`) }),
     ),
@@ -104,4 +105,19 @@ export function formatMinutes(locale: Locale, minutes: number, unitDisplay: 'sho
   const { intl } = localeInfo(locale);
   if (fallback) return format(fallback, { n: new Intl.NumberFormat(intl).format(minutes) });
   return new Intl.NumberFormat(intl, { style: 'unit', unit: 'minute', unitDisplay }).format(minutes);
+}
+
+/**
+ * A date in a language: "17 November 2026", "17. November 2026". Where the
+ * language's calendar is not the Gregorian one (Persian uses the Solar Hijri
+ * calendar), the Gregorian date follows in brackets, so it can be compared
+ * with the English original: "۲۶ آبان ۱۴۰۵ (۱۷ نوامبر ۲۰۲۶)".
+ */
+export function formatDate(locale: Locale, date: Date | string): string {
+  const day = typeof date === 'string' ? new Date(`${date}T00:00:00Z`) : date;
+  const options = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } as const;
+  const { intl } = localeInfo(locale);
+  const local = new Intl.DateTimeFormat(intl, options);
+  if (local.resolvedOptions().calendar === 'gregory') return local.format(day);
+  return `${local.format(day)} (${new Intl.DateTimeFormat(`${intl}-u-ca-gregory`, options).format(day)})`;
 }
