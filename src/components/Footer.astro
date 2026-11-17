@@ -7,7 +7,7 @@ import ThemeSwitch from './ThemeSwitch.astro';
 
 const { locale, t } = i18n(Astro.url);
 const nav = navigation(locale);
-const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, ...nav.sections.slice(1)];
+const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, nav.book, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
 // The company's registered details, those that are filled in (src/site.ts),
 // with the ways to reach it that Dutch law asks to sit beside them: the email

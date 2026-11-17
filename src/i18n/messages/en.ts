@@ -6,6 +6,9 @@
  * Kurdish phrases that are part of the brand (the motto and the footer line)
  * stay in Kurmanji in every language; see src/site.ts.
  */
+/** Text for a count, in each plural form a language uses (Intl.PluralRules): `other` always. */
+export type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
+
 export const en = {
   meta: {
     title: 'Zagrosian — Technology for everyday life',
@@ -27,6 +30,8 @@ export const en = {
   nav: {
     home: 'Home',
     hevalo: 'Hevalo',
+    /** The page with Hevalo's book (/book). Never just "Book", which reads as a verb. */
+    book: 'Hevalo’s book',
     about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
@@ -78,6 +83,8 @@ export const en = {
     description:
       'An app for learning Kurdish through short lessons and games played with friends. Available first in Kurmanji, with more dialects planned.',
     visit: 'Visit hevalo.app',
+    /** The link from the products section to the book's page. */
+    readBook: 'Read Hevalo’s book, free',
     website: 'Website',
     comingSoon: 'Coming soon',
     /** The facts under Hevalo's description: its dialects, and its native apps (shown with `comingSoon`). */
@@ -205,6 +212,102 @@ export const en = {
     hintMove: 'to move',
     hintOpen: 'to open',
     hintClose: 'to close',
+  },
+  /**
+   * The page with Hevalo's book (BookPage.astro and the reader). The book is
+   * in Kurmanji with English beside every line, and its title, Rêya Kurmancî,
+   * stays in Kurmanji in every language (`kurdish.book` in src/site.ts).
+   * Templates: {size} and {pages} are formatted for the language; {a}, {b},
+   * {n} and {total} are page numbers; {where} is a counter and {chapter} a
+   * chapter's or section's name.
+   */
+  book: {
+    /** Within 70 characters, in every language. */
+    metaTitle: 'Rêya Kurmancî: Hevalo’s free Kurmanji book — Zagrosian',
+    /** Within 170 characters, in every language. */
+    metaDescription:
+      'Hevalo’s illustrated Kurmanji course book, with Hamo, Xezal and Hevalo and English beside every line. Read it here page by page, or download the free PDF.',
+    /** The social image's description (public/og/book.jpg). */
+    shareAlt: 'Rêya Kurmancî, Hevalo’s book, open at its first pages',
+    eyebrow: 'Free book',
+    /** Under the Kurmanji title: what it means, and whose book it is. In Kurmanji only "Pirtûka Hevalo". */
+    subtitle: 'The Kurmanji Road · Hevalo’s book',
+    lead: 'A course book in Kurmanji, with English beside every line. Learn with Hamo, Xezal and Hevalo, from the first hello to stories and songs: read it here, page by page, or download it to print and keep.',
+    startReading: 'Start reading',
+    download: 'Download the book',
+    downloadShort: 'Download',
+    /** Under the download: "PDF · 2.6 MB · 192 pages". */
+    facts: 'PDF · {size} · {pages}',
+    /** A number of pages, in each plural form the language has (Intl.PluralRules); `other` is required. */
+    pageCount: { one: '{n} page', other: '{n} pages' } as Plural,
+    edition: 'Edition of {date}',
+    licence: 'Free to download, print and share for learning, but not for sale.',
+    hearHamo: 'Hear Hamo say every line in Hevalo',
+    inside: 'Inside the book',
+    /** The reader's heading, for screen readers. */
+    readerTitle: 'Read the book',
+    /** The slider's name, for screen readers: what it moves through. */
+    slider: 'Page',
+    contents: 'Contents',
+    previous: 'Previous page',
+    next: 'Next page',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    fit: 'Fit to screen',
+    /** The whole book as continuous text. */
+    textView: 'Text',
+    fullView: 'Full view',
+    /** Shown while the book has keyboard focus. */
+    keysHint: 'Arrow keys turn the pages; [ and ] go to the previous or next chapter; + and − zoom in and out.',
+    /** Shown for a few seconds on touch screens, in place of the bar under the book, with `zoomHint` under it. */
+    swipeHint: 'Tap the edges or swipe to turn',
+    zoomHint: 'Double-tap to zoom',
+    counterSpread: 'Pages {a} and {b} of {total}',
+    counterPage: 'Page {a} of {total}',
+    counterShort: '{a} / {total}',
+    pageLabel: 'Page {n}',
+    chapterLabel: 'Chapter {n}: {name}',
+    /** Announced after a turn: "Pages 12 and 13 of 192. Chapter 1: Hello." */
+    status: '{where}. {chapter}.',
+    /** The parts of the book outside its chapters. */
+    sections: {
+      cover: 'Cover',
+      letter: 'A letter from Hamo',
+      contents: 'Contents',
+      passport: 'The passport of the road',
+      alphabet: 'The alphabet',
+      people: 'The people of the road',
+      answers: 'Answers',
+      words: 'The word list',
+      author: 'About the author',
+      farewell: 'The last page',
+    },
+    /** The chapters' names, in order; in English they must be the book's own (src/lib/book.ts checks). */
+    chapters: [
+      'Hello',
+      'Family',
+      'House and village',
+      'The market',
+      'Days and time',
+      'The city',
+      'Weather and Newroz',
+      'Body and health',
+      'Yesterday',
+      'The summer pastures',
+      'Work and school',
+      'Stories and songs',
+    ],
+    /** The card after the last page. */
+    endTitle: 'That’s the whole book.',
+    endLearn: 'Learn with Hevalo',
+    backToStart: 'Back to the cover',
+    /** Shown when a page's picture does not load: offline, or a new edition published under the reader. */
+    loadFailed: 'Some pages could not be loaded.',
+    reload: 'Reload',
+    /** For apps' own browsers, which often cannot download files. */
+    inAppHint: 'Download not starting? Open this page in your browser.',
+    /** Printed instead of the reader; {url} is the PDF's address. */
+    printNote: 'To print the book, download the PDF from {url}.',
   },
   notFound: {
     title: 'Page not found',

@@ -9,8 +9,9 @@
  *   maqam Kurd) that breathes in and out, wind as if across the mountains, and
  *   now and then a soft bell, all in a small generated reverb.
  * - Interface sounds: a light tick when the pointer or keyboard reaches a
- *   control, a soft tap on a click, air when a menu opens or closes, and a
- *   rising or falling pair of bells when sound is switched on or off.
+ *   control, a soft tap on a click, air when a menu opens or closes, a
+ *   rising or falling pair of bells when sound is switched on or off, and the
+ *   paper of a page of Hevalo's book as it turns.
  */
 import type { Cue } from './sound';
 
@@ -286,6 +287,47 @@ function blip(g: Graph, from: number, to: number, duration: number, level: numbe
   oscillator.stop(now + duration + 0.02);
 }
 
+/**
+ * A page turning: the paper's soft rush as the leaf lifts and crosses, and the
+ * small slap of it landing, from filtered noise (a riffle of a few grains, so
+ * no two turns sound quite the same).
+ */
+function riffle(g: Graph) {
+  const { context } = g;
+  const now = context.currentTime;
+  air(g, 900, 4200, 0.42, 0.05);
+  for (let i = 0; i < 4; i++) {
+    const at = now + 0.05 + i * (0.035 + Math.random() * 0.02);
+    const source = context.createBufferSource();
+    source.buffer = g.noise;
+    source.playbackRate.value = 1.6 + Math.random() * 0.6;
+    const band = context.createBiquadFilter();
+    band.type = 'highpass';
+    band.frequency.value = 2400 + Math.random() * 1600;
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0, at);
+    gain.gain.linearRampToValueAtTime(0.025 * (1 - i * 0.18), at + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.05);
+    source.connect(band).connect(gain).connect(g.master);
+    source.start(at, Math.random() * 3);
+    source.stop(at + 0.07);
+  }
+  // the leaf lands
+  const land = now + 0.5;
+  const source = context.createBufferSource();
+  source.buffer = g.noise;
+  const low = context.createBiquadFilter();
+  low.type = 'lowpass';
+  low.frequency.value = 1400;
+  const gain = context.createGain();
+  gain.gain.setValueAtTime(0, land);
+  gain.gain.linearRampToValueAtTime(0.06, land + 0.006);
+  gain.gain.exponentialRampToValueAtTime(0.0001, land + 0.09);
+  source.connect(low).connect(gain).connect(g.master);
+  source.start(land, Math.random() * 3);
+  source.stop(land + 0.12);
+}
+
 let lastHover = 0;
 
 /** Plays one interface sound. */
@@ -319,6 +361,9 @@ export function cue(name: Cue) {
     case 'off':
       bell(g, 587.33, 0.05);
       bell(g, 440, 0.04, g.context.currentTime + 0.12);
+      break;
+    case 'page':
+      riffle(g);
       break;
   }
 }

@@ -1,7 +1,7 @@
 ---
 import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import { format, formatMinutes, i18n } from '../i18n';
+import { format, formatDate, formatMinutes, i18n } from '../i18n';
 import { site } from '../site';
 import BaseLayout from './BaseLayout.astro';
 
@@ -12,18 +12,11 @@ interface Props {
 
 const { entry, headings } = Astro.props;
 const { title, description, eyebrow, updated } = entry.data;
-const { locale, info, t, base } = i18n(Astro.url);
+const { locale, t, base } = i18n(Astro.url);
 
-const dateOptions = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' } as const;
-const localDate = new Intl.DateTimeFormat(info.intl, dateOptions);
-// Where the language's calendar is not the Gregorian one (Persian uses the
-// Solar Hijri calendar), the Gregorian date of the English original follows in
-// brackets: "۷ مهر ۱۴۰۵ (۲۹ سپتامبر ۲۰۲۶)".
-const gregorian =
-  localDate.resolvedOptions().calendar === 'gregory'
-    ? ''
-    : ` (${new Intl.DateTimeFormat(`${info.intl}-u-ca-gregory`, dateOptions).format(updated)})`;
-const updatedLabel = localDate.format(updated) + gregorian;
+// In Persian, the Solar Hijri date, with the Gregorian date of the English
+// original in brackets: "۷ مهر ۱۴۰۵ (۲۹ سپتامبر ۲۰۲۶)".
+const updatedLabel = formatDate(locale, updated);
 
 const sections = headings.filter((heading) => heading.depth === 2);
 

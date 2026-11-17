@@ -39,6 +39,26 @@ test('the tab icon is black on a light browser and white on a dark one', async (
   }
 });
 
+test('the book is described as a book, with its PDF, its chapters and its pages', () => {
+  const book = JSON.parse(readFileSync(new URL('../src/assets/book/book.json', import.meta.url), 'utf8'));
+  for (const file of ['book.html', 'de/book.html', 'ar/book.html']) {
+    const html = readFileSync(join(dist, file), 'utf8');
+    const json = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? '{}';
+    type Node = { '@type': string; '@id'?: string; numberOfPages?: number; encoding?: object; hasPart?: object[]; mainEntity?: object };
+    const graph = (JSON.parse(json) as { '@graph': Node[] })['@graph'];
+    const node = graph.find((item) => item['@type'] === 'Book');
+    expect(node, file).toBeDefined();
+    expect(node!.numberOfPages).toBe(book.pageCount);
+    expect(node!.encoding).toMatchObject({ '@type': 'MediaObject', encodingFormat: 'application/pdf', contentUrl: 'https://zagrosian.com/book/reya-kurmanci.pdf' });
+    expect(node!.hasPart).toHaveLength(book.chapters.length);
+    expect(node!.hasPart![0]).toMatchObject({ '@type': 'Chapter', position: 1, pageStart: book.chapters[0].start, pageEnd: book.chapters[0].end });
+    const webPage = graph.find((item) => item['@type'] === 'WebPage')!;
+    expect(webPage.mainEntity).toEqual({ '@id': node!['@id'] });
+    expect(html).toContain('<meta property="og:image" content="https://zagrosian.com/og/book.jpg"');
+    expect(html).toContain('<meta property="og:image:type" content="image/jpeg"');
+  }
+});
+
 for (const file of built) {
   test(`metadata: ${file}`, () => {
     const html = readFileSync(join(dist, file), 'utf8');

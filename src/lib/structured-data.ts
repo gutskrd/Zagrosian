@@ -7,7 +7,7 @@
  * so they are identical wherever they appear.
  */
 import { locales, messages, type Locale } from '../i18n';
-import { hevalo, registration, site, socialProfiles } from '../site';
+import { book as bookSite, hevalo, kurdish, registration, site, socialProfiles } from '../site';
 import { answerText, faq } from './faq';
 
 const english = messages('en');
@@ -36,6 +36,10 @@ export interface PageData {
   breadcrumb?: string;
   /** Date of the last material change (YYYY-MM-DD). */
   dateModified?: string;
+  /** More nodes for the page's graph, such as the book on the book's page. */
+  nodes?: Record<string, unknown>[];
+  /** The @id of the node the page is about. */
+  mainEntity?: string;
 }
 
 export function structuredData(page: PageData) {
@@ -122,7 +126,9 @@ export function structuredData(page: PageData) {
       }),
       ...(page.dateModified && { dateModified: page.dateModified }),
       ...(page.breadcrumb && { breadcrumb: { '@id': breadcrumbId } }),
+      ...(page.mainEntity && { mainEntity: { '@id': page.mainEntity } }),
     },
+    ...(page.nodes ?? []),
   ];
 
   // The homepage's questions and answers (Faq.astro), in its language.
@@ -153,6 +159,57 @@ export function structuredData(page: PageData) {
   }
 
   return { '@context': 'https://schema.org', '@graph': graph };
+}
+
+/**
+ * Hevalo's book (the book's page, /book): an e-book in Kurmanji and English,
+ * free, with its PDF and its chapters, published by the company. In English
+ * on every language's page, like the company itself. It came out on the day
+ * of its first edition here (`book.published` in src/site.ts); each edition
+ * since is a modification, named by its date.
+ */
+export function bookNode(edition: {
+  date: string;
+  edition: string;
+  pageCount: number;
+  levels: string;
+  cover: string;
+  pdfBytes: number;
+  chapters: { number: number; titleKu: string; titleEn: string; start: number; end: number }[];
+}) {
+  const id = `${site.url}${bookSite.path}#book`;
+  return {
+    '@type': 'Book',
+    '@id': id,
+    name: kurdish.book,
+    alternateName: [english.nav.book, english.book.subtitle.split(' · ')[0]],
+    url: `${site.url}${bookSite.path}`,
+    bookFormat: 'https://schema.org/EBook',
+    inLanguage: ['ku', 'en'],
+    numberOfPages: edition.pageCount,
+    isAccessibleForFree: true,
+    educationalLevel: edition.levels,
+    learningResourceType: 'Textbook',
+    datePublished: bookSite.published,
+    dateModified: edition.date,
+    bookEdition: edition.date,
+    identifier: edition.edition,
+    image: new URL(edition.cover, site.url).href,
+    publisher: { '@id': ids.organization },
+    encoding: {
+      '@type': 'MediaObject',
+      contentUrl: `${site.url}${bookSite.pdf}`,
+      encodingFormat: 'application/pdf',
+      contentSize: `${(edition.pdfBytes / 1e6).toFixed(1)} MB`,
+    },
+    hasPart: edition.chapters.map((chapter) => ({
+      '@type': 'Chapter',
+      position: chapter.number,
+      name: `${chapter.titleKu} (${chapter.titleEn})`,
+      pageStart: chapter.start,
+      pageEnd: chapter.end,
+    })),
+  };
 }
 
 /** JSON for a <script type="application/ld+json"> element; `<` is escaped so the data can never end the element. */

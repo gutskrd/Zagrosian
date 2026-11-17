@@ -41,7 +41,7 @@ export const site = {
    * Date of the homepage's last material change (YYYY-MM-DD), for the sitemap.
    * Update it when the homepage's text changes.
    */
-  updated: '2026-10-06',
+  updated: '2026-11-17',
   /**
    * IndexNow key, which lets the site tell search engines about changed pages
    * (`npm run indexnow`). It is public by design: public/<key>.txt holds it, to
@@ -88,6 +88,21 @@ export const registration: Registration = {
   phone: '+31 6 38066158',
 };
 
+/**
+ * Hevalo's book on this site: its page, the PDF under the name it is saved
+ * with (the same name hevalo.app gives it), its social image (drawn by
+ * scripts/book.mjs) and the day its first edition came out here, which later
+ * editions keep (the structured data's `datePublished`). The edition itself is
+ * in src/assets/book/ (scripts/book.mjs brings it in; src/lib/book.ts reads it).
+ */
+export const book = {
+  path: '/book',
+  pdf: '/book/reya-kurmanci.pdf',
+  fileName: 'Reya-Kurmanci-Pirtuka-Hevalo.pdf',
+  shareImage: '/og/book.jpg',
+  published: '2026-11-17',
+};
+
 export const hevalo = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
@@ -112,6 +127,8 @@ export const kurdish = {
   proverb: 'Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.',
   /** "Proverb" (literally "a saying of the forebears"), the proverb's credit. */
   proverbSource: 'Gotina pêşiyan',
+  /** The title of Hevalo's book, "The Kurmanji Road": the book's page (`book.subtitle`). */
+  book: 'Rêya Kurmancî',
 };
 
 export const socialProfiles: SocialProfile[] = [

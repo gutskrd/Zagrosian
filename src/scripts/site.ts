@@ -56,7 +56,8 @@ function initDeepLink() {
     return;
   }
   const target = id ? document.getElementById(id) : null;
-  if (!target) return;
+  // A page of Hevalo's book (#page-12, #chapter-3) is opened by the book's own reader (book.ts).
+  if (!target || target.closest('[data-book]')) return;
 
   const inputs = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
   let queued = false;
