@@ -12,7 +12,10 @@
  * pages, loaded as they come into view. With it (the theme script marks the
  * page before the first paint, so the layout is final from the start), only
  * the pages open in front of the reader are displayed, so a screen reader
- * meets them and no others, and their pictures alone are downloaded.
+ * meets them and no others, and their pictures alone are downloaded. The
+ * reader can also choose to scroll: the scroll view lays every page out in
+ * one column again, its pictures loaded as they come near, and the text view
+ * does the same with the words alone.
  *
  * The stage describes the physical book and runs left to right in every
  * language: page 1 is on the right, the next page is to the right, and the
@@ -88,6 +91,12 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     <button class="book__button book__button--round book__wide" type="button" data-book-zoom="fit" aria-disabled="true">
       <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 3.5v4h-4M12.5 3.5v4h4M16.5 12.5h-4v4M3.5 12.5h4v4"></path></svg>
       <span class="visually-hidden">{t.book.fit}</span>
+    </button>
+    <button class="book__button book__scroll-toggle" type="button" aria-pressed="false" data-book-scroll-toggle>
+      {/* a page and the top of the next under it: the pages one under the other */}
+      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h9v7.5h-9zM5.5 17.25v-4h9v4"></path></svg>
+      <span class="book__label-text" aria-hidden="true">{t.book.scrollView}</span>
+      <span class="visually-hidden">{t.book.scrollView}</span>
     </button>
     <button class="book__button book__text-toggle" type="button" aria-pressed="false" data-book-text-toggle>
       {/* a page of text, so it does not look like the contents' list */}
@@ -465,7 +474,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
 
   /* A mouse can click a page to turn it. */
   @media (hover: hover) and (pointer: fine) {
-    :root[data-theme] .book:not([data-book='off'], [data-zoom], [data-text]) .book__spread {
+    :root[data-theme] .book:not([data-book='off'], [data-zoom], [data-scroll], [data-text]) .book__spread {
       cursor: pointer;
     }
   }
@@ -970,7 +979,20 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     display: none !important;
   }
 
-  @container reader (max-width: 419.98px) {
+  /* The views' names stand beside their icons only where the bars have room for them in every language: from a
+     wide tablet's width, while the tools share the row above the book with the contents, and on a wide screen, where
+     every control shares the one bar under the book, from where that bar holds them all. */
+  @container reader (max-width: 899.98px) {
+    .book__label-text {
+      display: none;
+    }
+
+    .book__bar--end .book__button {
+      padding: 0;
+    }
+  }
+
+  @container reader (min-width: 1000px) and (max-width: 1359.98px) {
     .book__label-text {
       display: none;
     }
@@ -1025,6 +1047,21 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
+  /* Under a wide book, until the screen is wider still, the counter is the short one, so the slider keeps its room. */
+  @container reader (min-width: 1000px) and (max-width: 1439.98px) {
+    .book__counter-long {
+      display: none;
+    }
+
+    .book__counter-short {
+      display: inline;
+    }
+
+    .book__counter {
+      min-width: 4.5rem;
+    }
+  }
+
   /* Wide: one bar under the stage, in the order the controls are used. */
   @container reader (min-width: 1000px) {
     :root[data-theme] .book:not([data-book='off']) .book__body {
@@ -1050,6 +1087,13 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
       justify-self: center;
       width: 100%;
       padding-inline: 1.5rem;
+    }
+  }
+
+  /* Just past the width for one bar, the contents' button gives the slider some of its room. */
+  @container reader (min-width: 1000px) and (max-width: 1199.98px) {
+    :root[data-theme] .book:not([data-book='off']) .book__body {
+      grid-template-columns: minmax(min-content, 12rem) minmax(0, 1fr) auto;
     }
   }
 
@@ -1200,9 +1244,9 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     cursor: grabbing;
   }
 
-  /* ---- The whole book as text ---- */
+  /* ---- The whole book as one column to scroll: its pages (the scroll view) or its words (the text view) ---- */
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) .book__stage {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__stage {
     display: block;
     height: auto;
     overflow: visible;
@@ -1210,14 +1254,14 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     user-select: text;
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) .book__spread {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__spread {
     width: min(100% - 2rem, 42rem);
     height: auto;
     margin: 0 auto;
     transform: none;
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__page, .book__end) {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) :is(.book__page, .book__end) {
     display: block;
     position: static;
     width: auto;
@@ -1225,35 +1269,75 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     opacity: 1;
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__paper, .book__leaves, .book__edges, .book__hint) {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) :is(.book__leaves, .book__edges, .book__hint) {
     display: none;
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) .book__spread::after {
+  :root[data-theme] .book[data-text]:not([data-book='off']) .book__paper {
+    display: none;
+  }
+
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__spread::after {
     content: none;
   }
 
-  /* The controls stay at hand while the text scrolls. */
-  :root[data-theme] .book[data-text]:not([data-book='off']) .book__bar {
+  /* The controls stay at hand while the column scrolls. */
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__bar {
     position: sticky;
     z-index: 2;
     background: var(--color-paper);
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
     top: var(--header-height);
   }
 
-  :root[data-theme] .book[data-text]:not([data-book='off']) .book__bar--nav {
+  :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__bar--nav {
     bottom: 0;
   }
 
   @container reader (min-width: 1000px) {
-    :root[data-theme] .book[data-text]:not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
+    :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) :is(.book__bar--start, .book__bar--end) {
       top: auto;
       bottom: 0;
     }
   }
+
+  /* The pages one under the other, each its own sheet of paper, as wide as a page reads well and no wider. A page
+     brought into view lands under the bars that stay above it (on a wide reader they are all below). */
+  :root[data-theme] .book[data-scroll]:not([data-book='off']) .book__spread {
+    width: min(100% - 2rem, 40rem);
+    padding-block: 1rem 2rem;
+  }
+
+  :root[data-theme] .book[data-scroll]:not([data-book='off']) .book__pages {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  :root[data-theme] .book[data-scroll]:not([data-book='off']) :is(.book__sheet, .book__paper, .book__paper img) {
+    height: auto;
+  }
+
+  :root[data-theme] .book[data-scroll]:not([data-book='off']) :is(.book__paper, .book__end)::before {
+    content: none;
+  }
+
+  :root[data-theme] .book[data-scroll]:not([data-book='off']) .book__end {
+    margin-top: 1.25rem;
+  }
+
+  .book[data-scroll] .book__page {
+    scroll-margin-top: calc(var(--header-height) + 4rem);
+  }
+
+  @container reader (min-width: 1000px) {
+    .book[data-scroll] .book__page {
+      scroll-margin-top: calc(var(--header-height) + 1rem);
+    }
+  }
+
+  /* ---- The words ---- */
 
   .book[data-text] .book__page + .book__page {
     margin-top: 2.5rem;

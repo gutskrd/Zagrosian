@@ -210,6 +210,7 @@ export const fr: Messages = {
     zoomIn: 'Agrandir',
     zoomOut: 'Réduire',
     fit: 'Ajuster à l’écran',
+    scrollView: 'Défilement',
     textView: 'Texte',
     fullView: 'Plein écran',
     keysHint: 'Les flèches tournent les pages ; [ et ] mènent au chapitre précédent ou suivant ; + et − agrandissent et réduisent.',

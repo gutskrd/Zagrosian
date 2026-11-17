@@ -208,6 +208,7 @@ export const tr: Messages = {
     zoomIn: 'Yakınlaştır',
     zoomOut: 'Uzaklaştır',
     fit: 'Ekrana sığdır',
+    scrollView: 'Kaydırma',
     textView: 'Metin',
     fullView: 'Tam ekran',
     keysHint: 'Ok tuşları sayfa çevirir; [ ve ] önceki ya da sonraki bölüme gider; + ve − yakınlaştırır ve uzaklaştırır.',

@@ -254,6 +254,8 @@ export const en = {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
     fit: 'Fit to screen',
+    /** The whole book as one column of pages, to scroll through. */
+    scrollView: 'Scroll',
     /** The whole book as continuous text. */
     textView: 'Text',
     fullView: 'Full view',

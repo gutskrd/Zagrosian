@@ -209,6 +209,7 @@ export const de: Messages = {
     zoomIn: 'Vergrößern',
     zoomOut: 'Verkleinern',
     fit: 'Einpassen',
+    scrollView: 'Fortlaufend',
     textView: 'Text',
     fullView: 'Vollbild',
     keysHint: 'Mit den Pfeiltasten blättern; [ und ] springen zum vorigen oder nächsten Kapitel; + und − zoomen.',

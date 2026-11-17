@@ -146,8 +146,14 @@
 # Hevalo's book, as a file to keep (BookDownload.astro also asks for the
 # download): saved under its own name, kept out of search results like the
 # Markdown versions (the book's page is what is indexed), and in the book's
-# two languages, Kurmanji and English.
+# two languages, Kurmanji and English. It is sent as plain bytes rather than
+# as a PDF: a browser that can show a PDF itself (Safari on a phone, Firefox,
+# most browsers on an iPhone) tends to open one in its viewer even when asked
+# to save it, and a file it cannot show it saves. The name ends in .pdf, so
+# the phone or computer opens the saved file as the PDF it is.
 /book/reya-kurmanci.pdf
+  ! Content-Type
+  Content-Type: application/octet-stream
   Content-Disposition: attachment; filename="Reya-Kurmanci-Pirtuka-Hevalo.pdf"
   X-Robots-Tag: noindex
   ! Content-Language
