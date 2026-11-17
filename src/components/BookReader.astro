@@ -1002,11 +1002,23 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* on the narrowest phones the contents' button holds its words a little tighter */
-  @container reader (max-width: 359.98px) {
+  /* On a phone the contents' button holds its words a little tighter, without its chevron (the list beside the
+     chapter's name already says what it opens); on the narrowest phones the download also leaves the bar for the foot
+     of the contents (it is above the book as well), so the chapter's name keeps its room beside the views. */
+  @container reader (max-width: 419.98px) {
     .book__where {
       gap: 0.375rem;
       padding-inline: 0.5rem;
+    }
+
+    .book__chevron {
+      display: none;
+    }
+  }
+
+  @container reader (max-width: 359.98px) {
+    .book__bar--end .book__narrow {
+      display: none !important;
     }
   }
 
@@ -1024,8 +1036,9 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     display: none;
   }
 
-  /* From a tablet's width, the zoom and the download join the tools, and the counter is written out. */
-  @container reader (min-width: 600px) {
+  /* From a tablet's width the counter is written out, and from a little wider, the zoom and the download with its
+     name join the tools. */
+  @container reader (min-width: 700px) {
     .book__wide {
       display: inline-flex !important;
     }
@@ -1033,7 +1046,9 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     .book__narrow {
       display: none !important;
     }
+  }
 
+  @container reader (min-width: 600px) {
     .book__counter-long {
       display: inline;
     }

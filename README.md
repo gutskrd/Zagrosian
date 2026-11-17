@@ -535,8 +535,9 @@ same code as hevalo.app's own download; which chapters it holds is the owner's d
   PDF is served as an attachment and as plain bytes (`application/octet-stream`), so a browser that
   can show a PDF itself saves this one rather than opening it, kept out of search results, in Kurmanji
   and English (`public/_headers`), and is never prerendered (`speculation-rules.json`). The bars'
-  labels stand beside their icons only where every language fits (a test measures them all from 360
-  to 1440 pixels). The book has its own
+  labels stand beside their icons only where every language fits, and on the narrowest phones the
+  bar's download moves to the foot of the contents (a test measures every language from 320 to 1440
+  pixels). The book has its own
   social image (`public/og/book.jpg`, a JPEG of about 80 KB, well under what chat apps show a preview
   for) and structured data (a `Book` with its PDF and its chapters, published on the day of its first
   edition here, `book.published` in `src/site.ts`, and modified with each edition since).

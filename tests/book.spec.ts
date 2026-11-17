@@ -9,8 +9,8 @@
  * following the page being read), the text view (the same, in words) and
  * full view (over the site's header, keeping the focus); the focus stays in
  * the book on its last page; only the pages near the reader are fetched, all
- * from this site; the bars hold every control apart in every language at
- * every width; the download is the book, under its own name, from the
+ * from this site; the bars hold every control apart, and the chapter’s name
+ * whole, in every language at every width; the download is the book, under its own name, from the
  * phone's bar too. Without JavaScript the pages are a column; a picture gone
  * and a reader that cannot start both leave the book readable.
  */
@@ -366,12 +366,12 @@ test.describe('on a computer', () => {
 });
 
 test.describe('the bars', () => {
-  test('hold every control apart, and the contents’ name readable, in every language from a phone to a wide screen', async ({ page }) => {
+  test('hold every control apart, and the contents’ name whole, in every language from the narrowest phone to a wide screen', async ({ page }) => {
     test.setTimeout(120_000);
     const problems: string[] = [];
     for (const code of ['', 'ku', 'ckb', 'ar', 'fa', 'tr', 'de', 'fr', 'es', 'nl']) {
       await open(page, code ? `/${code}/book` : '/book');
-      for (const width of [360, 420, 600, 768, 900, 1000, 1199, 1280, 1360, 1440]) {
+      for (const width of [320, 360, 375, 420, 600, 700, 768, 900, 1000, 1199, 1280, 1360, 1440]) {
         await page.setViewportSize({ width, height: 900 });
         const found = await page.evaluate(() => {
           const bars = [...document.querySelectorAll<HTMLElement>('[data-book] .book__bar')];
@@ -385,10 +385,10 @@ test.describe('the bars', () => {
           const apart = boxes.every((one, i) =>
             boxes.slice(i + 1).every((other) => one.every((a) => other.every((b) => a.right - 10 <= b.left || b.right - 10 <= a.left || a.bottom - 1 <= b.top || b.bottom - 1 <= a.top))),
           );
-          const where = document.querySelector('[data-book] .book__where')!.getBoundingClientRect().width;
-          return { apart, where, wide: document.documentElement.scrollWidth > innerWidth };
+          const name = document.querySelector<HTMLElement>('[data-book] .book__where-text')!;
+          return { apart, cut: name.scrollWidth > name.clientWidth + 1, wide: document.documentElement.scrollWidth > innerWidth };
         });
-        if (!found.apart || found.where < 96 || found.wide) problems.push(`${code || 'en'} at ${width}: ${JSON.stringify(found)}`);
+        if (!found.apart || found.cut || found.wide) problems.push(`${code || 'en'} at ${width}: ${JSON.stringify(found)}`);
       }
     }
     expect(problems).toEqual([]);
