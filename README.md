@@ -437,7 +437,12 @@ reduced motion, and the site works fully without it.
   headquarters. Share opens the system's share sheet where the browser has one (phones, Safari,
   Chrome and Edge) and otherwise copies the page's address, saying so on the button for a moment. It is a
   native popover: it opens, closes on Escape and returns focus without JavaScript; the page behind
-  does not scroll while it is open. Its links are sized to their column (container query units), so
+  does not scroll while it is open. Browsers from before the Popover API (Safari before 17, on
+  iPhones and iPads that stay on iOS 15 or 16; Chrome before 114) get the same from
+  [`popover.ts`](src/scripts/popover.ts), for this menu, the language menu and the book's contents:
+  [`postcss.config.mjs`](postcss.config.mjs) gives each `:popover-open` rule a twin for the class it
+  sets, and a check opens and closes each menu with it forced on. The sizes in container query
+  units (Safari 16) come first in `--cq` or `vw`, which give the same sizes. Its links are sized to their column (container query units), so
   the longest word in any language fits on its line, and a label too long for one line wraps between
   words; every small link and language in it is at least 44 pixels tall, as Apple's guidelines ask.
   A check opens it, and the language menu, in every language and with every word 40% longer, at six
