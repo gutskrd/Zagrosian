@@ -102,10 +102,13 @@ const words = kurdish.motto.split(' ');
     gap: clamp(2rem, 1rem + 4vw, 4rem);
   }
 
-  /* The values are sized to their column (see `fit` above). */
+  /* The values are sized to their column (see `fit` above). With no container
+     around them, their `cqi` measure the window: each follows the same in
+     `vw`, for browsers without container query units (Safari before 16). */
   .story__values {
     container-type: inline-size;
     margin: 0;
+    font-size: min(var(--text-display), 17vw);
     font-size: min(var(--text-display), 17cqi);
     line-height: 1;
     letter-spacing: -0.045em;
@@ -113,14 +116,17 @@ const words = kurdish.motto.split(' ');
   }
 
   .story__values--md {
+    font-size: min(var(--text-display), 13vw);
     font-size: min(var(--text-display), 13cqi);
   }
 
   .story__values--sm {
+    font-size: min(var(--text-display), 10.5vw);
     font-size: min(var(--text-display), 10.5cqi);
   }
 
   .story__values--xs {
+    font-size: min(var(--text-display), 9vw);
     font-size: min(var(--text-display), 9cqi);
   }
 
@@ -232,18 +238,22 @@ const words = kurdish.motto.split(' ');
 
     :global(:root[data-story]) .story__values {
       grid-column: 1 / span 7;
+      font-size: min(var(--text-display), 17vw, 15svh);
       font-size: min(var(--text-display), 17cqi, 15svh);
     }
 
     :global(:root[data-story]) .story__values--md {
+      font-size: min(var(--text-display), 13vw, 13svh);
       font-size: min(var(--text-display), 13cqi, 13svh);
     }
 
     :global(:root[data-story]) .story__values--sm {
+      font-size: min(var(--text-display), 10.5vw, 11svh);
       font-size: min(var(--text-display), 10.5cqi, 11svh);
     }
 
     :global(:root[data-story]) .story__values--xs {
+      font-size: min(var(--text-display), 9vw, 10svh);
       font-size: min(var(--text-display), 9cqi, 10svh);
     }
 

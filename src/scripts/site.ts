@@ -3,6 +3,8 @@
  * here; the larger ones (sound, motion, the theme, quick navigation) have
  * modules of their own. All of them start at the end of this file.
  */
+// First: the menus' fallback for browsers without the Popover API.
+import { isOpen } from './popover';
 import { initCommandMenu } from './command';
 import { initDeer } from './deer';
 import { initEyes } from './eyes';
@@ -109,7 +111,7 @@ function initMenu() {
   if (!menu) return;
 
   menu.addEventListener('click', (event) => {
-    if (event.target instanceof Element && event.target.closest('a') && menu.matches(':popover-open')) {
+    if (event.target instanceof Element && event.target.closest('a') && isOpen(menu)) {
       menu.hidePopover();
     }
   });

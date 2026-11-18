@@ -98,6 +98,10 @@
   /* Layout */
   --container: 86rem;
   --gutter: clamp(1.25rem, 0.75rem + 2.5vw, 3rem);
+  /* 1% of the content's width, which is what `cqi` measures in a container as
+     wide as the content: for browsers without container query units (Safari
+     before 16), which read the declaration written before each `cqi` one. */
+  --cq: calc(min(100vw - 2 * var(--gutter), var(--container)) / 100);
   --section-space: clamp(6rem, 3.5rem + 10vw, 11rem);
   --header-height: 4rem;
 
@@ -184,6 +188,31 @@
 /* `hidden` always hides, even on elements whose styles set a display value. */
 [hidden] {
   display: none !important;
+}
+
+/* Browsers without the Popover API (src/scripts/popover.ts): a menu is
+   hidden until it is opened, as the browser would hide it, from the first
+   paint; once the script has taken over, it is opened by the class
+   "popover-open", above the sticky header, as in the browser's top layer. */
+@supports not selector(:popover-open) {
+  [popover]:not(.popover-open) {
+    display: none !important;
+  }
+}
+
+[data-popover]:not(.popover-open) {
+  display: none !important;
+}
+
+[data-popover].popover-open {
+  z-index: 100;
+}
+
+/* The header's frosted glass would hold a fixed menu inside the header's own
+   box; the top layer would lift it out, so here the glass gives way. */
+html[data-popover-open] [data-site-header] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 *,

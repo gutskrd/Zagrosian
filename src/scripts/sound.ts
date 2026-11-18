@@ -17,6 +17,8 @@
  * while the tab is hidden.
  */
 
+import { POPOVER } from './popover';
+
 /** The interface sounds; `page` is a leaf of Hevalo's book turning (book.ts). */
 export type Cue = 'hover' | 'tap' | 'open' | 'close' | 'on' | 'off' | 'page';
 
@@ -278,7 +280,7 @@ function initInterfaceSounds() {
   });
 
   // Menus opening and closing.
-  for (const popover of document.querySelectorAll<HTMLElement>('[popover]')) {
+  for (const popover of document.querySelectorAll<HTMLElement>(POPOVER)) {
     popover.addEventListener('toggle', (event) => play((event as ToggleEvent).newState === 'open' ? 'open' : 'close'));
   }
 }

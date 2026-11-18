@@ -173,7 +173,9 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   /* The headline is sized to its column: "Technology for" is about 6.1em wide.
-     The text stays above the travelling logo, which may pass behind it. */
+     The text stays above the travelling logo, which may pass behind it. Each
+     size in `cqi` follows the same in `--cq` (global.css), for browsers
+     without container query units. */
   .hero__text {
     position: relative;
     z-index: 2;
@@ -182,20 +184,24 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
   .hero__title {
     /* Never wider than the column, nor too tall for short landscape screens. */
+    font-size: min(var(--text-display), calc(16 * var(--cq)), 18svh);
     font-size: min(var(--text-display), 16cqi, 18svh);
     line-height: 0.98;
     letter-spacing: -0.045em;
   }
 
   .hero__title--md {
+    font-size: min(var(--text-display), calc(14 * var(--cq)), 18svh);
     font-size: min(var(--text-display), 14cqi, 18svh);
   }
 
   .hero__title--sm {
+    font-size: min(var(--text-display), calc(12.5 * var(--cq)), 18svh);
     font-size: min(var(--text-display), 12.5cqi, 18svh);
   }
 
   .hero__title--xs {
+    font-size: min(var(--text-display), calc(11 * var(--cq)), 18svh);
     font-size: min(var(--text-display), 11cqi, 18svh);
   }
 
@@ -408,6 +414,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
     .hero__text {
       grid-column: 1 / span 7;
+      /* 1% of 7 of 12 columns with 2rem between them, for the line before each `cqi` one. */
+      --cq: calc((min(100vw - 2 * var(--gutter), var(--container)) - 22rem) * 7 / 1200 + 0.12rem);
     }
 
     .hero__mark {

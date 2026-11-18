@@ -209,6 +209,8 @@ const registered = !!(address || kvk || vat || phone);
 
   .site-footer__mark > span {
     display: grid;
+    /* In `--cq` first, for browsers without container query units (global.css). */
+    font-size: calc(24.2 * var(--cq));
     font-size: 24.2cqi;
     font-weight: 600;
     line-height: 0.8;

@@ -4,11 +4,68 @@
  * story's scene; Escape closes it. And nothing in it, or in the language menu,
  * overlaps, runs off the screen or is cut off: in every language, and with
  * every word 40% longer (as a longer language's would be), at six widths.
+ * In a browser from before the Popover API (Safari before 17: iPhones and
+ * iPads that stay on iOS 15 or 16), the menus still start hidden, open, cover
+ * what they should and close (src/scripts/popover.ts).
  */
 import { type Page, expect, test } from "@playwright/test";
 import { locales, prefix, settled } from "./support";
 
 const paper = { light: "rgb(255, 255, 255)", dark: "rgb(10, 10, 10)" };
+
+test.describe("in a browser without the Popover API", () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test.beforeEach(async ({ page }) => {
+    await settled(page.context());
+    await page.addInitScript(() => {
+      (window as Window & { __popoverFallback?: boolean }).__popoverFallback = true;
+    });
+  });
+
+  test("the site menu starts hidden, covers the screen when opened, and closes", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    await expect(page.locator("html")).toHaveAttribute("data-popover-fallback", "");
+    const menu = page.locator("#site-menu");
+    const open = page.locator(".menu-button--open");
+    await expect(menu).toBeHidden();
+
+    await open.click();
+    await expect(menu).toBeVisible();
+    await expect(open).toHaveAttribute("aria-expanded", "true");
+    // Over the whole screen, as in the browser's top layer, not inside the header.
+    expect(await menu.boundingBox()).toEqual({ x: 0, y: 0, width: 390, height: 844 });
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(open).toBeFocused();
+
+    await open.click();
+    await menu.locator('a[href*="#"]').first().click();
+    await expect(menu, "a link in it closes it").toBeHidden();
+    await open.click();
+    await menu.locator(".menu-button--close").click();
+    await expect(menu, "and so does its close button").toBeHidden();
+  });
+
+  test("the language menu closes on a click outside it, and the book’s contents open and close", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/", { waitUntil: "networkidle" });
+    const languages = page.locator("#language-menu");
+    await expect(languages).toBeHidden();
+    await page.locator('[popovertarget="language-menu"]').click();
+    await expect(languages).toBeVisible();
+    await page.mouse.click(640, 600);
+    await expect(languages).toBeHidden();
+
+    await page.goto("/book", { waitUntil: "networkidle" });
+    const contents = page.locator("#book-contents");
+    await expect(contents).toBeHidden();
+    await page.locator('[popovertarget="book-contents"]').first().click();
+    await expect(contents).toBeVisible();
+    await contents.locator('[popovertargetaction="hide"]').click();
+    await expect(contents).toBeHidden();
+  });
+});
 
 test.describe("on a phone", () => {
   test.use({

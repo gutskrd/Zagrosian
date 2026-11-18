@@ -38,6 +38,7 @@
  */
 import { Turner, progressForAngle, progressForReach, type Direction, type Source, type Turn, type TurnSpec } from './book-turn';
 import { Zoom } from './book-zoom';
+import { anyOpen, isOpen, POPOVER } from './popover';
 import { play } from './sound';
 
 type Item = number | 'end';
@@ -58,14 +59,14 @@ const PEEK_DEGREES = 20;
 
 const fill = (template: string, values: Record<string, string>) => template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
 
+/** Whether an element is shown: checkVisibility where the browser has it (Safari from 17.4), its boxes elsewhere. */
+const visible = (element: HTMLElement) =>
+  typeof element.checkVisibility === 'function'
+    ? element.checkVisibility()
+    : element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden';
+
 /** Whether a popover or a dialog is open over the page. */
-const somethingOpen = () => {
-  try {
-    return document.querySelector(':popover-open, dialog[open]') !== null;
-  } catch {
-    return document.querySelector('dialog[open]') !== null;
-  }
-};
+const somethingOpen = () => anyOpen() || document.querySelector('dialog[open]') !== null;
 
 export function initBook() {
   const root = document.querySelector<HTMLElement>('[data-book]');
@@ -470,7 +471,7 @@ function setUp(root: HTMLElement) {
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     const page = Number(link.dataset.bookJump);
-    if (menu.matches(':popover-open')) menu.hidePopover();
+    if (isOpen(menu)) menu.hidePopover();
     if (column) {
       columnGoTo(page);
       return;
@@ -502,7 +503,7 @@ function setUp(root: HTMLElement) {
     if (event.key === 'Tab' && root.hasAttribute('data-full')) return keepFocus(event);
     if (event.defaultPrevented) return;
     const target = event.target as Element;
-    if (target === range || target.closest('[popover]')) return;
+    if (target === range || target.closest(POPOVER)) return;
     // [ and ] before the modifiers: many keyboards type them with AltGr, which reads as Ctrl and Alt held together
     if ((event.key === ']' || event.key === '[') && !event.metaKey) {
       event.preventDefault();
@@ -921,7 +922,7 @@ function setUp(root: HTMLElement) {
     const boxes = new Map(parts.map((part) => [part, part.getBoundingClientRect()]));
     const sign = getComputedStyle(root).direction === 'rtl' ? -1 : 1;
     return [...root.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex="0"]')]
-      .filter((element) => element.checkVisibility() && !element.closest('[inert], [popover]'))
+      .filter((element) => visible(element) && !element.closest(`[inert], ${POPOVER}`))
       .map((element, i) => ({ element, i, box: boxes.get(parts.find((part) => part.contains(element))!) }))
       .sort((a, b) => {
         if (!a.box || !b.box) return a.i - b.i;
@@ -932,7 +933,7 @@ function setUp(root: HTMLElement) {
   };
   const keepFocus = (event: KeyboardEvent) => {
     // the contents, open over the book, keep their own order
-    if ((event.target as Element).closest('[popover]')) return;
+    if ((event.target as Element).closest(POPOVER)) return;
     const order = focusOrder();
     if (order.length === 0) return;
     event.preventDefault();
