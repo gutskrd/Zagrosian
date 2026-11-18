@@ -7,15 +7,12 @@
  * so they are identical wherever they appear.
  */
 import { locales, messages, type Locale } from '../i18n';
-import { book as bookSite, hevalo, kurdish, registration, site, socialProfiles } from '../site';
+import { book as bookSite, hevalo, kurdish, site, socialProfiles } from '../site';
 import { answerText, faq } from './faq';
 
 const english = messages('en');
 
 const home = `${site.url}/`;
-
-/** The company's registered details, those that are filled in (src/site.ts). */
-const { address, kvk, vat, phone } = registration;
 
 const ids = {
   website: `${home}#website`,
@@ -67,14 +64,10 @@ export function structuredData(page: PageData) {
       description: english.meta.description,
       slogan: english.meta.tagline,
       email: site.emails.contact,
-      ...(phone && { telephone: phone }),
-      address: {
-        '@type': 'PostalAddress',
-        ...(address && { streetAddress: address.street, postalCode: address.postalCode, addressLocality: address.city }),
-        addressCountry: site.country,
-      },
-      ...(kvk && { identifier: { '@type': 'PropertyValue', propertyID: 'KvK', value: kvk } }),
-      ...(vat && { vatID: vat }),
+      // Only the country: the registered address, the trade register number
+      // and the telephone number are shown to visitors but kept out of search
+      // results (src/site.ts, `registration`).
+      address: { '@type': 'PostalAddress', addressCountry: site.country },
       areaServed: 'Worldwide',
       knowsLanguage: locales.map((locale) => locale.code),
       contactPoint: [

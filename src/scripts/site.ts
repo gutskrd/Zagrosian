@@ -10,6 +10,7 @@ import { initSound } from './sound';
 import { initText } from './text';
 import { initLanguageMenu, initLanguageSuggestion } from './language';
 import { enteredFromAbove, initMotion } from './motion';
+import { initRegistration } from './registration';
 import { initRug } from './rug';
 import { initTheme } from './theme';
 
@@ -376,6 +377,8 @@ function initLegalTools() {
 /* there are none.                                                            */
 /* -------------------------------------------------------------------------- */
 
+// First, so the registered details in the footer are asked for at once.
+initRegistration();
 initHeader();
 initDeepLink();
 initMenu();

@@ -69,9 +69,11 @@ export const site = {
  * The company's registration. A company in the EU that offers services online
  * shows its registered address, trade register number and VAT number on its
  * site (Directive 2000/31/EC, article 5; in the Netherlands, Burgerlijk Wetboek
- * 3:15d). Each detail is shown in every footer (Footer.astro) and added to the
- * structured data (src/lib/structured-data.ts) as soon as it is filled in here;
- * until then nothing is shown. Fill in only what the Chamber of Commerce (KVK)
+ * 3:15d). Each detail is shown in every footer as soon as it is filled in here;
+ * until then nothing is shown. They are for visitors, not for search results:
+ * the pages do not contain them, nor does the structured data; the footer reads
+ * them from /registration.json (src/scripts/registration.ts), which robots.txt
+ * asks crawlers not to fetch. Fill in only what the Chamber of Commerce (KVK)
  * and the tax office have issued, and update `site.legalName` to the registered
  * name with them.
  *

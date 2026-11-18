@@ -2,13 +2,16 @@
  * What search engines and AI crawlers read: every built page has a title, a
  * description, a canonical address, its other languages, one main heading and
  * valid structured data; the 404 page is kept out of the index; the sitemap
- * lists every page.
+ * lists every page. The company's registered address, trade register number
+ * and telephone number are in no page, nor in what crawlers may fetch, and
+ * every footer still shows them to visitors.
  */
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
-import { locales, pages } from './support';
+import { registration } from '../src/site';
+import { locales, pages, settled } from './support';
 
 const dist = fileURLToPath(new URL('../dist', import.meta.url));
 const built = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.html'));
@@ -18,6 +21,32 @@ test('every page is built, and the sitemap lists every page', () => {
   expect(built.length).toBe(pages.length + locales.length);
   const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8');
   expect(sitemap.match(/<loc>/g)?.length).toBe(pages.length);
+});
+
+test('the registered details are shown in every footer, and kept out of search', async ({ page }) => {
+  const { address, kvk, phone } = registration;
+  const details = [address!.street, address!.postalCode, kvk!, phone!, phone!.replace(/[^+\d]/g, '')];
+  // In no page, nor its structured data, nor its Markdown or llms.txt versions.
+  const readable = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((file) => /\.(html|md|txt|xml)$/.test(file));
+  for (const file of readable) {
+    const text = readFileSync(join(dist, file), 'utf8');
+    for (const detail of details) expect(text.includes(detail), `${detail} in ${file}`).toBe(false);
+  }
+  // The file the footer reads them from is not for crawlers.
+  expect(readFileSync(join(dist, 'robots.txt'), 'utf8')).toMatch(/^Disallow: \/registration\.json$/m);
+  const response = await page.request.get('/registration.json');
+  expect(response.headers()['x-robots-tag']).toContain('noindex');
+
+  // Visitors see them, in the footer of every kind of page, in either direction of reading.
+  await settled(page.context());
+  for (const path of ['/', '/ar/privacy', '/book']) {
+    await page.goto(path);
+    const line = page.locator('[data-registration]');
+    await expect(line, path).toHaveAttribute('data-registered', '');
+    for (const detail of [address!.street, `${address!.postalCode} ${address!.city}`, kvk!, phone!]) await expect(line, path).toContainText(detail);
+    await expect(line.locator('a[href^="tel:"]'), path).toHaveAttribute('href', `tel:${phone!.replace(/[^+\d]/g, '')}`);
+    await expect(page.locator('[data-nosnippet] [data-registration]'), 'not for search snippets').toHaveCount(1);
+  }
 });
 
 test('the tab icon is black on a light browser and white on a dark one', async ({ page }) => {

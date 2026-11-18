@@ -9,26 +9,15 @@ const { locale, t } = i18n(Astro.url);
 const nav = navigation(locale);
 const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, nav.book, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
-// The company's registered details, those that are filled in (src/site.ts),
-// with the ways to reach it that Dutch law asks to sit beside them: the email
-// address and, as registered, the telephone number, each a link that opens it.
+// The company's registered details (src/site.ts): its address, its number in
+// the trade register and its telephone number, beside the email address, as
+// Dutch law asks. Visitors see them in every footer; search engines are not to
+// list them, so they are not written into the page: src/scripts/registration.ts
+// puts them in this line from /registration.json, which robots.txt asks
+// crawlers not to fetch, and the line is marked data-nosnippet. The email,
+// which is for everyone, is in the page.
 const { address, kvk, vat, phone } = registration;
-// Each detail is kept in one piece (the address in two: the street, then the
-// postcode with the place), so a narrow screen breaks the line between them
-// rather than through them, in either direction of reading.
-type Detail = { parts: string[]; href?: string };
-const filled = [
-  address && { parts: [`${address.street},`, `${address.postalCode} ${address.city}`] },
-  kvk && { parts: [`${t.footer.kvk} ${kvk}`] },
-  vat && { parts: [`${t.footer.vat} ${vat}`] },
-];
-const registered = filled.some(Boolean)
-  ? [
-      ...filled,
-      phone && { parts: [phone], href: `tel:${phone.replace(/[^+\d]/g, '')}` },
-      { parts: [site.emails.contact], href: `mailto:${site.emails.contact}` },
-    ].filter((detail): detail is Detail => !!detail)
-  : [];
+const registered = !!(address || kvk || vat || phone);
 ---
 
 <footer class="site-footer">
@@ -112,29 +101,19 @@ const registered = filled.some(Boolean)
     </div>
 
     {
-      registered.length > 0 && (
-        <address class="site-footer__registration">
-          {site.legalName}
-          {registered.map((detail) => (
-            <>
-              {' · '}
-              <bdi>
-                {detail.href ? (
-                  <a class="site-footer__contact site-footer__whole" href={detail.href} dir="ltr">
-                    {detail.parts.join(' ')}
-                  </a>
-                ) : (
-                  detail.parts.map((part, i) => (
-                    <>
-                      {i > 0 && ' '}
-                      <span class="site-footer__whole">{part}</span>
-                    </>
-                  ))
-                )}
-              </bdi>
-            </>
-          ))}
-        </address>
+      registered && (
+        <div data-nosnippet>
+          <address class="site-footer__registration" data-registration data-kvk={t.footer.kvk} data-vat={t.footer.vat}>
+            <span>{site.legalName}</span>
+            <span class="site-footer__details" data-registration-details />
+            <span class="site-footer__dot" aria-hidden="true">·</span>
+            <bdi>
+              <a class="site-footer__contact site-footer__whole" href={`mailto:${site.emails.contact}`} dir="ltr">
+                {site.emails.contact}
+              </a>
+            </bdi>
+          </address>
+        </div>
       )
     }
   </div>
@@ -369,20 +348,35 @@ const registered = filled.some(Boolean)
     font-size: inherit;
   }
 
-  /* The company's registered details, when filled in. */
+  /* The company's registered details, when filled in: each detail whole, set
+     apart by space, and, on a screen wide enough to hold them in one line,
+     by a dot, so a line never starts or ends with one. */
   .site-footer__registration {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.125rem 0.875rem;
     padding-top: 0.5rem;
     color: var(--color-muted);
     font-style: normal;
   }
 
-  .site-footer__whole {
+  /* Global inside the line: the script that adds the registered details
+     (src/scripts/registration.ts) does not carry Astro's scoping attribute. */
+  .site-footer__registration :global(.site-footer__details) {
+    display: contents;
+  }
+
+  .site-footer__registration :global(.site-footer__dot) {
+    display: none;
+  }
+
+  .site-footer__registration :global(.site-footer__whole) {
     white-space: nowrap;
   }
 
   /* The telephone number and email in the registration line: the line's own
      quiet colour, a finger's height to tap, and lit only when reached for. */
-  .site-footer__contact {
+  .site-footer__registration :global(.site-footer__contact) {
     display: inline-flex;
     align-items: center;
     min-height: 1.5rem;
@@ -391,7 +385,7 @@ const registered = filled.some(Boolean)
     transition: color 0.2s ease;
   }
 
-  .site-footer__contact:hover {
+  .site-footer__registration :global(.site-footer__contact:hover) {
     color: var(--color-ink);
     text-decoration: underline;
     text-underline-offset: 0.2em;
@@ -409,6 +403,16 @@ const registered = filled.some(Boolean)
 
   .site-footer__legal .site-footer__link:hover {
     color: var(--color-ink);
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer__registration {
+      column-gap: 0.5rem;
+    }
+
+    .site-footer__registration :global(.site-footer__dot) {
+      display: inline;
+    }
   }
 
   @media (min-width: 48rem) {

@@ -50,6 +50,14 @@
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
+# The registered details the footer reads (src/pages/registration.json.ts):
+# for visitors, not for search results; robots.txt also asks crawlers not to
+# fetch it.
+/registration.json
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
 # Plain-text versions for machines: each page as Markdown and the llms.txt
 # summary. Search results should show the HTML pages, so these are noindex;
 # AI assistants and other tools can still read them.

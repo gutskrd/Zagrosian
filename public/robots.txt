@@ -9,5 +9,9 @@
 
 User-agent: *
 Allow: /
+# The company's registered address, trade register (KvK) number and telephone
+# number: every footer shows them to visitors, reading them from this file,
+# but they are not for search results or answers.
+Disallow: /registration.json
 
 Sitemap: https://zagrosian.com/sitemap.xml
