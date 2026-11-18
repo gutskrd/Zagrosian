@@ -599,6 +599,11 @@ and other tools read directly:
 - **Sitemap, robots.txt, web app manifest and security.txt** complete the picture. `robots.txt`
   welcomes every crawler, AI assistants included, and points them to `llms.txt`, `llms-full.txt` and
   the Markdown versions.
+- **What is not for search:** the company's registered address, trade register (KvK) number and
+  telephone number are shown in every footer but written into no page, Markdown version or
+  structured data: the footer reads them from `/registration.json`
+  ([`src/scripts/registration.ts`](src/scripts/registration.ts)), which `robots.txt` asks crawlers
+  not to fetch and which is served `noindex`, and the line is marked `data-nosnippet`.
 - **Clean text in the HTML:** crawlers that read the raw HTML (most AI crawlers do) get every piece of
   text once and in order. Rolling button labels draw their letters with CSS from `data-char`
   attributes instead of repeating the label, and the headline's lines are separated by a real
@@ -615,10 +620,12 @@ ranks happens off the site, and is up to Zagrosian:
 - Verify the domain in [Google Search Console](https://search.google.com/search-console) and
   [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit `https://zagrosian.com/sitemap.xml`
   (Bing's index also feeds ChatGPT search and other assistants).
-- After each deploy, run `npm run indexnow` ([`scripts/indexnow.mjs`](scripts/indexnow.mjs)): it
-  tells search engines that support [IndexNow](https://www.indexnow.org) (Bing, Yandex, Seznam,
-  Naver) about every page in the live sitemap, so they crawl them soon. The key is in `src/site.ts`
-  and `public/<key>.txt`. Google does not use IndexNow; it reads the sitemap, whose dates come from
+- After each deploy, the *Search engines* workflow
+  ([`.github/workflows/indexnow.yml`](.github/workflows/indexnow.yml)) runs `npm run indexnow`
+  ([`scripts/indexnow.mjs`](scripts/indexnow.mjs)) once the checks have passed: it tells search
+  engines that support [IndexNow](https://www.indexnow.org) (Bing, Yandex, Seznam, Naver) about
+  every page in the live sitemap, so they crawl them soon. It can also be started by hand from the
+  Actions tab, or run locally. The key is in `src/site.ts` and `public/<key>.txt`. Google does not use IndexNow; it reads the sitemap, whose dates come from
   each legal page's `updated` field and, for the homepage, from `updated` in `src/site.ts`: change
   that date when the homepage's text changes.
 - Link to zagrosian.com from hevalo.app and from the Instagram and TikTok profiles, and keep the
