@@ -2,7 +2,8 @@
  * Loads the 3D rug (rug-scene.ts, with its shaders) and the paper plane
  * under it (plane.ts) only when the rug (Rug.astro) comes within a screen of
  * view, so pages that never reach it, and the first paint of every page,
- * carry none of it.
+ * carry none of it; and sets them up when the page is still, not during a
+ * swipe.
  *
  * Also wires the "Lift the rug" button (Underneath.astro): with the 3D rug it
  * asks the scene to fold the corner over; without it (no WebGL, or before it
@@ -54,16 +55,40 @@ export function initRug() {
     (entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
-      import('./rug-scene')
-        .then(({ mountRug }) => mountRug(stage))
-        // Without it, the flat rug stays.
-        .catch(() => undefined);
-      import('./plane')
-        .then(({ initPlane }) => initPlane())
-        // Without it, the proverb's sheet simply lies where it is.
-        .catch(() => undefined);
+      // Fetched at once, but set up once the page is still: compiling the
+      // rug's shaders and taking its picture onto the graphics card are a
+      // heavy frame or two, which on a slower phone would catch a swipe. The
+      // flat picture, the same rug, is there until then.
+      const scene = import('./rug-scene');
+      const plane = import('./plane');
+      void whenStill().then(() => {
+        scene
+          .then(({ mountRug }) => mountRug(stage))
+          // Without it, the flat rug stays.
+          .catch(() => undefined);
+        plane
+          .then(({ initPlane }) => initPlane())
+          // Without it, the proverb's sheet simply lies where it is.
+          .catch(() => undefined);
+      });
     },
     { rootMargin: '100% 0px' },
   );
   observer.observe(stage);
+}
+
+/** Resolves once the page has not scrolled for a moment (at once, if it is not scrolling). */
+function whenStill(quiet = 150) {
+  return new Promise<void>((resolve) => {
+    let timer = 0;
+    const wait = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        removeEventListener('scroll', wait);
+        resolve();
+      }, quiet);
+    };
+    addEventListener('scroll', wait, { passive: true });
+    wait();
+  });
 }
