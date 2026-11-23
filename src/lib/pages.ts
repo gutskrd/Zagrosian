@@ -43,7 +43,7 @@ const absolute = (path: string) => new URL(path, site.url).href;
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 
 /** /index.md, /privacy.md, /de/index.md, /de/privacy.md */
-export function markdownPath(locale: Locale, slug: TextPage['slug']): string {
+function markdownPath(locale: Locale, slug: TextPage['slug']): string {
   if (slug !== 'index') return `${localizePath(locale, `/${slug}`)}.md`;
   return locale === defaultLocale ? '/index.md' : `/${locale}/index.md`;
 }

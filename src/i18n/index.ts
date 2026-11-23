@@ -28,13 +28,13 @@ export const messages = (locale: Locale): Messages => catalogues[locale];
 /** Strips `.html` and a trailing `index`: /de/privacy.html -> /de/privacy. */
 const cleanPath = (pathname: string) => pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1') || '/';
 
-export function localeFromPath(pathname: string): Locale {
+function localeFromPath(pathname: string): Locale {
   const first = cleanPath(pathname).split('/')[1];
   return isLocale(first) && first !== defaultLocale ? first : defaultLocale;
 }
 
 /** English path of a page, without the locale prefix: /de/privacy -> /privacy, /de -> /. */
-export function basePath(pathname: string): string {
+function basePath(pathname: string): string {
   const path = cleanPath(pathname);
   const locale = localeFromPath(path);
   if (locale === defaultLocale) return path;

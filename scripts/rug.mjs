@@ -1,4 +1,4 @@
-// Generates the rug texture (Rug.astro, rug-scene.ts) as src/assets/rug/rug.webp, plus
+// Generates the rug texture (Rug.astro, src/scripts/rug/scene.ts) as src/assets/rug/rug.webp, plus
 // rug-small.webp for phones and standard-DPI screens (so it arrives sooner on slow connections). A
 // pile rug in the style of Bijar and Senneh, Kurdish weaving towns in the Zagros: madder-red field
 // with a lobed indigo medallion, pendants on stems at either end, scalloped ivory corners; flowers,
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
 const OUT = fileURLToPath(new URL('../src/assets/rug/', import.meta.url));
-/** Size in 2x2-knot cells, matching rug-scene.ts: width, length, and fringe at each end. */
+/** Size in 2x2-knot cells, matching rug/scene.ts: width, length, and fringe at each end. */
 const ACROSS = 101;
 const ALONG = 161;
 const FRINGE = 6;

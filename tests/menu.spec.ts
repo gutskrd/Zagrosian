@@ -4,7 +4,7 @@
  * overlaps, overflows or is clipped, in every locale and with every word 40% longer (simulating
  * longer translations), at six widths. Without the Popover API (Safari < 17: iPhones and iPads on
  * iOS 15/16) the menus still start hidden, open, cover the right area and close
- * (src/scripts/popover.ts).
+ * (src/scripts/utils/popover.ts).
  */
 import { type Page, expect, test } from "@playwright/test";
 import { locales, prefix, settled } from "./support";

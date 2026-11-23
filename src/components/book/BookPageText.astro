@@ -1,0 +1,50 @@
+---
+/**
+ * Text content of one book page: what screen readers, search engines and translation tools read
+ * instead of the page image, and what the reader's text view shows. The book's own headings are h4
+ * (below the page's h3), Kurmanji is marked `lang="ku"` (the rest inherits English), and speakers
+ * are set in bold before their line. Each row of the page reads as one line, with pieces separated
+ * by " · " ("1 · Silav · Hello · 9").
+ */
+import type { TextBlock, TextSpan } from '../../lib/book';
+
+interface Props {
+  blocks: TextBlock[];
+}
+
+const { blocks } = Astro.props;
+
+// A speaker and their line form one paragraph. Each row of the page is already one block (joined by
+// Hevalo's export), and the export drops the number badges; any badge that slips through (a bare
+// number as a label) carries no meaning and is skipped too.
+const badge = (block: TextBlock) => block.kind === 'label' && /^[\d\s]+$/.test(block.spans.map((span) => span.text).join(''));
+type Row = { kind: TextBlock['kind']; spans: TextSpan[]; speaker?: TextSpan[] };
+const rows: Row[] = [];
+for (let i = 0; i < blocks.length; i++) {
+  const block = blocks[i]!;
+  if (badge(block)) continue;
+  const next = blocks[i + 1];
+  if (block.kind === 'speaker' && next && next.kind === 'text') {
+    rows.push({ kind: 'text', spans: next.spans, speaker: block.spans });
+    i += 1;
+  } else rows.push({ kind: block.kind, spans: block.spans });
+}
+---
+
+{
+  rows.map((row) => {
+    const Tag = row.kind === 'heading' ? 'h4' : 'p';
+    return (
+      <Tag class:list={[row.kind === 'label' && 'book__label', row.kind === 'speaker' && 'book__label']}>
+        {row.speaker && (
+          <>
+            <b>
+              {row.speaker.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
+            </b>{' '}
+          </>
+        )}
+        {row.spans.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
+      </Tag>
+    );
+  })
+}

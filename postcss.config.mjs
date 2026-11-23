@@ -2,7 +2,7 @@
  * PostCSS config (run by Vite on every stylesheet).
  *
  * One custom plugin for the Popover API fallback: in browsers without popover support,
- * src/scripts/popover.ts marks open popovers with `.popover-open` and the root with
+ * src/scripts/utils/popover.ts marks open popovers with `.popover-open` and the root with
  * `data-popover-fallback`. Each `:popover-open` rule therefore gets a twin rule using the class,
  * scoped to the fallback root. It must be a separate rule because browsers drop any rule whose
  * selector they can't parse; and it's scoped because negated selectors like

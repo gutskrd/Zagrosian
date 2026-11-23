@@ -121,9 +121,9 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     transform-origin: var(--start);
   }
 
-  /* Native scroll-driven animation where supported; elsewhere (and with reduced motion) motion.ts
-     drives it. Longhand properties, since the minifier would otherwise fold the timeline into the
-     `animation` shorthand, which browsers reject. */
+  /* Native scroll-driven animation where supported; elsewhere (and with reduced motion)
+     motion/index.ts drives it. Longhand properties, since the minifier would otherwise fold the
+     timeline into the `animation` shorthand, which browsers reject. */
   @supports (animation-timeline: scroll()) {
     @media (prefers-reduced-motion: no-preference) {
       .reading-progress span {
@@ -244,9 +244,9 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     stroke-linejoin: round;
   }
 
-  /* Copy-link buttons next to section headings (added by src/scripts/site.ts). When JS is available
-     (`data-theme` is set), headings reserve room for the button from first paint, so inserting it
-     never moves the text. */
+  /* Copy-link buttons next to section headings (added by src/scripts/legal.ts). When JS is
+     available (`data-theme` is set), headings reserve room for the button from first paint, so
+     inserting it never moves the text. */
   :global(:root[data-theme]) .legal__content :global(h2) {
     position: relative;
     padding-inline-end: 2.5rem;

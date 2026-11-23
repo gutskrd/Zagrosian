@@ -79,7 +79,7 @@
 
   /* Type */
   --font-sans: 'Inter Variable', 'Vazirmatn Variable', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
-  /* Kurdish phrases use the same serif stack as hevalo.app: system fonts only, nothing downloaded. */
+  /* Kurdish phrases use hevalo.app's serif stack: system fonts only, nothing downloaded. */
   --font-kurdish: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
   /* Small labels use the system monospace (nothing downloaded); Arabic script falls through to
      Vazirmatn. */
@@ -184,9 +184,9 @@
   display: none !important;
 }
 
-/* Popover API fallback (src/scripts/popover.ts): hide closed popovers from first paint, as the UA
-   stylesheet would. Once the script takes over, open popovers get `.popover-open` and sit above the
-   sticky header, like the top layer. */
+/* Popover API fallback (src/scripts/utils/popover.ts): hide closed popovers from first paint, as
+   the UA stylesheet would. Once the script takes over, open popovers get `.popover-open` and sit
+   above the sticky header, like the top layer. */
 @supports not selector(:popover-open) {
   [popover]:not(.popover-open) {
     display: none !important;
@@ -508,7 +508,7 @@ svg {
 }
 
 /* ==========================================================================
-   Rolling labels (src/components/RollText.astro)
+   Rolling labels (src/components/ui/RollText.astro)
    Each letter carries a copy of itself below it (a text-shadow); on hover the
    letters slide up in sequence so the copies take their place. Each word is
    its own one-line mask, so labels wrap between words like normal text and
@@ -717,7 +717,7 @@ html:has(.site-menu:popover-open) {
 }
 
 /* ==========================================================================
-   Rising lines (src/scripts/text.ts)
+   Rising lines (src/scripts/motion/text.ts)
    Paragraphs marked data-lines are split into lines as they enter view; each
    line rises from its own mask, then the paragraph is restored.
    ========================================================================== */
@@ -799,7 +799,7 @@ html:has(.site-menu:popover-open) {
   transform: translateY(1.25rem);
 }
 
-/* Entered while scrolling up: show immediately (src/scripts/site.ts). */
+/* Entered while scrolling up: show immediately (src/scripts/motion/reveal.ts). */
 [data-reveal='instant'],
 [data-reveal='instant'] *,
 [data-reveal='instant']::before,
@@ -807,7 +807,7 @@ html:has(.site-menu:popover-open) {
   transition: none !important;
 }
 
-/* Split headings (src/components/SplitText.astro): each word rises from its own mask; the script
+/* Split headings (src/components/ui/SplitText.astro): each word rises from its own mask; the script
    staggers them via the Web Animations API. */
 .split__word {
   display: inline-block;
@@ -938,7 +938,7 @@ html:has(.site-menu:popover-open) {
 }
 
 /* Forced colors (Windows High Contrast): the system replaces backgrounds, so marks drawn with a
-   background color are redrawn in the system text color, and filled buttons get a visible outline. */
+   background color are redrawn in the system text color. Filled buttons get a visible outline. */
 @media (forced-colors: active) {
   .rule::before,
   .status-dot,

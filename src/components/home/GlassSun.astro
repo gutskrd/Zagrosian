@@ -1,0 +1,139 @@
+---
+/**
+ * The Kurdish sun as a thick piece of glass, in 3D, for the homepage story (Story.astro,
+ * src/scripts/motion/story.ts).
+ *
+ * Every layer uses the sun outline (21 rays, gaps at 51.2% of the ray length; src/lib/sun.ts) as
+ * vector shapes, sharp at any size. A faint back face, offset by the glass thickness, forms the
+ * body: clear except for its depth, which shows as it rotates. The front has a bright bevel around
+ * a clear face that catches light at its top left, plus a glint that sweeps across as it turns. (No
+ * intermediate layers: a dozen of them made the page stutter.) Layers are drawn as shapes rather
+ * than clipped with `clip-path`, because a clipped layer rotating in 3D is re-clipped every frame.
+ *
+ * It takes its color from the surrounding text color, so it reads as clear glass in any palette.
+ * story.ts rotates it by setting the transform on `.glass-sun__body` and moves the glint via
+ * `.glass-sun__band` directly: custom properties set on an ancestor would be inherited by the
+ * vector layers, which would then repaint every frame. Without them it faces forward with the glint
+ * centered. Decorative, so hidden from assistive technology.
+ */
+import { sunOutline } from '../../lib/sun';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// Outline, and the face inside the rim: the same outline at 88%.
+const outline = sunOutline();
+const face = sunOutline(0.88);
+// Gradient IDs are document-scoped; there's only one sun per page.
+const id = 'glass-sun';
+---
+
+<span class:list={['glass-sun', className]} aria-hidden="true">
+  <span class="glass-sun__body">
+    <svg class="glass-sun__layer glass-sun__back" viewBox="-100 -100 200 200" focusable="false">
+      <path d={outline} fill="currentColor" fill-opacity="0.16"></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__bevel" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        {/* Equivalent to linear-gradient(150deg, ...) across the box. */}
+        <linearGradient id={`${id}-bevel`} gradientUnits="userSpaceOnUse" x1="-68.3" y1="-118.3" x2="68.3" y2="118.3">
+          <stop offset="0" stop-color="currentColor"></stop>
+          <stop offset="0.55" stop-color="currentColor" stop-opacity="0.4"></stop>
+          <stop offset="1" stop-color="currentColor" stop-opacity="0.8"></stop>
+        </linearGradient>
+      </defs>
+      <path d={`${outline}${face}`} fill-rule="evenodd" fill={`url(#${id}-bevel)`}></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__face" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        <linearGradient id={`${id}-face`} gradientUnits="userSpaceOnUse" x1="-68.3" y1="-118.3" x2="68.3" y2="118.3">
+          <stop offset="0" stop-color="currentColor" stop-opacity="0.24"></stop>
+          <stop offset="0.55" stop-color="currentColor" stop-opacity="0.06"></stop>
+          <stop offset="1" stop-color="currentColor" stop-opacity="0.16"></stop>
+        </linearGradient>
+        {/* Equivalent to radial-gradient(circle at 34% 28%, ...) to the farthest corner. */}
+        <radialGradient id={`${id}-light`} gradientUnits="userSpaceOnUse" cx="-32" cy="-44" r="195.34">
+          <stop offset="0" stop-color="currentColor" stop-opacity="0.46"></stop>
+          <stop offset="0.42" stop-color="currentColor" stop-opacity="0"></stop>
+        </radialGradient>
+      </defs>
+      <path d={face} fill={`url(#${id}-face)`}></path>
+      <path d={face} fill={`url(#${id}-light)`}></path>
+    </svg>
+    <svg class="glass-sun__layer glass-sun__glint" viewBox="-100 -100 200 200" focusable="false">
+      <defs>
+        <clipPath id={`${id}-face-clip`}>
+          <path d={face}></path>
+        </clipPath>
+        {/* A band at 118deg across a strip three times the sun's width. */}
+        <linearGradient id={`${id}-glint`} gradientUnits="userSpaceOnUse" x1="-75.3" y1="-146.4" x2="475.3" y2="146.4">
+          <stop offset="0.42" stop-color="currentColor" stop-opacity="0"></stop>
+          <stop offset="0.5" stop-color="currentColor" stop-opacity="0.65"></stop>
+          <stop offset="0.58" stop-color="currentColor" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <g clip-path={`url(#${id}-face-clip)`}>
+        <rect class="glass-sun__band" x="-100" y="-100" width="600" height="200" fill={`url(#${id}-glint)`}></rect>
+      </g>
+    </svg>
+  </span>
+</span>
+
+<style>
+  .glass-sun {
+    --thickness: 10cqi;
+
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    container-type: inline-size;
+    transform-style: preserve-3d;
+  }
+
+  .glass-sun__body {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 50% calc(var(--thickness) * -0.5);
+    transform-style: preserve-3d;
+  }
+
+  .glass-sun__layer {
+    --f: 0;
+
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: translateZ(calc(var(--thickness) * var(--f) * -1));
+  }
+
+  /* Back face, offset by the glass thickness. */
+  .glass-sun__back {
+    --f: 1;
+  }
+
+  /* The face and glint, just in front of the surrounding bevel. */
+  .glass-sun__face,
+  .glass-sun__glint {
+    transform: translateZ(0.5px);
+  }
+
+  /* The glint band: its strip is 3x the sun's width, centered here over the sun. */
+  .glass-sun__band {
+    transform: translateX(-200px);
+  }
+
+  @media (forced-colors: active) {
+    .glass-sun__layer:not(.glass-sun__bevel) {
+      display: none;
+    }
+
+    .glass-sun__bevel path {
+      fill: CanvasText;
+    }
+  }
+</style>
