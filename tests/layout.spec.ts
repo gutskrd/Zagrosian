@@ -15,11 +15,11 @@ const sizes = [
 ];
 
 for (const viewport of sizes) {
-  test.describe(`${viewport.width} wide`, () => {
+  test.describe(`${viewport.width}px`, () => {
     // Reduced motion puts every section at rest.
     test.use({ viewport, contextOptions: { reducedMotion: 'reduce' }, deviceScaleFactor: 1 });
 
-    test('nothing overflows, is cut off or is too small to tap', async ({ page }) => {
+    test('has no overflow, clipping or undersized tap targets', async ({ page }) => {
       const issues: string[] = [];
       for (const path of [...pages, ...missing]) {
         await page.goto(path, { waitUntil: 'networkidle' });

@@ -45,7 +45,7 @@ async function expectShown(page: Page, pages: string[]) {
 }
 
 test.describe('serving', () => {
-  test('/book is the page, and /book/ leads to it', async ({ request }) => {
+  test('serves /book and redirects /book/ to it', async ({ request }) => {
     const response = await request.get('/book');
     expect(response.status()).toBe(200);
     expect(await response.text()).toContain('data-book');
@@ -56,10 +56,10 @@ test.describe('serving', () => {
   });
 });
 
-test.describe('on a computer', () => {
+test.describe('desktop', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test('the closed book: the cover alone, in the middle', async ({ page }) => {
+  test('opens on the cover, centered', async ({ page }) => {
     await open(page);
     expect(await shown(page)).toEqual(['1']);
     const cover = (await page.locator('#page-1').boundingBox())!;
@@ -67,7 +67,7 @@ test.describe('on a computer', () => {
     expect(Math.abs(cover.x + cover.width / 2 - (box.x + box.width / 2))).toBeLessThan(2);
   });
 
-  test('the next pages: the button, the arrow key and a click on the right page', async ({ page }) => {
+  test('turns forward with the button, the arrow key and a click on the right page', async ({ page }) => {
     await open(page);
     await page.locator('[data-book-next]').click();
     await expectShown(page, ['2', '3']);
@@ -81,7 +81,7 @@ test.describe('on a computer', () => {
     expect(new URL(page.url()).hash).toBe('#page-6');
   });
 
-  test('back, to the cover and to the end', async ({ page }) => {
+  test('turns back, and jumps to the cover and the end', async ({ page }) => {
     await open(page, '/book#page-10');
     await expectShown(page, ['10', '11']);
     await stage(page).focus();
@@ -94,7 +94,7 @@ test.describe('on a computer', () => {
     await expectShown(page, [String(manifest.pageCount), 'end']);
   });
 
-  test('a chapter at a time: ] and the contents reach chapter 3, which is marked', async ({ page }) => {
+  test('jumps by chapter with ] and the contents, and marks the current chapter', async ({ page }) => {
     await open(page);
     await stage(page).focus();
     for (let i = 0; i < 3; i++) {
@@ -114,13 +114,13 @@ test.describe('on a computer', () => {
     await expect(stage(page)).toBeFocused();
   });
 
-  test('says where the reader is', async ({ page }) => {
+  test('announces the current page', async ({ page }) => {
     await open(page);
     await page.locator('[data-book-next]').click();
     await expect(page.locator('[data-book-status]')).toHaveText(new RegExp(`Pages 2 and 3 of ${manifest.pageCount}\\.`));
   });
 
-  test('quick clicks each turn a page', async ({ page }) => {
+  test('turns once per click when clicked rapidly', async ({ page }) => {
     await open(page, '/book#page-20');
     await expectShown(page, ['20', '21']);
     for (let i = 0; i < 5; i++) {
@@ -130,7 +130,7 @@ test.describe('on a computer', () => {
     await expectShown(page, ['30', '31']);
   });
 
-  test('the arrow keys turn the pages before the book has the focus, and the keys are shown once it has', async ({ page }) => {
+  test('turns with arrow keys before the book has focus, and shows the shortcuts once it does', async ({ page }) => {
     await open(page, '/book#page-30');
     await expectShown(page, ['30', '31']);
     expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
@@ -140,7 +140,7 @@ test.describe('on a computer', () => {
     await expect(page.locator('.book__keys')).toBeVisible();
   });
 
-  test('[ and ] go a chapter on, also typed with AltGr (Ctrl and Alt)', async ({ page }) => {
+  test('jumps by chapter with [ and ], including AltGr (Ctrl+Alt)', async ({ page }) => {
     await open(page, `/book#page-${chapter(2).start}`);
     await stage(page).focus();
     await page.keyboard.down('Control');
@@ -151,7 +151,7 @@ test.describe('on a computer', () => {
     await expect.poll(() => shown(page)).toContain(String(chapter(3).start));
   });
 
-  test('on the last page the focus stays in the book, and the arrows still turn back', async ({ page }) => {
+  test('keeps focus in the book on the last page and still turns back', async ({ page }) => {
     await open(page, `/book#page-${manifest.pageCount - 2}`);
     const next = page.locator('[data-book-next]');
     await next.focus();
@@ -165,14 +165,14 @@ test.describe('on a computer', () => {
     await expectShown(page, [String(manifest.pageCount - 2), String(manifest.pageCount - 1)]);
   });
 
-  test('an address opens its page: /de/book#page-37, and #chapter-4', async ({ page }) => {
+  test('opens the page or chapter in the URL fragment', async ({ page }) => {
     await open(page, '/de/book#page-37');
     expect(await shown(page)).toEqual(['36', '37']);
     await open(page, '/book#chapter-4');
     expect(await shown(page)).toContain(String(chapter(4).start));
   });
 
-  test('a page drawn across by hand turns past a third, and falls back before', async ({ page }) => {
+  test('completes a drag past a third of the page and cancels a shorter one', async ({ page }) => {
     await open(page, '/book#page-2');
     const right = (await page.locator('#page-3').boundingBox())!;
     const y = right.y + right.height * 0.4;
@@ -193,7 +193,7 @@ test.describe('on a computer', () => {
     await expectShown(page, ['4', '5']);
   });
 
-  test('zoom: the page twice as large, its sharper picture, and back to fit', async ({ page }) => {
+  test('zooms in with sharper images and back to fit', async ({ page }) => {
     await open(page, '/book#page-2');
     const before = (await page.locator('#page-3').boundingBox())!.width;
     await page.locator('[data-book-zoom="in"]').click();
@@ -204,7 +204,7 @@ test.describe('on a computer', () => {
     await expect.poll(async () => (await page.locator('#page-3').boundingBox())!.width).toBeCloseTo(before, 0);
   });
 
-  test('the text view: the whole book as text, Kurmanji marked, and back to the page being read', async ({ page }) => {
+  test('text view shows the whole book as text and returns to the current page', async ({ page }) => {
     await open(page, '/book#page-10');
     const toggle = page.locator('[data-book-text-toggle]');
     await toggle.click();
@@ -233,7 +233,7 @@ test.describe('on a computer', () => {
     await expect.poll(() => shown(page)).toContain('14');
   });
 
-  test('the scroll view: every page in one column, the bar following the page being read, and back to it', async ({ page }) => {
+  test('scroll view lists every page, tracks the current one and returns to it', async ({ page }) => {
     await open(page, '/book#page-10');
     const toggle = page.locator('[data-book-scroll-toggle]');
     await toggle.click();
@@ -274,7 +274,7 @@ test.describe('on a computer', () => {
     await expect.poll(() => shown(page)).toContain(String(next));
   });
 
-  test('the scroll view on a phone: whole pages across the screen, the bars at hand', async ({ browser }) => {
+  test('scroll view on mobile shows full-width pages with the toolbars in reach', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const page = await context.newPage();
     await open(page, '/book#page-20');
@@ -290,9 +290,7 @@ test.describe('on a computer', () => {
     await context.close();
   });
 
-  test('full view: over the site’s header, the focus stays in the book, Escape gives it back, and the page behind holds still', async ({
-    page,
-  }) => {
+  test('full view covers the header, traps focus, exits on Escape and locks page scroll', async ({ page }) => {
     await open(page);
     const toggle = page.locator('[data-book-full-toggle]');
     await toggle.click();
@@ -323,7 +321,7 @@ test.describe('on a computer', () => {
     await expect(toggle).toBeFocused();
   });
 
-  test('loading: a few pictures near the cover, the next before it is asked for, all from this site', async ({ page }) => {
+  test('loads only nearby page images, prefetches the next and stays same-origin', async ({ page }) => {
     const pictures: { url: string; bytes: number }[] = [];
     const elsewhere: string[] = [];
     page.on('request', (request) => {
@@ -353,7 +351,7 @@ test.describe('on a computer', () => {
     expect(documents).toEqual([]);
   });
 
-  test('the download: the book, under its own name', async ({ page, request }) => {
+  test('downloads the PDF under its own file name', async ({ page, request }) => {
     await open(page);
     const [download] = await Promise.all([page.waitForEvent('download'), page.locator('.book-intro [data-book-download]').click()]);
     expect(download.suggestedFilename()).toBe('Reya-Kurmanci-Pirtuka-Hevalo.pdf');
@@ -369,10 +367,8 @@ test.describe('on a computer', () => {
   });
 });
 
-test.describe('the bars', () => {
-  test('hold every control apart, and the contents’ name whole, in every language from the narrowest phone to a wide screen', async ({
-    page,
-  }) => {
+test.describe('toolbars', () => {
+  test('keep controls apart and labels whole in every language, from 320 px to wide screens', async ({ page }) => {
     test.setTimeout(120_000);
     const problems: string[] = [];
     for (const code of ['', 'ku', 'ckb', 'ar', 'fa', 'tr', 'de', 'fr', 'es', 'nl']) {
@@ -408,17 +404,17 @@ test.describe('the bars', () => {
   });
 });
 
-test.describe('on a phone', () => {
+test.describe('mobile', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test('the download is on the bar above the book', async ({ page }) => {
+  test('shows the download in the toolbar above the book', async ({ page }) => {
     await open(page);
     const download = page.locator('.book__bar--end [data-book-download]:visible');
     await expect(download).toBeVisible();
     await expect(download).toHaveAttribute('download', 'Reya-Kurmanci-Pirtuka-Hevalo.pdf');
   });
 
-  test('zoomed in, a finger moves the page sideways too', async ({ page }) => {
+  test('pans a zoomed page horizontally by touch', async ({ page }) => {
     await open(page);
     await reader(page).evaluate((element) => element.scrollIntoView({ block: 'start' }));
     await page.waitForTimeout(300);
@@ -455,14 +451,14 @@ test.describe('on a phone', () => {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   }
 
-  test('one page, 358 pixels wide, and nothing to scroll sideways', async ({ page }) => {
+  test('shows a single 358 px page without horizontal scrolling', async ({ page }) => {
     await open(page);
     const cover = (await page.locator('#page-1').boundingBox())!;
     expect(Math.abs(cover.width - 358)).toBeLessThanOrEqual(1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
-  test('a sideways swipe turns, a swipe up scrolls, and a tap at the edge turns', async ({ page }) => {
+  test('turns on a horizontal swipe or an edge tap, and scrolls on a vertical swipe', async ({ page }) => {
     await open(page);
     await reader(page).evaluate((element) => element.scrollIntoView({ block: 'start' }));
     await page.waitForTimeout(300);
@@ -483,10 +479,10 @@ test.describe('on a phone', () => {
   });
 });
 
-test.describe('on a narrow phone, in Kurmanji', () => {
+test.describe('narrow mobile, in Kurmanji', () => {
   test.use({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true });
 
-  test('the hint fits, beside nothing it covers but the bar under the book', async ({ page }) => {
+  test('fits the gesture hint without covering anything but the bottom toolbar', async ({ page }) => {
     await open(page, '/ku/book');
     await reader(page).evaluate((element) => element.scrollIntoView({ block: 'start' }));
     const hint = page.locator('[data-book-hint]');
@@ -508,10 +504,10 @@ test.describe('on a narrow phone, in Kurmanji', () => {
   });
 });
 
-test.describe('with reduced motion', () => {
+test.describe('reduced motion', () => {
   test.use({ viewport: { width: 1280, height: 800 }, contextOptions: { reducedMotion: 'reduce' } });
 
-  test('the page changes at once, with no leaf', async ({ page }) => {
+  test('changes pages instantly, without a turning leaf', async ({ page }) => {
     await open(page);
     await page.locator('[data-book-next]').click();
     expect(await shown(page)).toEqual(['2', '3']);
@@ -530,7 +526,7 @@ test.describe('with reduced motion', () => {
   });
 });
 
-test.describe('right to left', () => {
+test.describe('right-to-left', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   for (const code of ['ar', 'fa', 'ckb']) {
@@ -557,7 +553,7 @@ test.describe('right to left', () => {
 test.describe('without JavaScript', () => {
   test.use({ viewport: { width: 1280, height: 800 }, javaScriptEnabled: false });
 
-  test('a column of every page in order, with the contents and the download', async ({ page }) => {
+  test('renders every page in order, with the contents and the download', async ({ page }) => {
     await page.goto('/book');
     const pages = page.locator('.book__page');
     await expect(pages).toHaveCount(manifest.pageCount);
@@ -571,10 +567,10 @@ test.describe('without JavaScript', () => {
   });
 });
 
-test.describe('when something fails', () => {
+test.describe('failures', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test('a page whose picture does not load says so, with a way to reload', async ({ page }) => {
+  test('reports an image that fails to load and offers a reload', async ({ page }) => {
     await settled(page.context());
     await page.route(/\/p\d{3}-(720|1440)\.[\w-]+\.webp$/, (route) => route.abort());
     await page.goto('/book');
@@ -582,7 +578,7 @@ test.describe('when something fails', () => {
     await expect(page.locator('[data-book-reload]')).toBeVisible();
   });
 
-  test('a reader that cannot start leaves the column of pages', async ({ page }) => {
+  test('falls back to the page column when the reader cannot start', async ({ page }) => {
     await settled(page.context());
     await page.addInitScript(() => {
       // The reader requires ResizeObserver to track its stage size.

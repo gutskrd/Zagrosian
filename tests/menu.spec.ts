@@ -11,7 +11,7 @@ import { locales, prefix, settled } from './support';
 
 const paper = { light: 'rgb(255, 255, 255)', dark: 'rgb(10, 10, 10)' };
 
-test.describe('in a browser without the Popover API', () => {
+test.describe('without the Popover API', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
   test.beforeEach(async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe('in a browser without the Popover API', () => {
     });
   });
 
-  test('the site menu starts hidden, covers the screen when opened, and closes', async ({ page }) => {
+  test('site menu starts hidden, opens full screen and closes', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await expect(page.locator('html')).toHaveAttribute('data-popover-fallback', '');
     const menu = page.locator('#site-menu');
@@ -45,7 +45,7 @@ test.describe('in a browser without the Popover API', () => {
     await expect(menu, 'and so does its close button').toBeHidden();
   });
 
-  test('the language menu closes on a click outside it, and the book’s contents open and close', async ({ page }) => {
+  test('language menu closes on an outside click; book contents open and close', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/', { waitUntil: 'networkidle' });
     const languages = page.locator('#language-menu');
@@ -65,7 +65,7 @@ test.describe('in a browser without the Popover API', () => {
   });
 });
 
-test.describe('on a phone', () => {
+test.describe('mobile', () => {
   test.use({
     viewport: { width: 390, height: 844 },
     isMobile: true,
@@ -76,7 +76,7 @@ test.describe('on a phone', () => {
     test.describe(colorScheme, () => {
       test.use({ colorScheme });
 
-      test('the menu is in the theme’s colours, and Escape closes it', async ({ page }) => {
+      test('uses the theme colors and closes on Escape', async ({ page }) => {
         await settled(page.context());
         await page.goto('/', { waitUntil: 'networkidle' });
         const menu = page.locator('#site-menu');
@@ -89,7 +89,7 @@ test.describe('on a phone', () => {
     });
   }
 
-  test('opened over the story’s scene, the menu keeps the page’s colours', async ({ page }) => {
+  test('keeps the page colors when opened over the story scene', async ({ page }) => {
     await settled(page.context());
     await page.emulateMedia({ colorScheme: 'light' });
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -187,7 +187,7 @@ const sizes = [
 ];
 
 for (const viewport of sizes) {
-  test.describe(`${viewport.width} wide`, () => {
+  test.describe(`${viewport.width}px`, () => {
     const touch = viewport.width < 800;
     test.use({
       viewport,
@@ -196,7 +196,7 @@ for (const viewport of sizes) {
       contextOptions: { reducedMotion: 'reduce' },
     });
 
-    test('nothing in the menus overlaps, runs off or is cut off, in any language', async ({ page }) => {
+    test('menus have no overlap, overflow or clipping in any language', async ({ page }) => {
       await settled(page.context());
       const issues: string[] = [];
       const runs = [

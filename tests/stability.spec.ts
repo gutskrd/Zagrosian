@@ -31,12 +31,12 @@ async function measureShifts(page: Page) {
 }
 
 const screens = [
-  { name: 'phone', viewport: { width: 412, height: 823 }, isMobile: true, hasTouch: true },
-  { name: 'computer', viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false },
+  { name: 'mobile', viewport: { width: 412, height: 823 }, isMobile: true, hasTouch: true },
+  { name: 'desktop', viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false },
 ];
 
 for (const { name, ...screen } of screens) {
-  test.describe(`loading, on a ${name}`, () => {
+  test.describe(`load, ${name}`, () => {
     test.use(screen);
 
     // The homepage, and the book page, whose reader initializes on load.
@@ -59,7 +59,7 @@ for (const { width, height, path } of [
   { width: 1280, height: 800, path: '/ar' },
   { width: 390, height: 844, path: '/fa' },
 ]) {
-  test(`scrolling down and back up: ${path} at ${width} wide`, async ({ page }) => {
+  test(`scroll down and back up: ${path} at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await settled(page.context());
     const shifts = await measureShifts(page);

@@ -42,7 +42,7 @@ for (const viewport of [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
 ]) {
-  test(`at ${viewport.width}px, found, it flies from under the rug to the proverb and back`, async ({ page }) => {
+  test(`flies from under the rug to the proverb and back once found, at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await settled(page.context());
     const problems = await watch(page);
@@ -78,7 +78,7 @@ for (const viewport of [
   });
 }
 
-test('not found, it stays under the rug and the sheet simply lies there', async ({ page }) => {
+test('stays under the rug until the rug is lifted', async ({ page }) => {
   await settled(page.context());
   await page.goto('/', { waitUntil: 'networkidle' });
   await rug(page).scrollIntoViewIfNeeded();
@@ -90,7 +90,7 @@ test('not found, it stays under the rug and the sheet simply lies there', async 
   await expect(sheet(page).getByText('A tree thrives through its roots', { exact: false })).toBeVisible();
 });
 
-test('with reduced motion, the proverb simply lies there', async ({ page }) => {
+test('leaves the proverb static with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await settled(page.context());
   await page.goto('/', { waitUntil: 'networkidle' });
@@ -102,7 +102,7 @@ test('with reduced motion, the proverb simply lies there', async ({ page }) => {
   await expect(sheet(page).getByText('A tree thrives through its roots', { exact: false })).toBeVisible();
 });
 
-test('the button lifts the rug and lays it back, saying which it will do', async ({ page }) => {
+test('lift button toggles the rug and updates its label', async ({ page }) => {
   await settled(page.context());
   await page.goto('/', { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: 'Lift the rug' }).scrollIntoViewIfNeeded();

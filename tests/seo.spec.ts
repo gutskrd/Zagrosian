@@ -14,14 +14,14 @@ import { locales, pages, settled } from './support';
 const dist = fileURLToPath(new URL('../dist', import.meta.url));
 const built = readdirSync(dist, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.html'));
 
-test('every page is built, and the sitemap lists every page', () => {
+test('builds every page and lists each in the sitemap', () => {
   // Every page in every locale, plus a 404 page per locale.
   expect(built.length).toBe(pages.length + locales.length);
   const sitemap = readFileSync(join(dist, 'sitemap.xml'), 'utf8');
   expect(sitemap.match(/<loc>/g)?.length).toBe(pages.length);
 });
 
-test('the registered details are shown in every footer, and kept out of search', async ({ page }) => {
+test('shows registration details in every footer but keeps them out of crawlable files', async ({ page }) => {
   const { address, kvk, phone } = registration;
   const details = [address!.street, address!.postalCode, kvk!, phone!, phone!.replace(/[^+\d]/g, '')];
   // Not in any page, its structured data, or its Markdown/llms.txt versions.
@@ -48,7 +48,7 @@ test('the registered details are shown in every footer, and kept out of search',
   }
 });
 
-test('the tab icon is black on a light browser and white on a dark one', async ({ page }) => {
+test('favicon follows the browser color scheme', async ({ page }) => {
   const html = readFileSync(join(dist, 'index.html'), 'utf8');
   const icons = [...html.matchAll(/<link rel="icon"[^>]*>/g)].map(([link]) => link);
   // Declared as 16x16, the black-only ICO is an exact match and Chrome prefers it over the SVG,
@@ -69,7 +69,7 @@ test('the tab icon is black on a light browser and white on a dark one', async (
   }
 });
 
-test('the book is described as a book, with its PDF, its chapters and its pages', () => {
+test('describes the book with its PDF, chapters and page count', () => {
   const book = JSON.parse(readFileSync(new URL('../src/assets/book/book.json', import.meta.url), 'utf8'));
   for (const file of ['book.html', 'de/book.html', 'ar/book.html']) {
     const html = readFileSync(join(dist, file), 'utf8');

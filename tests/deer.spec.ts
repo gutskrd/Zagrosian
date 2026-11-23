@@ -31,7 +31,7 @@ const state = (page: Page) =>
     };
   });
 
-test('it climbs out of the hole as it scrolls into view, and back in', async ({ page }) => {
+test('emerges from the icon as it scrolls into view and retreats on the way back', async ({ page }) => {
   await settled(page.context());
   await page.goto('/', { waitUntil: 'networkidle' });
 
@@ -50,10 +50,10 @@ test('it climbs out of the hole as it scrolls into view, and back in', async ({ 
   expect(await state(page)).toMatchObject({ behind: 1, front: 0 });
 });
 
-test.describe('with reduced motion', () => {
+test.describe('reduced motion', () => {
   test.use({ contextOptions: { reducedMotion: 'reduce' } });
 
-  test('it is out from the start', async ({ page }) => {
+  test('is shown fully emerged', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await scrollDeerTo(page, 20);

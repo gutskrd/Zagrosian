@@ -7,8 +7,8 @@ import { expect, test } from '@playwright/test';
 import { locales, pagesIn, prefix, settled } from './support';
 
 const screens = [
-  { name: 'computer', viewport: { width: 1440, height: 900 } },
-  { name: 'phone', viewport: { width: 390, height: 844 } },
+  { name: 'desktop', viewport: { width: 1440, height: 900 } },
+  { name: 'mobile', viewport: { width: 390, height: 844 } },
 ];
 
 for (const { name, viewport } of screens) {
@@ -40,8 +40,8 @@ for (const { name, viewport } of screens) {
               const where = violation.nodes.slice(0, 3).map((node) => {
                 // Include the colors axe measured, so contrast failures in CI are diagnosable.
                 const data = node.any[0]?.data as { fgColor?: string; bgColor?: string; contrastRatio?: number } | undefined;
-                const colours = data?.fgColor ? ` (${data.fgColor} on ${data.bgColor}, ${data.contrastRatio}:1)` : '';
-                return `${node.target.join(' ')}${colours}`;
+                const colors = data?.fgColor ? ` (${data.fgColor} on ${data.bgColor}, ${data.contrastRatio}:1)` : '';
+                return `${node.target.join(' ')}${colors}`;
               });
               failures.push(`${path}: ${violation.id} (${violation.impact}) at ${where.join(', ')}`);
             }

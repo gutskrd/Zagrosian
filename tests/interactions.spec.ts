@@ -14,10 +14,10 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
-test.describe('on a computer', () => {
+test.describe('desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 }, locale: 'de-DE' });
 
-  test('the language menu changes the language, and the theme is kept', async ({ page }) => {
+  test('switches language from the language menu and keeps the theme', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     // A German browser is offered the German site.
     await expect(page.locator('.suggest__card[data-locale="de"]')).toBeVisible();
@@ -43,10 +43,10 @@ test.describe('on a computer', () => {
   });
 });
 
-test.describe('in the menu', () => {
+test.describe('site menu', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('Share copies the page’s own address where there is no share sheet', async ({ page, context }) => {
+  test('Share copies the canonical URL without the Web Share API', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await context.addInitScript(() => {
       // Simulates a browser without a native share sheet (desktop Firefox).
@@ -62,13 +62,13 @@ test.describe('in the menu', () => {
   });
 });
 
-test.describe('on a phone', () => {
+test.describe('mobile', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  test.describe('in Turkish', () => {
+  test.describe('Turkish', () => {
     test.use({ locale: 'tr-TR' });
 
-    test('accepting the suggestion goes to the same page in that language', async ({ page }) => {
+    test('accepting the language suggestion opens the same page in that language', async ({ page }) => {
       await page.goto('/privacy', { waitUntil: 'networkidle' });
       await page.locator('.suggest__card[data-locale="tr"] .suggest__link').click();
       await page.waitForURL('**/tr/privacy');
@@ -76,10 +76,10 @@ test.describe('on a phone', () => {
     });
   });
 
-  test.describe('in Sorani', () => {
+  test.describe('Sorani', () => {
     test.use({ locale: 'ckb-IQ' });
 
-    test('a dismissed suggestion stays dismissed; the menu changes the language', async ({ page }) => {
+    test('remembers a dismissed suggestion and switches language from the menu', async ({ page }) => {
       await page.goto('/', { waitUntil: 'networkidle' });
       const card = page.locator('.suggest__card[data-locale="ckb"]');
       await expect(card).toBeVisible();
@@ -98,7 +98,7 @@ test.describe('on a phone', () => {
   });
 });
 
-test.describe('links to a section', () => {
+test.describe('section links', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
   /** Distance from the section's top to the header's bottom, in whole pixels. */
@@ -108,12 +108,12 @@ test.describe('links to a section', () => {
       return Math.abs(Math.round(document.getElementById(target)!.getBoundingClientRect().top - header));
     }, id);
 
-  test('opened from elsewhere, land on the section once the page has settled', async ({ page }) => {
+  test('land on the section once the page settles when opened directly', async ({ page }) => {
     await page.goto('/#about', { waitUntil: 'load' });
     await expect.poll(() => offset(page, 'about'), { timeout: 6000 }).toBeLessThanOrEqual(1);
   });
 
-  test('followed from another page of the site, land on the section', async ({ page }) => {
+  test('land on the section when followed from another page', async ({ page }) => {
     await page.goto('/privacy', { waitUntil: 'load' });
     await page.locator('.site-footer a[href="/#faq"]').click();
     await page.waitForURL('**/#faq');

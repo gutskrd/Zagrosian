@@ -2,7 +2,7 @@
 import { expect, test } from '@playwright/test';
 import { locales, pagesIn, scrollThrough, settled, watch } from './support';
 
-test('the security headers', async ({ request }) => {
+test('sends the security headers', async ({ request }) => {
   const response = await request.get('/');
   const headers = response.headers();
   const policy = headers['content-security-policy'] ?? '';
@@ -23,7 +23,7 @@ test('the security headers', async ({ request }) => {
 // redirects to HTTPS on the same host first (as the HSTS preload list requires), then www to the
 // apex. (wrangler dev rewrites redirect schemes to its own, so the Worker is also called directly
 // here.)
-test('http and www are sent to https://zagrosian.com', async ({ request }) => {
+test('redirects HTTP and www to https://zagrosian.com', async ({ request }) => {
   const { default: worker } = await import('../worker/index.ts');
   const env = { ASSETS: { fetch: async () => new Response('page') } };
   const visit = async (url: string, method = 'GET') => {
@@ -42,7 +42,7 @@ test('http and www are sent to https://zagrosian.com', async ({ request }) => {
   expect(www.headers()['location']).toMatch(/^https?:\/\/www\.zagrosian\.com\/$/);
 });
 
-test('security.txt never expires between builds', async () => {
+test('keeps security.txt from expiring between builds', async () => {
   const { default: worker } = await import('../worker/index.ts');
   const built = 'Contact: mailto:contact@zagrosian.com\nExpires: 2020-01-01T00:00:00.000Z\n';
   const env = { ASSETS: { fetch: async () => new Response(built, { headers: { 'Content-Type': 'text/plain' } }) } };
@@ -54,13 +54,13 @@ test('security.txt never expires between builds', async () => {
   expect(response.headers.get('content-type')).toBe('text/plain');
 });
 
-test('a page in another language says so', async ({ request }) => {
+test('sends Content-Language for localized pages', async ({ request }) => {
   expect((await request.get('/de')).headers()['content-language']).toBe('de');
 });
 
 // Arbitrary fragments can be linked to; an invalid percent-encoding (`#%`) once threw before the
 // menu, theme and search were initialized.
-test('a malformed address leaves the page working', async ({ page }) => {
+test('tolerates malformed URL fragments', async ({ page }) => {
   await settled(page.context());
   const problems = await watch(page);
   for (const path of ['/#%', '/privacy#%zz', '/de#%E0%A4']) {
@@ -70,7 +70,7 @@ test('a malformed address leaves the page working', async ({ page }) => {
 });
 
 for (const { code } of locales) {
-  test(`no policy violations or errors on any page: ${code}`, async ({ page }) => {
+  test(`no CSP violations or console errors: ${code}`, async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     for (const path of pagesIn(code)) {

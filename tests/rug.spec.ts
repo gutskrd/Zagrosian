@@ -70,10 +70,10 @@ async function arrive(page: Page) {
   await resting(page);
 }
 
-test.describe('with a mouse', () => {
+test.describe('mouse', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('it lies there, a corner can be folded over, and it is laid straight again', async ({ page }) => {
+  test('folds a corner on drag and lies flat again after scrolling away', async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -104,7 +104,7 @@ test.describe('with a mouse', () => {
     expect(problems).toEqual([]);
   });
 
-  test('with reduced motion, it lies still and cannot be picked up', async ({ page }) => {
+  test('stays still and cannot be picked up with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -120,7 +120,7 @@ test.describe('with a mouse', () => {
   });
 });
 
-test.describe('on a touch screen', () => {
+test.describe('touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
   /** Tap: touch down and up immediately. */
@@ -186,7 +186,7 @@ test.describe('on a touch screen', () => {
     expect(Math.abs((await page.evaluate(() => scrollY)) - still), 'and the page stays put').toBeLessThanOrEqual(1);
   }
 
-  test('a swipe over it scrolls the page; pressing and holding picks it up', async ({ page }) => {
+  test('a vertical swipe scrolls the page; a long press picks the rug up', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
@@ -216,7 +216,7 @@ test.describe('on a touch screen', () => {
     await stayedPut(page, still);
   });
 
-  test('set off sideways, it is picked up at once; a tap lifts the corner and lays it back', async ({ page }) => {
+  test('a horizontal drag picks it up at once; a tap lifts the corner and lays it back', async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -246,7 +246,7 @@ test.describe('on a touch screen', () => {
   // pinch. So this checks that the rug allows it, and that two fingers drawn apart horizontally
   // (dispatched to the rug directly, as a browser that doesn't handle the pinch itself would) don't
   // grab it.
-  test('two fingers on it are left to zoom the page', async ({ page }) => {
+  test('leaves two-finger gestures to page zoom', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
@@ -275,7 +275,7 @@ test.describe('on a touch screen', () => {
     expect(held, 'a pinch does not pick it up').toBe(false);
   });
 
-  test('with reduced motion, a tap still lifts it, at once', async ({ page }) => {
+  test('a tap lifts it instantly with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settled(page.context());
     const problems = await watch(page);
