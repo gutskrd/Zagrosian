@@ -8,7 +8,13 @@ export { locales };
 export const prefix = (code: string) => (code === defaultLocale ? '' : `/${code}`);
 
 /** A locale's pages: homepage, book and legal pages. */
-export const pagesIn = (code: string) => [prefix(code) || '/', `${prefix(code)}/book`, `${prefix(code)}/privacy`, `${prefix(code)}/terms`, `${prefix(code)}/security`];
+export const pagesIn = (code: string) => [
+  prefix(code) || '/',
+  `${prefix(code)}/book`,
+  `${prefix(code)}/privacy`,
+  `${prefix(code)}/terms`,
+  `${prefix(code)}/security`,
+];
 
 /** Every page in every locale. */
 export const pages = locales.flatMap(({ code }) => pagesIn(code));

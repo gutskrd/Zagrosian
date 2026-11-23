@@ -9,7 +9,12 @@ export function initLocalTime() {
 
     let formatter: Intl.DateTimeFormat;
     try {
-      formatter = new Intl.DateTimeFormat(document.documentElement.lang, { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      formatter = new Intl.DateTimeFormat(document.documentElement.lang, {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      });
     } catch {
       continue;
     }

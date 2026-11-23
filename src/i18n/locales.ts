@@ -24,7 +24,6 @@ export const defaultLocale: Locale = 'en';
 /** Every locale except English (which has no URL prefix). */
 export const prefixedLocales = locales.filter((locale) => locale.code !== defaultLocale).map((locale) => locale.code);
 
-export const isLocale = (value: string | undefined): value is Locale =>
-  locales.some((locale) => locale.code === value);
+export const isLocale = (value: string | undefined): value is Locale => locales.some((locale) => locale.code === value);
 
 export const localeInfo = (code: Locale): LocaleInfo => locales.find((locale) => locale.code === code)!;

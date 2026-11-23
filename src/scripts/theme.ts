@@ -40,8 +40,7 @@ function savePreference(preference: Preference) {
   }
 }
 
-const resolve = (preference: Preference): Theme =>
-  preference === 'system' ? (systemDark.matches ? 'dark' : 'light') : preference;
+const resolve = (preference: Preference): Theme => (preference === 'system' ? (systemDark.matches ? 'dark' : 'light') : preference);
 
 /** Applies a preference to the document and every theme control. */
 function render(preference: Preference) {

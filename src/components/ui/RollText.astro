@@ -35,19 +35,18 @@ const words = text
 const dir = joined ? undefined : 'ltr';
 ---
 
-<span class:list={['roll', className]} dir={dir}
-  ><span class="visually-hidden">{text}</span><span class="roll__track" aria-hidden="true"
-    >{
-      words.map((pieces, index) => (
-        <>
-          {index > 0 && ' '}
-          <span class="roll__word">
-            {pieces.map(({ piece, i }) => (
-              <span class="roll__piece" data-char={piece} data-i={i} />
-            ))}
-          </span>
-        </>
-      ))
-    }</span
-  ></span
->
+<span class:list={['roll', className]} dir={dir}>
+  <span class="visually-hidden">{text}</span>
+  <span class="roll__track" aria-hidden="true">
+    {words.map((pieces, index) => (
+      <>
+        {index > 0 && ' '}
+        <span class="roll__word">
+          {pieces.map(({ piece, i }) => (
+            <span class="roll__piece" data-char={piece} data-i={i} />
+          ))}
+        </span>
+      </>
+    ))}
+  </span>
+</span>

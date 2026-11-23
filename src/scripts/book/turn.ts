@@ -264,10 +264,19 @@ export class Turn {
     // arriving curled from beyond it) and flattening as it lands.
     const sign = forward ? -1 : 1;
     const [curl, at] = spec.spread
-      ? [[0, 16, 24, -8, 0], [0, 0.12, 0.45, 0.85, 1]]
+      ? [
+          [0, 16, 24, -8, 0],
+          [0, 0.12, 0.45, 0.85, 1],
+        ]
       : forward
-        ? [[0, 22, 32, 30, 28], [0, 0.12, 0.45, 0.85, 1]]
-        : [[28, 30, 32, 22, 0], [0, 0.15, 0.55, 0.88, 1]];
+        ? [
+            [0, 22, 32, 30, 28],
+            [0, 0.12, 0.45, 0.85, 1],
+          ]
+        : [
+            [28, 30, 32, 22, 0],
+            [0, 0.15, 0.55, 0.88, 1],
+          ];
     const bend = curl.map((degrees, i) => ({ transform: `rotateY(${sign * degrees}deg)`, offset: at[i] }));
     // Progress at which the leaf is edge-on (90 degrees).
     const edge = 90 / sweep;

@@ -42,8 +42,7 @@ const { class: className } = Astro.props;
   /* Spinning: each meridian sweeps from the edge to the center line and back, a third of a cycle
      apart. */
   @media (prefers-reduced-motion: no-preference) {
-    :global(:is(a:hover, a:focus-visible, button:hover, button:focus-visible, .language:has(:popover-open), .globe-spin))
-      .globe__meridian {
+    :global(:is(a:hover, a:focus-visible, button:hover, button:focus-visible, .language:has(:popover-open), .globe-spin)) .globe__meridian {
       opacity: 1;
       animation: globe-turn 2.4s linear infinite;
     }

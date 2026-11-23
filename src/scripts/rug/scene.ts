@@ -312,10 +312,22 @@ const lookAt = (eye: number[], up: number[]): Matrix => {
   const top = [back[1] * right[2] - back[2] * right[1], back[2] * right[0] - back[0] * right[2], back[0] * right[1] - back[1] * right[0]];
   const dot = (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   return new Float32Array([
-    right[0], top[0], back[0], 0,
-    right[1], top[1], back[1], 0,
-    right[2], top[2], back[2], 0,
-    -dot(right, eye), -dot(top, eye), -dot(back, eye), 1,
+    right[0],
+    top[0],
+    back[0],
+    0,
+    right[1],
+    top[1],
+    back[1],
+    0,
+    right[2],
+    top[2],
+    back[2],
+    0,
+    -dot(right, eye),
+    -dot(top, eye),
+    -dot(back, eye),
+    1,
   ]);
 };
 
@@ -420,7 +432,11 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   const anisotropic = gl.getExtension('EXT_texture_filter_anisotropic');
   if (anisotropic) {
-    gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(anisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+    gl.texParameterf(
+      gl.TEXTURE_2D,
+      anisotropic.TEXTURE_MAX_ANISOTROPY_EXT,
+      Math.min(8, gl.getParameter(anisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT)),
+    );
   }
 
   // Cloth state as float textures, one texel per particle. Fewer substeps on low-end devices:
@@ -518,7 +534,12 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     const half = Math.max(view.width, view.height) * 0.62;
     lightViewProjection = multiply(orthographic(half, LIGHT_NEAR, LIGHT_FAR), lookAt(eye, [0, 0, -1]));
     const margin = 0.02;
-    cloth.bounds = { left: -view.width / 2 + margin, right: view.width / 2 - margin, top: -view.height / 2 + margin, bottom: view.height / 2 - margin };
+    cloth.bounds = {
+      left: -view.width / 2 + margin,
+      right: view.width / 2 - margin,
+      top: -view.height / 2 + margin,
+      bottom: view.height / 2 - margin,
+    };
   };
 
   const readTheme = () => {

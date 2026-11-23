@@ -38,23 +38,25 @@ const words = kurdish.motto.split(' ');
   <div class="story__stage">
     <div class="container story__grid">
       <h2 id="story-title" class:list={['story__values', fit && `story__values--${fit}`]}>
-        {
-          t.story.values.map((value, index) => (
-            <>
-              {index > 0 && ' '}
-              <span class="story__value" data-story-value>
-                <span class="story__value-text">{value}</span>
-              </span>
-            </>
-          ))
-        }
+        {t.story.values.map((value, index) => (
+          <>
+            {index > 0 && ' '}
+            <span class="story__value" data-story-value>
+              <span class="story__value-text">{value}</span>
+            </span>
+          </>
+        ))}
       </h2>
       <div class="story__slot" aria-hidden="true" data-story-slot></div>
     </div>
 
     <div class="story__motto" data-story-motto>
-      <div class="story__sun" data-story-sun><Sun /></div>
-      <p class="story__kurdish kurdish" lang="ku" dir="ltr">{kurdish.motto}</p>
+      <div class="story__sun" data-story-sun>
+        <Sun />
+      </div>
+      <p class="story__kurdish kurdish" lang="ku" dir="ltr">
+        {kurdish.motto}
+      </p>
       {t.motto && <p class="story__translation lead">{t.motto}</p>}
     </div>
 
@@ -62,25 +64,31 @@ const words = kurdish.motto.split(' ');
       <div class="story__motto">
         <div class="story__sun">
           <span class="story__glow" data-story-glow></span>
-          <span class="story__glass-sun" data-story-sunrise><GlassSun /></span>
+          <span class="story__glass-sun" data-story-sunrise>
+            <GlassSun />
+          </span>
         </div>
         <p class="story__kurdish kurdish" lang="ku" dir="ltr">
-          {
-            words.map((word, index) => (
-              <>
-                {index > 0 && ' '}
-                <span class="story__word">
-                  <span data-story-word>{word}</span>
-                </span>
-              </>
-            ))
-          }
+          {words.map((word, index) => (
+            <>
+              {index > 0 && ' '}
+              <span class="story__word">
+                <span data-story-word>{word}</span>
+              </span>
+            </>
+          ))}
         </p>
-        {t.motto && <p class="story__translation lead" data-story-translation>{t.motto}</p>}
+        {t.motto && (
+          <p class="story__translation lead" data-story-translation>
+            {t.motto}
+          </p>
+        )}
       </div>
     </div>
 
-    <div class="story__progress" aria-hidden="true"><span data-story-progress></span></div>
+    <div class="story__progress" aria-hidden="true">
+      <span data-story-progress></span>
+    </div>
   </div>
 </section>
 

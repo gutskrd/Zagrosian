@@ -54,7 +54,8 @@ if (text.pages?.length !== pageCount) fail(`text.json has ${text.pages?.length} 
 
 const ratio = book.pagePt.h / book.pagePt.w;
 const files = (await readdir(join(dir, 'pages'))).filter((name) => name.endsWith('.webp'));
-if (files.length !== pageCount * renditions.length) fail(`pages/ holds ${files.length} pictures, expected ${pageCount * renditions.length}`);
+if (files.length !== pageCount * renditions.length)
+  fail(`pages/ holds ${files.length} pictures, expected ${pageCount * renditions.length}`);
 const hashes = new Map();
 for (let n = 1; n <= pageCount; n++) {
   for (const width of renditions) {
@@ -73,13 +74,15 @@ for (let n = 1; n <= pageCount; n++) {
 
 let next = null;
 for (const chapter of book.chapters) {
-  if (next !== null && chapter.start !== next) fail(`chapter ${chapter.number} starts on page ${chapter.start}, not right after the one before (${next})`);
+  if (next !== null && chapter.start !== next)
+    fail(`chapter ${chapter.number} starts on page ${chapter.start}, not right after the one before (${next})`);
   if (chapter.end < chapter.start) fail(`chapter ${chapter.number} ends before it starts`);
   next = chapter.end + 1;
 }
 
 const pdfBytes = await readFile(join(dir, book.pdf.file));
-if (pdfBytes.length !== book.pdf.bytes || sha256(pdfBytes) !== book.pdf.sha256) fail(`${book.pdf.file} does not match the size and hash book.json records`);
+if (pdfBytes.length !== book.pdf.bytes || sha256(pdfBytes) !== book.pdf.sha256)
+  fail(`${book.pdf.file} does not match the size and hash book.json records`);
 if (pdfBytes.length > LIMIT || Buffer.byteLength(textRaw) > LIMIT) fail('a file is over 25 MiB');
 
 // --- Unchanged editions ---
@@ -88,7 +91,11 @@ const contentHash = (edition) => String(edition ?? '').split('.')[1];
 const installed = await readFile(join(ASSETS, 'book.json'), 'utf8')
   .then((raw) => JSON.parse(raw))
   .catch(() => null);
-const present = async (file) => stat(file).then(() => true, () => false);
+const present = async (file) =>
+  stat(file).then(
+    () => true,
+    () => false,
+  );
 // (A run that stopped before rendering the social image completes it next time.)
 if (installed && contentHash(installed.edition) === contentHash(book.edition) && (await present(PDF)) && (await present(OG))) {
   console.log(`unchanged: edition ${installed.edition} is already in the site`);
@@ -118,14 +125,17 @@ const changed = [];
 for (let n = 1; n <= pageCount; n++) {
   if (renditions.some((width) => before.get(pageFile(n, width)) !== hashes.get(pageFile(n, width)))) changed.push(n);
 }
-console.log(`edition ${book.edition}: ${pageCount} pages, ${book.chapters.length} chapters, ${mb(weight)} in all (PDF ${mb(pdfBytes.length)})`);
-console.log(installed ? `pages changed: ${changed.length === 0 ? 'none (the words or the PDF did)' : changed.join(', ')}` : 'first edition');
+console.log(
+  `edition ${book.edition}: ${pageCount} pages, ${book.chapters.length} chapters, ${mb(weight)} in all (PDF ${mb(pdfBytes.length)})`,
+);
+console.log(
+  installed ? `pages changed: ${changed.length === 0 ? 'none (the words or the PDF did)' : changed.join(', ')}` : 'first edition',
+);
 if (installed && changed.length === pageCount) {
   // The same book rendered by a different poppler or WebP encoder version differs slightly on every
   // page.
   console.log('every page changed: if the book itself did not, the export ran with other versions of poppler or sharp than the last');
 }
-
 
 // --- Social image ---
 

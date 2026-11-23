@@ -100,10 +100,12 @@ const reflection = ([px, py]: Point, [qx, qy]: Point): Affine => {
 const sideOf = ([px, py]: Point, [qx, qy]: Point, [x, y]: Point) => (qx - px) * (y - py) - (qy - py) * (x - px);
 
 const area = (outline: Point[]) =>
-  Math.abs(outline.reduce((sum, [x, y], i) => {
-    const [nx, ny] = outline[(i + 1) % outline.length];
-    return sum + x * ny - nx * y;
-  }, 0)) / 2;
+  Math.abs(
+    outline.reduce((sum, [x, y], i) => {
+      const [nx, ny] = outline[(i + 1) % outline.length];
+      return sum + x * ny - nx * y;
+    }, 0),
+  ) / 2;
 
 const centroid = (outline: Point[]): Point => [
   outline.reduce((s, p) => s + p[0], 0) / outline.length,
@@ -128,7 +130,7 @@ const cut = (outline: Point[], p: Point, q: Point, sign: number): Point[] => {
     const sa = sideOf(p, q, a) * sign;
     const sb = sideOf(p, q, b) * sign;
     if (sa >= 0) out.push(a);
-    if ((sa >= 0) !== (sb >= 0)) {
+    if (sa >= 0 !== sb >= 0) {
       const t = sa / (sa - sb);
       out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
     }
@@ -161,7 +163,9 @@ export function foldSheet(): { pieces: Piece[]; creases: Crease[] } {
     for (const piece of pieces) {
       const laid = piece.outline.map((point) => apply(piece.layout, point));
       const back = invert(piece.layout);
-      const parts = [clip(laid, fold.from, fold.to, 1), clip(laid, fold.from, fold.to, -1)].filter((part) => part.length >= 3 && area(part) > 1e-7);
+      const parts = [clip(laid, fold.from, fold.to, 1), clip(laid, fold.from, fold.to, -1)].filter(
+        (part) => part.length >= 3 && area(part) > 1e-7,
+      );
       if (parts.length === 2) {
         // Where the crease cuts the piece is a crease of the sheet.
         const on = parts[0].filter((point) => Math.abs(sideOf(fold.from, fold.to, point)) < 1e-9);

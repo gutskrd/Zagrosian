@@ -13,7 +13,9 @@ const { t } = i18n(Astro.url);
 
 <section class="under section" aria-labelledby="under-title">
   <div class="container">
-    <h2 id="under-title" class="visually-hidden">{t.under.title}</h2>
+    <h2 id="under-title" class="visually-hidden">
+      {t.under.title}
+    </h2>
     <Rug />
 
     <div class="under__controls">
@@ -21,13 +23,7 @@ const { t } = i18n(Astro.url);
         <span class="under__hint-pointer">{t.under.hintPointer}</span>
         <span class="under__hint-touch">{t.under.hintTouch}</span>
       </p>
-      <button
-        class="under__button"
-        type="button"
-        data-rug-button
-        data-lift={t.under.lift}
-        data-lay={t.under.lay}
-      >
+      <button class="under__button" type="button" data-rug-button data-lift={t.under.lift} data-lay={t.under.lay}>
         {t.under.lift}
       </button>
     </div>

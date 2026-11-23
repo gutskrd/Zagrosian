@@ -41,19 +41,17 @@ if (lastLine.length > 2 && lastLine.slice(-2).join(' ').length <= 16) {
   data-split={effect === 'rise' ? '' : undefined}
   data-highlight={effect === 'highlight' ? '' : undefined}
 >
-  {
-    lines.map((words, line) => (
-      <>
-        {line > 0 && <br />}
-        {words.map((word, index) => (
-          <>
-            {index > 0 && ' '}
-            <span class="split__word" aria-hidden="true">
-              <span class="split__inner">{word}</span>
-            </span>
-          </>
-        ))}
-      </>
-    ))
-  }
+  {lines.map((words, line) => (
+    <>
+      {line > 0 && <br />}
+      {words.map((word, index) => (
+        <>
+          {index > 0 && ' '}
+          <span class="split__word" aria-hidden="true">
+            <span class="split__inner">{word}</span>
+          </span>
+        </>
+      ))}
+    </>
+  ))}
 </Tag>

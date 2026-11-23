@@ -13,19 +13,11 @@ import { play, setSound, soundEnabled } from './sound';
 import { currentPreference, setThemePreference, type Preference } from './theme';
 
 /** Lowercases and strips diacritics and Arabic harakat: "Français" -> "francais". */
-const normalise = (text: string) =>
-  text
-    .normalize('NFKD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .trim();
+const normalise = (text: string) => text.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().trim();
 
 /** Whether the user is typing in an editable element, so "/" is left alone. */
 function isEditing(target: EventTarget | null) {
-  return (
-    target instanceof HTMLElement &&
-    (target.isContentEditable || target.matches('input, textarea, select, [contenteditable]'))
-  );
+  return target instanceof HTMLElement && (target.isContentEditable || target.matches('input, textarea, select, [contenteditable]'));
 }
 
 export function initCommandMenu() {
@@ -200,8 +192,7 @@ export function initCommandMenu() {
   dialog.addEventListener('click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
-    const inside =
-      event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    const inside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
     if (!inside) close();
   });
 

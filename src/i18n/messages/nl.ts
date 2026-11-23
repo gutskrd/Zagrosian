@@ -115,13 +115,11 @@ export const nl: Messages = {
       },
       {
         question: 'Welke Koerdische dialecten leert u met Hevalo?',
-        answer:
-          'Hevalo begint met het Kurmanji. Meer dialecten volgen.',
+        answer: 'Hevalo begint met het Kurmanji. Meer dialecten volgen.',
       },
       {
         question: 'Is Hevalo beschikbaar voor iOS en Android?',
-        answer:
-          'Nog niet. De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
+        answer: 'Nog niet. De native apps zijn in ontwikkeling en verschijnen in de App Store en Google Play.',
       },
       {
         question: 'Verzamelt zagrosian.com persoonsgegevens?',
@@ -188,8 +186,7 @@ export const nl: Messages = {
     shareAlt: 'Rêya Kurmancî, het boek van Hevalo, opengeslagen bij de eerste pagina’s',
     eyebrow: 'Gratis boek',
     subtitle: 'De weg van het Kurmanji · het boek van Hevalo',
-    lead:
-      'Een lesboek in het Kurmanji, met Engels naast elke regel. Leer met Hamo, Xezal en Hevalo, van het eerste hallo tot verhalen en liedjes: lees het hier pagina voor pagina, of download het om te printen en te bewaren.',
+    lead: 'Een lesboek in het Kurmanji, met Engels naast elke regel. Leer met Hamo, Xezal en Hevalo, van het eerste hallo tot verhalen en liedjes: lees het hier pagina voor pagina, of download het om te printen en te bewaren.',
     startReading: 'Begin met lezen',
     download: 'Download het boek',
     downloadShort: 'Downloaden',

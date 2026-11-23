@@ -30,7 +30,16 @@ interface Props {
 }
 
 const { locale, info, t, base } = i18n(Astro.url);
-const { title = t.meta.title, description = t.meta.description, noindex = false, breadcrumb, dateModified, image, nodes, mainEntity } = Astro.props;
+const {
+  title = t.meta.title,
+  description = t.meta.description,
+  noindex = false,
+  breadcrumb,
+  dateModified,
+  image,
+  nodes,
+  mainEntity,
+} = Astro.props;
 
 const absolute = (path: string) => new URL(path, site.url).href;
 // Pages build to /name.html but are served and linked as /name.
@@ -73,18 +82,18 @@ const jsonLd = noindex
     <script is:inline src={themeInit}></script>
     <title>{title}</title>
     <meta name="description" content={description} />
-    {
-      noindex ? (
-        <meta name="robots" content="noindex" />
-      ) : (
-        <>
-          <link rel="canonical" href={canonical} />
-          {/* Allow large image previews and full snippets. */}
-          <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-        </>
-      )
-    }
-    {alternates.map(({ hreflang, href }) => <link rel="alternate" hreflang={hreflang} href={href} />)}
+    {noindex ? (
+      <meta name="robots" content="noindex" />
+    ) : (
+      <>
+        <link rel="canonical" href={canonical} />
+        {/* Allow large image previews and full snippets. */}
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      </>
+    )}
+    {alternates.map(({ hreflang, href }) => (
+      <link rel="alternate" hreflang={hreflang} href={href} />
+    ))}
     {!noindex && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown" />}
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
@@ -107,11 +116,11 @@ const jsonLd = noindex
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content={info.ogLocale} />
-    {
-      locales
-        .filter(({ code }) => code !== locale)
-        .map(({ ogLocale }) => <meta property="og:locale:alternate" content={ogLocale} />)
-    }
+    {locales
+      .filter(({ code }) => code !== locale)
+      .map(({ ogLocale }) => (
+        <meta property="og:locale:alternate" content={ogLocale} />
+      ))}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -134,7 +143,9 @@ const jsonLd = noindex
     <slot name="head" />
   </head>
   <body>
-    <a class="skip-link" href="#main">{t.common.skipToContent}</a>
+    <a class="skip-link" href="#main">
+      {t.common.skipToContent}
+    </a>
     <Header />
     <main id="main">
       <slot />

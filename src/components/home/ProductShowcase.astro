@@ -10,7 +10,9 @@ const { t, localize } = i18n(Astro.url);
 
 <section id="hevalo" class="showcase" aria-labelledby="hevalo-title">
   <div class="container">
-    <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
+    <p class="eyebrow" data-reveal>
+      {t.hevalo.eyebrow}
+    </p>
 
     <div class="showcase__body">
       {/* Hevalo's icon as a hole in the page with the deer emerging (HevaloDeer.astro), which
@@ -27,9 +29,13 @@ const { t, localize } = i18n(Astro.url);
 
       <div class="showcase__text">
         <SplitText id="hevalo-title" class="showcase__name" lang="en" text={hevalo.name} />
-        <p class="showcase__byline" data-reveal>{t.hevalo.category}</p>
+        <p class="showcase__byline" data-reveal>
+          {t.hevalo.category}
+        </p>
         <div class="showcase__details" data-reveal>
-          <p class="showcase__description" data-lines>{t.hevalo.description}</p>
+          <p class="showcase__description" data-lines>
+            {t.hevalo.description}
+          </p>
           <div class="showcase__actions">
             <Cta href={hevalo.url} arrow="up-right" label={t.hevalo.visit} />
             {/* Hevalo's book, free to read and download on this site. */}
@@ -44,11 +50,18 @@ const { t, localize } = i18n(Astro.url);
           </div>
           <div>
             <dt>{t.hevalo.website}</dt>
-            <dd><a href={hevalo.url} dir="ltr">{hevalo.domain}</a></dd>
+            <dd>
+              <a href={hevalo.url} dir="ltr">
+                {hevalo.domain}
+              </a>
+            </dd>
           </div>
           <div>
             <dt>{t.hevalo.platformsLabel}</dt>
-            <dd class="showcase__status"><span class="status-dot" aria-hidden="true"></span>{t.hevalo.comingSoon}</dd>
+            <dd class="showcase__status">
+              <span class="status-dot" aria-hidden="true"></span>
+              {t.hevalo.comingSoon}
+            </dd>
           </div>
         </dl>
       </div>
@@ -201,6 +214,5 @@ const { t, localize } = i18n(Astro.url);
     .showcase__facts {
       --reveal-delay: 0.2s;
     }
-
   }
 </style>

@@ -22,7 +22,9 @@ async function picture(page: Page) {
   const view = page.viewportSize()!;
   const top = Math.max(0, box.y);
   const clip = { x: box.x, y: top, width: box.width, height: Math.min(box.y + box.height, view.height) - top };
-  const { data, info } = await sharp(await page.screenshot({ clip })).raw().toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(await page.screenshot({ clip }))
+    .raw()
+    .toBuffer({ resolveWithObject: true });
   return { data, info, clip };
 }
 

@@ -183,7 +183,23 @@ export function initStory() {
     // Mobile browser chrome collapsing or expanding resizes the window without changing these
     // values (the stage is sized for it), so keep the current rasters instead of redrawing as the
     // user changes scroll direction.
-    const as = [width, stageHeight, view, heroTop, storyTop, pinned, start.x, start.y, start.size, rest.x, rest.y, rest.size, sunAt.x, sunAt.y, sunAt.size]
+    const as = [
+      width,
+      stageHeight,
+      view,
+      heroTop,
+      storyTop,
+      pinned,
+      start.x,
+      start.y,
+      start.size,
+      rest.x,
+      rest.y,
+      rest.size,
+      sunAt.x,
+      sunAt.y,
+      sunAt.size,
+    ]
       .map((value) => value.toFixed(1))
       .join();
     if (as === measuredAs) return;
@@ -207,8 +223,7 @@ export function initStory() {
     written.set(key, value);
     element.style.setProperty(name, value);
   };
-  const shown = (element: HTMLElement, visible: boolean, key: string) =>
-    style(element, 'visibility', visible ? 'visible' : '', key);
+  const shown = (element: HTMLElement, visible: boolean, key: string) => style(element, 'visibility', visible ? 'visible' : '', key);
 
   // Last rung each layer was rasterized at. On a rung change (or first sight), `will-change` is
   // dropped for one frame so the compositor re-rasterizes at the current size, then restored for
@@ -317,7 +332,12 @@ export function initStory() {
     const inView = inScene > 0 && q < IRIS[1];
     shown(scene, inView, 'scene');
     style(scene, 'opacity', inScene.toFixed(3), 'scene-o');
-    style(scene, 'clip-path', closing > 0 ? `circle(${radius.toFixed(1)}px at ${sunAt.x.toFixed(1)}px ${sunAt.y.toFixed(1)}px)` : '', 'scene-clip');
+    style(
+      scene,
+      'clip-path',
+      closing > 0 ? `circle(${radius.toFixed(1)}px at ${sunAt.x.toFixed(1)}px ${sunAt.y.toFixed(1)}px)` : '',
+      'scene-clip',
+    );
     shown(motto, q >= IRIS[0] - 0.02, 'motto');
 
     // The glass sun rises from below, large and tumbling, to center, then settles facing the viewer
@@ -353,7 +373,12 @@ export function initStory() {
 
     // Soft back light, strongest as the sun reaches center.
     const light = up * (1 - 0.6 * settle);
-    style(glow, 'transform', `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${((sunSize / sunAt.size) * 0.9).toFixed(3)})`, 'glow-t');
+    style(
+      glow,
+      'transform',
+      `translate3d(${(sunX - sunAt.x).toFixed(2)}px, ${(sunY - sunAt.y).toFixed(2)}px, 0) scale(${((sunSize / sunAt.size) * 0.9).toFixed(3)})`,
+      'glow-t',
+    );
     style(glow, 'opacity', light.toFixed(3), 'glow-o');
 
     words.forEach((word, index) => {

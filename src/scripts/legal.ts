@@ -43,7 +43,10 @@ export function initLegalTools() {
     icon.setAttribute('viewBox', '0 0 20 20');
     icon.setAttribute('aria-hidden', 'true');
     const path = document.createElementNS(svg, 'path');
-    path.setAttribute('d', 'M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1');
+    path.setAttribute(
+      'd',
+      'M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1',
+    );
     icon.append(path);
     button.append(icon);
 

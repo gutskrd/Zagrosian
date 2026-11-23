@@ -81,13 +81,15 @@ const fail = (message: string): never => {
 
 // --- Build-time checks ---
 
-if (images.size !== book.pageCount * renditions.length) fail(`${images.size} page pictures, expected ${book.pageCount * renditions.length}`);
+if (images.size !== book.pageCount * renditions.length)
+  fail(`${images.size} page pictures, expected ${book.pageCount * renditions.length}`);
 if (text.pages.length !== book.pageCount) fail(`text.json has ${text.pages.length} pages, book.json ${book.pageCount}`);
 const ratio = book.pagePt.h / book.pagePt.w;
 for (let n = 1; n <= book.pageCount; n++) {
   for (const width of renditions) {
     const image = images.get(fileName(n, width)) ?? fail(`no picture ${fileName(n, width)}`);
-    if (image.width !== width || Math.abs(image.height - width * ratio) > 1) fail(`${fileName(n, width)} is ${image.width}×${image.height}`);
+    if (image.width !== width || Math.abs(image.height - width * ratio) > 1)
+      fail(`${fileName(n, width)} is ${image.width}×${image.height}`);
   }
 }
 const pdfBytes = statSync(join(process.cwd(), 'public', bookSite.pdf)).size;
@@ -97,7 +99,8 @@ for (const { code, intl } of locales) {
   for (const chapter of chapters) {
     const name = t.chapters[chapter.number - 1];
     if (!name) fail(`chapter ${chapter.number} has no name in src/i18n/messages/${code}.ts (book.chapters)`);
-    if (code === 'en' && name !== chapter.titleEn) fail(`chapter ${chapter.number} is “${chapter.titleEn}”, but book.chapters in en.ts says “${name}”`);
+    if (code === 'en' && name !== chapter.titleEn)
+      fail(`chapter ${chapter.number} is “${chapter.titleEn}”, but book.chapters in en.ts says “${name}”`);
   }
   for (const category of new Intl.PluralRules(intl).resolvedOptions().pluralCategories) {
     if (!(category in t.pageCount)) fail(`book.pageCount in ${code}.ts has no “${category}” form`);
@@ -106,7 +109,8 @@ for (const { code, intl } of locales) {
 
 // --- Pages ---
 
-const within = <T extends { start: number; end: number }>(list: T[], n: number) => list.find((item) => item.start <= n && n <= item.end) ?? null;
+const within = <T extends { start: number; end: number }>(list: T[], n: number) =>
+  list.find((item) => item.start <= n && n <= item.end) ?? null;
 
 export const pages: BookPage[] = text.pages.map(({ n, blocks }) => {
   const chapter = within(chapters, n);
@@ -143,7 +147,9 @@ export function pageCountText(locale: Locale, count = book.pageCount): string {
 
 /** PDF size in MB, localized: "2.6 MB", "2,6 Mo". */
 export const pdfSize = (locale: Locale) =>
-  new Intl.NumberFormat(localeInfo(locale).intl, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }).format(book.pdf.bytes / 1e6);
+  new Intl.NumberFormat(localeInfo(locale).intl, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }).format(
+    book.pdf.bytes / 1e6,
+  );
 
 /** Edition date, localized. */
 export const editionDate = (locale: Locale) => formatDate(locale, book.date);

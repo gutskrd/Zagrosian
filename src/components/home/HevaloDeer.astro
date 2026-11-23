@@ -92,34 +92,44 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
   {/* The hole: the purple backdrop, and the deer while it's behind the page. */}
   <span class="deer__hole">
     <span class="deer__back">
-      {
-        images('snow').map((img) => (
-          <img class="deer__image deer__snow" data-season={img.season} {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
-        ))
-      }
+      {images('snow').map((img) => (
+        <img
+          class="deer__image deer__snow"
+          data-season={img.season}
+          {...img.attributes}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+        />
+      ))}
     </span>
     <span class="deer__body deer__body--neck">
       <span class="deer__layer deer__neck">
-        {
-          images('neck').map((img) => (
-            <img class="deer__image" {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
-          ))
-        }
+        {images('neck').map((img) => (
+          <img class="deer__image" {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
+        ))}
       </span>
     </span>
     <span class="deer__body deer__body--behind">
-      {
-        parts.map((layer) => (
-          <span class:list={['deer__layer', `deer__${layer}`]}>
-            <span class="deer__part">
-              {images(layer).map((img) => (
-                <img class="deer__image" data-season={img.season} {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
-              ))}
-              {layer === 'head' && <HevaloEyes frame="head" lids />}
-            </span>
+      {parts.map((layer) => (
+        <span class:list={['deer__layer', `deer__${layer}`]}>
+          <span class="deer__part">
+            {images(layer).map((img) => (
+              <img
+                class="deer__image"
+                data-season={img.season}
+                {...img.attributes}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                draggable="false"
+              />
+            ))}
+            {layer === 'head' && <HevaloEyes frame="head" lids />}
           </span>
-        ))
-      }
+        </span>
+      ))}
     </span>
     <span class="deer__veil"></span>
   </span>
@@ -128,26 +138,30 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
   {/* In front of the page: the deer's shadow on it, and the deer. */}
   <span class="deer__body deer__body--shade">
     <span class="deer__shade">
-      {
-        images('shade').map((img) => (
-          <img class="deer__image" data-season={img.season} {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
-        ))
-      }
+      {images('shade').map((img) => (
+        <img class="deer__image" data-season={img.season} {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
+      ))}
     </span>
   </span>
   <span class="deer__body deer__body--front">
-    {
-      parts.map((layer) => (
-        <span class:list={['deer__layer', `deer__${layer}`]}>
-          <span class="deer__part">
-            {images(layer).map((img) => (
-              <img class="deer__image" data-season={img.season} {...img.attributes} alt="" loading="lazy" decoding="async" draggable="false" />
-            ))}
-            {layer === 'head' && <HevaloEyes frame="head" lids />}
-          </span>
+    {parts.map((layer) => (
+      <span class:list={['deer__layer', `deer__${layer}`]}>
+        <span class="deer__part">
+          {images(layer).map((img) => (
+            <img
+              class="deer__image"
+              data-season={img.season}
+              {...img.attributes}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              draggable="false"
+            />
+          ))}
+          {layer === 'head' && <HevaloEyes frame="head" lids />}
         </span>
-      ))
-    }
+      </span>
+    ))}
   </span>
 </span>
 

@@ -35,12 +35,67 @@ const AXIS = 359.9; // x' = AXIS - x mirrors horizontally
 // creaseL: where the left ear goes under the head; dome: top of the head; jaw: cheek and chin
 // outline over the neck (the shaded underside of the chin belongs to the head); notchL: through the
 // purple gap between the left ear and antler. The right side mirrors the left.
-const creaseL = [[69, 203], [72, 196], [75, 186], [79, 174], [84, 162], [91, 151], [100, 143]];
-const dome = [[100, 143], [105, 140], [110, 135.5], [120, 130.5], [130, 127], [140, 124], [150, 122], [160, 120.5], [170, 119.5], [180, 119], [190, 119.5], [200, 120.5], [210, 122], [220, 124], [230, 127], [240, 131], [250, 136], [255, 139.5], [259.9, 143]];
+const creaseL = [
+  [69, 203],
+  [72, 196],
+  [75, 186],
+  [79, 174],
+  [84, 162],
+  [91, 151],
+  [100, 143],
+];
+const dome = [
+  [100, 143],
+  [105, 140],
+  [110, 135.5],
+  [120, 130.5],
+  [130, 127],
+  [140, 124],
+  [150, 122],
+  [160, 120.5],
+  [170, 119.5],
+  [180, 119],
+  [190, 119.5],
+  [200, 120.5],
+  [210, 122],
+  [220, 124],
+  [230, 127],
+  [240, 131],
+  [250, 136],
+  [255, 139.5],
+  [259.9, 143],
+];
 const mirror = (points) => points.map(([x, y]) => [AXIS - x, y]);
 const creaseR = mirror(creaseL).reverse(); // top to bottom
-const jaw = [[262, 321], [247, 320.5], [238, 329], [228, 336.5], [220, 343], [210, 349], [200, 354], [190, 357], [180, 358.6], [170, 357], [160, 354], [150, 349], [140, 343], [132, 336.5], [122, 329], [113, 320.5], [98, 321]];
-const notchL = [[-20, 85], [40, 90], [60, 98], [75, 106], [90, 117], [98, 127], [101, 135], [100, 143]];
+const jaw = [
+  [262, 321],
+  [247, 320.5],
+  [238, 329],
+  [228, 336.5],
+  [220, 343],
+  [210, 349],
+  [200, 354],
+  [190, 357],
+  [180, 358.6],
+  [170, 357],
+  [160, 354],
+  [150, 349],
+  [140, 343],
+  [132, 336.5],
+  [122, 329],
+  [113, 320.5],
+  [98, 321],
+];
+const notchL = [
+  [-20, 85],
+  [40, 90],
+  [60, 98],
+  [75, 106],
+  [90, 117],
+  [98, 127],
+  [101, 135],
+  [100, 143],
+];
 
 const poly = (points) => points.map(([x, y]) => `${x},${y}`).join(' ');
 
@@ -88,7 +143,8 @@ function fitQuadratic(samples) {
   const n = 6;
   const A = Array.from({ length: n }, () => new Float64Array(n + 3));
   for (const [x, y, r, g, b] of samples) {
-    const u = x / 180 - 1, v = y / 180 - 1;
+    const u = x / 180 - 1,
+      v = y / 180 - 1;
     const f = [1, u, v, u * u, v * v, u * v];
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) A[i][j] += f[i] * f[j];
@@ -110,7 +166,8 @@ function fitQuadratic(samples) {
   }
   const coef = [0, 1, 2].map((ch) => A.map((row, i) => row[n + ch] / row[i]));
   return (x, y) => {
-    const u = x / 180 - 1, v = y / 180 - 1;
+    const u = x / 180 - 1,
+      v = y / 180 - 1;
     const f = [1, u, v, u * u, v * v, u * v];
     return coef.map((c) => c.reduce((s, ci, i) => s + ci * f[i], 0));
   };
@@ -155,7 +212,8 @@ async function layersFor({ season, source, height: H }) {
   const C = new Float32Array(N * 3); // straight color
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
-      const sx = x + FRAME.left, sy = y + FRAME.top;
+      const sx = x + FRAME.left,
+        sy = y + FRAME.top;
       const i = y * W + x;
       if (sy >= info.height) continue;
       const j = (sy * info.width + sx) * 4;
@@ -185,8 +243,28 @@ async function layersFor({ season, source, height: H }) {
     residual += Math.hypot(r - br, g - bg, b - bb);
   }
   console.log(season, 'background fit on', samples.length, 'px, mean residual', (residual / samples.length).toFixed(2));
-  const hex = (rgb) => '#' + rgb.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('');
-  console.log(season, 'purple: top left', hex(bgAt(14, 1)), 'top right', hex(bgAt(346, 1)), 'bottom left', hex(bgAt(14, 358)), 'bottom right', hex(bgAt(346, 358)), 'centre', hex(bgAt(180, 180)));
+  const hex = (rgb) =>
+    '#' +
+    rgb
+      .map((v) =>
+        Math.round(Math.min(255, Math.max(0, v)))
+          .toString(16)
+          .padStart(2, '0'),
+      )
+      .join('');
+  console.log(
+    season,
+    'purple: top left',
+    hex(bgAt(14, 1)),
+    'top right',
+    hex(bgAt(346, 1)),
+    'bottom left',
+    hex(bgAt(14, 358)),
+    'bottom right',
+    hex(bgAt(346, 358)),
+    'centre',
+    hex(bgAt(180, 180)),
+  );
 
   // Initial hard deer mask: far from the purple inside the square, or opaque outside it.
   const S = squareCoverage(SA, H);
@@ -227,9 +305,16 @@ async function layersFor({ season, source, height: H }) {
     while (stack.length) {
       const k = stack.pop();
       count++;
-      const x = k % W, y = (k / W) | 0;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nx = x + dx, ny = y + dy;
+      const x = k % W,
+        y = (k / W) | 0;
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const nx = x + dx,
+          ny = y + dy;
         if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
         const n = ny * W + nx;
         if (core[n] && label[n] < 0) {
@@ -261,7 +346,8 @@ async function layersFor({ season, source, height: H }) {
       let interior = true;
       for (let dy = -1; dy <= 1 && interior; dy++)
         for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx, ny = y + dy;
+          const nx = x + dx,
+            ny = y + dy;
           if (nx < 0 || ny < 0 || nx >= W || ny >= H || !core[ny * W + nx]) {
             interior = false;
             break;
@@ -274,10 +360,14 @@ async function layersFor({ season, source, height: H }) {
         continue;
       }
       // Local deer color: mean of core pixels within 3px, away from the edge.
-      let fr = 0, fg = 0, fb = 0, fw = 0;
+      let fr = 0,
+        fg = 0,
+        fb = 0,
+        fw = 0;
       for (let dy = -3; dy <= 3; dy++)
         for (let dx = -3; dx <= 3; dx++) {
-          const nx = x + dx, ny = y + dy;
+          const nx = x + dx,
+            ny = y + dy;
           if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
           const n = ny * W + nx;
           if (!core[n] || SA[n] < 0.98) continue;
@@ -290,7 +380,8 @@ async function layersFor({ season, source, height: H }) {
       if (!fw) continue;
       const f = [fr / fw, fg / fw, fb / fw];
       const bp = [B[i * 3] * S[i], B[i * 3 + 1] * S[i], B[i * 3 + 2] * S[i]];
-      let num = 0, den = 0;
+      let num = 0,
+        den = 0;
       for (let c = 0; c < 3; c++) {
         num += (P[i * 3 + c] - bp[c]) * (f[c] - bp[c]);
         den += (f[c] - bp[c]) ** 2;
@@ -329,7 +420,8 @@ async function layersFor({ season, source, height: H }) {
   const domeY = (x) => {
     const d = r.dome;
     if (x <= d[0][0]) return d[0][1];
-    for (let k = 1; k < d.length; k++) if (x <= d[k][0]) return d[k - 1][1] + ((x - d[k - 1][0]) / (d[k][0] - d[k - 1][0])) * (d[k][1] - d[k - 1][1]);
+    for (let k = 1; k < d.length; k++)
+      if (x <= d[k][0]) return d[k - 1][1] + ((x - d[k - 1][0]) / (d[k][0] - d[k - 1][0])) * (d[k][1] - d[k - 1][1]);
     return d[d.length - 1][1];
   };
   for (let y = 0; y < H; y++)
@@ -344,7 +436,8 @@ async function layersFor({ season, source, height: H }) {
           // Snow (light gray-white) and fur (orange) belong to the head; antlers, wire and colored
           // bulbs to the antlers.
           const [cr, cg, cb] = [F[i * 3], F[i * 3 + 1], F[i * 3 + 2]];
-          const max = Math.max(cr, cg, cb), min = Math.min(cr, cg, cb);
+          const max = Math.max(cr, cg, cb),
+            min = Math.min(cr, cg, cb);
           const snow = min > 165 && max - min < 70;
           const fur = cr > cg && cg > cb && cr > 150 && (cg - cb) / Math.max(1, cr - cb) > 0.25 && (cg - cb) / Math.max(1, cr - cb) < 0.75;
           h = snow || fur ? h : 0;
@@ -385,9 +478,16 @@ async function layersFor({ season, source, height: H }) {
         }
     while (stack.length) {
       const k = stack.pop();
-      const x = k % W, y = (k / W) | 0;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nx = x + dx, ny = y + dy;
+      const x = k % W,
+        y = (k / W) | 0;
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const nx = x + dx,
+          ny = y + dy;
         if (nx < 138 || nx > 223 || ny < 266 || ny > 325) continue;
         const n = ny * W + nx;
         if (!outside[n] && nose0[n] < 0.5) {
@@ -414,7 +514,8 @@ async function layersFor({ season, source, height: H }) {
   if (season === 'christmas') {
     // The snow on top of the nose.
     nose = new Float32Array(N);
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) nose[y * W + x] = Math.max(...[0, 1, 2, 3, 4, 5, 6].map((k) => (y + k < H ? nose0[(y + k) * W + x] : 0)));
+    for (let y = 0; y < H; y++)
+      for (let x = 0; x < W; x++) nose[y * W + x] = Math.max(...[0, 1, 2, 3, 4, 5, 6].map((k) => (y + k < H ? nose0[(y + k) * W + x] : 0)));
   }
 
   // Layers behind extend slightly under the head so no gaps open when they move apart: antlers and
@@ -427,25 +528,34 @@ async function layersFor({ season, source, height: H }) {
     const inside = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
     const solid = (x, y) => inside(x, y) && A[y * W + x] * weight[y * W + x] >= 0.5;
     for (let i = 0; i < N; i++) {
-      const x = i % W, y = (i / W) | 0;
+      const x = i % W,
+        y = (i / W) | 0;
       if (!solid(x, y) || solid(x + dx, y + dy)) continue;
       const n = (y + dy) * W + (x + dx);
       if (!inside(x + dx, y + dy) || head[n] < 0.5) continue;
       // Color 2-4px inside the edge, averaged over 5px along it.
       let fill = flat;
       if (!fill) {
-        let r = 0, g = 0, b = 0, count = 0;
+        let r = 0,
+          g = 0,
+          b = 0,
+          count = 0;
         for (let along = -2; along <= 2; along++)
           for (let depth = 2; depth <= 4; depth++) {
-            const sx = x - dx * depth + dy * along, sy = y - dy * depth + dx * along;
+            const sx = x - dx * depth + dy * along,
+              sy = y - dy * depth + dx * along;
             if (!solid(sx, sy)) continue;
             const k = sy * W + sx;
-            r += F[k * 3]; g += F[k * 3 + 1]; b += F[k * 3 + 2]; count++;
+            r += F[k * 3];
+            g += F[k * 3 + 1];
+            b += F[k * 3 + 2];
+            count++;
           }
         fill = count ? [r / count, g / count, b / count] : [F[i * 3], F[i * 3 + 1], F[i * 3 + 2]];
       }
       for (let k = 1; k <= reach; k++) {
-        const tx = x + dx * k, ty = y + dy * k;
+        const tx = x + dx * k,
+          ty = y + dy * k;
         if (!inside(tx, ty)) break;
         const t = ty * W + tx;
         if (head[t] < 0.3 || A[t] < 0.5) break;
@@ -465,24 +575,36 @@ async function layersFor({ season, source, height: H }) {
     const columns = [];
     for (let x = 0; x < W; x++) {
       let y0 = -1;
-      for (let y = 280; y < H - 1; y++) if (A[y * W + x] * neck[y * W + x] >= 0.5) { y0 = y; break; }
+      for (let y = 280; y < H - 1; y++)
+        if (A[y * W + x] * neck[y * W + x] >= 0.5) {
+          y0 = y;
+          break;
+        }
       if (y0 < 0) continue;
       const sy = Math.min(y0 + 2, Math.floor(SQUARE.bottom) - 1);
       const k = sy * W + x;
-      columns.push({ x, y0, rgb: A[k] * neck[k] >= 0.5 ? [F[k * 3], F[k * 3 + 1], F[k * 3 + 2]] : null, a: A[y0 * W + x] * neck[y0 * W + x] });
+      columns.push({
+        x,
+        y0,
+        rgb: A[k] * neck[k] >= 0.5 ? [F[k * 3], F[k * 3 + 1], F[k * 3 + 2]] : null,
+        a: A[y0 * W + x] * neck[y0 * W + x],
+      });
     }
     // Columns with no neck pixel below the jaw (where the chin reaches the tile edge) take their
     // neighbors' color; then a light horizontal blur.
     const known = columns.filter((c) => c.rgb);
     for (const c of columns) {
       if (c.rgb) continue;
-      const left = [...known].reverse().find((k) => k.x < c.x), right = known.find((k) => k.x > c.x);
-      const a = left ?? right, b = right ?? left;
+      const left = [...known].reverse().find((k) => k.x < c.x),
+        right = known.find((k) => k.x > c.x);
+      const a = left ?? right,
+        b = right ?? left;
       const t = a === b ? 0 : (c.x - a.x) / (b.x - a.x);
       c.rgb = a.rgb.map((v, ch) => v + (b.rgb[ch] - v) * t);
     }
     const smoothRgb = columns.map((c, index) => {
-      let sum = [0, 0, 0], weight = 0;
+      let sum = [0, 0, 0],
+        weight = 0;
       for (let d = -3; d <= 3; d++) {
         const o = columns[index + d];
         if (!o || Math.abs(o.x - c.x) > 3) continue;
@@ -544,12 +666,21 @@ async function layersFor({ season, source, height: H }) {
       if (out[i * 4 + 3] === 0 || deep[i]) continue;
       const lum = (0.2126 * F[i * 3] + 0.7152 * F[i * 3 + 1] + 0.0722 * F[i * 3 + 2]) / 255;
       if (season === 'christmas' && lum > 0.6 && nose0[i] < 0.5) continue;
-      const x = i % W, y = (i / W) | 0;
-      let r = 0, g = 0, b = 0, count = 0;
+      const x = i % W,
+        y = (i / W) | 0;
+      let r = 0,
+        g = 0,
+        b = 0,
+        count = 0;
       for (let dy = -3; dy <= 3; dy++)
         for (let dx = -3; dx <= 3; dx++) {
           const k = (y + dy) * W + (x + dx);
-          if (deep[k]) { r += F[k * 3]; g += F[k * 3 + 1]; b += F[k * 3 + 2]; count++; }
+          if (deep[k]) {
+            r += F[k * 3];
+            g += F[k * 3 + 1];
+            b += F[k * 3 + 2];
+            count++;
+          }
         }
       if (count) out.set([r / count, g / count, b / count], i * 4);
     }
@@ -560,7 +691,8 @@ async function layersFor({ season, source, height: H }) {
     const snow = new Float32Array(N * 4);
     for (let i = 0; i < N; i++) {
       if (A[i] > 0 || band[i] > 0 || SA[i] <= 0.5 || S[i] <= 0.99) continue;
-      let num = 0, den = 0;
+      let num = 0,
+        den = 0;
       for (let c = 0; c < 3; c++) {
         num += (C[i * 3 + c] - B[i * 3 + c]) * (255 - B[i * 3 + c]);
         den += (255 - B[i * 3 + c]) ** 2;
@@ -599,7 +731,8 @@ async function layersFor({ season, source, height: H }) {
           // From slightly inside the neck on either side, past the jaw's edge.
           const a = drawn(x - 3) ? x - 3 : x - 1;
           const b = drawn(end + 2) ? end + 2 : end;
-          const l = (y * W + a) * 4, r = (y * W + b) * 4;
+          const l = (y * W + a) * 4,
+            r = (y * W + b) * 4;
           for (let g = x; g < end; g++) {
             const t = (g - a) / (b - a);
             const m = (y * W + g) * 4;
@@ -618,13 +751,19 @@ async function layersFor({ season, source, height: H }) {
   const sil = new Float32Array(N);
   for (let i = 0; i < N; i++) sil[i] = A[i] * Math.min(1, head[i] + antlers[i] + earL[i] + earR[i]);
   const silBuf = Buffer.from(Uint8Array.from(sil, (v) => Math.round(v * 255)));
-  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } }).blur(6).extractChannel(0).raw().toBuffer();
+  const blurred = await sharp(silBuf, { raw: { width: W, height: H, channels: 1 } })
+    .blur(6)
+    .extractChannel(0)
+    .raw()
+    .toBuffer();
   if (blurred.length !== N) throw new Error('shade: unexpected channels');
   const shade = new Float32Array(N * 4);
-  const DX = 4, DY = 10;
+  const DX = 4,
+    DY = 10;
   for (let y = 0; y < H; y++)
     for (let x = 0; x < W; x++) {
-      const sx = x - DX, sy = y - DY;
+      const sx = x - DX,
+        sy = y - DY;
       if (sx < 0 || sy < 0) continue;
       const v = blurred[sy * W + sx] / 255;
       const i = y * W + x;
@@ -650,19 +789,27 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
   const names = ['snow', 'shade', 'neck', 'antlers', 'ear-left', 'ear-right', 'head', 'nose'];
   const boxes = {};
   for (const name of names) {
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    let x0 = Infinity,
+      y0 = Infinity,
+      x1 = -Infinity,
+      y1 = -Infinity;
     for (const { layers } of results) {
       const L = layers[name];
       if (!L) continue;
       for (let y = 0; y < L.length / 4 / W; y++)
         for (let x = 0; x < W; x++)
           if (L[(y * W + x) * 4 + 3] > 0.004) {
-            x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + 1); y1 = Math.max(y1, y + 1);
+            x0 = Math.min(x0, x);
+            y0 = Math.min(y0, y);
+            x1 = Math.max(x1, x + 1);
+            y1 = Math.max(y1, y + 1);
           }
     }
     const H = Math.max(...results.map((r) => (r.layers[name] ? r.layers[name].length / 4 / W : 0)));
-    x0 = Math.max(0, Math.floor(x0 / 5) * 5); y0 = Math.max(0, Math.floor(y0 / 5) * 5);
-    x1 = Math.min(W, Math.ceil(x1 / 5) * 5); y1 = Math.min(H + 3, Math.ceil(y1 / 5) * 5);
+    x0 = Math.max(0, Math.floor(x0 / 5) * 5);
+    y0 = Math.max(0, Math.floor(y0 / 5) * 5);
+    x1 = Math.min(W, Math.ceil(x1 / 5) * 5);
+    y1 = Math.min(H + 3, Math.ceil(y1 / 5) * 5);
     boxes[name] = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
   }
 
@@ -680,7 +827,10 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
       const png = await full.png().toBuffer();
       for (const frame of name === 'shade' ? [144] : [288, 576]) {
         const k = frame / W;
-        const scaled = await sharp(png).resize({ width: frame, height: Math.round(rows * k), kernel: 'mitchell' }).raw().toBuffer({ resolveWithObject: true });
+        const scaled = await sharp(png)
+          .resize({ width: frame, height: Math.round(rows * k), kernel: 'mitchell' })
+          .raw()
+          .toBuffer({ resolveWithObject: true });
         const h = Math.round(box.h * k);
         const out = path.join(OUT, `${prefix}-${name}-${frame}.webp`);
         // The resized pixels are straight alpha, not premultiplied, regardless of what the metadata
@@ -691,7 +841,10 @@ const toBuffer = (layer) => Buffer.from(Uint8ClampedArray.from(layer, (v, i) => 
           .toFile(out);
         console.log(path.basename(out), `${res.width}x${res.height}`, res.size, 'B');
       }
-      if (DEBUG) await sharp(toBuffer(L), { raw: { width: W, height: L.length / 4 / W, channels: 4 } }).png().toFile(path.join(DEBUG, `${season}-${name}.png`));
+      if (DEBUG)
+        await sharp(toBuffer(L), { raw: { width: W, height: L.length / 4 / W, channels: 4 } })
+          .png()
+          .toFile(path.join(DEBUG, `${season}-${name}.png`));
     }
   }
   console.log(JSON.stringify(boxes));

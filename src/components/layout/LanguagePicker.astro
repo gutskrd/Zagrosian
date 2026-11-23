@@ -18,33 +18,33 @@ const buttonLabel = `${t.language.label}: ${info.name} (${locale.toUpperCase()})
 <div class="language">
   <button class="language__button" type="button" popovertarget="language-menu" aria-label={buttonLabel}>
     <Globe class="language__icon" />
-    <span class="language__code" aria-hidden="true">{locale.toUpperCase()}</span>
+    <span class="language__code" aria-hidden="true">
+      {locale.toUpperCase()}
+    </span>
   </button>
 
   <nav id="language-menu" class="language__menu" popover aria-label={t.language.label}>
     <ul class="language__list">
-      {
-        locales.map(({ code, name, dir }) => (
-          <li>
-            <a
-              class="language__link"
-              href={localizePath(code, base)}
-              hreflang={code}
-              lang={code}
-              aria-current={code === locale ? 'true' : undefined}
-            >
-              {/* Each name keeps its own direction but starts at the menu's edge, so the list reads
+      {locales.map(({ code, name, dir }) => (
+        <li>
+          <a
+            class="language__link"
+            href={localizePath(code, base)}
+            hreflang={code}
+            lang={code}
+            aria-current={code === locale ? 'true' : undefined}
+          >
+            {/* Each name keeps its own direction but starts at the menu's edge, so the list reads
                  as one aligned column. */}
-              <span dir={dir}>{name}</span>
-              {code === locale && (
-                <svg class="language__check" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                  <path d="M3.5 8.5l3 3 6-7" />
-                </svg>
-              )}
-            </a>
-          </li>
-        ))
-      }
+            <span dir={dir}>{name}</span>
+            {code === locale && (
+              <svg class="language__check" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M3.5 8.5l3 3 6-7" />
+              </svg>
+            )}
+          </a>
+        </li>
+      ))}
     </ul>
   </nav>
 </div>

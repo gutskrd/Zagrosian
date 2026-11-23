@@ -48,30 +48,26 @@ const year = new Date().getFullYear();
 
   <div class="container site-menu__body">
     <ul class="site-menu__links">
-      {
-        links.map((link) => (
-          <li>
-            <a class="site-menu__link" href={link.href} data-nav-section={link.section} aria-current={link.current ? 'page' : undefined}>
-              <span class="site-menu__mask">
-                <span class="site-menu__text">
-                  <RollText text={link.label} />
-                </span>
+      {links.map((link) => (
+        <li>
+          <a class="site-menu__link" href={link.href} data-nav-section={link.section} aria-current={link.current ? 'page' : undefined}>
+            <span class="site-menu__mask">
+              <span class="site-menu__text">
+                <RollText text={link.label} />
               </span>
-              <Arrow class="site-menu__arrow" />
-            </a>
-          </li>
-        ))
-      }
+            </span>
+            <Arrow class="site-menu__arrow" />
+          </a>
+        </li>
+      ))}
     </ul>
 
     <div class="site-menu__aside">
       <div class="site-menu__group site-menu__group--cta">
         <Cta href={hevalo.url} arrow="up-right" label={t.nav.visitHevalo} />
-        {
-          /* The system's share sheet where there is one (phones, Safari,
+        {/* The system's share sheet where there is one (phones, Safari,
              Chrome and Edge), otherwise the link is copied (share.ts). Shown
-             once the script can do either. */
-        }
+             once the script can do either. */}
         <button
           class="site-menu__share"
           type="button"
@@ -91,43 +87,44 @@ const year = new Date().getFullYear();
 
       <div class="site-menu__group">
         <p class="site-menu__label">{t.contact.eyebrow}</p>
-        <a class="site-menu__small-link" href={`mailto:${site.emails.contact}`} dir="ltr">{site.emails.contact}</a>
+        <a class="site-menu__small-link" href={`mailto:${site.emails.contact}`} dir="ltr">
+          {site.emails.contact}
+        </a>
       </div>
 
       <div class="site-menu__group">
         <p class="site-menu__label">{t.common.socialNav}</p>
         <ul class="site-menu__social">
-          {
-            socialProfiles.map((profile) => (
-              <li>
-                <a class="site-menu__small-link" href={profile.url} rel="me">
-                  <SocialIcon name={profile.icon} class="site-menu__social-icon" />
-                  {profile.label}
-                </a>
-              </li>
-            ))
-          }
+          {socialProfiles.map((profile) => (
+            <li>
+              <a class="site-menu__small-link" href={profile.url} rel="me">
+                <SocialIcon name={profile.icon} class="site-menu__social-icon" />
+                {profile.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
       <div class="site-menu__group site-menu__group--languages">
-        <p class="site-menu__label site-menu__label--world globe-spin"><Globe />{t.language.label}</p>
+        <p class="site-menu__label site-menu__label--world globe-spin">
+          <Globe />
+          {t.language.label}
+        </p>
         <ul class="site-menu__languages">
-          {
-            locales.map(({ code, name, dir }) => (
-              <li>
-                <a
-                  class="language__link site-menu__language"
-                  href={localizePath(code, base)}
-                  hreflang={code}
-                  lang={code}
-                  aria-current={code === locale ? 'true' : undefined}
-                >
-                  <span dir={dir}>{name}</span>
-                </a>
-              </li>
-            ))
-          }
+          {locales.map(({ code, name, dir }) => (
+            <li>
+              <a
+                class="language__link site-menu__language"
+                href={localizePath(code, base)}
+                hreflang={code}
+                lang={code}
+                aria-current={code === locale ? 'true' : undefined}
+              >
+                <span dir={dir}>{name}</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
@@ -144,17 +141,17 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="container site-menu__foot">
-    <p class="site-menu__copyright">&copy; {year} {site.legalName}</p>
+    <p class="site-menu__copyright">
+      &copy; {year} {site.legalName}
+    </p>
     <ul class="site-menu__legal">
-      {
-        nav.legal.map((link) => (
-          <li>
-            <a class="site-menu__small-link" href={link.href}>
-              {link.label}
-            </a>
-          </li>
-        ))
-      }
+      {nav.legal.map((link) => (
+        <li>
+          <a class="site-menu__small-link" href={link.href}>
+            {link.label}
+          </a>
+        </li>
+      ))}
     </ul>
     <p class="site-menu__time">
       {t.about.headquarters}

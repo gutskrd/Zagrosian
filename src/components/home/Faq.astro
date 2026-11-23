@@ -18,27 +18,29 @@ const more = faqMore(locale);
 <section id="faq" class="faq section" aria-labelledby="faq-title">
   <div class="container faq__grid">
     <div class="faq__intro">
-      <p class="eyebrow" data-reveal>{t.faq.eyebrow}</p>
+      <p class="eyebrow" data-reveal>
+        {t.faq.eyebrow}
+      </p>
       <SplitText id="faq-title" class="heading-2 faq__title" text={t.faq.title} />
     </div>
 
     <div class="faq__body">
       <div class="faq__list">
-        {
-          items.map((item) => (
-            <details class="faq__item" data-reveal>
-              <summary class="faq__summary">
-                <h3 class="faq__question">{item.question}</h3>
-                <span class="faq__icon" aria-hidden="true" />
-              </summary>
-              <p class="faq__answer">
-                <LinkedText parts={item.answer} />
-              </p>
-            </details>
-          ))
-        }
+        {items.map((item) => (
+          <details class="faq__item" data-reveal>
+            <summary class="faq__summary">
+              <h3 class="faq__question">{item.question}</h3>
+              <span class="faq__icon" aria-hidden="true" />
+            </summary>
+            <p class="faq__answer">
+              <LinkedText parts={item.answer} />
+            </p>
+          </details>
+        ))}
       </div>
-      <p class="faq__more" data-reveal><LinkedText parts={more} /></p>
+      <p class="faq__more" data-reveal>
+        <LinkedText parts={more} />
+      </p>
     </div>
   </div>
 </section>

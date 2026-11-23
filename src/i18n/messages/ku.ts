@@ -119,13 +119,11 @@ export const ku: Messages = {
       },
       {
         question: 'Hevalo kîjan zaravayên kurdî hîn dike?',
-        answer:
-          'Hevalo bi kurmancî dest pê dike. Zaravayên din jî di plana me de ne.',
+        answer: 'Hevalo bi kurmancî dest pê dike. Zaravayên din jî di plana me de ne.',
       },
       {
         question: 'Gelo Hevalo li ser iOS û Androidê heye?',
-        answer:
-          'Hêj na. Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
+        answer: 'Hêj na. Sepanên xwecihî di pêşxistinê de ne û dê li App Store û Google Playê peyda bibin.',
       },
       {
         question: 'Gelo zagrosian.com daneyên kesane berhev dike?',
@@ -192,8 +190,7 @@ export const ku: Messages = {
     shareAlt: 'Rêya Kurmancî, pirtûka Hevalo, li rûpelên xwe yên pêşîn vekirî',
     eyebrow: 'Pirtûka belaş',
     subtitle: 'Pirtûka Hevalo',
-    lead:
-      'Pirtûkeke dersan a kurmancî ye, û li kêleka her rêzê îngilîziya wê heye. Bi Hamo, Xezal û Hevalo re fêr bibe, ji silava yekem heta çîrok û stranan: li vir rûpel bi rûpel bixwîne, an jî daxe, çap bike û li cem xwe bihêle.',
+    lead: 'Pirtûkeke dersan a kurmancî ye, û li kêleka her rêzê îngilîziya wê heye. Bi Hamo, Xezal û Hevalo re fêr bibe, ji silava yekem heta çîrok û stranan: li vir rûpel bi rûpel bixwîne, an jî daxe, çap bike û li cem xwe bihêle.',
     startReading: 'Dest bi xwendinê bike',
     download: 'Pirtûkê daxe',
     downloadShort: 'Daxe',

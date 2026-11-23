@@ -44,7 +44,9 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 <span class:list={['lifted-logo', className]} {...label} {...attributes}>
   <span class="lifted-logo__body">
     <span class="lifted-logo__back"></span>
-    {slices.map((depth) => <span class="lifted-logo__slice" data-depth={depth} />)}
+    {slices.map((depth) => (
+      <span class="lifted-logo__slice" data-depth={depth} />
+    ))}
     <span class="lifted-logo__frame"></span>
     <span class="lifted-logo__inner">
       <svg viewBox="0 0 1290 1290" aria-hidden="true" focusable="false">
@@ -125,8 +127,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
   :global(:root[data-theme='dark']) .lifted-logo__back {
     background:
       radial-gradient(circle at 76% 24%, var(--haze), rgb(255 255 255 / 0) 66%),
-      radial-gradient(circle at 18% 84%, var(--haze), rgb(255 255 255 / 0) 42%),
-      var(--body);
+      radial-gradient(circle at 18% 84%, var(--haze), rgb(255 255 255 / 0) 42%), var(--body);
   }
 
   /* Drop shadow below the block (the image is transparent where the block is): 132% of the block

@@ -30,7 +30,9 @@ const { t } = i18n(Astro.url);
   aria-controls="site-menu"
   autofocus={action === 'close'}
 >
-  <span class="menu-button__label"><RollText text={action === 'close' ? t.common.close : t.common.menu} /></span>
+  <span class="menu-button__label">
+    <RollText text={action === 'close' ? t.common.close : t.common.menu} />
+  </span>
   <span class="menu-button__icon" aria-hidden="true">
     <span class="menu-button__dot"></span>
     <span class="menu-button__dot"></span>

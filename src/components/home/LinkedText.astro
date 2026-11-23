@@ -9,14 +9,12 @@ interface Props {
 const { parts } = Astro.props;
 ---
 
-{
-  parts.map((part) =>
-    typeof part === 'string' ? (
-      part
-    ) : (
-      <a href={part.href} dir={part.ltr ? 'ltr' : undefined}>
-        {part.text}
-      </a>
-    ),
-  )
-}
+{parts.map((part) =>
+  typeof part === 'string' ? (
+    part
+  ) : (
+    <a href={part.href} dir={part.ltr ? 'ltr' : undefined}>
+      {part.text}
+    </a>
+  ),
+)}

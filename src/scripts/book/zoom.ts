@@ -99,7 +99,14 @@ export class Zoom {
   private pointerDown(event: PointerEvent) {
     this.pan = null;
     if (this.level === 1 || event.pointerType !== 'mouse' || event.button !== 0) return;
-    this.pan = { x: event.clientX, y: event.clientY, left: this.stage.scrollLeft, top: this.stage.scrollTop, id: event.pointerId, moved: false };
+    this.pan = {
+      x: event.clientX,
+      y: event.clientY,
+      left: this.stage.scrollLeft,
+      top: this.stage.scrollTop,
+      id: event.pointerId,
+      moved: false,
+    };
   }
 
   private pointerMove(event: PointerEvent) {

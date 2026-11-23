@@ -83,8 +83,7 @@ export const es: Messages = {
   motto: 'La vida es más dulce en kurdo.',
   about: {
     eyebrow: 'Nosotros',
-    mission:
-      'Nuestra misión es crear software que la gente disfrute usando cada día: sencillo, respetuoso con la privacidad y claro.',
+    mission: 'Nuestra misión es crear software que la gente disfrute usando cada día: sencillo, respetuoso con la privacidad y claro.',
     approach: 'Zagrosian es una empresa de propiedad privada. Diseñamos y desarrollamos nuestros productos con un equipo propio.',
     headquartersLabel: 'Sede',
     headquarters: 'Países Bajos',
@@ -116,13 +115,11 @@ export const es: Messages = {
       },
       {
         question: '¿Qué dialectos del kurdo enseña Hevalo?',
-        answer:
-          'Hevalo empieza por el kurmanji. Hay más dialectos previstos.',
+        answer: 'Hevalo empieza por el kurmanji. Hay más dialectos previstos.',
       },
       {
         question: '¿Está Hevalo disponible para iOS y Android?',
-        answer:
-          'Todavía no. Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
+        answer: 'Todavía no. Las aplicaciones nativas están en desarrollo y estarán disponibles en App Store y Google Play.',
       },
       {
         question: '¿Recoge zagrosian.com datos personales?',
@@ -161,8 +158,7 @@ export const es: Messages = {
     eyebrow: 'Información legal',
     updated: 'Última actualización',
     contents: 'En esta página',
-    translationNotice:
-      'Esta es una traducción. Si difiere de la versión en inglés, prevalece la versión en inglés.',
+    translationNotice: 'Esta es una traducción. Si difiere de la versión en inglés, prevalece la versión en inglés.',
     readEnglish: 'Leer la versión en inglés',
     readingTime: '{duration} de lectura',
     readingTimeUnit: 'short',
@@ -190,8 +186,7 @@ export const es: Messages = {
     shareAlt: 'Rêya Kurmancî, el libro de Hevalo, abierto por sus primeras páginas',
     eyebrow: 'Libro gratuito',
     subtitle: 'El camino del kurmanji · el libro de Hevalo',
-    lead:
-      'Un libro de curso en kurmanji, con el inglés junto a cada línea. Aprende con Hamo, Xezal y Hevalo, desde el primer hola hasta cuentos y canciones: léelo aquí página a página o descárgalo para imprimirlo y guardarlo.',
+    lead: 'Un libro de curso en kurmanji, con el inglés junto a cada línea. Aprende con Hamo, Xezal y Hevalo, desde el primer hola hasta cuentos y canciones: léelo aquí página a página o descárgalo para imprimirlo y guardarlo.',
     startReading: 'Empezar a leer',
     download: 'Descargar el libro',
     downloadShort: 'Descargar',

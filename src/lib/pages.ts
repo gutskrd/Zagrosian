@@ -7,17 +7,7 @@
  * to the English text.
  */
 import { getCollection } from 'astro:content';
-import {
-  defaultLocale,
-  format,
-  legalSlugs,
-  localizePath,
-  locales,
-  messages,
-  navigation,
-  type LegalSlug,
-  type Locale,
-} from '../i18n';
+import { defaultLocale, format, legalSlugs, localizePath, locales, messages, navigation, type LegalSlug, type Locale } from '../i18n';
 import { book as bookSite, hevalo, kurdish, site, socialProfiles } from '../site';
 import { book, chapterName, chapters, editionDate, pageCountText, pages as bookPages, pdfSize, sections, type TextBlock } from './book';
 import { answerMarkdown, faq, faqMore } from './faq';

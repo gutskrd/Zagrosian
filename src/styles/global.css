@@ -15,8 +15,8 @@
   font-display: swap;
   src: url('@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2') format('woff2');
   unicode-range:
-    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
-    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -36,8 +36,8 @@
   font-display: swap;
   src: url('@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2') format('woff2');
   unicode-range:
-    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
-    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+    U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF,
+    U+FE70-FE74, U+FE76-FEFC;
 }
 
 /* Arial with Inter's metrics, so the font swap causes no layout shift. */
@@ -567,7 +567,7 @@ svg {
 }
 
 .roll__piece[data-i='5'] {
-  transition-delay: 0.080s;
+  transition-delay: 0.08s;
 }
 
 .roll__piece[data-i='6'] {
@@ -587,7 +587,7 @@ svg {
 }
 
 .roll__piece[data-i='10'] {
-  transition-delay: 0.160s;
+  transition-delay: 0.16s;
 }
 
 .roll__piece[data-i='11'] {
@@ -607,7 +607,7 @@ svg {
 }
 
 .roll__piece[data-i='15'] {
-  transition-delay: 0.240s;
+  transition-delay: 0.24s;
 }
 
 .roll__piece[data-i='16'] {
@@ -627,7 +627,7 @@ svg {
 }
 
 .roll__piece[data-i='20'] {
-  transition-delay: 0.320s;
+  transition-delay: 0.32s;
 }
 
 .roll__piece[data-i='21'] {
@@ -647,7 +647,7 @@ svg {
 }
 
 .roll__piece[data-i='25'] {
-  transition-delay: 0.400s;
+  transition-delay: 0.4s;
 }
 
 .roll__piece[data-i='26'] {
@@ -667,7 +667,7 @@ svg {
 }
 
 .roll__piece[data-i='30'] {
-  transition-delay: 0.480s;
+  transition-delay: 0.48s;
 }
 
 .roll__piece[data-i='31'] {
@@ -687,7 +687,7 @@ svg {
 }
 
 .roll__piece[data-i='35'] {
-  transition-delay: 0.560s;
+  transition-delay: 0.56s;
 }
 
 .roll__piece[data-i='36'] {

@@ -38,22 +38,22 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
   breadcrumb={title}
   dateModified={updated.toISOString().slice(0, 10)}
 >
-  <div class="reading-progress" aria-hidden="true" data-reading-progress><span></span></div>
+  <div class="reading-progress" aria-hidden="true" data-reading-progress>
+    <span></span>
+  </div>
 
-  <article
-    class="legal"
-    aria-labelledby="legal-title"
-    data-legal
-    data-copy-link={t.legal.copyLink}
-    data-link-copied={t.legal.linkCopied}
-  >
+  <article class="legal" aria-labelledby="legal-title" data-legal data-copy-link={t.legal.copyLink} data-link-copied={t.legal.linkCopied}>
     <header class="container legal__header">
       <p class="eyebrow">{eyebrow ?? t.legal.eyebrow}</p>
-      <h1 id="legal-title" class:list={['legal__title', fit && `legal__title--${fit}`]}>{title}</h1>
+      <h1 id="legal-title" class:list={['legal__title', fit && `legal__title--${fit}`]}>
+        {title}
+      </h1>
       <div class="legal__meta">
         <p class="legal__updated">
           {t.legal.updated} <time datetime={updated.toISOString().slice(0, 10)}>{updatedLabel}</time>
-          <span class="legal__separator" aria-hidden="true">·</span>
+          <span class="legal__separator" aria-hidden="true">
+            ·
+          </span>
           <span class="legal__reading">{readingTime}</span>
         </p>
         <button class="legal__print" type="button" data-print>
@@ -63,35 +63,31 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
           {t.legal.print}
         </button>
       </div>
-      {
-        isTranslation && (
-          <p class="legal__notice">
-            {t.legal.translationNotice}{' '}
-            <a href={base} hreflang="en">
-              {t.legal.readEnglish}
-            </a>
-          </p>
-        )
-      }
+      {isTranslation && (
+        <p class="legal__notice">
+          {t.legal.translationNotice}{' '}
+          <a href={base} hreflang="en">
+            {t.legal.readEnglish}
+          </a>
+        </p>
+      )}
     </header>
 
     <div class="container legal__grid">
-      {
-        sections.length > 0 && (
-          <nav class="legal__toc" aria-label={t.legal.contents}>
-            <details class="legal__toc-details" data-toc>
-              <summary class="legal__toc-title">{t.legal.contents}</summary>
-              <ol>
-                {sections.map((section) => (
-                  <li>
-                    <a href={`#${section.slug}`}>{section.text}</a>
-                  </li>
-                ))}
-              </ol>
-            </details>
-          </nav>
-        )
-      }
+      {sections.length > 0 && (
+        <nav class="legal__toc" aria-label={t.legal.contents}>
+          <details class="legal__toc-details" data-toc>
+            <summary class="legal__toc-title">{t.legal.contents}</summary>
+            <ol>
+              {sections.map((section) => (
+                <li>
+                  <a href={`#${section.slug}`}>{section.text}</a>
+                </li>
+              ))}
+            </ol>
+          </details>
+        </nav>
+      )}
 
       <div class="legal__content" data-legal-content>
         <slot />

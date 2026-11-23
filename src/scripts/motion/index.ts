@@ -273,7 +273,6 @@ function initPointerDepth() {
   }
 }
 
-
 export function initMotion() {
   const effects: ScrollEffect[] = [];
 

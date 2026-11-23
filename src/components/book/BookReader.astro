@@ -34,7 +34,8 @@ const { locale, t } = i18n(Astro.url);
 const digits = Array.from({ length: 10 }, (_, d) => formatNumber(locale, d)).join('');
 
 const label = (page: BookPage) => {
-  if (page.chapter) return format(t.book.chapterLabel, { n: formatNumber(locale, page.chapter.number), name: chapterName(locale, page.chapter) });
+  if (page.chapter)
+    return format(t.book.chapterLabel, { n: formatNumber(locale, page.chapter.number), name: chapterName(locale, page.chapter) });
   return page.section ? t.book.sections[page.section.key] : '';
 };
 const short = (page: BookPage) => (page.chapter ? `${formatNumber(locale, page.chapter.number)} · ${page.chapter.titleKu}` : label(page));
@@ -61,62 +62,89 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
   data-end-title={t.book.endTitle}
   data-cover-label={t.book.sections.cover}
 >
-  <h2 id="book-reader-title" class="visually-hidden">{t.book.readerTitle}</h2>
+  <h2 id="book-reader-title" class="visually-hidden">
+    {t.book.readerTitle}
+  </h2>
 
   <div class="book__body">
-  <div class="book__bar book__bar--start">
-    <button class="book__button book__where" type="button" popovertarget="book-contents">
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3.5 5h13M3.5 10h13M3.5 15h8"></path></svg>
-      <span class="visually-hidden">{t.book.contents}:</span>
-      <span class="book__where-text" data-book-where>{t.book.sections.cover}</span>
-      <svg class="book__chevron" viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3 4.5 6 7.5l3-3"></path></svg>
-    </button>
-  </div>
+    <div class="book__bar book__bar--start">
+      <button class="book__button book__where" type="button" popovertarget="book-contents">
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M3.5 5h13M3.5 10h13M3.5 15h8"></path>
+        </svg>
+        <span class="visually-hidden">{t.book.contents}:</span>
+        <span class="book__where-text" data-book-where>
+          {t.book.sections.cover}
+        </span>
+        <svg class="book__chevron" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+          <path d="M3 4.5 6 7.5l3-3"></path>
+        </svg>
+      </button>
+    </div>
 
-  <div class="book__bar book__bar--end">
-    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="out" aria-disabled="true">
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.25"></circle><path d="M12.5 12.5l4 4M6 8.5h5"></path></svg>
-      <span class="visually-hidden">{t.book.zoomOut}</span>
-    </button>
-    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="in">
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="8.5" cy="8.5" r="5.25"></circle><path d="M12.5 12.5l4 4M6 8.5h5M8.5 6v5"></path></svg>
-      <span class="visually-hidden">{t.book.zoomIn}</span>
-    </button>
-    <button class="book__button book__button--round book__wide" type="button" data-book-zoom="fit" aria-disabled="true">
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 3.5v4h-4M12.5 3.5v4h4M16.5 12.5h-4v4M3.5 12.5h4v4"></path></svg>
-      <span class="visually-hidden">{t.book.fit}</span>
-    </button>
-    <button class="book__button book__scroll-toggle" type="button" aria-pressed="false" data-book-scroll-toggle>
-      {/* Stacked pages: the scroll view. */}
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h9v7.5h-9zM5.5 17.25v-4h9v4"></path></svg>
-      <span class="book__label-text" aria-hidden="true">{t.book.scrollView}</span>
-      <span class="visually-hidden">{t.book.scrollView}</span>
-    </button>
-    <button class="book__button book__text-toggle" type="button" aria-pressed="false" data-book-text-toggle>
-      {/* A page of text; deliberately distinct from the contents icon. */}
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h6.25l3 3v11.5H5.5zM11.75 2.75v3h3M8 9.5h4.5M8 12.25h4.5M8 15h2.75"></path></svg>
-      <span class="book__label-text" aria-hidden="true">{t.book.textView}</span>
-      <span class="visually-hidden">{t.book.textView}</span>
-    </button>
-    <button class="book__button book__full-toggle" type="button" aria-pressed="false" data-book-full-toggle>
-      <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3.5 7.5v-4h4M12.5 3.5h4v4M16.5 12.5v4h-4M7.5 16.5h-4v-4"></path></svg>
-      <span class="book__label-text" aria-hidden="true">{t.book.fullView}</span>
-      <span class="visually-hidden">{t.book.fullView}</span>
-    </button>
-    <BookDownload variant="small" class="book__wide" />
-    <BookDownload variant="icon" class="book__narrow" />
-  </div>
+    <div class="book__bar book__bar--end">
+      <button class="book__button book__button--round book__wide" type="button" data-book-zoom="out" aria-disabled="true">
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <circle cx="8.5" cy="8.5" r="5.25"></circle>
+          <path d="M12.5 12.5l4 4M6 8.5h5"></path>
+        </svg>
+        <span class="visually-hidden">{t.book.zoomOut}</span>
+      </button>
+      <button class="book__button book__button--round book__wide" type="button" data-book-zoom="in">
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <circle cx="8.5" cy="8.5" r="5.25"></circle>
+          <path d="M12.5 12.5l4 4M6 8.5h5M8.5 6v5"></path>
+        </svg>
+        <span class="visually-hidden">{t.book.zoomIn}</span>
+      </button>
+      <button class="book__button book__button--round book__wide" type="button" data-book-zoom="fit" aria-disabled="true">
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M7.5 3.5v4h-4M12.5 3.5v4h4M16.5 12.5h-4v4M3.5 12.5h4v4"></path>
+        </svg>
+        <span class="visually-hidden">{t.book.fit}</span>
+      </button>
+      <button class="book__button book__scroll-toggle" type="button" aria-pressed="false" data-book-scroll-toggle>
+        {/* Stacked pages: the scroll view. */}
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5.5 2.75h9v7.5h-9zM5.5 17.25v-4h9v4"></path>
+        </svg>
+        <span class="book__label-text" aria-hidden="true">
+          {t.book.scrollView}
+        </span>
+        <span class="visually-hidden">{t.book.scrollView}</span>
+      </button>
+      <button class="book__button book__text-toggle" type="button" aria-pressed="false" data-book-text-toggle>
+        {/* A page of text; deliberately distinct from the contents icon. */}
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5.5 2.75h6.25l3 3v11.5H5.5zM11.75 2.75v3h3M8 9.5h4.5M8 12.25h4.5M8 15h2.75"></path>
+        </svg>
+        <span class="book__label-text" aria-hidden="true">
+          {t.book.textView}
+        </span>
+        <span class="visually-hidden">{t.book.textView}</span>
+      </button>
+      <button class="book__button book__full-toggle" type="button" aria-pressed="false" data-book-full-toggle>
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M3.5 7.5v-4h4M12.5 3.5h4v4M16.5 12.5v4h-4M7.5 16.5h-4v-4"></path>
+        </svg>
+        <span class="book__label-text" aria-hidden="true">
+          {t.book.fullView}
+        </span>
+        <span class="visually-hidden">{t.book.fullView}</span>
+      </button>
+      <BookDownload variant="small" class="book__wide" />
+      <BookDownload variant="icon" class="book__narrow" />
+    </div>
 
-  <div class="book__frame">
-    <div class="book__stage" tabindex="0" role="group" aria-label={kurdish.book} aria-describedby="book-keys" dir="ltr" data-book-stage>
-      <div class="book__spread" data-book-spread>
-        <div class="book__edges" aria-hidden="true">
-          <span class="book__edge book__edge--left"></span>
-          <span class="book__edge book__edge--right"></span>
-        </div>
-        <ol class="book__pages" data-book-pages>
-          {
-            pages.map((page) => (
+    <div class="book__frame">
+      <div class="book__stage" tabindex="0" role="group" aria-label={kurdish.book} aria-describedby="book-keys" dir="ltr" data-book-stage>
+        <div class="book__spread" data-book-spread>
+          <div class="book__edges" aria-hidden="true">
+            <span class="book__edge book__edge--left"></span>
+            <span class="book__edge book__edge--right"></span>
+          </div>
+          <ol class="book__pages" data-book-pages>
+            {pages.map((page) => (
               <li
                 id={`page-${page.n}`}
                 class="book__page"
@@ -151,74 +179,83 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
                   </div>
                 </article>
               </li>
-            ))
-          }
-        </ol>
-        <div class="book__end" data-book-end>
-          <p class="book__end-title">{t.book.endTitle}</p>
-          <BookDownload />
-          <a class="book__end-link" href={hevalo.url}>
-            {t.book.endLearn}
-            <Arrow direction="up-right" />
-          </a>
-          <a class="book__end-link" href="#page-1" data-book-jump="1">
-            {t.book.backToStart}
-          </a>
+            ))}
+          </ol>
+          <div class="book__end" data-book-end>
+            <p class="book__end-title">{t.book.endTitle}</p>
+            <BookDownload />
+            <a class="book__end-link" href={hevalo.url}>
+              {t.book.endLearn}
+              <Arrow direction="up-right" />
+            </a>
+            <a class="book__end-link" href="#page-1" data-book-jump="1">
+              {t.book.backToStart}
+            </a>
+          </div>
+          <div class="book__leaves" aria-hidden="true" inert data-book-leaves>
+            <div class="book__hold" data-hold="left"></div>
+            <div class="book__hold" data-hold="right"></div>
+            <div class="book__cast" data-book-cast></div>
+            <BookLeaf />
+            <BookLeaf />
+            <BookLeaf />
+          </div>
         </div>
-        <div class="book__leaves" aria-hidden="true" inert data-book-leaves>
-          <div class="book__hold" data-hold="left"></div>
-          <div class="book__hold" data-hold="right"></div>
-          <div class="book__cast" data-book-cast></div>
-          <BookLeaf />
-          <BookLeaf />
-          <BookLeaf />
+        <div class="book__notice" role="alert" data-book-notice hidden>
+          <p>{t.book.loadFailed}</p>
+          <button class="book__button book__button--solid" type="button" data-book-reload>
+            {t.book.reload}
+          </button>
         </div>
       </div>
-      <div class="book__notice" role="alert" data-book-notice hidden>
-        <p>{t.book.loadFailed}</p>
-        <button class="book__button book__button--solid" type="button" data-book-reload>{t.book.reload}</button>
-      </div>
+      <p id="book-keys" class="book__keys">
+        {t.book.keysHint}
+      </p>
     </div>
-    <p id="book-keys" class="book__keys">{t.book.keysHint}</p>
-  </div>
 
-  <div class="book__bar book__bar--nav" dir="ltr">
-    <button class="book__button book__button--round" type="button" data-book-prev aria-disabled="true">
-      <Arrow direction="left" />
-      <span class="visually-hidden">{t.book.previous}</span>
-    </button>
-    <div class="book__scrub" data-book-scrub>
-      <svg class="book__marks" aria-hidden="true" focusable="false">
-        {marks.map((mark) => <rect x={mark.x} y="0" width="1" height="100%" data-mark={mark.n} />)}
-      </svg>
-      <input
-        class="book__range"
-        type="range"
-        dir="ltr"
-        min="0"
-        max={Math.ceil(book.pageCount / 2)}
-        step="1"
-        value="0"
-        aria-label={t.book.slider}
-        aria-valuetext={format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}
-        data-book-range
-      />
-      <span class="book__bubble" aria-hidden="true" data-book-bubble></span>
+    <div class="book__bar book__bar--nav" dir="ltr">
+      <button class="book__button book__button--round" type="button" data-book-prev aria-disabled="true">
+        <Arrow direction="left" />
+        <span class="visually-hidden">{t.book.previous}</span>
+      </button>
+      <div class="book__scrub" data-book-scrub>
+        <svg class="book__marks" aria-hidden="true" focusable="false">
+          {marks.map((mark) => (
+            <rect x={mark.x} y="0" width="1" height="100%" data-mark={mark.n} />
+          ))}
+        </svg>
+        <input
+          class="book__range"
+          type="range"
+          dir="ltr"
+          min="0"
+          max={Math.ceil(book.pageCount / 2)}
+          step="1"
+          value="0"
+          aria-label={t.book.slider}
+          aria-valuetext={format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}
+          data-book-range
+        />
+        <span class="book__bubble" aria-hidden="true" data-book-bubble></span>
+      </div>
+      <p class="book__counter" aria-hidden="true" data-book-counter>
+        <bdi class="book__counter-short" data-book-counter-short>
+          {format(t.book.counterShort, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}
+        </bdi>
+        <bdi class="book__counter-long" data-book-counter-long>
+          {format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}
+        </bdi>
+      </p>
+      <button class="book__button book__button--round" type="button" data-book-next>
+        <Arrow direction="right" />
+        <span class="visually-hidden">{t.book.next}</span>
+      </button>
+      {/* Brief touch hint over the bottom toolbar: how to turn and zoom. */}
+      <p class="book__hint" dir="auto" data-book-hint hidden>
+        <span>{t.book.swipeHint}</span>
+        <span>{t.book.zoomHint}</span>
+      </p>
     </div>
-    <p class="book__counter" aria-hidden="true" data-book-counter>
-      <bdi class="book__counter-short" data-book-counter-short>{format(t.book.counterShort, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}</bdi>
-      <bdi class="book__counter-long" data-book-counter-long>{format(t.book.counterPage, { a: formatNumber(locale, 1), total: formatNumber(locale, book.pageCount) })}</bdi>
-    </p>
-    <button class="book__button book__button--round" type="button" data-book-next>
-      <Arrow direction="right" />
-      <span class="visually-hidden">{t.book.next}</span>
-    </button>
-    {/* Brief touch hint over the bottom toolbar: how to turn and zoom. */}
-    <p class="book__hint" dir="auto" data-book-hint hidden>
-      <span>{t.book.swipeHint}</span>
-      <span>{t.book.zoomHint}</span>
-    </p>
-  </div>
   </div>
 
   <p class="visually-hidden" role="status" data-book-status></p>
@@ -227,7 +264,9 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     <div class="book__menu-head">
       <p class="book__menu-title">{t.book.contents}</p>
       <button class="book__button book__button--round" type="button" popovertarget="book-contents" popovertargetaction="hide">
-        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5 5l10 10M15 5 5 15"></path></svg>
+        <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+          <path d="M5 5l10 10M15 5 5 15"></path>
+        </svg>
         <span class="visually-hidden">{t.common.close}</span>
       </button>
     </div>

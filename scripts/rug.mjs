@@ -260,9 +260,31 @@ function draw({ across: W, along: H, fringe, scale }) {
     }
     for (const f of flowers) {
       if (f.kind < 0.38) {
-        rosette(f.x, f.y, between(1.15, 1.5), 8, [C.ivory, C.rose], [[0.42, C.navy], [0.2, C.gold]], f.kind * 9);
+        rosette(
+          f.x,
+          f.y,
+          between(1.15, 1.5),
+          8,
+          [C.ivory, C.rose],
+          [
+            [0.42, C.navy],
+            [0.2, C.gold],
+          ],
+          f.kind * 9,
+        );
       } else if (f.kind < 0.58) {
-        rosette(f.x, f.y, between(1.0, 1.3), 6, [C.navy], [[0.4, C.ivory], [0.2, C.red]], f.kind * 7);
+        rosette(
+          f.x,
+          f.y,
+          between(1.0, 1.3),
+          6,
+          [C.navy],
+          [
+            [0.4, C.ivory],
+            [0.2, C.red],
+          ],
+          f.kind * 7,
+        );
       } else if (f.kind < 0.74) {
         palmette(f.x, f.y, 1.9, Math.atan2(f.y, f.x), C.gold, C.navy);
       } else if (f.kind < 0.88) {
@@ -302,10 +324,32 @@ function draw({ across: W, along: H, fringe, scale }) {
       const phi = (Math.PI / 2) * ((k + 0.5) / 3);
       const x = hx - 8.2 * Math.cos(phi);
       const y = hy - 11.6 * Math.sin(phi);
-      rosette(x, y, 1.35, 8, [C.red, C.rose], [[0.4, C.ivory], [0.18, C.navy]], k);
+      rosette(
+        x,
+        y,
+        1.35,
+        8,
+        [C.red, C.rose],
+        [
+          [0.4, C.ivory],
+          [0.18, C.navy],
+        ],
+        k,
+      );
       leaf(x, y, 2, 0.55, -phi - 0.6, C.green);
     }
-    rosette(hx - 3.4, hy - 4.6, 1.8, 10, [C.rose, C.red], [[0.45, C.ivory], [0.24, C.red], [0.1, C.gold]]);
+    rosette(
+      hx - 3.4,
+      hy - 4.6,
+      1.8,
+      10,
+      [C.rose, C.red],
+      [
+        [0.45, C.ivory],
+        [0.24, C.red],
+        [0.1, C.gold],
+      ],
+    );
     // Small red flowers along the ivory.
     for (let k = 1; k < 9; k++) {
       const phi = (Math.PI / 2) * (k / 9);
@@ -362,7 +406,17 @@ function draw({ across: W, along: H, fringe, scale }) {
     shape(drop);
     fill(C.navy);
     stroke(C.ivory, 0.6);
-    rosette(cx, py, 1.6, 8, [C.red, C.rose], [[0.42, C.ivory], [0.2, C.red]]);
+    rosette(
+      cx,
+      py,
+      1.6,
+      8,
+      [C.red, C.rose],
+      [
+        [0.42, C.ivory],
+        [0.2, C.red],
+      ],
+    );
   }
   // A small lozenge on either side.
   for (const sx of [1, -1]) {
@@ -379,16 +433,23 @@ function draw({ across: W, along: H, fringe, scale }) {
     circle(px, cy, 0.45, C.red);
   }
   // Flowers inside the medallion.
-  const inMedallion = scatter(
-    a,
-    b,
-    2.7,
-    (x, y) => x > 1.6 && y > 1.6 && x / a + y / b < 0.84 && (x / 12) ** 2 + (y / 15) ** 2 > 1,
-  );
+  const inMedallion = scatter(a, b, 2.7, (x, y) => x > 1.6 && y > 1.6 && x / a + y / b < 0.84 && (x / 12) ** 2 + (y / 15) ** 2 > 1);
   four(cx, cy, () => {
     vines(inMedallion, C.gold, 0.28);
     for (const p of inMedallion) {
-      if (random() < 0.6) rosette(p.x, p.y, 1.05, 8, [C.red, C.rose], [[0.4, C.ivory], [0.18, C.gold]], p.x);
+      if (random() < 0.6)
+        rosette(
+          p.x,
+          p.y,
+          1.05,
+          8,
+          [C.red, C.rose],
+          [
+            [0.4, C.ivory],
+            [0.18, C.gold],
+          ],
+          p.x,
+        );
       else leaf(p.x, p.y, 2.1, 0.6, Math.atan2(p.y, p.x), C.ivory, C.gold);
     }
   });
@@ -406,12 +467,19 @@ function draw({ across: W, along: H, fringe, scale }) {
     const t = (k / 8) * TAU;
     leaf(cx + Math.cos(t) * 5.6, cy + Math.sin(t) * 7, 4, 1.1, t, k % 2 ? C.navy : C.red, k % 2 ? C.sky : C.rose);
   }
-  rosette(cx, cy, 5.4, 16, [C.red, C.redDeep], [
-    [0.52, C.ivory],
-    [0.4, C.navy],
-    [0.24, C.red],
-    [0.1, C.gold],
-  ]);
+  rosette(
+    cx,
+    cy,
+    5.4,
+    16,
+    [C.red, C.redDeep],
+    [
+      [0.52, C.ivory],
+      [0.4, C.navy],
+      [0.24, C.red],
+      [0.1, C.gold],
+    ],
+  );
 
   // --- Borders, from the field outward ---
   /** Fills the band between two insets from the edge. */
@@ -437,7 +505,15 @@ function draw({ across: W, along: H, fringe, scale }) {
     for (const [x0, y0, x1, y1] of sides) {
       const length = Math.hypot(x1 - x0, y1 - y0);
       const n = Math.max(1, Math.round(length / step));
-      for (let k = 0; k < n; k++) pts.push({ x: x0 + ((x1 - x0) * k) / n, y: y0 + ((y1 - y0) * k) / n, corner: k === 0, dx: (x1 - x0) / length, dy: (y1 - y0) / length, step: length / n });
+      for (let k = 0; k < n; k++)
+        pts.push({
+          x: x0 + ((x1 - x0) * k) / n,
+          y: y0 + ((y1 - y0) * k) / n,
+          corner: k === 0,
+          dx: (x1 - x0) / length,
+          dy: (y1 - y0) / length,
+          step: length / n,
+        });
     }
     return pts;
   };
@@ -499,16 +575,49 @@ function draw({ across: W, along: H, fringe, scale }) {
   main.forEach((p, i) => {
     if (p.corner) {
       star(p.x, p.y, 4.5, 0.62, 8, C.ivory, Math.PI / 8);
-      rosette(p.x, p.y, 3, 10, [C.red, C.rose], [[0.45, C.ivory], [0.22, C.navy]]);
+      rosette(
+        p.x,
+        p.y,
+        3,
+        10,
+        [C.red, C.rose],
+        [
+          [0.45, C.ivory],
+          [0.22, C.navy],
+        ],
+      );
     } else if (i % 2) {
-      rosette(p.x, p.y, 3.6, 10, [C.rose, C.red], [[0.5, C.ivory], [0.34, C.red], [0.15, C.navy]]);
+      rosette(
+        p.x,
+        p.y,
+        3.6,
+        10,
+        [C.rose, C.red],
+        [
+          [0.5, C.ivory],
+          [0.34, C.red],
+          [0.15, C.navy],
+        ],
+      );
     } else {
-      rosette(p.x, p.y, 3.4, 8, [C.ivory, C.ivoryDeep], [[0.48, C.red], [0.3, C.gold], [0.13, C.ivory]], Math.PI / 8);
+      rosette(
+        p.x,
+        p.y,
+        3.4,
+        8,
+        [C.ivory, C.ivoryDeep],
+        [
+          [0.48, C.red],
+          [0.3, C.gold],
+          [0.13, C.ivory],
+        ],
+        Math.PI / 8,
+      );
     }
   });
 
   // Abrash: color shifts between dye lots, in bands across the rug.
-  for (let y = 0; y < H; ) {
+  for (let y = 0; y < H;) {
     const h = between(2, 8);
     g.globalCompositeOperation = random() < 0.5 ? 'multiply' : 'screen';
     g.fillStyle = `rgb(${g.globalCompositeOperation === 'multiply' ? '205 200 195' : '40 34 30'})`;
@@ -548,6 +657,8 @@ for (const [name, scale] of [
   const picture = await page.evaluate(draw, { across: ACROSS, along: ALONG, fringe: FRINGE, scale });
   const bytes = Buffer.from(picture.slice(picture.indexOf(',') + 1), 'base64');
   writeFileSync(`${OUT}${name}`, bytes);
-  console.log(`Wrote ${name} (${ACROSS * scale} by ${(ALONG + 2 * FRINGE) * scale}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`);
+  console.log(
+    `Wrote ${name} (${ACROSS * scale} by ${(ALONG + 2 * FRINGE) * scale}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`,
+  );
 }
 await browser.close();

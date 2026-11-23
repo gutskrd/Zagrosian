@@ -126,9 +126,7 @@ function whenShown(callback: () => void) {
  * back/forward carry no activation, and trying would just log a warning.
  */
 function mayStartOnArrival() {
-  const policy = (navigator as Navigator & { getAutoplayPolicy?(type: 'audiocontext'): string }).getAutoplayPolicy?.(
-    'audiocontext',
-  );
+  const policy = (navigator as Navigator & { getAutoplayPolicy?(type: 'audiocontext'): string }).getAutoplayPolicy?.('audiocontext');
   if (policy) return policy === 'allowed';
   const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
   if (navigation && navigation.type !== 'navigate') return false;
@@ -267,7 +265,6 @@ function initInterfaceSounds() {
     popover.addEventListener('toggle', (event) => play((event as ToggleEvent).newState === 'open' ? 'open' : 'close'));
   }
 }
-
 
 export function initSound() {
   reflect();

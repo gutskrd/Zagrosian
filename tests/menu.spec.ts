@@ -6,12 +6,12 @@
  * iOS 15/16) the menus still start hidden, open, cover the right area and close
  * (src/scripts/utils/popover.ts).
  */
-import { type Page, expect, test } from "@playwright/test";
-import { locales, prefix, settled } from "./support";
+import { type Page, expect, test } from '@playwright/test';
+import { locales, prefix, settled } from './support';
 
-const paper = { light: "rgb(255, 255, 255)", dark: "rgb(10, 10, 10)" };
+const paper = { light: 'rgb(255, 255, 255)', dark: 'rgb(10, 10, 10)' };
 
-test.describe("in a browser without the Popover API", () => {
+test.describe('in a browser without the Popover API', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
   test.beforeEach(async ({ page }) => {
@@ -21,42 +21,42 @@ test.describe("in a browser without the Popover API", () => {
     });
   });
 
-  test("the site menu starts hidden, covers the screen when opened, and closes", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
-    await expect(page.locator("html")).toHaveAttribute("data-popover-fallback", "");
-    const menu = page.locator("#site-menu");
-    const open = page.locator(".menu-button--open");
+  test('the site menu starts hidden, covers the screen when opened, and closes', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await expect(page.locator('html')).toHaveAttribute('data-popover-fallback', '');
+    const menu = page.locator('#site-menu');
+    const open = page.locator('.menu-button--open');
     await expect(menu).toBeHidden();
 
     await open.click();
     await expect(menu).toBeVisible();
-    await expect(open).toHaveAttribute("aria-expanded", "true");
+    await expect(open).toHaveAttribute('aria-expanded', 'true');
     // Covers the full viewport like the top layer, not just the header box.
     expect(await menu.boundingBox()).toEqual({ x: 0, y: 0, width: 390, height: 844 });
-    await page.keyboard.press("Escape");
+    await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
     await expect(open).toBeFocused();
 
     await open.click();
     await menu.locator('a[href*="#"]').first().click();
-    await expect(menu, "a link in it closes it").toBeHidden();
+    await expect(menu, 'a link in it closes it').toBeHidden();
     await open.click();
-    await menu.locator(".menu-button--close").click();
-    await expect(menu, "and so does its close button").toBeHidden();
+    await menu.locator('.menu-button--close').click();
+    await expect(menu, 'and so does its close button').toBeHidden();
   });
 
-  test("the language menu closes on a click outside it, and the book’s contents open and close", async ({ page }) => {
+  test('the language menu closes on a click outside it, and the book’s contents open and close', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto("/", { waitUntil: "networkidle" });
-    const languages = page.locator("#language-menu");
+    await page.goto('/', { waitUntil: 'networkidle' });
+    const languages = page.locator('#language-menu');
     await expect(languages).toBeHidden();
     await page.locator('[popovertarget="language-menu"]').click();
     await expect(languages).toBeVisible();
     await page.mouse.click(640, 600);
     await expect(languages).toBeHidden();
 
-    await page.goto("/book", { waitUntil: "networkidle" });
-    const contents = page.locator("#book-contents");
+    await page.goto('/book', { waitUntil: 'networkidle' });
+    const contents = page.locator('#book-contents');
     await expect(contents).toBeHidden();
     await page.locator('[popovertarget="book-contents"]').first().click();
     await expect(contents).toBeVisible();
@@ -65,55 +65,49 @@ test.describe("in a browser without the Popover API", () => {
   });
 });
 
-test.describe("on a phone", () => {
+test.describe('on a phone', () => {
   test.use({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
   });
 
-  for (const colorScheme of ["light", "dark"] as const) {
+  for (const colorScheme of ['light', 'dark'] as const) {
     test.describe(colorScheme, () => {
       test.use({ colorScheme });
 
-      test("the menu is in the theme’s colours, and Escape closes it", async ({
-        page,
-      }) => {
+      test('the menu is in the theme’s colours, and Escape closes it', async ({ page }) => {
         await settled(page.context());
-        await page.goto("/", { waitUntil: "networkidle" });
-        const menu = page.locator("#site-menu");
-        await page.locator(".menu-button--open").click();
+        await page.goto('/', { waitUntil: 'networkidle' });
+        const menu = page.locator('#site-menu');
+        await page.locator('.menu-button--open').click();
         await expect(menu).toBeVisible();
-        await expect(menu).toHaveCSS("background-color", paper[colorScheme]);
-        await page.keyboard.press("Escape");
+        await expect(menu).toHaveCSS('background-color', paper[colorScheme]);
+        await page.keyboard.press('Escape');
         await expect(menu).toBeHidden();
       });
     });
   }
 
-  test("opened over the story’s scene, the menu keeps the page’s colours", async ({
-    page,
-  }) => {
+  test('opened over the story’s scene, the menu keeps the page’s colours', async ({ page }) => {
     await settled(page.context());
-    await page.emulateMedia({ colorScheme: "light" });
-    await page.goto("/", { waitUntil: "networkidle" });
-    const header = page.locator(".site-header");
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    const header = page.locator('.site-header');
     // Scroll into the story until the header renders inverted.
     await expect
       .poll(
         async () => {
           await page.mouse.wheel(0, 300);
-          return header.evaluate((element) =>
-            element.hasAttribute("data-inverse"),
-          );
+          return header.evaluate((element) => element.hasAttribute('data-inverse'));
         },
         { timeout: 30_000, intervals: [100] },
       )
       .toBe(true);
-    await page.locator(".menu-button--open").click();
-    const menu = page.locator("#site-menu");
+    await page.locator('.menu-button--open').click();
+    const menu = page.locator('#site-menu');
     await expect(menu).toBeVisible();
-    await expect(menu).toHaveCSS("background-color", paper.light);
+    await expect(menu).toHaveCSS('background-color', paper.light);
   });
 });
 
@@ -121,26 +115,18 @@ test.describe("on a phone", () => {
 async function lengthen(page: Page, selector: string) {
   await page.evaluate((selector) => {
     const menu = document.querySelector(selector)!;
-    const longer = (text: string) =>
-      text.replace(
-        /[A-Za-z]{2,}/g,
-        (word) => word + word.slice(0, Math.ceil(word.length * 0.4)),
-      );
+    const longer = (text: string) => text.replace(/[A-Za-z]{2,}/g, (word) => word + word.slice(0, Math.ceil(word.length * 0.4)));
     const walker = document.createTreeWalker(menu, NodeFilter.SHOW_TEXT);
     const nodes: Node[] = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
-    for (const node of nodes) node.textContent = longer(node.textContent ?? "");
-    for (const track of menu.querySelectorAll(".roll__track")) {
-      for (const piece of track.querySelectorAll<HTMLElement>(".roll__word")) {
-        const letters = longer(
-          [...piece.children]
-            .map((letter) => (letter as HTMLElement).dataset.char)
-            .join(""),
-        );
+    for (const node of nodes) node.textContent = longer(node.textContent ?? '');
+    for (const track of menu.querySelectorAll('.roll__track')) {
+      for (const piece of track.querySelectorAll<HTMLElement>('.roll__word')) {
+        const letters = longer([...piece.children].map((letter) => (letter as HTMLElement).dataset.char).join(''));
         piece.replaceChildren(
           ...[...letters].map((letter) => {
-            const span = document.createElement("span");
-            span.className = "roll__piece";
+            const span = document.createElement('span');
+            span.className = 'roll__piece';
             span.dataset.char = letter;
             return span;
           }),
@@ -168,42 +154,24 @@ function problemsIn(page: Page, selector: string) {
       );
     };
     // Units a reader perceives as one piece: links, buttons, labels.
-    const pieces = [...menu.querySelectorAll("a, button, p, li > span, svg")]
-      .filter(
-        (element) =>
-          !element.closest(".visually-hidden") &&
-          !element.parentElement!.closest("a, button"),
-      )
+    const pieces = [...menu.querySelectorAll('a, button, p, li > span, svg')]
+      .filter((element) => !element.closest('.visually-hidden') && !element.parentElement!.closest('a, button'))
       .filter(shown);
-    const name = (element: Element) =>
-      `${element.localName} "${element.textContent?.trim().slice(0, 24)}"`;
+    const name = (element: Element) => `${element.localName} "${element.textContent?.trim().slice(0, 24)}"`;
     const boxes = pieces.map((piece) => piece.getBoundingClientRect());
     boxes.forEach((a, i) => {
-      if (a.right > width + 0.5 || a.left < -0.5)
-        out.push(
-          `${name(pieces[i])} spans ${Math.round(a.left)} to ${Math.round(a.right)}`,
-        );
+      if (a.right > width + 0.5 || a.left < -0.5) out.push(`${name(pieces[i])} spans ${Math.round(a.left)} to ${Math.round(a.right)}`);
       boxes.forEach((b, j) => {
-        if (
-          j <= i ||
-          pieces[i].contains(pieces[j]) ||
-          pieces[j].contains(pieces[i])
-        )
-          return;
+        if (j <= i || pieces[i].contains(pieces[j]) || pieces[j].contains(pieces[i])) return;
         const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
         const y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
-        if (x > 2 && y > 2)
-          out.push(`${name(pieces[i])} overlaps ${name(pieces[j])}`);
+        if (x > 2 && y > 2) out.push(`${name(pieces[i])} overlaps ${name(pieces[j])}`);
       });
     });
-    for (const element of menu.querySelectorAll("*")) {
+    for (const element of menu.querySelectorAll('*')) {
       const style = getComputedStyle(element);
-      if (!shown(element) || element.closest(".visually-hidden")) continue;
-      if (
-        style.overflowX !== "visible" &&
-        element.scrollWidth > element.clientWidth + 1
-      )
-        out.push(`${name(element)} is cut off`);
+      if (!shown(element) || element.closest('.visually-hidden')) continue;
+      if (style.overflowX !== 'visible' && element.scrollWidth > element.clientWidth + 1) out.push(`${name(element)} is cut off`);
     }
     return [...new Set(out)];
   }, selector);
@@ -225,40 +193,31 @@ for (const viewport of sizes) {
       viewport,
       isMobile: touch,
       hasTouch: touch,
-      contextOptions: { reducedMotion: "reduce" },
+      contextOptions: { reducedMotion: 'reduce' },
     });
 
-    test("nothing in the menus overlaps, runs off or is cut off, in any language", async ({
-      page,
-    }) => {
+    test('nothing in the menus overlaps, runs off or is cut off, in any language', async ({ page }) => {
       await settled(page.context());
       const issues: string[] = [];
       const runs = [
         ...locales.map(({ code }) => ({
           name: code,
-          path: prefix(code) || "/",
+          path: prefix(code) || '/',
           longer: false,
         })),
-        { name: "en, 40% longer", path: "/", longer: true },
+        { name: 'en, 40% longer', path: '/', longer: true },
       ];
       for (const run of runs) {
-        await page.goto(run.path, { waitUntil: "networkidle" });
-        const menus = [
-          { selector: "#site-menu", open: page.locator(".menu-button--open") },
-        ];
-        const languages = page.locator(".language__button");
-        if (await languages.isVisible())
-          menus.push({ selector: "#language-menu", open: languages });
+        await page.goto(run.path, { waitUntil: 'networkidle' });
+        const menus = [{ selector: '#site-menu', open: page.locator('.menu-button--open') }];
+        const languages = page.locator('.language__button');
+        if (await languages.isVisible()) menus.push({ selector: '#language-menu', open: languages });
         for (const { selector, open } of menus) {
           await open.click();
           await expect(page.locator(selector)).toBeVisible();
           if (run.longer) await lengthen(page, selector);
-          issues.push(
-            ...(await problemsIn(page, selector)).map(
-              (issue) => `${run.name} ${selector}: ${issue}`,
-            ),
-          );
-          await page.keyboard.press("Escape");
+          issues.push(...(await problemsIn(page, selector)).map((issue) => `${run.name} ${selector}: ${issue}`));
+          await page.keyboard.press('Escape');
           await expect(page.locator(selector)).toBeHidden();
         }
       }

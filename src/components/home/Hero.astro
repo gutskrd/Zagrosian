@@ -24,17 +24,15 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       </a>
 
       <h1 id="hero-title" class:list={['hero__title', fit && `hero__title--${fit}`]}>
-        {
-          t.hero.headline.map((line, index) => (
-            <>
-              {/* A real space between lines for unstyled consumers (search engines, crawlers). */}
-              {index > 0 && ' '}
-              <span class="hero__line">
-                <span>{line}</span>
-              </span>
-            </>
-          ))
-        }
+        {t.hero.headline.map((line, index) => (
+          <>
+            {/* A real space between lines for unstyled consumers (search engines, crawlers). */}
+            {index > 0 && ' '}
+            <span class="hero__line">
+              <span>{line}</span>
+            </span>
+          </>
+        ))}
       </h1>
 
       <p class="hero__lead lead intro">{t.hero.lead}</p>
@@ -53,12 +51,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   </div>
 </section>
 
-{
-  /* The layer the logo travels in on its way into the story below
+{/* The layer the logo travels in on its way into the story below
      (Story.astro, src/scripts/motion/story.ts), fixed to the screen. The script
      copies the logo into it; it is unused without JavaScript or with reduced
-     motion. */
-}
+     motion. */}
 <div class="journey" aria-hidden="true" data-journey-layer>
   <div class="journey__art" data-lean>
     <div class="journey__tilt"></div>

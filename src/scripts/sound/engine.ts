@@ -212,16 +212,19 @@ export function startScore() {
       bus.gain.cancelScheduledValues(at);
       bus.gain.setValueAtTime(bus.gain.value, at);
       bus.gain.linearRampToValueAtTime(0, at + release);
-      window.setTimeout(() => {
-        for (const stop of stops) {
-          try {
-            stop();
-          } catch {
-            // Already stopped.
+      window.setTimeout(
+        () => {
+          for (const stop of stops) {
+            try {
+              stop();
+            } catch {
+              // Already stopped.
+            }
           }
-        }
-        bus.disconnect();
-      }, release * 1000 + 200);
+          bus.disconnect();
+        },
+        release * 1000 + 200,
+      );
     },
   };
 }

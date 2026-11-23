@@ -31,20 +31,16 @@ for (let i = 0; i < blocks.length; i++) {
 }
 ---
 
-{
-  rows.map((row) => {
-    const Tag = row.kind === 'heading' ? 'h4' : 'p';
-    return (
-      <Tag class:list={[row.kind === 'label' && 'book__label', row.kind === 'speaker' && 'book__label']}>
-        {row.speaker && (
-          <>
-            <b>
-              {row.speaker.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
-            </b>{' '}
-          </>
-        )}
-        {row.spans.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
-      </Tag>
-    );
-  })
-}
+{rows.map((row) => {
+  const Tag = row.kind === 'heading' ? 'h4' : 'p';
+  return (
+    <Tag class:list={[row.kind === 'label' && 'book__label', row.kind === 'speaker' && 'book__label']}>
+      {row.speaker && (
+        <>
+          <b>{row.speaker.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}</b>{' '}
+        </>
+      )}
+      {row.spans.map((span) => (span.lang === 'ku' ? <span lang="ku">{span.text}</span> : span.text))}
+    </Tag>
+  );
+})}

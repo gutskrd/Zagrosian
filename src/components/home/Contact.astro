@@ -11,9 +11,13 @@ const { contact } = site.emails;
 <section id="contact" class="contact section" aria-labelledby="contact-title">
   <div class="container contact__grid">
     <div>
-      <p class="eyebrow" data-reveal>{t.contact.eyebrow}</p>
+      <p class="eyebrow" data-reveal>
+        {t.contact.eyebrow}
+      </p>
       <SplitText id="contact-title" class="heading-2 contact__title" text={t.contact.title} />
-      <p class="contact__text lead" data-lines>{t.contact.lead}</p>
+      <p class="contact__text lead" data-lines>
+        {t.contact.lead}
+      </p>
     </div>
 
     <address class="contact__panel" data-reveal>
@@ -33,13 +37,16 @@ const { contact } = site.emails;
           hidden
         >
           <span class="contact__copy-idle">{t.contact.copy}</span>
-          <span class="contact__copy-done" aria-hidden="true">{t.contact.copied}</span>
+          <span class="contact__copy-done" aria-hidden="true">
+            {t.contact.copied}
+          </span>
         </button>
         <p class="visually-hidden" role="status" data-copy-status></p>
       </div>
 
       <p class="contact__note">
-        {t.contact.security.before} <a href={localize('/security')}>{t.contact.security.link}</a>{t.contact.security.after}
+        {t.contact.security.before} <a href={localize('/security')}>{t.contact.security.link}</a>
+        {t.contact.security.after}
       </p>
     </address>
   </div>

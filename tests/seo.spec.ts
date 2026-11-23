@@ -41,7 +41,8 @@ test('the registered details are shown in every footer, and kept out of search',
     await page.goto(path);
     const line = page.locator('[data-registration]');
     await expect(line, path).toHaveAttribute('data-registered', '');
-    for (const detail of [address!.street, `${address!.postalCode} ${address!.city}`, kvk!, phone!]) await expect(line, path).toContainText(detail);
+    for (const detail of [address!.street, `${address!.postalCode} ${address!.city}`, kvk!, phone!])
+      await expect(line, path).toContainText(detail);
     await expect(line.locator('a[href^="tel:"]'), path).toHaveAttribute('href', `tel:${phone!.replace(/[^+\d]/g, '')}`);
     await expect(page.locator('[data-nosnippet] [data-registration]'), 'not for search snippets').toHaveCount(1);
   }
@@ -60,7 +61,9 @@ test('the tab icon is black on a light browser and white on a dark one', async (
     await page.emulateMedia({ colorScheme });
     await page.goto('/favicon.svg');
     const shown = await page.evaluate(() =>
-      [...document.querySelectorAll('path')].filter((path) => getComputedStyle(path).display !== 'none').map((path) => path.getAttribute('fill')),
+      [...document.querySelectorAll('path')]
+        .filter((path) => getComputedStyle(path).display !== 'none')
+        .map((path) => path.getAttribute('fill')),
     );
     expect(shown, colorScheme).toEqual([colorScheme === 'dark' ? '#fff' : '#000']);
   }
@@ -76,9 +79,18 @@ test('the book is described as a book, with its PDF, its chapters and its pages'
     const node = graph.find((item) => item['@type'] === 'Book');
     expect(node, file).toBeDefined();
     expect(node!.numberOfPages).toBe(book.pageCount);
-    expect(node!.encoding).toMatchObject({ '@type': 'MediaObject', encodingFormat: 'application/pdf', contentUrl: 'https://zagrosian.com/book/reya-kurmanci.pdf' });
+    expect(node!.encoding).toMatchObject({
+      '@type': 'MediaObject',
+      encodingFormat: 'application/pdf',
+      contentUrl: 'https://zagrosian.com/book/reya-kurmanci.pdf',
+    });
     expect(node!.hasPart).toHaveLength(book.chapters.length);
-    expect(node!.hasPart![0]).toMatchObject({ '@type': 'Chapter', position: 1, pageStart: book.chapters[0].start, pageEnd: book.chapters[0].end });
+    expect(node!.hasPart![0]).toMatchObject({
+      '@type': 'Chapter',
+      position: 1,
+      pageStart: book.chapters[0].start,
+      pageEnd: book.chapters[0].end,
+    });
     const webPage = graph.find((item) => item['@type'] === 'WebPage')!;
     expect(webPage.mainEntity).toEqual({ '@id': node!['@id'] });
     expect(html).toContain('<meta property="og:image" content="https://zagrosian.com/og/book.jpg"');

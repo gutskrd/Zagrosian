@@ -18,8 +18,7 @@ interface Props {
 const { variant } = Astro.props;
 const { locale, t } = i18n(Astro.url);
 
-const matter = (keys: SectionKey[]) =>
-  keys.map((key) => sections.find((section) => section.key === key)!).filter(Boolean);
+const matter = (keys: SectionKey[]) => keys.map((key) => sections.find((section) => section.key === key)!).filter(Boolean);
 const front = matter(['passport', 'alphabet', 'people']);
 const back = matter(['answers', 'words', 'author']);
 const pageNumber = (n: number) => format(t.book.pageLabel, { n: formatNumber(locale, n) });
@@ -29,75 +28,75 @@ const Title = variant === 'section' ? 'h3' : 'span';
 ---
 
 <ol class:list={['contents', `contents--${variant}`]} data-book-contents={variant}>
-  {
-    front.map((section) => (
-      <li class="contents__matter">
-        <a class="contents__link" href={`#page-${section.start}`} data-book-jump={section.start}>
-          <span class="contents__name">{t.book.sections[section.key]}</span>
-          <span class="contents__page" aria-hidden="true">{formatNumber(locale, section.start)}</span>
-          <span class="visually-hidden">{pageNumber(section.start)}</span>
-        </a>
+  {front.map((section) => (
+    <li class="contents__matter">
+      <a class="contents__link" href={`#page-${section.start}`} data-book-jump={section.start}>
+        <span class="contents__name">{t.book.sections[section.key]}</span>
+        <span class="contents__page" aria-hidden="true">
+          {formatNumber(locale, section.start)}
+        </span>
+        <span class="visually-hidden">{pageNumber(section.start)}</span>
+      </a>
+    </li>
+  ))}
+  {chapters.map((chapter) => {
+    const name = chapterName(locale, chapter);
+    return (
+      <li class="contents__chapter">
+        <Title class="contents__title">
+          <a
+            class="contents__link contents__link--chapter"
+            href={`#page-${chapter.start}`}
+            data-book-jump={chapter.start}
+            data-book-chapter={chapter.number}
+            data-start={chapter.start}
+            data-end={chapter.end}
+          >
+            <span class="contents__number" aria-hidden="true">
+              {formatNumber(locale, chapter.number)}
+            </span>
+            <span class="visually-hidden">
+              {format(t.book.chapterLabel, { n: formatNumber(locale, chapter.number), name: '' }).replace(/[\s:：]+$/, '')}
+            </span>
+            <span class="contents__titles">
+              <span class="contents__ku kurdish" lang="ku" dir="ltr">
+                {chapter.titleKu}
+              </span>
+              {named(name, chapter.titleKu) && <span class="contents__translation">{name}</span>}
+            </span>
+            <span class="contents__level" lang="en" dir="ltr">
+              {chapter.cefr}
+            </span>
+            <span class="contents__page" aria-hidden="true">
+              {formatNumber(locale, chapter.start)}
+            </span>
+            <span class="visually-hidden">{pageNumber(chapter.start)}</span>
+          </a>
+        </Title>
+        {variant === 'section' && (
+          <p class="contents__parts" lang="ku" dir="ltr">
+            {chapter.parts.map((part, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true"> · </span>}
+                <span>{part.titleKu}</span>
+              </>
+            ))}
+          </p>
+        )}
       </li>
-    ))
-  }
-  {
-    chapters.map((chapter) => {
-      const name = chapterName(locale, chapter);
-      return (
-        <li class="contents__chapter">
-          <Title class="contents__title">
-            <a
-              class="contents__link contents__link--chapter"
-              href={`#page-${chapter.start}`}
-              data-book-jump={chapter.start}
-              data-book-chapter={chapter.number}
-              data-start={chapter.start}
-              data-end={chapter.end}
-            >
-              <span class="contents__number" aria-hidden="true">
-                {formatNumber(locale, chapter.number)}
-              </span>
-              <span class="visually-hidden">{format(t.book.chapterLabel, { n: formatNumber(locale, chapter.number), name: '' }).replace(/[\s:：]+$/, '')}</span>
-              <span class="contents__titles">
-                <span class="contents__ku kurdish" lang="ku" dir="ltr">
-                  {chapter.titleKu}
-                </span>
-                {named(name, chapter.titleKu) && <span class="contents__translation">{name}</span>}
-              </span>
-              <span class="contents__level" lang="en" dir="ltr">
-                {chapter.cefr}
-              </span>
-              <span class="contents__page" aria-hidden="true">
-                {formatNumber(locale, chapter.start)}
-              </span>
-              <span class="visually-hidden">{pageNumber(chapter.start)}</span>
-            </a>
-          </Title>
-          {variant === 'section' && (
-            <p class="contents__parts" lang="ku" dir="ltr">
-              {chapter.parts.map((part, i) => (
-                <>
-                  {i > 0 && <span aria-hidden="true"> · </span>}
-                  <span>{part.titleKu}</span>
-                </>
-              ))}
-            </p>
-          )}
-        </li>
-      );
-    })
-  }
-  {
-    back.map((section) => (
-      <li class="contents__matter">
-        <a class="contents__link" href={`#page-${section.start}`} data-book-jump={section.start}>
-          <span class="contents__name">{t.book.sections[section.key]}</span>
-          <span class="contents__page" aria-hidden="true">{formatNumber(locale, section.start)}</span>
-          <span class="visually-hidden">{pageNumber(section.start)}</span>
-        </a>
-      </li>
-    ))
-  }
+    );
+  })}
+  {back.map((section) => (
+    <li class="contents__matter">
+      <a class="contents__link" href={`#page-${section.start}`} data-book-jump={section.start}>
+        <span class="contents__name">{t.book.sections[section.key]}</span>
+        <span class="contents__page" aria-hidden="true">
+          {formatNumber(locale, section.start)}
+        </span>
+        <span class="visually-hidden">{pageNumber(section.start)}</span>
+      </a>
+    </li>
+  ))}
 </ol>
 
 <style>

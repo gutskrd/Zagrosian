@@ -23,7 +23,8 @@ const shadows = {
 };
 // Front-face shading: darker along the bottom and right, with a faint inner glow. (The sharp bevel
 // stays in CSS, crisp at any size.)
-const shading = 'inset 0 -0.57cqi 0.85cqi rgb(0 0 0 / 0.18), inset -0.57cqi 0 0.85cqi rgb(0 0 0 / 0.08), inset 0 0 6.8cqi rgb(255 255 255 / 0.12)';
+const shading =
+  'inset 0 -0.57cqi 0.85cqi rgb(0 0 0 / 0.18), inset -0.57cqi 0 0.85cqi rgb(0 0 0 / 0.08), inset 0 0 6.8cqi rgb(255 255 255 / 0.12)';
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ deviceScaleFactor: 1 });
@@ -36,7 +37,9 @@ async function render(css, clip, file) {
   </style><div class="frame"><div class="block"></div></div>`);
   await page.setViewportSize({ width: BLOCK + 600, height: BLOCK + 600 });
   const png = await page.screenshot({ clip, omitBackground: true });
-  await sharp(png).webp({ lossless: true, effort: 6 }).toFile(OUT + file);
+  await sharp(png)
+    .webp({ lossless: true, effort: 6 })
+    .toFile(OUT + file);
   console.log(file);
 }
 

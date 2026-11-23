@@ -60,7 +60,6 @@ test.describe('in the menu', () => {
     await expect(share).toHaveText('Link kopiert');
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('https://zagrosian.com/de/privacy');
   });
-
 });
 
 test.describe('on a phone', () => {

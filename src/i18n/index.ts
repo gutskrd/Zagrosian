@@ -82,9 +82,7 @@ export function navigation(locale: Locale) {
   return {
     home: link(t.nav.home, '/'),
     book: link(t.nav.book, '/book'),
-    sections: (['hevalo', 'about', 'faq', 'contact'] as const).map(
-      (key): SectionLink => ({ key, ...link(t.nav[key], `/#${key}`) }),
-    ),
+    sections: (['hevalo', 'about', 'faq', 'contact'] as const).map((key): SectionLink => ({ key, ...link(t.nav[key], `/#${key}`) })),
     legal: legalSlugs.map((slug) => link(t.nav[slug], `/${slug}`)),
   };
 }

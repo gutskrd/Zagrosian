@@ -144,18 +144,15 @@ export const en = {
       },
       {
         question: 'What is Hevalo?',
-        answer:
-          'Hevalo is an app for learning Kurdish through short lessons and games played with friends. You can find it at {hevalo}.',
+        answer: 'Hevalo is an app for learning Kurdish through short lessons and games played with friends. You can find it at {hevalo}.',
       },
       {
         question: 'Which Kurdish dialects does Hevalo teach?',
-        answer:
-          'Hevalo starts with Kurmanji. More dialects are planned.',
+        answer: 'Hevalo starts with Kurmanji. More dialects are planned.',
       },
       {
         question: 'Is Hevalo available on iOS and Android?',
-        answer:
-          'Not yet. The native apps are in development and will be available on the App Store and Google Play.',
+        answer: 'Not yet. The native apps are in development and will be available on the App Store and Google Play.',
       },
       {
         question: 'Does zagrosian.com collect personal data?',

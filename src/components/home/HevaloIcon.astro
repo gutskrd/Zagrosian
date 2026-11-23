@@ -35,23 +35,21 @@ const variants = [
 ---
 
 <span class:list={['hevalo-icon', className]} data-hevalo-eyes>
-  {
-    variants.map(({ season, images }) => (
-      <img
-        class="hevalo-icon__image"
-        data-season={season}
-        src={images[1].src}
-        srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
-        sizes={sizes}
-        width={images[1].width}
-        height={images[1].height}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        draggable="false"
-      />
-    ))
-  }
+  {variants.map(({ season, images }) => (
+    <img
+      class="hevalo-icon__image"
+      data-season={season}
+      src={images[1].src}
+      srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+      sizes={sizes}
+      width={images[1].width}
+      height={images[1].height}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      draggable="false"
+    />
+  ))}
   <HevaloEyes frame="icon" />
 </span>
 

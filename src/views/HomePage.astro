@@ -15,11 +15,9 @@ import shadowDark from '../assets/brand/lifted-logo-shadow-dark.webp?url';
 ---
 
 <BaseLayout>
-  {
-    /* The hero logo's soft shading and shadow are CSS backgrounds, found only
+  {/* The hero logo's soft shading and shadow are CSS backgrounds, found only
        once the stylesheet is read; fetched at once instead, they are there
-       when the logo first appears (theme-init.js waits a moment for them). */
-  }
+       when the logo first appears (theme-init.js waits a moment for them). */}
   <Fragment slot="head">
     <link rel="preload" as="image" href={shading} />
     <link rel="preload" as="image" href={shadowLight} media="(prefers-color-scheme: light)" />

@@ -60,10 +60,13 @@ export function initDeer() {
     if (!visible || document.hidden) return;
     habits.forEach((habit, index) => {
       const next = () => {
-        timers[index] = window.setTimeout(() => {
-          habit.run();
-          next();
-        }, between(...habit.every));
+        timers[index] = window.setTimeout(
+          () => {
+            habit.run();
+            next();
+          },
+          between(...habit.every),
+        );
       };
       next();
     });

@@ -8,32 +8,34 @@ const { t } = i18n(Astro.url);
 
 <section id="about" class="about section" aria-labelledby="about-title">
   <div class="container about__grid">
-    <p class="eyebrow" data-reveal>{t.about.eyebrow}</p>
+    <p class="eyebrow" data-reveal>
+      {t.about.eyebrow}
+    </p>
 
     <div class="about__body" data-reveal>
       <SplitText id="about-title" class="about__statement" effect="highlight" text={t.about.mission} />
-      <p class="about__text lead" data-lines>{t.about.approach}</p>
+      <p class="about__text lead" data-lines>
+        {t.about.approach}
+      </p>
 
       <dl class="about__facts rule">
         <div>
           <dt>{t.about.headquartersLabel}</dt>
           <dd>
             {t.about.headquarters}
-            <span
-              class="about__time"
-              data-local-time
-              data-time-zone={site.timeZone}
-              data-template={t.about.localTime}
-              hidden></span>
+            <span class="about__time" data-local-time data-time-zone={site.timeZone} data-template={t.about.localTime} hidden></span>
           </dd>
         </div>
         <div>
           <dt>{t.about.productsLabel}</dt>
-          <dd><a href={hevalo.url} lang="en" dir="ltr">{hevalo.name}</a></dd>
+          <dd>
+            <a href={hevalo.url} lang="en" dir="ltr">
+              {hevalo.name}
+            </a>
+          </dd>
         </div>
       </dl>
     </div>
-
   </div>
 </section>
 

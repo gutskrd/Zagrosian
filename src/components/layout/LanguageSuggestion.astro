@@ -11,24 +11,22 @@ const others = locales.filter(({ code }) => code !== locale);
 ---
 
 <aside class="suggest" data-language-suggestion hidden>
-  {
-    others.map(({ code, dir }) => {
-      const m = messages(code);
-      return (
-        <div class="suggest__card" data-locale={code} lang={code} dir={dir} hidden>
-          <p class="suggest__text">{m.language.suggestion}</p>
-          <a class="suggest__link" href={localizePath(code, base)} hreflang={code} data-language-link>
-            {m.language.switchTo}
-          </a>
-          <button class="suggest__close" type="button" data-language-suggestion-dismiss aria-label={m.language.dismiss}>
-            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <path d="M4 4l8 8M12 4l-8 8" />
-            </svg>
-          </button>
-        </div>
-      );
-    })
-  }
+  {others.map(({ code, dir }) => {
+    const m = messages(code);
+    return (
+      <div class="suggest__card" data-locale={code} lang={code} dir={dir} hidden>
+        <p class="suggest__text">{m.language.suggestion}</p>
+        <a class="suggest__link" href={localizePath(code, base)} hreflang={code} data-language-link>
+          {m.language.switchTo}
+        </a>
+        <button class="suggest__close" type="button" data-language-suggestion-dismiss aria-label={m.language.dismiss}>
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M4 4l8 8M12 4l-8 8" />
+          </svg>
+        </button>
+      </div>
+    );
+  })}
 </aside>
 
 <style>

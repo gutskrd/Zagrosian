@@ -28,10 +28,14 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
   <div class="container">
     <figure class="proverb__sheet" data-sheet>
       <svg class="proverb__creases proverb__creases--tall" viewBox={`0 0 1 ${round(LENGTH)}`} aria-hidden="true" focusable="false">
-        {tall.map(([x1, y1, x2, y2]) => <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />)}
+        {tall.map(([x1, y1, x2, y2]) => (
+          <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />
+        ))}
       </svg>
       <svg class="proverb__creases proverb__creases--wide" viewBox={`0 0 ${round(LENGTH)} 1`} aria-hidden="true" focusable="false">
-        {wide.map(([x1, y1, x2, y2]) => <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />)}
+        {wide.map(([x1, y1, x2, y2]) => (
+          <line x1={x1} y1={y1} x2={x2} y2={y2} vector-effect="non-scaling-stroke" />
+        ))}
       </svg>
       <div class="proverb__writing">
         <blockquote class="proverb__text kurdish" lang="ku" dir="ltr">
@@ -39,7 +43,9 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
         </blockquote>
         {t.hevalo.proverb && <p class="proverb__translation">{t.hevalo.proverb}</p>}
         <figcaption class="proverb__source">
-          <span lang="ku" dir="ltr">{kurdish.proverbSource}</span>
+          <span lang="ku" dir="ltr">
+            {kurdish.proverbSource}
+          </span>
           {t.hevalo.proverbSource && <span>{t.hevalo.proverbSource}</span>}
         </figcaption>
       </div>

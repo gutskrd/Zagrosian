@@ -242,7 +242,9 @@ test.describe('on a computer', () => {
     // The previously open page is at the top, below the toolbars, with every page stacked below.
     await expect.poll(() => new URL(page.url()).hash).toBe('#page-10');
     await expect(page.locator('#page-10 img')).toBeInViewport();
-    const boxes = await page.locator('.book__page').evaluateAll((items) => items.map((item) => item.getBoundingClientRect()).map(({ top, height, width }) => ({ top, height, width })));
+    const boxes = await page
+      .locator('.book__page')
+      .evaluateAll((items) => items.map((item) => item.getBoundingClientRect()).map(({ top, height, width }) => ({ top, height, width })));
     expect(boxes).toHaveLength(manifest.pageCount);
     for (let i = 1; i < boxes.length; i++) expect(boxes[i]!.top).toBeGreaterThan(boxes[i - 1]!.top + boxes[i - 1]!.height - 1);
     // Each page has the right aspect ratio before its image loads and is no wider than the
@@ -288,7 +290,9 @@ test.describe('on a computer', () => {
     await context.close();
   });
 
-  test('full view: over the site’s header, the focus stays in the book, Escape gives it back, and the page behind holds still', async ({ page }) => {
+  test('full view: over the site’s header, the focus stays in the book, Escape gives it back, and the page behind holds still', async ({
+    page,
+  }) => {
     await open(page);
     const toggle = page.locator('[data-book-full-toggle]');
     await toggle.click();
@@ -326,7 +330,8 @@ test.describe('on a computer', () => {
       if (!request.url().startsWith('http://127.0.0.1:8788/')) elsewhere.push(request.url());
     });
     page.on('response', async (response) => {
-      if (/\/p\d{3}-(720|1440)\.[\w-]+\.webp$/.test(response.url())) pictures.push({ url: response.url(), bytes: (await response.body()).length });
+      if (/\/p\d{3}-(720|1440)\.[\w-]+\.webp$/.test(response.url()))
+        pictures.push({ url: response.url(), bytes: (await response.body()).length });
     });
     await open(page);
     await page.waitForTimeout(800);
@@ -365,7 +370,9 @@ test.describe('on a computer', () => {
 });
 
 test.describe('the bars', () => {
-  test('hold every control apart, and the contents’ name whole, in every language from the narrowest phone to a wide screen', async ({ page }) => {
+  test('hold every control apart, and the contents’ name whole, in every language from the narrowest phone to a wide screen', async ({
+    page,
+  }) => {
     test.setTimeout(120_000);
     const problems: string[] = [];
     for (const code of ['', 'ku', 'ckb', 'ar', 'fa', 'tr', 'de', 'fr', 'es', 'nl']) {
@@ -383,7 +390,13 @@ test.describe('the bars', () => {
           // The contents button intentionally overhangs its bar's edge slightly, so a few pixels of
           // contact are allowed.
           const apart = boxes.every((one, i) =>
-            boxes.slice(i + 1).every((other) => one.every((a) => other.every((b) => a.right - 10 <= b.left || b.right - 10 <= a.left || a.bottom - 1 <= b.top || b.bottom - 1 <= a.top))),
+            boxes
+              .slice(i + 1)
+              .every((other) =>
+                one.every((a) =>
+                  other.every((b) => a.right - 10 <= b.left || b.right - 10 <= a.left || a.bottom - 1 <= b.top || b.bottom - 1 <= a.top),
+                ),
+              ),
           );
           const name = document.querySelector<HTMLElement>('[data-book] .book__where-text')!;
           return { apart, cut: name.scrollWidth > name.clientWidth + 1, wide: document.documentElement.scrollWidth > innerWidth };
@@ -482,7 +495,8 @@ test.describe('on a narrow phone, in Kurmanji', () => {
       box: element.getBoundingClientRect().toJSON() as DOMRect,
       bar: element.closest('.book__bar')!.getBoundingClientRect().toJSON() as DOMRect,
       // Every line fits: nothing overflows its box in either direction.
-      whole: element.scrollHeight <= element.clientHeight + 1 && [...element.children].every((line) => line.scrollWidth <= line.clientWidth + 1),
+      whole:
+        element.scrollHeight <= element.clientHeight + 1 && [...element.children].every((line) => line.scrollWidth <= line.clientWidth + 1),
     }));
     expect(box.left).toBeGreaterThanOrEqual(0);
     expect(box.right).toBeLessThanOrEqual(320);

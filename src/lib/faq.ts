@@ -58,6 +58,4 @@ export const answerText = (answer: FaqPart[]) => answer.map((part) => (typeof pa
 
 /** Answer as Markdown with absolute links. */
 export const answerMarkdown = (answer: FaqPart[]) =>
-  answer
-    .map((part) => (typeof part === 'string' ? part : `[${part.text}](${new URL(part.href, site.url).href})`))
-    .join('');
+  answer.map((part) => (typeof part === 'string' ? part : `[${part.text}](${new URL(part.href, site.url).href})`)).join('');

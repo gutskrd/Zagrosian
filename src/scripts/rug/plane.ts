@@ -172,7 +172,9 @@ const foldTurns = (angles: Angles): Matrix[] => {
       from = transform(turns[fold.carriedBy], from);
       to = transform(turns[fold.carriedBy], to);
     }
-    const moving = Math.sign((fold.to[0] - fold.from[0]) * (fold.side[1] - fold.from[1]) - (fold.to[1] - fold.from[1]) * (fold.side[0] - fold.from[0]));
+    const moving = Math.sign(
+      (fold.to[0] - fold.from[0]) * (fold.side[1] - fold.from[1]) - (fold.to[1] - fold.from[1]) * (fold.side[0] - fold.from[0]),
+    );
     const axis = normalise([to[0] - from[0], to[1] - from[1], to[2] - from[2]]);
     turns.push(rotation(from, axis, fold.towards * moving * angles[i]));
   });

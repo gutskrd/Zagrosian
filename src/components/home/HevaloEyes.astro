@@ -15,20 +15,22 @@ interface Props {
 const { frame, lids = false } = Astro.props;
 ---
 
-<span class="eye eye--left" data-frame={frame} aria-hidden="true"><span class="pupil" data-pupil></span></span>
-<span class="eye eye--right" data-frame={frame} aria-hidden="true"><span class="pupil" data-pupil></span></span>
-{
-  lids && (
-    <>
-      <span class="lid lid--left" aria-hidden="true">
-        <span class="lid__skin" />
-      </span>
-      <span class="lid lid--right" aria-hidden="true">
-        <span class="lid__skin" />
-      </span>
-    </>
-  )
-}
+<span class="eye eye--left" data-frame={frame} aria-hidden="true">
+  <span class="pupil" data-pupil></span>
+</span>
+<span class="eye eye--right" data-frame={frame} aria-hidden="true">
+  <span class="pupil" data-pupil></span>
+</span>
+{lids && (
+  <>
+    <span class="lid lid--left" aria-hidden="true">
+      <span class="lid__skin" />
+    </span>
+    <span class="lid lid--right" aria-hidden="true">
+      <span class="lid__skin" />
+    </span>
+  </>
+)}
 
 <style>
   /* Eyes measured on the icon's 360px square: each eye white is 58x68px (keeping the pupil inside),

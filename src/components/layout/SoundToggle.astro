@@ -16,15 +16,13 @@ const { labelled = false, class: className } = Astro.props;
 const { t } = i18n(Astro.url);
 ---
 
-<button
-  class:list={['sound-toggle', labelled && 'sound-toggle--labelled', className]}
-  type="button"
-  aria-pressed="false"
-  data-sound-toggle
->
+<button class:list={['sound-toggle', labelled && 'sound-toggle--labelled', className]} type="button" aria-pressed="false" data-sound-toggle>
   <span class:list={[!labelled && 'visually-hidden']}>{t.sound.label}</span>
   <span class="sound-toggle__bars" aria-hidden="true">
-    <span></span><span></span><span></span><span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
   </span>
 </button>
 

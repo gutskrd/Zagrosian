@@ -154,7 +154,8 @@ function setUp(root: HTMLElement) {
   };
   const itemElement = (item: Item) => (item === 'end' ? endCard : pageOf(item));
   const imgOf = (page: number) => pageOf(page).querySelector('img')!;
-  const sourceOf = (item: Item | undefined): Source => (item === undefined ? null : item === 'end' ? { card: endCard } : { img: imgOf(item) });
+  const sourceOf = (item: Item | undefined): Source =>
+    item === undefined ? null : item === 'end' ? { card: endCard } : { img: imgOf(item) };
   const sides = (view: View) => {
     if (!twoPages) return { left: undefined, right: view[0] };
     if (view.length === 1) return view[0] === 1 ? { left: undefined, right: 1 as Item } : { left: view[0], right: undefined };
@@ -306,13 +307,27 @@ function setUp(root: HTMLElement) {
         leaves === 1
           ? [{ front: sourceOf(a.right), back: sourceOf(b.left) }]
           : [{ front: sourceOf(a.right), back: 'plain' as Source }, plain, { front: 'plain' as Source, back: sourceOf(b.left) }];
-      return { direction, spread: true, leaves: list, reveal: sourceOf(b.right), hold: sourceOf(a.left), glide: from === 0 ? 'open' : undefined };
+      return {
+        direction,
+        spread: true,
+        leaves: list,
+        reveal: sourceOf(b.right),
+        hold: sourceOf(a.left),
+        glide: from === 0 ? 'open' : undefined,
+      };
     }
     const list =
       leaves === 1
         ? [{ front: sourceOf(b.right), back: sourceOf(a.left) }]
         : [{ front: 'plain' as Source, back: sourceOf(a.left) }, plain, { front: sourceOf(b.right), back: 'plain' as Source }];
-    return { direction, spread: true, leaves: list, reveal: sourceOf(b.left), hold: sourceOf(a.right), glide: to === 0 ? 'close' : undefined };
+    return {
+      direction,
+      spread: true,
+      leaves: list,
+      reveal: sourceOf(b.left),
+      hold: sourceOf(a.right),
+      glide: to === 0 ? 'close' : undefined,
+    };
   };
 
   const firstTurn = () => {
@@ -411,12 +426,15 @@ function setUp(root: HTMLElement) {
   const chapterStep = (by: 1 | -1) => {
     cancelQueue();
     if (column) {
-      const target = by === 1 ? chapterStarts.find((start) => start > reading) : [...chapterStarts].reverse().find((start) => start < reading);
+      const target =
+        by === 1 ? chapterStarts.find((start) => start > reading) : [...chapterStarts].reverse().find((start) => start < reading);
       if (target !== undefined) columnGoTo(target);
       return;
     }
     const target =
-      by === 1 ? chapterStarts.find((start) => viewIndexOf(start) > heading) : [...chapterStarts].reverse().find((start) => viewIndexOf(start) < heading);
+      by === 1
+        ? chapterStarts.find((start) => viewIndexOf(start) > heading)
+        : [...chapterStarts].reverse().find((start) => viewIndexOf(start) < heading);
     if (target !== undefined) void go(viewIndexOf(target), 'chapter');
   };
 
@@ -437,7 +455,8 @@ function setUp(root: HTMLElement) {
     const page = typeof view[0] === 'number' ? view[0] : null;
     const first = page ? pageOf(page) : null;
     const chapter = first?.dataset.short?.split(' · ')[1];
-    bubble.textContent = page === null ? (root.dataset.endTitle ?? '') : chapter ? `${n(page)} · ${chapter}` : `${n(page)} · ${first?.dataset.label ?? ''}`;
+    bubble.textContent =
+      page === null ? (root.dataset.endTitle ?? '') : chapter ? `${n(page)} · ${chapter}` : `${n(page)} · ${first?.dataset.label ?? ''}`;
     const min = Number(range.min);
     const max = Number(range.max);
     const thumb = 14;
@@ -462,7 +481,8 @@ function setUp(root: HTMLElement) {
     scrub.removeAttribute('data-dragging');
     goToValue();
   });
-  for (const type of ['pointerup', 'pointercancel', 'blur'] as const) range.addEventListener(type, () => scrub.removeAttribute('data-dragging'));
+  for (const type of ['pointerup', 'pointercancel', 'blur'] as const)
+    range.addEventListener(type, () => scrub.removeAttribute('data-dragging'));
 
   // Contents links (menu, in-page list, end card): turn a few leaves to the chapter, then focus the
   // book. In a column, scroll there.
@@ -478,7 +498,8 @@ function setUp(root: HTMLElement) {
     }
     const fromOutside = !root.contains(link) || link.closest('.book__end') === null;
     void go(viewIndexOf(page), 'chapter');
-    if (fromOutside && !root.hasAttribute('data-full')) root.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'instant' : 'smooth' });
+    if (fromOutside && !root.hasAttribute('data-full'))
+      root.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'instant' : 'smooth' });
     stage.focus({ preventScroll: true });
   });
 
@@ -695,7 +716,8 @@ function setUp(root: HTMLElement) {
       const end = { x: event.clientX, t: event.timeStamp };
       const recent = samples.filter((sample) => sample.t >= end.t - 100);
       const from = recent[0];
-      const velocity = from && from.t < end.t ? ((end.x - from.x) / Math.max(16, end.t - from.t)) * (state.direction === 'forward' ? -1 : 1) : 0;
+      const velocity =
+        from && from.t < end.t ? ((end.x - from.x) / Math.max(16, end.t - from.t)) * (state.direction === 'forward' ? -1 : 1) : 0;
       // Past a third of the way, or flicked: complete the turn; otherwise fall back.
       const moved = Math.abs(event.clientX - started.x) > DRAG_START;
       release(state, !cancelled && (!moved || state.progress > 1 / 3 || velocity > 0.3));
@@ -750,7 +772,10 @@ function setUp(root: HTMLElement) {
     'touchstart',
     (event) => {
       const finger = event.touches[0];
-      swipe = zoom.level > 1 && event.touches.length === 1 && finger ? { x: finger.clientX, y: finger.clientY, left: stage.scrollLeft, time: performance.now() } : null;
+      swipe =
+        zoom.level > 1 && event.touches.length === 1 && finger
+          ? { x: finger.clientX, y: finger.clientY, left: stage.scrollLeft, time: performance.now() }
+          : null;
     },
     { passive: true },
   );
@@ -940,7 +965,8 @@ function setUp(root: HTMLElement) {
     if (order.length === 0) return;
     event.preventDefault();
     const at = order.indexOf(document.activeElement as HTMLElement);
-    const next = at < 0 ? (event.shiftKey ? order.at(-1) : order[0]) : order[(at + (event.shiftKey ? -1 : 1) + order.length) % order.length];
+    const next =
+      at < 0 ? (event.shiftKey ? order.at(-1) : order[0]) : order[(at + (event.shiftKey ? -1 : 1) + order.length) % order.length];
     next?.focus();
   };
 
@@ -1019,7 +1045,11 @@ function setUp(root: HTMLElement) {
 
   // In-app browsers (Facebook, Instagram, TikTok, WeChat, Line, ...) often can't download files;
   // show a hint under each download link.
-  if (/\b(FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|BytedanceWebview|musical_ly|Snapchat|LinkedInApp|Pinterest)\b/i.test(navigator.userAgent)) {
+  if (
+    /\b(FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|BytedanceWebview|musical_ly|Snapchat|LinkedInApp|Pinterest)\b/i.test(
+      navigator.userAgent,
+    )
+  ) {
     for (const line of document.querySelectorAll<HTMLElement>('[data-book-inapp]')) line.removeAttribute('hidden');
   }
 

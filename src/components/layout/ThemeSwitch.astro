@@ -23,29 +23,27 @@ const options = [
 <fieldset class="theme-switch" data-theme-switch>
   <legend class="visually-hidden">{t.theme.legend}</legend>
   <span class="theme-switch__thumb" aria-hidden="true"></span>
-  {
-    options.map(({ value, label }) => (
-      <label class="theme-switch__option" data-value={value} title={label}>
-        <input class="visually-hidden" type="radio" name={name} value={value} />
-        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-          {value === 'system' && (
-            <>
-              <rect x="2.75" y="3.75" width="14.5" height="10" rx="1.75" />
-              <path d="M7.5 16.75h5M10 13.75v3" />
-            </>
-          )}
-          {value === 'light' && (
-            <>
-              <circle cx="10" cy="10" r="3.25" />
-              <path d="M10 2.5v1.5M10 16v1.5M4.7 4.7l1.06 1.06M14.24 14.24l1.06 1.06M2.5 10H4M16 10h1.5M4.7 15.3l1.06-1.06M14.24 5.76l1.06-1.06" />
-            </>
-          )}
-          {value === 'dark' && <path d="M16 12.1A6.25 6.25 0 0 1 7.9 4a6.25 6.25 0 1 0 8.1 8.1z" />}
-        </svg>
-        <span class="visually-hidden">{label}</span>
-      </label>
-    ))
-  }
+  {options.map(({ value, label }) => (
+    <label class="theme-switch__option" data-value={value} title={label}>
+      <input class="visually-hidden" type="radio" name={name} value={value} />
+      <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        {value === 'system' && (
+          <>
+            <rect x="2.75" y="3.75" width="14.5" height="10" rx="1.75" />
+            <path d="M7.5 16.75h5M10 13.75v3" />
+          </>
+        )}
+        {value === 'light' && (
+          <>
+            <circle cx="10" cy="10" r="3.25" />
+            <path d="M10 2.5v1.5M10 16v1.5M4.7 4.7l1.06 1.06M14.24 14.24l1.06 1.06M2.5 10H4M16 10h1.5M4.7 15.3l1.06-1.06M14.24 5.76l1.06-1.06" />
+          </>
+        )}
+        {value === 'dark' && <path d="M16 12.1A6.25 6.25 0 0 1 7.9 4a6.25 6.25 0 1 0 8.1 8.1z" />}
+      </svg>
+      <span class="visually-hidden">{label}</span>
+    </label>
+  ))}
 </fieldset>
 
 <style>
