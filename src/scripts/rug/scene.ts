@@ -204,10 +204,10 @@ void main() {
   // Grazing angles reveal the pile's shadowed depth: slightly darker.
   float pile = mix(0.8, 1.0, sqrt(max(dot(n, v), 0.0)));
   // Warm key light, slightly cool ambient (late-afternoon sun vs. bluish sky).
-  vec3 sunColour = mix(vec3(1.0), vec3(1.0, 0.72, 0.44), beam);
+  vec3 sunColor = mix(vec3(1.0), vec3(1.0, 0.72, 0.44), beam);
   // Dim room: the beams carry most of the light.
-  vec3 colour = base * (0.36 * sky * vec3(0.93, 0.95, 1.0) + sun * sunColour) * pile;
-  outColor = vec4(pow(colour, vec3(1.0 / 2.2)), 1.0);
+  vec3 color = base * (0.36 * sky * vec3(0.93, 0.95, 1.0) + sun * sunColor) * pile;
+  outColor = vec4(pow(color, vec3(1.0 / 2.2)), 1.0);
 }`;
 
 const floorVertex = /* glsl */ `#version 300 es

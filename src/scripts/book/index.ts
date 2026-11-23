@@ -705,7 +705,7 @@ function setUp(root: HTMLElement) {
     moveManual(manual, progressForReach(along, pageWidth(), twoPages));
   });
 
-  const endPress = (event: PointerEvent, cancelled: boolean) => {
+  const endPress = (event: PointerEvent, canceled: boolean) => {
     const started = press;
     press = null;
     if (!started || event.pointerId !== started.id) return;
@@ -720,10 +720,10 @@ function setUp(root: HTMLElement) {
         from && from.t < end.t ? ((end.x - from.x) / Math.max(16, end.t - from.t)) * (state.direction === 'forward' ? -1 : 1) : 0;
       // Past a third of the way, or flicked: complete the turn; otherwise fall back.
       const moved = Math.abs(event.clientX - started.x) > DRAG_START;
-      release(state, !cancelled && (!moved || state.progress > 1 / 3 || velocity > 0.3));
+      release(state, !canceled && (!moved || state.progress > 1 / 3 || velocity > 0.3));
       return;
     }
-    if (cancelled || zoom.panned) return;
+    if (canceled || zoom.panned) return;
     const moved = Math.hypot(event.clientX - started.x, event.clientY - started.y);
     if (moved > DRAG_START || performance.now() - started.time > 500) return;
     tap(event, started.type);

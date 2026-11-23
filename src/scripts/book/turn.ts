@@ -240,8 +240,8 @@ export class Turn {
   private turns: Animation[] = [];
   private settled = false;
   private falling = false;
-  readonly done: Promise<'finished' | 'cancelled'>;
-  private resolve!: (how: 'finished' | 'cancelled') => void;
+  readonly done: Promise<'finished' | 'canceled'>;
+  private resolve!: (how: 'finished' | 'canceled') => void;
 
   constructor(
     private readonly turner: Turner,
@@ -333,9 +333,9 @@ export class Turn {
     }
 
     for (const animation of this.animations) animation.pause();
-    this.turns.at(-1)!.addEventListener('finish', () => this.settle(this.falling ? 'cancelled' : 'finished'));
+    this.turns.at(-1)!.addEventListener('finish', () => this.settle(this.falling ? 'canceled' : 'finished'));
     this.turns[0]!.addEventListener('finish', () => {
-      if (this.falling) this.settle('cancelled');
+      if (this.falling) this.settle('canceled');
     });
   }
 
@@ -366,7 +366,7 @@ export class Turn {
   /** Reverts the turn to its start. */
   fallBack() {
     this.falling = true;
-    if (this.progress === 0) return this.settle('cancelled');
+    if (this.progress === 0) return this.settle('canceled');
     for (const animation of this.animations) {
       animation.playbackRate = -1.4;
       animation.play();
@@ -380,10 +380,10 @@ export class Turn {
 
   /** Stops the turn immediately, wherever it is. */
   stop() {
-    this.settle('cancelled');
+    this.settle('canceled');
   }
 
-  private settle(how: 'finished' | 'cancelled') {
+  private settle(how: 'finished' | 'canceled') {
     if (this.settled) return;
     this.settled = true;
     for (const animation of this.animations) animation.cancel();

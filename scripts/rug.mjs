@@ -63,41 +63,41 @@ function draw({ across: W, along: H, fringe, scale }) {
     points.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     g.closePath();
   };
-  const fill = (colour) => {
-    g.fillStyle = colour;
+  const fill = (color) => {
+    g.fillStyle = color;
     g.fill();
   };
-  const stroke = (colour, width) => {
-    g.strokeStyle = colour;
+  const stroke = (color, width) => {
+    g.strokeStyle = color;
     g.lineWidth = width;
     g.lineJoin = 'round';
     g.lineCap = 'round';
     g.stroke();
   };
-  const circle = (x, y, r, colour) => {
+  const circle = (x, y, r, color) => {
     g.beginPath();
     g.arc(x, y, r, 0, TAU);
-    fill(colour);
+    fill(color);
   };
 
   /**
    * Top-down flower: `petals` petals around the center, each outlined in a darker wool as in woven
    * flowers, then rings of [fraction of r, color].
    */
-  const rosette = (x, y, r, petals, colours, rings = [], turn = 0) => {
+  const rosette = (x, y, r, petals, colors, rings = [], turn = 0) => {
     const tangential = r * Math.sin(Math.PI / petals) * 0.8;
     for (let i = 0; i < petals; i++) {
       const a = turn + (i / petals) * TAU;
       g.beginPath();
       g.ellipse(x + Math.cos(a) * r * 0.55, y + Math.sin(a) * r * 0.55, r * 0.47, tangential, a, 0, TAU);
-      fill(colours[i % colours.length]);
+      fill(colors[i % colors.length]);
       stroke('rgb(44 20 16 / 0.5)', Math.max(0.12, r * 0.05));
     }
-    for (const [share, colour] of rings) circle(x, y, r * share, colour);
+    for (const [share, color] of rings) circle(x, y, r * share, color);
   };
 
   /** Leaf from (x, y), `length` long along `angle`, with an optional vein. */
-  const leaf = (x, y, length, width, angle, colour, vein) => {
+  const leaf = (x, y, length, width, angle, color, vein) => {
     g.save();
     g.translate(x, y);
     g.rotate(angle);
@@ -105,7 +105,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     g.moveTo(0, 0);
     g.quadraticCurveTo(length * 0.45, -width, length, 0);
     g.quadraticCurveTo(length * 0.45, width, 0, 0);
-    fill(colour);
+    fill(color);
     if (vein) {
       g.beginPath();
       g.moveTo(length * 0.12, 0);
@@ -116,13 +116,13 @@ function draw({ across: W, along: H, fringe, scale }) {
   };
 
   /** Palmette: a cup with a fan of five leaves, pointing along `angle`. */
-  const palmette = (x, y, size, angle, colour, cup) => {
-    for (let i = -2; i <= 2; i++) leaf(x, y, size * (1 - Math.abs(i) * 0.14), size * 0.2, angle + i * 0.38, colour);
+  const palmette = (x, y, size, angle, color, cup) => {
+    for (let i = -2; i <= 2; i++) leaf(x, y, size * (1 - Math.abs(i) * 0.14), size * 0.2, angle + i * 0.38, color);
     circle(x, y, size * 0.32, cup);
   };
 
   /** Star with `points` points; `inner` is the waist as a fraction of r. */
-  const star = (x, y, r, inner, points, colour, turn = -Math.PI / 2) => {
+  const star = (x, y, r, inner, points, color, turn = -Math.PI / 2) => {
     const pts = [];
     for (let i = 0; i < points * 2; i++) {
       const rr = i % 2 ? r * inner : r;
@@ -130,7 +130,7 @@ function draw({ across: W, along: H, fringe, scale }) {
       pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr]);
     }
     shape(pts);
-    fill(colour);
+    fill(color);
   };
 
   /**
@@ -165,7 +165,7 @@ function draw({ across: W, along: H, fringe, scale }) {
   };
 
   /** Thin curved vines from each point to its nearest neighbors. */
-  const vines = (points, colour, width) => {
+  const vines = (points, color, width) => {
     for (const p of points) {
       const near = points
         .filter((q) => q !== p)
@@ -180,7 +180,7 @@ function draw({ across: W, along: H, fringe, scale }) {
         g.beginPath();
         g.moveTo(p.x, p.y);
         g.quadraticCurveTo(mx, my, q.x, q.y);
-        stroke(colour, width);
+        stroke(color, width);
         // A small leaf where the vine bends.
         if (random() < 0.5) leaf(mx, my, 1.5, 0.5, Math.atan2(q.y - p.y, q.x - p.x) + 0.7, C.green);
       }
@@ -483,11 +483,11 @@ function draw({ across: W, along: H, fringe, scale }) {
 
   // --- Borders, from the field outward ---
   /** Fills the band between two insets from the edge. */
-  const band = (from, to, colour) => {
+  const band = (from, to, color) => {
     g.beginPath();
     g.rect(from, from, W - 2 * from, H - 2 * from);
     g.rect(to, to, W - 2 * to, H - 2 * to);
-    g.fillStyle = colour;
+    g.fillStyle = color;
     g.fill('evenodd');
   };
   /**

@@ -57,7 +57,7 @@ function render(preference: Preference) {
 }
 
 /** Center of an element, where the circular reveal starts. */
-function centreOf(element: Element) {
+function centerOf(element: Element) {
   const rect = element.getBoundingClientRect();
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
@@ -105,7 +105,7 @@ export function initTheme() {
 
   for (const input of document.querySelectorAll<HTMLInputElement>('[data-theme-switch] input')) {
     input.addEventListener('change', () => {
-      if (input.checked) choose(input.value as Preference, centreOf(input.closest('label') ?? input));
+      if (input.checked) choose(input.value as Preference, centerOf(input.closest('label') ?? input));
     });
   }
 

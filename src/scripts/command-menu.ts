@@ -13,7 +13,7 @@ import { play, setSound, soundEnabled } from './sound';
 import { currentPreference, setThemePreference, type Preference } from './theme';
 
 /** Lowercases and strips diacritics and Arabic harakat: "Français" -> "francais". */
-const normalise = (text: string) => text.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().trim();
+const normalize = (text: string) => text.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().trim();
 
 /** Whether the user is typing in an editable element, so "/" is left alone. */
 function isEditing(target: EventTarget | null) {
@@ -48,7 +48,7 @@ export function initCommandMenu() {
   }
 
   function filter() {
-    const words = normalise(input!.value).split(/\s+/).filter(Boolean);
+    const words = normalize(input!.value).split(/\s+/).filter(Boolean);
     for (const option of options) {
       const text = searchText.get(option) ?? '';
       option.hidden = !words.every((word) => text.includes(word));

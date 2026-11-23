@@ -262,7 +262,7 @@ async function layersFor({ season, source, height: H }) {
     hex(bgAt(14, 358)),
     'bottom right',
     hex(bgAt(346, 358)),
-    'centre',
+    'center',
     hex(bgAt(180, 180)),
   );
 
@@ -522,7 +522,7 @@ async function layersFor({ season, source, height: H }) {
   // ears continue in their own color (each edge pixel's color, averaged along the edge to avoid
   // streaks); the neck continues straight up behind the chin.
   const ext = (weight, dir, reach, flat) => {
-    const colour = new Float32Array(N * 3);
+    const color = new Float32Array(N * 3);
     const alpha = new Float32Array(N);
     const [dx, dy] = dir;
     const inside = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
@@ -561,16 +561,16 @@ async function layersFor({ season, source, height: H }) {
         if (head[t] < 0.3 || A[t] < 0.5) break;
         if (alpha[t] >= 1) continue;
         alpha[t] = 1;
-        colour.set(fill, t * 3);
+        color.set(fill, t * 3);
       }
     }
-    return { colour, alpha };
+    return { color, alpha };
   };
 
   // Neck behind the chin: each neck column extended straight up from just below the jaw, colors
   // smoothed horizontally, as far under the head as the head can ever move.
   const neckUnder = () => {
-    const colour = new Float32Array(N * 3);
+    const color = new Float32Array(N * 3);
     const alpha = new Float32Array(N);
     const columns = [];
     for (let x = 0; x < W; x++) {
@@ -619,10 +619,10 @@ async function layersFor({ season, source, height: H }) {
         const t = y * W + c.x;
         if (y < 0 || head[t] < 0.3 || A[t] < 0.5) break;
         alpha[t] = Math.min(1, c.a);
-        colour.set(smoothRgb[index], t * 3);
+        color.set(smoothRgb[index], t * 3);
       }
     });
-    return { colour, alpha };
+    return { color, alpha };
   };
 
   const extensions = {
@@ -638,7 +638,7 @@ async function layersFor({ season, source, height: H }) {
     for (let i = 0; i < N; i++) {
       const a = A[i] * Math.min(1, weight[i]);
       if (extension && extension.alpha[i] > a) {
-        out.set([extension.colour[i * 3], extension.colour[i * 3 + 1], extension.colour[i * 3 + 2], extension.alpha[i]], i * 4);
+        out.set([extension.color[i * 3], extension.color[i * 3 + 1], extension.color[i * 3 + 2], extension.alpha[i]], i * 4);
         continue;
       }
       if (a <= 0.004) continue;
@@ -715,7 +715,7 @@ async function layersFor({ season, source, height: H }) {
     for (let i = 0; i < N; i++) {
       const a = A[i] * neck[i];
       const e = extensions.neck.alpha[i] * (1 - neck[i]);
-      if (e > a) neckLayer.set([...extensions.neck.colour.subarray(i * 3, i * 3 + 3), e], i * 4);
+      if (e > a) neckLayer.set([...extensions.neck.color.subarray(i * 3, i * 3 + 3), e], i * 4);
       else if (a > 0.004) neckLayer.set([F[i * 3], F[i * 3 + 1], F[i * 3 + 2], a], i * 4);
     }
     // Last row the artwork draws completely.

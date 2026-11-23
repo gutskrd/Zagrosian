@@ -30,7 +30,7 @@ const LAYER = 0.0025;
 /** Eye distance in px, as in CSS `perspective`. */
 const PERSPECTIVE = 1500;
 /** Light direction: upper left and in front, matching the rug. */
-const LIGHT: Vector = normalise([-0.42, -0.55, 0.72]);
+const LIGHT: Vector = normalize([-0.42, -0.55, 0.72]);
 /** Paper color of the sheet (Proverb.astro); flat and facing up, the plane matches it exactly. */
 const PAPER: Vector = [243, 239, 230];
 
@@ -63,7 +63,7 @@ const ENGINES = [
 /** Signed shortest angle from `a` to `b`. */
 const turn = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
-function normalise([x, y, z]: Vector): Vector {
+function normalize([x, y, z]: Vector): Vector {
   const length = Math.hypot(x, y, z) || 1;
   return [x / length, y / length, z / length];
 }
@@ -175,7 +175,7 @@ const foldTurns = (angles: Angles): Matrix[] => {
     const moving = Math.sign(
       (fold.to[0] - fold.from[0]) * (fold.side[1] - fold.from[1]) - (fold.to[1] - fold.from[1]) * (fold.side[0] - fold.from[0]),
     );
-    const axis = normalise([to[0] - from[0], to[1] - from[1], to[2] - from[2]]);
+    const axis = normalize([to[0] - from[0], to[1] - from[1], to[2] - from[2]]);
     turns.push(rotation(from, axis, fold.towards * moving * angles[i]));
   });
   return turns;
@@ -208,7 +208,7 @@ const shadowSprite = (dark: boolean) => {
     g.save();
     g.translate(size * 0.14, size * 0.14);
     g.scale((size * 0.72) / 200, (size * 0.72) / 200);
-    // Fill each part separately so overlaps aren't cancelled out by the fill rule.
+    // Fill each part separately so overlaps aren't canceled out by the fill rule.
     for (const part of AIRLINER) g.fill(new Path2D(part));
     for (const [x, y, rx, ry] of ENGINES) {
       g.beginPath();
@@ -316,7 +316,7 @@ export function initPlane() {
   // flat image is fully shown; the 3D rug renders on top). On slow connections the image can arrive
   // after this script, and the plane would otherwise sit on the bare floor.
   const covered = () => stage.hasAttribute('data-covered');
-  const items = foldSheet().pieces.map((piece) => ({ piece, points: [] as number[], depth: 0, colour: '', edge: '' }));
+  const items = foldSheet().pieces.map((piece) => ({ piece, points: [] as number[], depth: 0, color: '', edge: '' }));
   const sprites = new Map<boolean, HTMLCanvasElement>();
 
   // Layout measurements, refreshed on layout changes only, not on scroll.
@@ -384,9 +384,9 @@ export function initPlane() {
     // never exceeds that height (Proverb.astro).
     const top = header?.getBoundingClientRect().height ?? 64;
     const inSight = paper.bottom + scrollY - window.innerHeight + 40;
-    const centred = card.y - (top + window.innerHeight) / 2;
+    const centered = card.y - (top + window.innerHeight) / 2;
     start = Math.max(cy - window.innerHeight / 2, foundAt);
-    end = Math.max(start + 120, Math.min(inSight, centred));
+    end = Math.max(start + 120, Math.min(inSight, centered));
 
     const ratio = pixelRatio();
     const view = screen.canvas.getBoundingClientRect();
@@ -531,11 +531,11 @@ export function initPlane() {
       }
       item.depth = depth / item.piece.outline.length;
       // Shade by the upward-facing side; the back is slightly grayer than the front.
-      const n = normalise([m[8], m[9], m[10]]);
+      const n = normalize([m[8], m[9], m[10]]);
       const up = n[2] >= 0 ? 1 : -1;
       const light = Math.max(0, up * (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]));
       const brightness = Math.min(1.05, ((0.66 + 0.34 * light) / (0.66 + 0.34 * LIGHT[2])) * (up > 0 ? 1 : 0.97));
-      item.colour = `rgb(${PAPER.map((value) => Math.min(255, Math.round(value * brightness))).join(',')})`;
+      item.color = `rgb(${PAPER.map((value) => Math.min(255, Math.round(value * brightness))).join(',')})`;
       // Slightly darker edges: creases and the paper's edge.
       item.edge = `rgb(${PAPER.map((value) => Math.round(value * brightness * 0.93)).join(',')})`;
     }
@@ -604,7 +604,7 @@ export function initPlane() {
       g.moveTo(p[0], p[1]);
       for (let i = 2; i < p.length; i += 2) g.lineTo(p[i], p[i + 1]);
       g.closePath();
-      g.fillStyle = item.colour;
+      g.fillStyle = item.color;
       g.fill();
       g.strokeStyle = item.edge;
       g.stroke();

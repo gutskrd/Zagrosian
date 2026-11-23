@@ -278,14 +278,14 @@ export function initStory() {
     // Progress through the front pane, which slides past the camera.
     const through = smoothstep(DIVE[1], DIVE[1] + 0.05, q);
     const inScene = smoothstep(DIVE[2] - 0.04, DIVE[2], q);
-    const travelling = inScene < 1;
+    const traveling = inScene < 1;
     // While rotating, lay out at the current size; once facing the viewer, lay out at the facing
     // size and scale from there with proportionally shorter perspective (see the header). Pixel
     // sizes inside the logo (edge lines, lean) are multiplied by the same factor so they render
     // unchanged when scaled.
     const facing = q >= DIVE[0];
     const box = facing ? dive : size;
-    if (travelling) {
+    if (traveling) {
       style(art, 'width', `${box.toFixed(2)}px`, 'art-w');
       style(art, 'height', `${box.toFixed(2)}px`, 'art-h');
       style(art, '--grow', facing ? (dive / rest.size).toFixed(4) : '1', 'art-grow');
@@ -304,8 +304,8 @@ export function initStory() {
       // Front pane slides past as the camera passes through.
       style(layer, '--front', (1 - through).toFixed(3));
     }
-    layer.toggleAttribute('data-hidden', !travelling);
-    layer.toggleAttribute('data-facing', facing && travelling);
+    layer.toggleAttribute('data-hidden', !traveling);
+    layer.toggleAttribute('data-facing', facing && traveling);
     // Face-on, the block edge is invisible: skip drawing it, and the front pane once the camera is
     // through.
     layer.toggleAttribute('data-flat', faced > 0.5);
