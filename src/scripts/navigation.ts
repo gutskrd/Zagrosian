@@ -37,7 +37,7 @@ export function initHeader() {
 export function initDeepLink() {
   // A hash with invalid percent-encoding (`#%`) names no section and must not break the rest of
   // this script.
-  let id = '';
+  let id: string;
   try {
     id = decodeURIComponent(window.location.hash.slice(1));
   } catch {

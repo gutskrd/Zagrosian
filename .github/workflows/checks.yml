@@ -1,7 +1,7 @@
-# Runs on every push: builds the site (including type checks), then tests it as
-# it will be served, with production headers: Playwright suites in tests/
-# (security, accessibility, layout, SEO, stability, interactions) and Lighthouse.
-# Any failure blocks the change before it reaches production.
+# Runs on every push: lint and formatting, then a production build (including type
+# checks) tested as it will be served, with production headers: the Playwright
+# suites in tests/ and Lighthouse. Any failure blocks the change before it
+# reaches production.
 name: Checks
 
 on:
@@ -19,6 +19,20 @@ env:
   WRANGLER_SEND_METRICS: 'false'
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+
   tests:
     name: Tests
     # Pinned: ubuntu-latest is Ubuntu 26.04, which Playwright 1.56.1 can't install

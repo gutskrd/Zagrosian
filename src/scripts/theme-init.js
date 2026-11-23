@@ -14,7 +14,7 @@
   try {
     var stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') preference = stored;
-  } catch (error) {
+  } catch {
     // Storage can be unavailable (private browsing, blocked cookies).
   }
   var dark = preference === 'dark' || (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);

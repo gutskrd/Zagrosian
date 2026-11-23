@@ -20,7 +20,7 @@ interface Props {
 
 const { text, class: className } = Astro.props;
 
-const joined = /[؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿]/.test(text);
+const joined = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(text);
 let count = 0;
 const words = text
   .split(/\s+/)
