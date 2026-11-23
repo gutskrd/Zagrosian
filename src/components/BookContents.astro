@@ -1,16 +1,12 @@
 ---
 /**
- * What is in Hevalo's book, with a link to the page each part begins on:
- * the passport of the road, the alphabet and the people of the road (as the
- * book's own contents page has them), then every chapter (its number,
- * its Kurmanji title, its name in the page's language, its level and its
- * four parts), then the answers, the word list and the author's note.
+ * Book contents, each entry linking to its starting page: the front matter (passport, alphabet,
+ * people of the road, as in the book's own contents page), every chapter (number, Kurmanji title,
+ * localized name, CEFR level and its four parts), then the answers, glossary and author's note.
  *
- * As a section of the page ("Inside the book") it is the book's contents
- * for everyone, also without JavaScript, where each link opens the page in
- * the column of pages. As a menu (the reader's Contents) it is the same
- * list, smaller; the reader marks the chapter being read (`aria-current`)
- * and turns to the chapter chosen.
+ * As a page section ("Inside the book") it serves everyone, including without JS, where each link
+ * opens the page in the column layout. As a menu (the reader's Contents) it's the same list,
+ * compact; the reader marks the current chapter (`aria-current`) and turns to the selected one.
  */
 import { i18n, format } from '../i18n';
 import { chapterName, chapters, formatNumber, sections, type SectionKey } from '../lib/book';
@@ -27,7 +23,7 @@ const matter = (keys: SectionKey[]) =>
 const front = matter(['passport', 'alphabet', 'people']);
 const back = matter(['answers', 'words', 'author']);
 const pageNumber = (n: number) => format(t.book.pageLabel, { n: formatNumber(locale, n) });
-// In Kurmanji the chapter's name is its title, already shown.
+// In Kurmanji the chapter name is the title, already shown.
 const named = (name: string, titleKu: string) => name !== titleKu;
 const Title = variant === 'section' ? 'h3' : 'span';
 ---
@@ -165,7 +161,7 @@ const Title = variant === 'section' ? 'h3' : 'span';
     font: inherit;
   }
 
-  /* As a section: room, hairlines between the chapters, the parts under each. */
+  /* Section variant: generous spacing, hairlines between chapters, parts listed under each. */
   .contents--section {
     border-top: 1px solid var(--color-line);
   }
@@ -193,7 +189,7 @@ const Title = variant === 'section' ? 'h3' : 'span';
     text-align: right;
   }
 
-  /* As a menu: compact rows. */
+  /* Menu variant: compact rows. */
   .contents--menu .contents__link {
     min-height: 2.75rem;
     padding: 0.5rem 0.75rem;

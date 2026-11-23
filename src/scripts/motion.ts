@@ -1,20 +1,16 @@
 /**
- * Motion for zagrosian.com, without dependencies.
+ * Animation runtime (no dependencies).
  *
- * - One-off entrances use the Web Animations API, so the browser can run them
- *   on the compositor.
- * - Scroll-linked effects share one requestAnimationFrame loop. Each frame
- *   measures everything first and writes afterwards, and effects only run
- *   while their element is near the viewport.
- * - Only transform, opacity and colour change.
+ * - One-off entrances use the Web Animations API, so they can run on the compositor.
+ * - Scroll-linked effects share one requestAnimationFrame loop: each frame reads layout for every
+ *   effect first, then writes, and effects only run while their element is near the viewport.
+ * - Only transform, opacity and color are animated.
  *
- * Security: no HTML is generated and no style attributes are written. Styles
- * are set through the CSSOM (element.style.transform), which the
- * Content-Security-Policy allows, and no Trusted Types sink is used.
+ * CSP: no HTML is generated and no style attributes are written. Styles are set through the CSSOM
+ * (`element.style`), which the Content-Security-Policy allows, and no Trusted Types sinks are used.
  *
- * Accessibility: when the visitor prefers reduced motion, nothing moves and
- * highlighted headings stay fully lit. Without JavaScript, everything is
- * visible and static.
+ * Accessibility: with reduced motion nothing moves and highlighted headings stay fully lit. Without
+ * JS everything is visible and static.
  */
 
 import { initStory } from './story';
@@ -27,24 +23,20 @@ const isBelowFold = (element: Element) => element.getBoundingClientRect().top > 
 export const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Whether the browser runs scroll-linked animations itself (CSS
- * `animation-timeline`), on the graphics card and in step with the scroll.
- * Where it does, the effects that have a CSS version (the footer wordmark,
- * the reading progress) are left to it, and this script only fills in
- * elsewhere.
+ * Whether the browser supports CSS scroll-driven animations (`animation-timeline`), which run off
+ * the main thread. Where supported, effects that have a CSS implementation (the footer wordmark,
+ * reading progress) are left to CSS.
  */
 const cssScrollTimelines = () => typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()');
 
 /**
- * Whether an element came into view from above, as the page scrolls back up
- * (after a reload or a link part-way down the page). Entrances only play for
- * what comes up from below; anything met on the way back up is shown as it is.
+ * Whether an element entered the viewport from above, i.e. while scrolling up (after a reload or a
+ * deep link). Entrances only play for content entering from below; content met while scrolling up
+ * is shown as is.
  */
 export const enteredFromAbove = (entry: IntersectionObserverEntry) => entry.boundingClientRect.top < 0;
 
-/* -------------------------------------------------------------------------- */
-/* Split headings: words rise one after another as the heading enters view.   */
-/* -------------------------------------------------------------------------- */
+// --- Split headings: words rise in sequence as the heading enters view ---
 
 function initSplitHeadings() {
   const headings = [...document.querySelectorAll<HTMLElement>('[data-split]')].filter(isBelowFold);
@@ -64,7 +56,7 @@ function initSplitHeadings() {
             duration: 900,
             delay: Math.min(index * 55, 500),
             easing: EASE_OUT,
-            // Hold the hidden position during the delay, then hand back to CSS.
+            // Hold the hidden state through the delay, then hand back to CSS.
             fill: 'backwards',
           });
         });
@@ -79,16 +71,14 @@ function initSplitHeadings() {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* Scroll-linked effects                                                      */
-/* -------------------------------------------------------------------------- */
+// --- Scroll-linked effects ---
 
 interface ScrollEffect {
-  /** The element whose visibility switches the effect on and off. */
+  /** Element whose visibility toggles the effect. */
   target: Element;
-  /** Read layout. Called for every active effect before any `render`. */
+  /** Reads layout. Called for every active effect before any `render`. */
   measure(viewportHeight: number): void;
-  /** Write styles. */
+  /** Writes styles. */
   render(): void;
 }
 
@@ -101,9 +91,9 @@ function runScrollEffects(effects: ScrollEffect[]) {
   let measured = false;
 
   const measure = () => {
-    // The height of the screen without a phone's address bar, which stays put
-    // as the bar slides away and back (innerHeight follows it, so the effects
-    // would jump each time the reader turned round).
+    // Use the layout viewport height (`clientHeight`), which stays fixed as mobile browser chrome
+    // collapses; `innerHeight` follows the chrome and would make effects jump on every scroll
+    // reversal.
     const viewportHeight = document.documentElement.clientHeight;
     for (const effect of active) effect.measure(viewportHeight);
   };
@@ -121,10 +111,9 @@ function runScrollEffects(effects: ScrollEffect[]) {
     requestAnimationFrame(frame);
   };
 
-  // On scroll, the layout is read at once: the scroll event comes before the
-  // frame's animation callbacks (the homepage story's among them) write any
-  // styles, so the layout is still clean and reading it costs nothing. Read
-  // after those writes, it would make the browser lay the page out twice.
+  // Read layout directly in the scroll handler: scroll events fire before this frame's rAF
+  // callbacks (including the story's) write styles, so layout is still clean and reading it is
+  // free. Reading after those writes would force a second layout.
   const onScroll = () => {
     measure();
     measured = true;
@@ -150,9 +139,8 @@ function runScrollEffects(effects: ScrollEffect[]) {
 }
 
 /**
- * The footer wordmark rises out of its baseline as the footer comes into view,
- * standing up in 3D from lying back on it (transform-origin: bottom). The
- * script version, for browsers without CSS scroll timelines (Footer.astro).
+ * Footer wordmark rises from its baseline in 3D as the footer enters view (transform-origin:
+ * bottom). JS fallback for browsers without CSS scroll timelines (Footer.astro).
  */
 function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
   let rest = 0;
@@ -172,7 +160,7 @@ function rise(frame: HTMLElement, layer: HTMLElement): ScrollEffect {
   };
 }
 
-/** Words in a heading light up one by one as the reader scrolls past it. */
+/** Lights up a heading's words one by one as it scrolls past. */
 function highlight(heading: HTMLElement): ScrollEffect {
   const words = [...heading.querySelectorAll<HTMLElement>('.split__word')];
   let lit = 0;
@@ -193,13 +181,10 @@ function highlight(heading: HTMLElement): ScrollEffect {
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/* Legal pages: reading progress and the current section in the contents.     */
-/* These are functional feedback rather than decoration, so they also run     */
-/* when reduced motion is preferred.                                          */
-/* -------------------------------------------------------------------------- */
+// --- Legal pages: reading progress and the active table-of-contents entry ---
+// Functional feedback rather than decoration, so these also run with reduced motion.
 
-/** The script version, for browsers without CSS scroll timelines (LegalLayout.astro). */
+/** JS fallback for browsers without CSS scroll timelines (LegalLayout.astro). */
 function readingProgress(track: HTMLElement, bar: HTMLElement): ScrollEffect {
   let progress = 0;
   return {
@@ -240,19 +225,14 @@ function contentsTracker(content: HTMLElement, links: HTMLAnchorElement[]): Scro
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/* Pointer depth: with a mouse, the hero logo leans slightly towards the      */
-/* pointer.                                                                   */
-/* -------------------------------------------------------------------------- */
+// --- Pointer depth: with a mouse, the hero logo leans toward the pointer ---
 
 function initPointerDepth() {
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  // The logo follows the pointer across the whole window, eased towards it
-  // frame by frame. It leans with the individual `rotate` and `translate`
-  // properties, so the lean combines with its entrance animation on
-  // `transform`. (On the homepage this is the logo on its way into the story,
-  // story.ts.)
+  // The logo eases toward the pointer across the whole window. The lean uses the individual
+  // `rotate` and `translate` properties so it composes with the entrance animation on `transform`.
+  // (On the homepage this is the traveling logo from story.ts.)
   const depth = document.querySelector<HTMLElement>('[data-lean]');
   const layer = depth?.firstElementChild;
   if (depth && layer instanceof HTMLElement) {
@@ -270,9 +250,8 @@ function initPointerDepth() {
     const step = () => {
       x += (targetX - x) * 0.07;
       y += (targetY - y) * 0.07;
-      // Set as custom properties, which the layer's styles turn into its
-      // `rotate` and `translate` (Hero.astro), so the story can ease the lean
-      // away (`--lean`) when the logo comes to face the reader.
+      // Exposed as custom properties that the layer's styles map to `rotate` and `translate`
+      // (Hero.astro), so the story can fade the lean out (`--lean`) once the logo faces the viewer.
       layer.style.setProperty('--lean-x', x.toFixed(3));
       layer.style.setProperty('--lean-y', y.toFixed(3));
       layer.style.setProperty('--lean-angle', `${(Math.hypot(x, y) * 7).toFixed(2)}deg`);
@@ -304,7 +283,6 @@ function initPointerDepth() {
   }
 }
 
-/* -------------------------------------------------------------------------- */
 
 export function initMotion() {
   const effects: ScrollEffect[] = [];

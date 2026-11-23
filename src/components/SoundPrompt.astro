@@ -1,11 +1,9 @@
 ---
 /**
- * A small card, offered once, inviting the visitor to turn sound on
- * (src/scripts/sound.ts). It appears in the corner a moment after the first
- * page of a visit has settled (after the language note, which uses the same
- * corner), and either answer is remembered. Left unanswered while the visitor
- * reads on, it steps aside. Sound is also switched from the header or quick
- * navigation.
+ * One-time card inviting the visitor to enable sound (src/scripts/sound.ts). It appears in the
+ * corner shortly after the first page of a visit settles (after the language suggestion, which uses
+ * the same corner), and either answer is remembered. If ignored while the visitor keeps reading, it
+ * dismisses itself. Sound can also be toggled from the header or the command menu.
  */
 import { i18n } from '../i18n';
 
@@ -42,8 +40,8 @@ const { t } = i18n(Astro.url);
     box-shadow:
       0 1px 2px rgb(0 0 0 / 0.06),
       0 16px 40px rgb(0 0 0 / 0.14);
-    /* It slides up from below the edge of the screen rather than fading in,
-       so its text is never shown at reduced contrast. */
+    /* Slides up from below the viewport rather than fading in, so its text never renders at reduced
+       contrast. */
     transform: translateY(calc(100% + 2 * var(--gutter)));
     transition: transform 0.7s var(--ease-out);
   }
@@ -62,7 +60,7 @@ const { t } = i18n(Astro.url);
     box-shadow: 0 16px 40px rgb(0 0 0 / 0.5);
   }
 
-  /* A small waveform that breathes. */
+  /* Small animated waveform. */
   .sound-prompt__wave {
     display: flex;
     align-items: center;

@@ -1,5 +1,5 @@
 ---
-/** The homepage, in the language of the URL (src/pages/index.astro and src/pages/[lang]/index.astro). */
+/** Homepage, in the URL's locale (src/pages/index.astro and src/pages/[lang]/index.astro). */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import About from './About.astro';
 import Contact from './Contact.astro';
@@ -25,8 +25,8 @@ import shadowDark from '../assets/brand/lifted-logo-shadow-dark.webp?url';
     <link rel="preload" as="image" href={shadowLight} media="(prefers-color-scheme: light)" />
     <link rel="preload" as="image" href={shadowDark} media="(prefers-color-scheme: dark)" />
   </Fragment>
-  {/* First, who we are; then the story, Hevalo and the studio; then the rug
-     with the paper plane under it, and the sheet it opens into. */}
+  {/* Order: who we are, then the story, Hevalo and the studio; then the rug with the paper plane
+     underneath, and the sheet it unfolds into. */}
   <Hero />
   <Story />
   <ProductShowcase />

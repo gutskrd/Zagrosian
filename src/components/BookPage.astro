@@ -1,14 +1,11 @@
 ---
 /**
- * The page with Hevalo's book (src/pages/book.astro and [lang]/book.astro):
- * a short introduction with the download (and, on a wide screen, the book's
- * cover beside it, which opens the reader), the book itself to read page by
- * page (BookReader), what is inside it (BookContents), the download again,
- * and a note on the edition and how the book may be used.
+ * Book page (src/pages/book.astro and [lang]/book.astro): a short intro with the download (plus, on
+ * wide screens, the cover, which opens the reader), the reader itself (BookReader), the contents
+ * (BookContents), the download again, and a note on the edition and license.
  *
- * The book's title, Rêya Kurmancî, is the page's main heading in every
- * language, kept in Kurmanji like the motto, with what it means and whose
- * book it is under it.
+ * The title, Rêya Kurmancî, is the page's h1 in every locale, kept in Kurmanji like the motto, with
+ * its meaning and author line below.
  */
 import { format, i18n } from '../i18n';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -56,9 +53,9 @@ const cover = pages[0]!.images;
           <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.5v11M3.5 9 8 13.5 12.5 9"></path></svg>
         </a>
       </div>
-      {/* The cover, beside the introduction on a wide screen: the same picture the reader opens with (the same
-          choice of file, so it is fetched once), and a way into it for the mouse; "Start reading" is the way in for
-          the keyboard and for screen readers. */}
+      {/* Cover next to the intro on wide screens: the same image the reader opens with (same source
+         choice, so it's fetched once), as a mouse entry point. "Start reading" is the entry point
+         for keyboard and screen reader users. */}
       <a class="book-intro__cover" href="#reader" tabindex="-1" aria-hidden="true" data-book-start-reading>
         <img
           src={cover[720].src}
@@ -99,24 +96,25 @@ const cover = pages[0]!.images;
   .book-page {
     position: relative;
     isolation: isolate;
-    /* The late sun's patch reaches past the window's edge. */
+    /* The sunlight patch extends past the window's edge. */
     overflow-x: clip;
     padding-block: clamp(4.5rem, 2.5rem + 6vw, 7rem) var(--section-space);
   }
 
-  /* In full view the book is laid over the whole window, the site's header included: nothing here may hold it under it. */
+  /* In full view the book covers the whole window including the site header, so nothing here may
+     create a stacking context above it. */
   .book-page:has(:global(.book[data-full])) {
     isolation: auto;
   }
 
-  /* ---- The introduction: compact, so the book is close below it ---- */
+  /* --- Intro: compact, so the book sits right below it --- */
   .book-intro {
     position: relative;
     display: grid;
     justify-items: start;
   }
 
-  /* The cover beside it, on a wide screen, turned a little towards the words, in the late sun. */
+  /* Cover next to the intro on wide screens, angled slightly toward the text, in the late sun. */
   .book-intro__cover {
     display: none;
   }
@@ -174,7 +172,7 @@ const cover = pages[0]!.images;
     }
   }
 
-  /* The late sun, faint and still, on the wall behind the book (as behind the hero's logo). */
+  /* Faint, static sunlight on the wall behind the book (as behind the hero logo). */
   .book-intro__sun {
     --sun-a: 0.08;
     position: absolute;
@@ -209,7 +207,7 @@ const cover = pages[0]!.images;
     letter-spacing: -0.02em;
   }
 
-  /* Kurmanji runs left to right, but lines up with the page's own side. */
+  /* Kurmanji is LTR but aligns with the page's start side. */
   :global(:root[dir='rtl']) .book-intro__title {
     text-align: right;
   }
@@ -262,7 +260,7 @@ const cover = pages[0]!.images;
     }
   }
 
-  /* ---- Inside the book ---- */
+  /* --- Contents --- */
   .book-inside {
     margin-top: clamp(4rem, 3rem + 4vw, 7rem);
   }
@@ -278,7 +276,7 @@ const cover = pages[0]!.images;
     max-width: 52rem;
   }
 
-  /* ---- The download again, at the end, and the note ---- */
+  /* --- Second download and edition note --- */
   .book-again {
     margin-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
   }

@@ -1,5 +1,5 @@
-# Monthly dependency updates, grouped into a single pull request.
-# Security updates are raised separately as soon as an advisory is published.
+# Monthly dependency updates, grouped into a single pull request. Security
+# updates are opened separately as soon as an advisory is published.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -11,12 +11,12 @@ updates:
         patterns:
           - '*'
     ignore:
-      # `astro check` (run by `npm run build`) does not support TypeScript 7 yet.
+      # `astro check` (part of `npm run build`) doesn't support TypeScript 7 yet.
       - dependency-name: typescript
         update-types:
           - version-update:semver-major
 
-  # The actions the checks workflow uses (.github/workflows/checks.yml).
+  # Actions used by the workflows in .github/workflows/.
   - package-ecosystem: github-actions
     directory: /
     schedule:

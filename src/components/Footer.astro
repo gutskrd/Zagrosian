@@ -9,13 +9,10 @@ const { locale, t } = i18n(Astro.url);
 const nav = navigation(locale);
 const footerLinks = [{ label: t.nav.hevalo, href: hevalo.url, external: true }, nav.book, ...nav.sections.slice(1)];
 const year = new Date().getFullYear();
-// The company's registered details (src/site.ts): its address, its number in
-// the trade register and its telephone number, beside the email address, as
-// Dutch law asks. Visitors see them in every footer; search engines are not to
-// list them, so they are not written into the page: src/scripts/registration.ts
-// puts them in this line from /registration.json, which robots.txt asks
-// crawlers not to fetch, and the line is marked data-nosnippet. The email,
-// which is for everyone, is in the page.
+// Registration details (src/site.ts): address, KvK number and phone, alongside the email, as Dutch
+// law requires. They're visible to visitors but kept out of search, so they aren't rendered into
+// the HTML: src/scripts/registration.ts injects them from /registration.json (disallowed in
+// robots.txt), and the line is marked data-nosnippet. The email is public and stays in the markup.
 const { address, kvk, vat, phone } = registration;
 const registered = !!(address || kvk || vat || phone);
 ---
@@ -24,7 +21,7 @@ const registered = !!(address || kvk || vat || phone);
   <div class="container">
     <div class="site-footer__top">
       <div class="site-footer__about">
-        {/* The site's last word: "thank you". */}
+        {/* Closing line: "thank you" in Kurmanji. */}
         <p class="site-footer__motto kurdish" lang="ku" dir="ltr">{kurdish.thanks}</p>
         {t.footer.thanks && <p class="site-footer__gloss">{t.footer.thanks}</p>}
         <p class="site-footer__company">
@@ -69,7 +66,7 @@ const registered = !!(address || kvk || vat || phone);
     <div class="site-footer__mark" aria-hidden="true" data-rise dir="ltr">
       <span>
         <span>{site.name}</span>
-        {/* The last of the sun, through a window, across the letters. */}
+        {/* Late sunlight through a window, falling across the letters. */}
         <span class="site-footer__sun">{site.name}</span>
       </span>
     </div>
@@ -120,7 +117,7 @@ const registered = !!(address || kvk || vat || phone);
 </footer>
 
 <style>
-  /* A hairline closes the page; the wordmark below is the footer's one flourish. */
+  /* A hairline closes the page; the wordmark below is the footer's only flourish. */
   .site-footer {
     padding-block: 4rem 2rem;
     border-top: 1px solid var(--color-line);
@@ -141,7 +138,7 @@ const registered = !!(address || kvk || vat || phone);
     color: var(--color-ink);
   }
 
-  /* Kurmanji runs left to right, but lines up with the page's own side. */
+  /* Kurmanji is LTR but aligns with the page's start side. */
   :global(:root[dir='rtl']) .site-footer__motto {
     text-align: right;
   }
@@ -199,7 +196,7 @@ const registered = !!(address || kvk || vat || phone);
     color: var(--color-muted);
   }
 
-  /* The wordmark spans the full content width at every screen size. */
+  /* The wordmark spans the full content width at every breakpoint. */
   .site-footer__mark {
     container-type: inline-size;
     overflow: hidden;
@@ -209,7 +206,7 @@ const registered = !!(address || kvk || vat || phone);
 
   .site-footer__mark > span {
     display: grid;
-    /* In `--cq` first, for browsers without container query units (global.css). */
+    /* `--cq` first, for browsers without container query units (global.css). */
     font-size: calc(24.2 * var(--cq));
     font-size: 24.2cqi;
     font-weight: 600;
@@ -219,7 +216,7 @@ const registered = !!(address || kvk || vat || phone);
     /* Optical alignment with the text column. */
     margin-left: -0.04em;
     padding-bottom: 0.2em;
-    /* It stands up from its baseline as the footer scrolls in (motion.ts). */
+    /* Stands up from its baseline as the footer scrolls in (motion.ts). */
     transform-origin: 50% 100%;
   }
 
@@ -227,16 +224,12 @@ const registered = !!(address || kvk || vat || phone);
     grid-area: 1 / 1;
   }
 
-  /*
-   * Late sun through a window, as on the floor under the rug (rug-scene.ts):
-   * a copy of the word in the light's colours, in broad soft beams, inside
-   * the soft-edged patch of the window. It comes in from
-   * the right as the wordmark rises (`--sun-at`, where the patch is).
-   */
+  /* Window light as on the floor under the rug (rug-scene.ts): a copy of the word in the light's
+     colors, in broad soft beams within the window's soft-edged patch. It sweeps in from the right
+     as the wordmark rises (`--sun-at` positions the patch). */
   .site-footer__sun {
     --sun-at: 66%;
-    /* Pale letters: warm white where the light falls, a little dimmer
-       between the beams. */
+    /* Light letters: warm white where the light falls, slightly dimmer between the beams. */
     --mark-lit: color-mix(in oklab, rgb(var(--sun)) 42%, #fff);
     --mark-shade: color-mix(in oklab, var(--color-ink) 80%, #000);
     color: transparent;
@@ -259,8 +252,8 @@ const registered = !!(address || kvk || vat || phone);
     );
   }
 
-  /* Black letters: the light is only a low warmth on them, the shade
-     between the beams as black as the rest. */
+  /* Dark letters: the light is only a faint warmth on them, with the shade between the beams as
+     dark as the rest. */
   :global(:root:not([data-theme='dark'])) .site-footer__sun {
     --mark-lit: color-mix(in oklab, rgb(var(--sun)) 27%, var(--color-ink));
     --mark-shade: var(--color-ink);
@@ -278,18 +271,17 @@ const registered = !!(address || kvk || vat || phone);
     }
   }
 
-  /* Where the browser runs scroll-linked animations itself, it stands the
-     wordmark up on the graphics card, in step with the scroll; elsewhere
-     motion.ts does the same with a script. From lying back on its baseline
-     to upright, while the wordmark comes into view (as it enters, easing out). */
+  /* Where CSS scroll-driven animations are supported, the compositor stands the wordmark up in sync
+     with scroll; elsewhere motion.ts does it in JS. It goes from lying back on its baseline to
+     upright as it enters view (ease-out). */
   .site-footer__mark {
     view-timeline-name: --wordmark;
   }
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      /* Separate properties, so the minifier cannot fold the timeline into
-         the `animation` shorthand (which browsers do not accept). */
+      /* Longhand properties, so the minifier can't fold the timeline into the `animation` shorthand
+         (which browsers reject). */
       .site-footer__mark > span {
         animation-name: wordmark-rise;
         animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
@@ -350,9 +342,8 @@ const registered = !!(address || kvk || vat || phone);
     font-size: inherit;
   }
 
-  /* The company's registered details, when filled in: each detail whole, set
-     apart by space, and, on a screen wide enough to hold them in one line,
-     by a dot, so a line never starts or ends with one. */
+  /* Registration line: each detail kept whole and separated by spacing; separator dots appear only
+     where everything fits on one line, so wrapped lines never start or end with a dot. */
   .site-footer__registration {
     display: flex;
     flex-wrap: wrap;
@@ -362,8 +353,8 @@ const registered = !!(address || kvk || vat || phone);
     font-style: normal;
   }
 
-  /* Global inside the line: the script that adds the registered details
-     (src/scripts/registration.ts) does not carry Astro's scoping attribute. */
+  /* `:global` because the details are injected by src/scripts/registration.ts and lack Astro's
+     scope attribute. */
   .site-footer__registration :global(.site-footer__details) {
     display: contents;
   }
@@ -376,8 +367,8 @@ const registered = !!(address || kvk || vat || phone);
     white-space: nowrap;
   }
 
-  /* The telephone number and email in the registration line: the line's own
-     quiet colour, a finger's height to tap, and lit only when reached for. */
+  /* Phone and email links: muted like the line, with a comfortable tap height, highlighted on
+     hover. */
   .site-footer__registration :global(.site-footer__contact) {
     display: inline-flex;
     align-items: center;

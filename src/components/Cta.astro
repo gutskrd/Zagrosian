@@ -1,11 +1,11 @@
 ---
 /**
- * A button link: a pill for the main action, or (as Apple sets "Learn more")
- * a plain link with an arrow for a secondary one.
+ * Call-to-action link: a pill for the primary action, or (like Apple's "Learn more") a plain link
+ * with an arrow for secondary ones.
  *
- * Under a mouse the pill's colour fills in from the middle, the label rolls
- * letter by letter (RollText) and the arrow slides out as a copy slides in
- * behind it; the link rolls and slides the same way, without the pill.
+ * On hover the pill's color fills in from the center, the label rolls letter by letter (RollText)
+ * and the arrow slides out as a copy slides in behind it. The link variant animates the same way
+ * without the pill.
  */
 import type { HTMLAttributes } from 'astro/types';
 import Arrow, { type ArrowDirection } from './Arrow.astro';
@@ -14,7 +14,7 @@ import RollText from './RollText.astro';
 interface Props extends HTMLAttributes<'a'> {
   href: string;
   label: string;
-  /** `solid` for the main action; `outline` or a plain `link` for a secondary one. */
+  /** `solid` for the primary action; `outline` or `link` for secondary ones. */
   variant?: 'solid' | 'outline' | 'link';
   arrow?: ArrowDirection;
 }
@@ -70,7 +70,7 @@ const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } 
     color: var(--color-ink);
   }
 
-  /* A plain link: no pill, still a full-size target. */
+  /* Plain link: no pill, but still a full-size target. */
   .cta--link {
     min-height: 2.75rem;
     padding: 0;
@@ -89,7 +89,7 @@ const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } 
     gap: 0.75rem;
   }
 
-  /* The hover colour, filling in from the middle. */
+  /* Hover fill, expanding from the center. */
   .cta__pour {
     position: absolute;
     z-index: -1;
@@ -111,12 +111,12 @@ const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } 
     background: var(--color-ink);
   }
 
-  /* The arrow leaves in the direction it points; its copy follows it in. */
+  /* The arrow exits in the direction it points; its copy follows it in. */
   .cta__arrows {
     display: inline-grid;
     width: 1em;
     height: 1em;
-    /* A mask, not a scroll box: the waiting arrow must not count as overflow. */
+    /* A clip, not a scroll container: the waiting arrow must not count as overflow. */
     clip-path: inset(0);
   }
 

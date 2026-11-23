@@ -1,20 +1,18 @@
 /**
- * Quick navigation (src/components/CommandMenu.astro).
+ * Command menu (CommandMenu.astro).
  *
- * Opens with Ctrl K or ⌘K, with "/" when the visitor is not typing, and from
- * the search button in the header. Typing filters the entries; the arrow keys
- * move through them, Enter opens one and Escape closes the menu. The search
- * field keeps focus throughout and points screen readers at the highlighted
- * entry with aria-activedescendant.
+ * Opens with Ctrl+K / Cmd+K, with "/" when not typing, and from the header's search button. Typing
+ * filters the entries; arrow keys move through them, Enter activates and Escape closes. Focus stays
+ * in the search field, which points assistive technology at the active entry via
+ * aria-activedescendant.
  *
- * Security: entries are written at build time. This script only toggles
- * attributes and sets text, so the Content-Security-Policy and Trusted Types
- * stay strict.
+ * Entries are rendered at build time; this script only toggles attributes and sets text, keeping
+ * CSP and Trusted Types strict.
  */
 import { play, setSound, soundEnabled } from './sound';
 import { currentPreference, setThemePreference, type Preference } from './theme';
 
-/** Lowercase, without accents or Arabic vowel marks: "Français" → "francais". */
+/** Lowercases and strips diacritics and Arabic harakat: "Français" -> "francais". */
 const normalise = (text: string) =>
   text
     .normalize('NFKD')
@@ -22,7 +20,7 @@ const normalise = (text: string) =>
     .toLowerCase()
     .trim();
 
-/** True while the visitor is typing somewhere, so "/" is left alone. */
+/** Whether the user is typing in an editable element, so "/" is left alone. */
 function isEditing(target: EventTarget | null) {
   return (
     target instanceof HTMLElement &&
@@ -72,7 +70,7 @@ export function initCommandMenu() {
     setActive(visible[0], false);
   }
 
-  /** Marks the current theme and sound setting. */
+  /** Marks the current theme and sound settings. */
   function markSettings() {
     const current = { theme: currentPreference(), sound: soundEnabled() ? 'on' : 'off' };
     for (const option of options) {
@@ -102,7 +100,7 @@ export function initCommandMenu() {
   function announce(message: string) {
     if (!status) return;
     status.textContent = '';
-    // A fresh message, so screen readers read it even when it repeats.
+    // Set after a tick so screen readers announce repeated messages.
     window.setTimeout(() => (status.textContent = message), 50);
   }
 
@@ -119,7 +117,7 @@ export function initCommandMenu() {
       return;
     }
     if (action === 'share') {
-      // As Share in the site menu (site.ts): the share sheet, else a copy.
+      // Same as Share in the site menu (site.ts): native share sheet, else copy the URL.
       const url = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href ?? location.href;
       const data = { title: document.title, url };
       const copy = () =>
@@ -143,8 +141,8 @@ export function initCommandMenu() {
         .catch(() => {});
       return;
     }
-    // Links: a click, so middle-clicks, the language memory and same-page
-    // section links all behave as they do elsewhere on the site.
+    // Links are clicked rather than navigated, so modifier clicks, the language preference and
+    // same-page anchors behave as anywhere else on the site.
     if (option instanceof HTMLAnchorElement) option.click();
   }
 
@@ -187,7 +185,7 @@ export function initCommandMenu() {
       if (active !== option) setActive(option, false);
     });
     option.addEventListener('click', (event) => {
-      // Let links open in a new tab or window as usual.
+      // Let modifier clicks open links in a new tab or window.
       if (option instanceof HTMLAnchorElement && (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)) return;
       if (option instanceof HTMLAnchorElement) {
         close();
@@ -198,7 +196,7 @@ export function initCommandMenu() {
     });
   }
 
-  // A click on the backdrop, outside the panel, closes the menu.
+  // Clicking the backdrop outside the panel closes the menu.
   dialog.addEventListener('click', (event) => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();

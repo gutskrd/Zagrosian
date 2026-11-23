@@ -1,6 +1,6 @@
 /**
- * Language helpers. Pages and components find their language from the URL, so
- * nothing has to be passed down: `const { t, localize } = i18n(Astro.url)`.
+ * i18n helpers. Pages and components derive their locale from the URL, so nothing needs to be
+ * passed down: `const { t, localize } = i18n(Astro.url)`.
  */
 import { defaultLocale, isLocale, localeInfo, type Locale } from './locales';
 import { ar } from './messages/ar';
@@ -17,7 +17,7 @@ import { tr } from './messages/tr';
 export * from './locales';
 export type { Messages };
 
-/** The legal pages, by their path in every language (/privacy, /de/privacy). */
+/** Legal page slugs, identical in every locale (/privacy, /de/privacy). */
 export const legalSlugs = ['privacy', 'terms', 'security'] as const;
 export type LegalSlug = (typeof legalSlugs)[number];
 
@@ -25,7 +25,7 @@ const catalogues: Record<Locale, Messages> = { en, ku, ckb, nl, de, es, fr, tr, 
 
 export const messages = (locale: Locale): Messages => catalogues[locale];
 
-/** A page's path without `.html` and without a trailing `index`: /de/privacy.html → /de/privacy. */
+/** Strips `.html` and a trailing `index`: /de/privacy.html -> /de/privacy. */
 const cleanPath = (pathname: string) => pathname.replace(/(index)?\.html$/, '').replace(/(.)\/$/, '$1') || '/';
 
 export function localeFromPath(pathname: string): Locale {
@@ -33,7 +33,7 @@ export function localeFromPath(pathname: string): Locale {
   return isLocale(first) && first !== defaultLocale ? first : defaultLocale;
 }
 
-/** The English path of a page, with any language prefix removed: /de/privacy → /privacy, /de → /. */
+/** English path of a page, without the locale prefix: /de/privacy -> /privacy, /de -> /. */
 export function basePath(pathname: string): string {
   const path = cleanPath(pathname);
   const locale = localeFromPath(path);
@@ -42,8 +42,8 @@ export function basePath(pathname: string): string {
 }
 
 /**
- * A path in the given language. `path` is the English path, optionally with a
- * fragment: ('de', '/') → /de, ('de', '/privacy') → /de/privacy, ('de', '/#about') → /de#about.
+ * Localizes an English path, optionally with a fragment: ('de', '/') -> /de, ('de', '/privacy') ->
+ * /de/privacy, ('de', '/#about') -> /de#about.
  */
 export function localizePath(locale: Locale, path: string): string {
   if (locale === defaultLocale) return path;
@@ -52,14 +52,14 @@ export function localizePath(locale: Locale, path: string): string {
   return hash === undefined ? localized : `${localized}#${hash}`;
 }
 
-/** Everything a page or component needs to render in its language. */
+/** Everything a page or component needs to render in its locale. */
 export function i18n(url: URL) {
   const locale = localeFromPath(url.pathname);
   return {
     locale,
     info: localeInfo(locale),
     t: messages(locale),
-    /** The current page's English path, for linking to it in other languages. */
+    /** Current page's English path, for linking to it in other locales. */
     base: basePath(url.pathname),
     localize: (path: string) => localizePath(locale, path),
   };
@@ -70,12 +70,12 @@ export interface NavLink {
   href: string;
 }
 
-/** A section of the homepage, with the key of its label in `nav`. */
+/** Homepage section link, with the key of its label in `nav`. */
 export interface SectionLink extends NavLink {
   key: 'hevalo' | 'about' | 'faq' | 'contact';
 }
 
-/** The site's links in a language: the homepage sections, the book and the legal pages. */
+/** Site navigation for a locale: homepage sections, the book and the legal pages. */
 export function navigation(locale: Locale) {
   const t = messages(locale);
   const link = (label: string, path: string): NavLink => ({ label, href: localizePath(locale, path) });
@@ -94,12 +94,12 @@ export const format = (template: string, values: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? `{${key}}`);
 
 /**
- * Unit wording that the Unicode locale data (CLDR) lacks, or gives in a less
- * usual form: English data now says "8 mins", where "8 min read" is the norm.
+ * Unit strings that CLDR lacks or renders unusually (e.g. English CLDR now says "8 mins", where "8
+ * min read" is the norm).
  */
 const minuteFallback: Partial<Record<Locale, string>> = { en: '{n} min', ckb: '{n} خولەک' };
 
-/** A number of minutes in a language: "6 min", "6 Min.", "6 دقائق", "٦ خولەک". */
+/** Localized minutes: "6 min", "6 Min.", "6 دقائق", "٦ خولەک". */
 export function formatMinutes(locale: Locale, minutes: number, unitDisplay: 'short' | 'long'): string {
   const fallback = minuteFallback[locale];
   const { intl } = localeInfo(locale);
@@ -108,10 +108,9 @@ export function formatMinutes(locale: Locale, minutes: number, unitDisplay: 'sho
 }
 
 /**
- * A date in a language: "17 November 2026", "17. November 2026". Where the
- * language's calendar is not the Gregorian one (Persian uses the Solar Hijri
- * calendar), the Gregorian date follows in brackets, so it can be compared
- * with the English original: "۲۶ آبان ۱۴۰۵ (۱۷ نوامبر ۲۰۲۶)".
+ * Localized date: "17 November 2026", "17. November 2026". For non-Gregorian calendars (Persian
+ * uses Solar Hijri), the Gregorian date follows in parentheses so it can be compared with the
+ * English original: "۲۶ آبان ۱۴۰۵ (۱۷ نوامبر ۲۰۲۶)".
  */
 export function formatDate(locale: Locale, date: Date | string): string {
   const day = typeof date === 'string' ? new Date(`${date}T00:00:00Z`) : date;

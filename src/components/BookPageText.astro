@@ -1,12 +1,10 @@
 ---
 /**
- * The words of one page of Hevalo's book, as text: what a screen reader,
- * search engine or translation tool reads instead of the page's picture, and
- * what the reader's text view shows. The book's own headings are h4 (under
- * the page's h3), its Kurmanji is marked `lang="ku"` (the rest is English,
- * the language of the block around it), and a speaker is set in bold before
- * what they say, on the same line. A row of the page reads as one line, its
- * pieces apart by " · " ("1 · Silav · Hello · 9").
+ * Text content of one book page: what screen readers, search engines and translation tools read
+ * instead of the page image, and what the reader's text view shows. The book's own headings are h4
+ * (below the page's h3), Kurmanji is marked `lang="ku"` (the rest inherits English), and speakers
+ * are set in bold before their line. Each row of the page reads as one line, with pieces separated
+ * by " · " ("1 · Silav · Hello · 9").
  */
 import type { TextBlock, TextSpan } from '../lib/book';
 
@@ -16,10 +14,9 @@ interface Props {
 
 const { blocks } = Astro.props;
 
-// A speaker and the line after it are one paragraph. What stands on one row
-// of the page is one block already (Hevalo's export joins it), and the
-// export leaves the book's number badges out; a badge that still came
-// through (a number alone, set as a label) says nothing, and is left out too.
+// A speaker and their line form one paragraph. Each row of the page is already one block (joined by
+// Hevalo's export), and the export drops the number badges; any badge that slips through (a bare
+// number as a label) carries no meaning and is skipped too.
 const badge = (block: TextBlock) => block.kind === 'label' && /^[\d\s]+$/.test(block.spans.map((span) => span.text).join(''));
 type Row = { kind: TextBlock['kind']; spans: TextSpan[]; speaker?: TextSpan[] };
 const rows: Row[] = [];

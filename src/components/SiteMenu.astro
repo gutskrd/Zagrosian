@@ -1,18 +1,15 @@
 ---
 /**
- * The site menu: a full-screen panel, like a studio's.
+ * Full-screen site menu.
  *
- * It drops in from the top like a curtain; the links, set very large, rise one
- * after another from behind their masks, and the rest follows. Hovering a
- * link dims the others. Besides the pages it holds Visit Hevalo and Share,
- * contact, social media, every language (with the world icon), the settings
- * (sound and the theme), and the time at headquarters.
+ * Drops in from the top like a curtain; the oversized links rise in sequence from their masks,
+ * followed by the rest. Hovering a link dims the others. Besides navigation it holds Visit Hevalo
+ * and Share, contact, social links, every language, settings (sound and theme) and the local time
+ * at headquarters.
  *
- * It is a popover (`#site-menu`), so it opens, closes on Escape and returns
- * focus by itself, without JavaScript. Its top bar mirrors the header, with
- * its own menu button in the same place to close it. It is in the page's own
- * colours, light or dark as the theme is (even when the header behind it is
- * in the other theme's, over the homepage story's scene: global.css).
+ * Implemented as a popover (`#site-menu`), so open, close, Escape and focus return work without JS.
+ * The top bar mirrors the header, with a close button where the menu button was. It always uses the
+ * page theme, even when the header behind it is inverted over the homepage story (global.css).
  */
 import { i18n, localizePath, locales, navigation } from '../i18n';
 import { hevalo, site, socialProfiles } from '../site';
@@ -30,7 +27,7 @@ import Wordmark from './Wordmark.astro';
 const { locale, t, base, localize } = i18n(Astro.url);
 const nav = navigation(locale);
 const sectionLinks = nav.sections.map((link) => ({ ...link, section: link.href.split('#')[1] }));
-// Hevalo's book comes after Hevalo: the page is marked as the current one while it is open.
+// The book follows Hevalo; the link is marked current on the book page.
 const links = [
   { label: nav.home.label, href: nav.home.href, section: undefined, current: false },
   ...sectionLinks.slice(0, 1).map((link) => ({ ...link, current: false })),
@@ -167,9 +164,7 @@ const year = new Date().getFullYear();
 </nav>
 
 <style>
-  /* ------------------------------------------------------------------------ */
-  /* The panel                                                                */
-  /* ------------------------------------------------------------------------ */
+  /* --- Panel --- */
 
   .site-menu {
     position: fixed;
@@ -196,15 +191,12 @@ const year = new Date().getFullYear();
     background: transparent;
   }
 
-  /* The page cannot scroll behind it. */
+  /* Lock page scroll while open. */
   :global(html:has(.site-menu:popover-open)) {
     overflow: hidden;
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* Top bar: the header's layout, so the close button sits where the menu    */
-  /* button was.                                                               */
-  /* ------------------------------------------------------------------------ */
+  /* --- Top bar: mirrors the header, so the close button sits where the menu button was --- */
 
   .site-menu__bar {
     display: flex;
@@ -227,9 +219,7 @@ const year = new Date().getFullYear();
     width: 1.75rem;
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* Body: the links, and beside or below them the rest                       */
-  /* ------------------------------------------------------------------------ */
+  /* --- Body: links, with secondary content beside or below --- */
 
   .site-menu__body {
     display: grid;
@@ -239,16 +229,15 @@ const year = new Date().getFullYear();
     padding-block: clamp(1.5rem, 1rem + 3vw, 3rem);
   }
 
-  /* The links are sized to their column (11% of its width, between 2 and
-     5.5rem), so the longest word in any language fits on its line; a label
-     longer than its line wraps between words. */
+  /* Links scale with their column (11% of its width, clamped to 2-5.5rem) so the longest word in
+     any locale fits; longer labels wrap between words. */
   .site-menu__links {
     display: grid;
     container-type: inline-size;
   }
 
-  /* A little more space between links than between the lines of one that
-     wraps, so each reads as one. */
+  /* Slightly more space between links than between wrapped lines of one link, so each reads as a
+     unit. */
   .site-menu__link {
     display: inline-flex;
     align-items: center;
@@ -269,7 +258,7 @@ const year = new Date().getFullYear();
     line-height: 1.35;
   }
 
-  /* Each link rises from behind its own mask. */
+  /* Each link rises from its own mask. */
   .site-menu__mask {
     display: block;
     overflow: hidden;
@@ -281,7 +270,7 @@ const year = new Date().getFullYear();
     display: block;
   }
 
-  /* An arrow slides in beside the link under the pointer. */
+  /* An arrow slides in next to the hovered link. */
   .site-menu__link :global(.site-menu__arrow) {
     width: 0.4em;
     height: 0.4em;
@@ -292,7 +281,7 @@ const year = new Date().getFullYear();
       translate 0.5s var(--ease-out);
   }
 
-  /* The current section is marked with a dot. */
+  /* Dot marking the current section. */
   .site-menu__link[aria-current]::after {
     content: '';
     order: -1;
@@ -318,8 +307,7 @@ const year = new Date().getFullYear();
     translate: 0 0;
   }
 
-  /* Contact and social media side by side where both fit, one above the
-     other where they do not: never squeezed into each other. */
+  /* Contact and social side by side where both fit, stacked otherwise; never squeezed. */
   .site-menu__aside {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
@@ -339,7 +327,7 @@ const year = new Date().getFullYear();
     grid-column: 1 / -1;
   }
 
-  /* Visit Hevalo, and beside it the quieter Share. */
+  /* Visit Hevalo, with the quieter Share next to it. */
   .site-menu__group--cta {
     display: flex;
     flex-wrap: wrap;
@@ -347,7 +335,7 @@ const year = new Date().getFullYear();
     gap: 0.75rem;
   }
 
-  /* An outlined pill, like the sound button below it. */
+  /* Outlined pill, matching the sound button below. */
   .site-menu__share {
     display: inline-flex;
     align-items: center;
@@ -412,7 +400,7 @@ const year = new Date().getFullYear();
     height: 1rem;
   }
 
-  /* 44px tall, as Apple's guidelines ask of anything tapped. */
+  /* 44px tap target (Apple HIG minimum). */
   .site-menu__small-link {
     display: inline-flex;
     align-items: center;
@@ -478,9 +466,7 @@ const year = new Date().getFullYear();
     background: currentColor;
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* Foot                                                                     */
-  /* ------------------------------------------------------------------------ */
+  /* --- Footer --- */
 
   .site-menu__foot {
     display: flex;
@@ -532,12 +518,10 @@ const year = new Date().getFullYear();
     }
   }
 
-  /* ------------------------------------------------------------------------ */
-  /* Opening and closing                                                      */
-  /* ------------------------------------------------------------------------ */
+  /* --- Open / close transitions --- */
 
   @media (prefers-reduced-motion: no-preference) {
-    /* The curtain drops in from the top, and lifts away again. */
+    /* Curtain drops in from the top and lifts away on close. */
     .site-menu {
       clip-path: inset(0 0 100% 0);
       transition:
@@ -556,8 +540,7 @@ const year = new Date().getFullYear();
       }
     }
 
-    /* The links rise one after another as it lands; they drop away quickly
-       when it closes. */
+    /* Links rise in sequence as the panel lands, and drop away quickly on close. */
     .site-menu__text {
       translate: 0 110%;
       transition: translate 0.35s var(--ease-in-out);
@@ -594,7 +577,7 @@ const year = new Date().getFullYear();
       --i: 5;
     }
 
-    /* The rest fades up after the links. */
+    /* Secondary content fades in after the links. */
     .site-menu__group,
     .site-menu__foot,
     .site-menu__bar > * {
@@ -620,7 +603,7 @@ const year = new Date().getFullYear();
       }
     }
 
-    /* The top bar is there almost at once. */
+    /* Top bar appears almost immediately. */
     .site-menu__bar > * {
       --j: -6;
     }
@@ -646,7 +629,7 @@ const year = new Date().getFullYear();
     }
   }
 
-  /* With reduced motion it simply appears and disappears. */
+  /* Reduced motion: appear and disappear without animation. */
   @media (prefers-reduced-motion: reduce) {
     .site-menu {
       opacity: 0;

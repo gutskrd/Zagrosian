@@ -1,16 +1,15 @@
 /**
- * The controls a visitor uses: the language menu, the language suggestion,
- * the site menu on a phone, the theme, and Share.
+ * User-facing controls: the language menu, language suggestion, mobile site menu, theme and Share.
  */
 import { expect, test } from '@playwright/test';
 
-/** With sound off. */
+/** Sound off. */
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     try {
       localStorage.setItem('sound', 'off');
     } catch {
-      // Storage can be unavailable.
+      // Storage may be unavailable.
     }
   });
 });
@@ -29,7 +28,7 @@ test.describe('on a computer', () => {
     await page.waitForURL('**/ar');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-    // A language chosen is never suggested against.
+    // An explicitly chosen language is never overridden by a suggestion.
     await page.waitForTimeout(1200);
     await expect(page.locator('.suggest')).toBeHidden();
 
@@ -50,7 +49,7 @@ test.describe('in the menu', () => {
   test('Share copies the page’s own address where there is no share sheet', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await context.addInitScript(() => {
-      // As in a browser without a share sheet (desktop Firefox).
+      // Simulates a browser without a native share sheet (desktop Firefox).
       Object.defineProperty(navigator, 'share', { value: undefined });
     });
     await page.goto('/de/privacy', { waitUntil: 'networkidle' });
@@ -103,7 +102,7 @@ test.describe('on a phone', () => {
 test.describe('links to a section', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  /** How far the section's top is from the bottom of the header, in whole pixels. */
+  /** Distance from the section's top to the header's bottom, in whole pixels. */
   const offset = (page: import('@playwright/test').Page, id: string) =>
     page.evaluate((target) => {
       const header = document.querySelector<HTMLElement>('[data-site-header]')!.offsetHeight;

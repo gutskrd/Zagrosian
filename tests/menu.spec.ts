@@ -1,12 +1,10 @@
 /**
- * The site menu is in the page's own colours, in either theme, also when it is
- * opened from the header while that is in the other theme's colours over the
- * story's scene; Escape closes it. And nothing in it, or in the language menu,
- * overlaps, runs off the screen or is cut off: in every language, and with
- * every word 40% longer (as a longer language's would be), at six widths.
- * In a browser from before the Popover API (Safari before 17: iPhones and
- * iPads that stay on iOS 15 or 16), the menus still start hidden, open, cover
- * what they should and close (src/scripts/popover.ts).
+ * The site menu uses the page theme in both light and dark, including when opened from an inverted
+ * header over the story's scene, and Escape closes it. Nothing in it or in the language menu
+ * overlaps, overflows or is clipped, in every locale and with every word 40% longer (simulating
+ * longer translations), at six widths. Without the Popover API (Safari < 17: iPhones and iPads on
+ * iOS 15/16) the menus still start hidden, open, cover the right area and close
+ * (src/scripts/popover.ts).
  */
 import { type Page, expect, test } from "@playwright/test";
 import { locales, prefix, settled } from "./support";
@@ -33,7 +31,7 @@ test.describe("in a browser without the Popover API", () => {
     await open.click();
     await expect(menu).toBeVisible();
     await expect(open).toHaveAttribute("aria-expanded", "true");
-    // Over the whole screen, as in the browser's top layer, not inside the header.
+    // Covers the full viewport like the top layer, not just the header box.
     expect(await menu.boundingBox()).toEqual({ x: 0, y: 0, width: 390, height: 844 });
     await page.keyboard.press("Escape");
     await expect(menu).toBeHidden();
@@ -100,7 +98,7 @@ test.describe("on a phone", () => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/", { waitUntil: "networkidle" });
     const header = page.locator(".site-header");
-    // Down into the story, until the header is drawn in the other colours.
+    // Scroll into the story until the header renders inverted.
     await expect
       .poll(
         async () => {
@@ -119,7 +117,7 @@ test.describe("on a phone", () => {
   });
 });
 
-/** Makes every word in a menu 40% longer, the big rolling labels' letters too. */
+/** Lengthens every word in a menu by 40%, including the large rolling labels' letters. */
 async function lengthen(page: Page, selector: string) {
   await page.evaluate((selector) => {
     const menu = document.querySelector(selector)!;
@@ -152,7 +150,7 @@ async function lengthen(page: Page, selector: string) {
   }, selector);
 }
 
-/** What in a menu overlaps, runs off the screen or is cut off. */
+/** Returns what in a menu overlaps, overflows or is clipped. */
 function problemsIn(page: Page, selector: string) {
   return page.evaluate((selector) => {
     const menu = document.querySelector(selector)!;
@@ -169,7 +167,7 @@ function problemsIn(page: Page, selector: string) {
         box.height > 0
       );
     };
-    // What a reader sees as one piece each: a link, a button, a label.
+    // Units a reader perceives as one piece: links, buttons, labels.
     const pieces = [...menu.querySelectorAll("a, button, p, li > span, svg")]
       .filter(
         (element) =>

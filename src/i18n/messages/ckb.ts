@@ -1,8 +1,8 @@
 import type { Messages } from './en';
 
-/* کوردیی ناوەندی (سۆرانی). Words shared with Hevalo's own interface
-   (بڕۆ بۆ ناوەڕۆک، لیست، داخستن، لەبەرگیرایەوە، پەڕە نەدۆزرایەوە) are kept
-   the same. Brand and product names stay in Latin script. */
+/* Central Kurdish (Sorani). Terms shared with Hevalo's UI (بڕۆ بۆ ناوەڕۆک، لیست، داخستن،
+   لەبەرگیرایەوە، پەڕە نەدۆزرایەوە) are kept identical. Brand and product names stay in Latin
+   script. */
 export const ckb: Messages = {
   meta: {
     title: 'Zagrosian — تەکنەلۆژیا بۆ ژیانی ڕۆژانە',

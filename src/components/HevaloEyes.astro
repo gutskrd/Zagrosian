@@ -1,13 +1,11 @@
 ---
 /**
- * The deer's eyes, drawn over Hevalo's icon (HevaloIcon.astro) and over the
- * head of the 3D deer (HevaloDeer.astro), so the two always look alike. The
- * images have no pupils of their own: these are placed where the artwork has
- * them, and follow the pointer (src/scripts/eyes.ts).
+ * The deer's eyes, drawn over Hevalo's icon (HevaloIcon.astro) and over the 3D deer's head
+ * (HevaloDeer.astro), so both always match. The images have no pupils of their own: these are
+ * positioned where the artwork has them and follow the pointer (src/scripts/eyes.ts).
  *
- * `frame` says what the eyes are placed in: the icon's square, or the head
- * layer of the 3D deer. `lids` adds eyelids, which close when the deer blinks
- * (src/scripts/deer.ts).
+ * `frame` sets the coordinate space: the icon's square or the 3D deer's head layer. `lids` adds
+ * eyelids, which close when the deer blinks (src/scripts/deer.ts).
  */
 interface Props {
   frame: 'icon' | 'head';
@@ -33,10 +31,9 @@ const { frame, lids = false } = Astro.props;
 }
 
 <style>
-  /* The eyes, measured on the 360 px square the icon is cut to: the white of
-     each eye (58 × 68 px, which keeps its pupil inside, at 97 and 202 across,
-     186 down) and its pupil (31 × 48 px), with the highlight that moves with
-     it. At rest the pupils sit as drawn, turned in towards each other. */
+  /* Eyes measured on the icon's 360px square: each eye white is 58x68px (keeping the pupil inside),
+     centered at x 97 and 202, y 186; pupils are 31x48px, with a highlight that moves with them. At
+     rest the pupils sit as drawn, angled slightly inward. */
   .eye {
     position: absolute;
     top: 51.667%;
@@ -54,8 +51,8 @@ const { frame, lids = false } = Astro.props;
     left: 56.111%;
   }
 
-  /* The same eyes in the 3D deer's head layer, which is 230 × 305 px of the
-     square, from 65 across and 110 down. */
+  /* Same eyes within the 3D deer's head layer, which is the 230x305px region of the square at (65,
+     110). */
   .eye[data-frame='head'] {
     top: 24.918%;
     width: 25.217%;
@@ -77,7 +74,7 @@ const { frame, lids = false } = Astro.props;
     height: 70.59%;
     border-radius: 50%;
     background: #532e28;
-    /* Kept in forced colours too: the images have no pupils of their own. */
+    /* Keep in forced-colors mode too: the images have no pupils of their own. */
     forced-color-adjust: none;
   }
 
@@ -100,10 +97,9 @@ const { frame, lids = false } = Astro.props;
     background: #fff;
   }
 
-  /* Eyelids: in the colour of the fur around the eyes, with a dark lash line,
-     a little larger than the white (whose soft edge is 59 × 75 and 65 × 75 px
-     at 123.5 and 230.5 across, 220 down). Open, they wait above the eye,
-     outside its outline; a blink brings them down and up again. */
+  /* Eyelids in the fur color around the eyes, with a dark lash line, slightly larger than the eye
+     white (whose soft edge is 59x75 and 65x75px at x 123.5 and 230.5, y 220). Open, they wait above
+     the eye, outside its outline; a blink sweeps them down and up. */
   .lid {
     position: absolute;
     top: 22.6%;

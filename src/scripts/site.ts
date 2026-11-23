@@ -1,9 +1,9 @@
 /**
- * The script every page runs (BaseLayout.astro). The small features are
- * here; the larger ones (sound, motion, the theme, quick navigation) have
- * modules of their own. All of them start at the end of this file.
+ * Entry point for the script bundle on every page (BaseLayout.astro). Small features live here;
+ * larger ones (sound, motion, theme, command menu) have their own modules. Initialization runs at
+ * the bottom of the file.
  */
-// First: the menus' fallback for browsers without the Popover API.
+// Must load first: installs the Popover API fallback for older browsers.
 import { isOpen } from './popover';
 import { initCommandMenu } from './command';
 import { initDeer } from './deer';
@@ -41,17 +41,14 @@ function initHeader() {
 }
 
 /**
- * A link to a section from another page (/#about, /de#faq) should land on
- * that section. The browser jumps there as soon as the page is read, before
- * the typeface, the images and the story's stage have settled; as they do,
- * the content above grows and the section slides away under the header.
- * So the section is held in place while the page settles: each time the
- * layout changes, it is put back under the header, until the visitor scrolls
- * on their own or a few seconds after the page has loaded.
+ * Keeps deep-linked sections (/#about, /de#faq) in place while the page settles. The browser jumps
+ * to the target before fonts, images and the story stage have loaded; as content above grows, the
+ * section would slide under the header. It is re-aligned on every layout change until the user
+ * scrolls or a few seconds after load.
  */
 function initDeepLink() {
-  // A link can carry a hash that is not valid percent-encoding (`#%`); it
-  // names no section, and must not stop the rest of this script.
+  // A hash with invalid percent-encoding (`#%`) names no section and must not break the rest of
+  // this script.
   let id = '';
   try {
     id = decodeURIComponent(window.location.hash.slice(1));
@@ -59,7 +56,7 @@ function initDeepLink() {
     return;
   }
   const target = id ? document.getElementById(id) : null;
-  // A page of Hevalo's book (#page-12, #chapter-3) is opened by the book's own reader (book.ts).
+  // Book deep links (#page-12, #chapter-3) are handled by the reader (book.ts).
   if (!target || target.closest('[data-book]')) return;
 
   const inputs = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
@@ -67,7 +64,7 @@ function initDeepLink() {
 
   const align = () => {
     queued = false;
-    // Measured against the header, as `scroll-padding-top` is (global.css).
+    // Offset by the header, matching `scroll-padding-top` (global.css).
     const header = document.querySelector<HTMLElement>('[data-site-header]')?.offsetHeight ?? 0;
     if (Math.abs(target.getBoundingClientRect().top - header) >= 2) {
       target.scrollIntoView({ block: 'start', behavior: 'instant' });
@@ -80,9 +77,8 @@ function initDeepLink() {
     requestAnimationFrame(align);
   };
 
-  // A layout change moves the section; so does the browser's own jump to it
-  // when a page transition interrupts it (with `scroll-behavior: smooth` it
-  // can stop short, even at the very top). Either way, put it back.
+  // Re-align on layout changes, and when a page transition interrupts the browser's own jump
+  // (smooth scrolling can stop short, even at the top).
   const observer = new ResizeObserver(schedule);
   observer.observe(document.body);
   window.addEventListener('scroll', schedule, { passive: true });
@@ -94,17 +90,16 @@ function initDeepLink() {
   };
   inputs.forEach((type) => window.addEventListener(type, release, { passive: true }));
 
-  // The homepage's entrance waits up to 2.5 s for its fonts and images
-  // (theme-init.js); hold the section a little longer than that.
+  // The homepage entrance waits up to 2.5 s for fonts and images (theme-init.js); hold a little
+  // longer than that.
   const letGo = () => window.setTimeout(release, 3000);
   if (document.readyState === 'complete') letGo();
   else window.addEventListener('load', letGo, { once: true });
 }
 
 /**
- * The full-screen menu (SiteMenu.astro). The popover handles open, close,
- * Escape and focus; a link just needs to close it, so a link to a section of
- * this page scrolls there as the menu lifts.
+ * Full-screen menu (SiteMenu.astro). The popover handles open, close, Escape and focus; links just
+ * need to close it, so in-page links scroll as the menu closes.
  */
 function initMenu() {
   const menu = document.querySelector<HTMLElement>('[data-site-menu]');
@@ -118,9 +113,8 @@ function initMenu() {
 }
 
 /**
- * Sections below the fold rise in once as they enter the viewport.
- * Anything already on screen is left untouched, so nothing flickers, and
- * anything met while scrolling back up is simply there.
+ * Sections below the fold animate in once as they enter the viewport. Content already on screen is
+ * left alone (no flicker), and content met while scrolling up appears without animation.
  */
 function initReveal() {
   if (!('IntersectionObserver' in window)) return;
@@ -136,7 +130,7 @@ function initReveal() {
           element.dataset.reveal = 'done';
           continue;
         }
-        // Met on the way back up: shown at once, without its transitions.
+        // Entered from above: show immediately, without transitions.
         element.dataset.reveal = 'instant';
         requestAnimationFrame(() => requestAnimationFrame(() => (element.dataset.reveal = 'done')));
       }
@@ -152,8 +146,8 @@ function initReveal() {
 }
 
 /**
- * Legal pages: the table of contents is collapsed on small screens and
- * always open on wide ones, where it sits in a sticky sidebar.
+ * Legal pages: the table of contents is collapsible on small screens and always open in the sticky
+ * sidebar on wide ones.
  */
 function initTableOfContents() {
   const toc = document.querySelector<HTMLDetailsElement>('[data-toc]');
@@ -174,8 +168,8 @@ function initTableOfContents() {
 }
 
 /**
- * Highlights the navigation link of the section being read. A section counts
- * as current while it crosses a thin band a little above the middle of the screen.
+ * Highlights the nav link of the current section: the one crossing a thin band slightly above the
+ * viewport's middle.
  */
 function initSectionNav() {
   const links = new Map<string, HTMLAnchorElement>();
@@ -209,9 +203,8 @@ function initSectionNav() {
 }
 
 /**
- * Copy buttons next to email addresses. They stay hidden where the Clipboard
- * API is unavailable. The icon turns into a check mark, and a live region
- * announces the result to screen readers.
+ * Copy buttons next to email addresses, hidden where the Clipboard API is unavailable. The icon
+ * switches to a check mark and a live region announces the result.
  */
 function initCopyButtons() {
   if (!navigator.clipboard?.writeText) return;
@@ -240,10 +233,8 @@ function initCopyButtons() {
 }
 
 /**
- * Share in the site menu: the system's share sheet where the browser has one
- * (phones, Safari, Chrome and Edge), otherwise the page's address is copied
- * and the button says so for a moment. The address shared is the page's
- * canonical one. Hidden where neither is possible.
+ * Share button in the site menu: the native share sheet where supported (Web Share API), otherwise
+ * copies the canonical URL and confirms on the button. Hidden where neither is available.
  */
 function initShare() {
   const canShare = typeof navigator.share === 'function';
@@ -280,7 +271,7 @@ function initShare() {
           await navigator.share(data);
           return;
         } catch (error) {
-          // Closed by the visitor: nothing more to do.
+          // Dismissed by the user.
           if (error instanceof DOMException && error.name === 'AbortError') return;
         }
       }
@@ -290,8 +281,8 @@ function initShare() {
 }
 
 /**
- * The current time at the headquarters, next to the country in About. It is
- * formatted for the page's language and updates on the minute.
+ * Local time at headquarters, next to the country in About; formatted for the page locale and
+ * updated every minute.
  */
 function initLocalTime() {
   for (const slot of document.querySelectorAll<HTMLElement>('[data-local-time]')) {
@@ -321,8 +312,8 @@ function initLocalTime() {
 }
 
 /**
- * Legal pages: a print button, and a button beside each section heading that
- * copies a link to that section. Both need JavaScript, so they are added here.
+ * Legal pages: a print button, and a copy-link button next to each section heading. Both require
+ * JS, so they are added here.
  */
 function initLegalTools() {
   const article = document.querySelector<HTMLElement>('[data-legal]');
@@ -364,7 +355,7 @@ function initLegalTools() {
           if (status) status.textContent = '';
         }, 2000);
       } catch {
-        // Copying was refused; the heading's address is still in the contents.
+        // Clipboard write refused; the link is still available in the table of contents.
       }
     });
 
@@ -372,14 +363,10 @@ function initLegalTools() {
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/* Every page runs this same script, so the header, the menu, the theme, the  */
-/* sound and the motion behave the same on the homepage, the legal pages and  */
-/* the 404 page. Each part looks for its own elements and does nothing where  */
-/* there are none.                                                            */
-/* -------------------------------------------------------------------------- */
+// --- Init ---
+// The same bundle runs on every page; each feature looks for its own elements and is a no-op without them.
 
-// First, so the registered details in the footer are asked for at once.
+// First, so the footer's registration details are requested as early as possible.
 initRegistration();
 initHeader();
 initDeepLink();

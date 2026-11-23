@@ -7,8 +7,8 @@ import LiftedLogo from './LiftedLogo.astro';
 
 const { t } = i18n(Astro.url);
 
-// The headline is sized so its longest line fits the column. Most languages
-// fit the default; longer lines step the size down (see .hero__title--*).
+// Size the headline so its longest line fits the column. Most locales fit the default; longer lines
+// step down (see .hero__title--*).
 const longest = Math.max(...t.hero.headline.map((line) => [...line].length));
 const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? 'sm' : 'xs';
 ---
@@ -27,8 +27,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
         {
           t.hero.headline.map((line, index) => (
             <>
-              {/* A real space between the lines, for anything that reads the
-                  text without the styles (search engines, AI crawlers). */}
+              {/* A real space between lines for unstyled consumers (search engines, crawlers). */}
               {index > 0 && ' '}
               <span class="hero__line">
                 <span>{line}</span>
@@ -70,24 +69,21 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   .hero {
     position: relative;
     padding-block: clamp(3.5rem, 1.5rem + 8vw, 8rem) clamp(4rem, 2rem + 6vw, 7rem);
-    /* The logo's shadow may reach past the sides of the screen, but never scrolls it. */
+    /* The logo's shadow may extend past the viewport edges without causing horizontal scroll. */
     overflow-x: clip;
   }
 
-  /* On a computer whose screen is short (1280 by 720, 1366 by 768), less air
-     above, so the headline, the words and both buttons fit the first screen. */
+  /* Short laptop screens (1280x720, 1366x768): less top space, so the headline, copy and both
+     buttons fit above the fold. */
   @media (min-width: 64rem) and (max-height: 50rem) {
     .hero {
       padding-top: max(2rem, 12vh - 1rem);
     }
   }
 
-  /*
-   * Dim late sun through a window, on the wall behind the logo: two broad
-   * soft beams and a narrow one, as in the photographs of Hevalo's kilims; the light the rug lies in further down, and that crosses
-   * the footer's wordmark at the end. Painted once and never moved, so it
-   * costs nothing while the page scrolls.
-   */
+  /* Window light on the wall behind the logo: two broad soft beams and a narrow one, the same light
+     the rug lies in further down and that crosses the footer wordmark. Static, so it costs nothing
+     while scrolling. */
   .hero__sun {
     --sun-a: 0.085;
     position: absolute;
@@ -101,7 +97,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       rgb(var(--sun) / calc(var(--sun-a) * 0.8)) 60% 64%,
       transparent 76%
     );
-    /* The window's patch, faded out well inside the hero. */
+    /* Fade the light patch out well within the hero. */
     mask-image: radial-gradient(54% 44% at 64% 50%, #000 15%, transparent 100%);
   }
 
@@ -130,7 +126,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
     padding: 0.25rem 0.875rem 0.25rem 0.75rem;
     border: 1px solid var(--color-line-strong);
-    /* Half its height: a pill on one line, a rounded box if it wraps. */
+    /* Half its height: a pill on one line, a rounded box when wrapped. */
     border-radius: 1.125rem;
     font-size: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
     font-weight: 450;
@@ -154,7 +150,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     transition: transform 0.3s var(--ease-out);
   }
 
-  /* On the narrowest phones the arrow gives way, to leave the text more room. */
+  /* Narrowest phones: drop the arrow to give the text more room. */
   @media (max-width: 22.49rem) {
     .hero__notice :global(.hero__notice-arrow) {
       display: none;
@@ -172,10 +168,9 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
-  /* The headline is sized to its column: "Technology for" is about 6.1em wide.
-     The text stays above the travelling logo, which may pass behind it. Each
-     size in `cqi` follows the same in `--cq` (global.css), for browsers
-     without container query units. */
+  /* The headline scales with its column ("Technology for" is about 6.1em wide) and stays above the
+     traveling logo, which may pass behind it. Each `cqi` size is preceded by a `--cq` equivalent
+     (global.css) for browsers without container query units. */
   .hero__text {
     position: relative;
     z-index: 2;
@@ -183,7 +178,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
   }
 
   .hero__title {
-    /* Never wider than the column, nor too tall for short landscape screens. */
+    /* Never wider than the column, nor too tall on short landscape screens. */
     font-size: min(var(--text-display), calc(16 * var(--cq)), 18svh);
     font-size: min(var(--text-display), 16cqi, 18svh);
     line-height: 0.98;
@@ -205,7 +200,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     font-size: min(var(--text-display), 11cqi, 18svh);
   }
 
-  /* Each line rises from behind its own mask on load. */
+  /* Each line rises from its own mask on load. */
   .hero__line {
     display: block;
     overflow: hidden;
@@ -230,11 +225,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     margin-top: clamp(2rem, 1.5rem + 1.5vw, 2.75rem);
   }
 
-  /* The glass logo, in 3D, over two soft lights that show through the glass.
-     The lights are gradients that fall off as a disc blurred by 1.75rem
-     would, rather than blurred discs: a large blur behind 3D glass is costly
-     to redraw while the logo moves. (No filter or opacity may sit on the
-     logo's ancestors once it is in place: they would flatten it.) */
+  /* Glass logo in 3D over two soft lights that show through the glass. The lights are radial
+     gradients shaped like a disc blurred by 1.75rem rather than actual blurs: a large blur behind
+     3D glass is expensive to repaint while the logo moves. (No filter or opacity may be set on the
+     logo's ancestors once it's in place; they would flatten the 3D.) */
   .hero__mark,
   .journey {
     --glow: 0 0 0;
@@ -267,7 +261,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     pointer-events: none;
   }
 
-  /* A disc 64% of the logo wide, centred near its top right corner. */
+  /* Disc 64% of the logo width, centered near its top-right corner. */
   .hero__mark::before,
   .journey__art::before {
     top: -26.5%;
@@ -284,7 +278,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     );
   }
 
-  /* A disc 52% of the logo wide, centred near its bottom left corner. */
+  /* Disc 52% of the logo width, centered near its bottom-left corner. */
   .hero__mark::after,
   .journey__art::after {
     bottom: -26.75%;
@@ -307,21 +301,17 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     transform-style: preserve-3d;
   }
 
-  /* The way into the story. theme-init.js makes room for the story before
-     the first paint (`data-story`), and story.ts turns it on once the logo is
-     copied into this layer (`data-story='on'`). The logo in the hero then
-     stays in place for screen readers, unseen, and the copy travels instead:
-     fixed to the screen, under the hero text, it settles beside the story's
-     values and the camera flies into it (`data-hidden` once the story's
-     scene has taken over). With a mouse it still leans towards the pointer
-     (motion.ts). */
+  /* Transition into the story. theme-init.js reserves the story's space before first paint
+     (`data-story`), and story.ts activates it once the logo is cloned into this layer
+     (`data-story='on'`). The hero logo then stays in place, invisible, for screen readers while the
+     clone travels: fixed to the viewport below the hero text, it settles beside the story's values
+     and the camera dollies into it (`data-hidden` once the scene takes over). With a mouse it still
+     leans toward the pointer (motion.ts). */
   .journey {
     display: none;
-    /* Laid out left to right in every language: while the logo turns, it is
-       laid out at the size it is seen at, growing from its top left corner,
-       and in a right-to-left page the browser would measure it from its top
-       right corner, which then moves, and count that as the page shifting. It
-       is artwork, placed from the left by story.ts. */
+    /* Always LTR: while rotating, the logo is laid out at its on-screen size, growing from its
+       top-left corner. In RTL the browser would anchor it at the top-right corner, which moves, and
+       count that as layout shift. It's artwork positioned from the left by story.ts. */
     direction: ltr;
   }
 
@@ -340,21 +330,18 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     visibility: hidden;
   }
 
-  /* Once the block faces the reader, its edge cannot be seen, so it is not
-     drawn (story.ts). */
+  /* Face-on, the block edge is invisible, so skip drawing it (story.ts). */
   .journey[data-flat] :global(.lifted-logo__slice) {
     visibility: hidden;
   }
 
-  /* Once the camera has gone through the front pane, it is not drawn. */
+  /* Once the camera passes the front pane, skip drawing it. */
   .journey[data-through] :global(.lifted-logo__front) {
     visibility: hidden;
   }
 
-  /* Facing the reader, laid out once and only moved and scaled by the
-     graphics card, which keeps its drawing while it moves; story.ts has it
-     drawn again, sharp, when its size has grown or shrunk by half a
-     doubling. */
+  /* Facing the viewer: laid out once and only translated and scaled on the compositor; story.ts
+     triggers a sharp re-raster whenever the scale crosses a sqrt(2) step. */
   .journey[data-facing] .journey__art {
     will-change: transform;
   }
@@ -367,9 +354,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     transform-origin: 50% 50%;
   }
 
-  /* The lean towards the pointer (motion.ts sets the direction, --lean-x and
-     --lean-y from -1 to 1, and the angle), which the story eases away as the
-     logo faces the reader (--lean, 1 to 0). */
+  /* Pointer lean (motion.ts sets --lean-x and --lean-y from -1 to 1, plus the angle), which the
+     story fades out (--lean, 1 to 0) as the logo faces the viewer. */
   .journey__tilt {
     --lean-x: 0;
     --lean-y: 0;
@@ -388,7 +374,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     opacity: 0;
   }
 
-  /* Printed, the logo stays in the hero. */
+  /* Print: the logo stays in the hero. */
   @media print {
     :global(:root[data-story='on']) .journey {
       display: none;
@@ -414,7 +400,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
 
     .hero__text {
       grid-column: 1 / span 7;
-      /* 1% of 7 of 12 columns with 2rem between them, for the line before each `cqi` one. */
+      /* 1% of 7 of 12 columns with 2rem gaps, for the declaration before each `cqi` value. */
       --cq: calc((min(100vw - 2 * var(--gutter), var(--container)) - 22rem) * 7 / 1200 + 0.12rem);
     }
 
@@ -426,10 +412,10 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
-  /* The entrance. Each animation holds its first frame through its delay and
-     lets go when it ends (`backwards`), so nothing stays animated: a finished
-     animation that held its last frame would keep the glass logo on a layer
-     of its own, redrawn in every frame of the scroll story below. */
+  /* Entrance. Each animation fills `backwards` (holds its first frame through the delay) and
+     releases when done, so nothing stays animated: a finished animation holding its last frame
+     would keep the glass logo on its own compositor layer, repainted on every frame of the scroll
+     story below. */
   @media (prefers-reduced-motion: no-preference) {
     .hero__line > span {
       animation: line-rise 1.1s var(--ease-out) backwards;
@@ -460,21 +446,21 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
       animation: logo-in 1.4s var(--ease-out) 0.3s backwards;
     }
 
-    /* The two soft lights behind the travelling logo come with it. */
+    /* The two soft lights travel with the logo. */
     .journey__art::before,
     .journey__art::after {
       animation: glow-in 1.4s var(--ease-out) 0.3s backwards;
     }
 
-    /* On the homepage the header arrives with the rest, so the first thing
-       seen is never a part of the page in a stand-in font. */
+    /* On the homepage the header enters with everything else, so nothing is ever shown in the
+       fallback font. */
     :global(:root:has(.hero) .site-header__inner) {
       animation: glow-in 0.9s var(--ease-out) backwards;
     }
   }
 
-  /* Held on its first frame for a moment while the typeface and the logo's
-     images arrive (theme-init.js), so it plays once, whole. */
+  /* Held on its first frame while the font and logo images load (theme-init.js), so the entrance
+     plays once, complete. */
   :global(:root[data-entrance='waiting']) .hero__line > span,
   :global(:root[data-entrance='waiting']) .intro,
   :global(:root[data-entrance='waiting']) .hero__mark,
@@ -485,8 +471,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     animation-play-state: paused;
   }
 
-  /* Coming from another page of the site, the page slides in as a whole
-     (global.css), and that is its entrance (theme-init.js sets the flag). */
+  /* Arriving from another page of the site, the whole page slides in (global.css) and that serves
+     as the entrance (flag set by theme-init.js). */
   :global(:root[data-arrival='slide']) .hero__line > span,
   :global(:root[data-arrival='slide']) .intro,
   :global(:root[data-arrival='slide']) .hero__mark,
@@ -497,7 +483,7 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     animation: none;
   }
 
-  /* Far enough below its mask that no ascender peeks over its edge. */
+  /* Far enough below the mask that no ascender peeks over its edge. */
   @keyframes line-rise {
     from {
       transform: translateY(130%);
@@ -510,9 +496,8 @@ const fit = longest <= 14 ? undefined : longest <= 16 ? 'md' : longest <= 18 ? '
     }
   }
 
-  /* The fades start at 1% rather than nothing: the same to the eye, but the
-     browser then counts the hero as shown when it starts to appear, not when
-     its fade has ended (Largest Contentful Paint, which search engines use). */
+  /* Fades start at 1% opacity rather than 0: visually identical, but the browser then records
+     Largest Contentful Paint when the hero starts appearing, not when the fade ends. */
   @keyframes intro {
     from {
       opacity: 0.01;

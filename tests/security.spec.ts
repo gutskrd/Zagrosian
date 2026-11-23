@@ -1,7 +1,4 @@
-/**
- * The site's security headers, as public/_headers sets them, and that nothing
- * on any page breaks its Content-Security-Policy or logs an error.
- */
+/** Security headers (public/_headers), and no CSP violations or console errors on any page. */
 import { expect, test } from '@playwright/test';
 import { locales, pagesIn, scrollThrough, settled, watch } from './support';
 
@@ -21,13 +18,11 @@ test('the security headers', async ({ request }) => {
   expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
 });
 
-// Over plain http the page's own policy would refuse its styles, fonts and
-// scripts (they are upgraded to https, a different origin), so a first visit
-// over http would show bare HTML. The Worker in front of the site
-// (worker/index.ts) sends every such request to https on the same host first
-// (as the HSTS preload list asks), and www to the bare domain. (wrangler dev
-// rewrites the scheme of a redirect to its own, so the Worker is also called
-// directly here.)
+// Over plain HTTP the page's own CSP would block its styles, fonts and scripts (upgraded to HTTPS,
+// a different origin), so a first visit would render bare HTML. The Worker (worker/index.ts)
+// redirects to HTTPS on the same host first (as the HSTS preload list requires), then www to the
+// apex. (wrangler dev rewrites redirect schemes to its own, so the Worker is also called directly
+// here.)
 test('http and www are sent to https://zagrosian.com', async ({ request }) => {
   const { default: worker } = await import('../worker/index.ts');
   const env = { ASSETS: { fetch: async () => new Response('page') } };
@@ -63,9 +58,8 @@ test('a page in another language says so', async ({ request }) => {
   expect((await request.get('/de')).headers()['content-language']).toBe('de');
 });
 
-// Anyone can link to the site with any address after it; one that is not
-// valid percent-encoding (`#%`) once stopped the page's script before the
-// menu, the theme and the search were set up.
+// Arbitrary fragments can be linked to; an invalid percent-encoding (`#%`) once threw before the
+// menu, theme and search were initialized.
 test('a malformed address leaves the page working', async ({ page }) => {
   await settled(page.context());
   const problems = await watch(page);

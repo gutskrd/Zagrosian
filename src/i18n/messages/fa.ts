@@ -1,8 +1,7 @@
 import type { Messages } from './en';
 
-/* فارسی. Written in formal Persian (شما), with Persian letters (ی، ک), zero-width
-   non-joiners where Persian needs them (می‌کنیم، داده‌ها) and the ezafe hamza
-   (صفحهٔ). Brand and product names stay in Latin script. */
+/* Persian. Formal register (شما), Persian letterforms (ی، ک), ZWNJ where required (می‌کنیم،
+   داده‌ها) and the ezafe hamza (صفحهٔ). Brand and product names stay in Latin script. */
 export const fa: Messages = {
   meta: {
     title: 'Zagrosian — فناوری برای زندگی روزمره',

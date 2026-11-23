@@ -1,15 +1,14 @@
 ---
 /**
- * Quick navigation: one searchable list of every page, section, language,
- * theme and sound setting, plus a few actions. Opens with Ctrl K or ⌘K, with "/", or from the
- * search button in the header (src/scripts/command.ts).
+ * Command menu: one searchable list of every page, section, language, theme and sound setting, plus
+ * a few actions. Opens with Ctrl+K / Cmd+K, "/", or the header's search button
+ * (src/scripts/command.ts).
  *
- * A native modal <dialog>, so focus stays inside and Escape closes it. The
- * search field and list follow the ARIA combobox pattern: the field keeps
- * focus and the highlighted option is announced. Every entry is written here
- * at build time; the script only shows, hides and highlights them, so no HTML
- * is generated in the browser. Entries match both their label in this
- * language and in English, so "privacy" also finds "Datenschutz".
+ * A native modal <dialog>, so focus is trapped and Escape closes it. The search field and list
+ * follow the ARIA combobox pattern: the field keeps focus and the active option is announced. All
+ * entries are rendered here at build time; the script only shows, hides and highlights them, so no
+ * HTML is generated client-side. Entries match their label in the current locale and in English, so
+ * "privacy" also finds "Datenschutz".
  */
 import { i18n, localizePath, locales, messages, navigation } from '../i18n';
 import { book, hevalo, site } from '../site';
@@ -22,15 +21,15 @@ type Icon = 'page' | 'section' | 'external' | 'copy' | 'share' | 'download' | 'l
 
 interface Entry {
   label: string;
-  /** Extra words that find this entry, besides its label. */
+  /** Additional search terms besides the label. */
   keywords: string[];
   icon: Icon;
   href?: string;
   action?: 'copy' | 'share' | 'theme' | 'sound';
-  /** For a file to keep: the name it is saved under. */
+  /** For downloads: the filename to save as. */
   download?: string;
   value?: string;
-  /** For language names: written in, and shown in the direction of, that language. */
+  /** Language names: rendered in that language and its direction. */
   lang?: string;
   dir?: string;
   code?: string;
@@ -41,7 +40,7 @@ const [home, ...legal] = [nav.home, ...nav.legal];
 const bookLink = nav.book;
 const currentPath = localizePath(locale, base);
 const legalKeys = ['privacy', 'terms', 'security'] as const;
-/** Extra English words each section can be found by, in any language. */
+/** English search terms for each section, available in every locale. */
 const sectionKeywords = {
   hevalo: 'app product kurdish',
   about: 'company mission',
@@ -141,7 +140,7 @@ const withIds = groups.map((group) => ({
   entries: group.entries.map((entry) => ({ ...entry, id: `command-option-${counter++}` })),
 }));
 
-// Everything an entry can be found by, in one lowercase string without accents.
+// Everything an entry matches on, lowercased and diacritic-free.
 const searchText = (entry: Entry) =>
   [entry.label, ...entry.keywords]
     .join(' ')
@@ -277,7 +276,7 @@ const searchText = (entry: Entry) =>
     backdrop-filter: blur(3px);
   }
 
-  /* Less transparency: the page behind is dimmed further, without the blur. */
+  /* Reduced transparency: dim the backdrop further, without blur. */
   @media (prefers-reduced-transparency: reduce) {
     .command::backdrop {
       background: rgb(10 10 10 / 0.7);
@@ -500,7 +499,7 @@ const searchText = (entry: Entry) =>
     font-size: 0.6875rem;
   }
 
-  /* Touch screens have no arrow keys or Escape key. */
+  /* Touch devices have no arrow or Escape keys. */
   @media (hover: none) {
     .command__footer,
     .command__esc {

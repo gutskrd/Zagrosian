@@ -1,19 +1,19 @@
 /**
- * PostCSS, which Vite runs on every stylesheet. One step: in browsers without
- * the Popover API, src/scripts/popover.ts opens a popover with the class
- * "popover-open" and marks the page `data-popover-fallback`, so each rule for
- * `:popover-open` gets a twin for `.popover-open`, which applies only on such
- * a page. The twin is a rule of its own because those browsers drop a whole
- * rule whose selector they do not know; and it applies only there because a
- * rule that says what holds while no popover is open (`:not(:has(...))`)
- * would otherwise always hold where the class is never set.
+ * PostCSS config (run by Vite on every stylesheet).
+ *
+ * One custom plugin for the Popover API fallback: in browsers without popover support,
+ * src/scripts/popover.ts marks open popovers with `.popover-open` and the root with
+ * `data-popover-fallback`. Each `:popover-open` rule therefore gets a twin rule using the class,
+ * scoped to the fallback root. It must be a separate rule because browsers drop any rule whose
+ * selector they can't parse; and it's scoped because negated selectors like
+ * `:not(:has(:popover-open))` would otherwise always match in browsers that never set the class.
  */
 const fallback = '[data-popover-fallback]';
 
 /**
- * One selector of the twin: on a page with the fallback, with the class for
- * the pseudo-class. A selector that starts at the root (also inside Astro's
- * `:global()`) is marked there, not looked for inside the root.
+ * Twin selector: `:popover-open` replaced with the class and scoped to the fallback root. Selectors
+ * that start at the root (including inside Astro's `:global()`) get the attribute on the root
+ * itself.
  */
 const twin = (selector) => {
   const classed = selector.replaceAll(':popover-open', '.popover-open');
@@ -26,8 +26,8 @@ const popoverTwins = {
   Rule(rule) {
     if (!rule.selector.includes(':popover-open')) return;
     const selectors = rule.selectors.map(twin);
-    // Vite runs this on a component's styles twice (before and after Astro
-    // scopes them): a rule already followed by its twin is left as it is.
+    // Vite runs PostCSS on component styles twice (before and after Astro scopes them); skip rules
+    // already followed by their twin.
     const next = rule.next();
     if (next?.type === 'rule' && next.selectors.join() === selectors.join()) return;
     rule.after(rule.clone({ selectors }));

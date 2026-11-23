@@ -1,20 +1,17 @@
 /**
- * Life for Hevalo's deer, coming out of its hole in the page (HevaloDeer.astro):
- * while it is on screen it blinks every few seconds and, less
- * often, twitches an ear or sniffs; when it is first all the way out it pricks
- * up both ears and blinks, as if it had seen you; a tap or a click on it gets all
- * of that at once (and the tap sound, when sound is on). Each is a short CSS
- * animation, started by an attribute on the deer and removed when it is over,
- * so nothing runs in between.
+ * Idle animation for Hevalo's deer peeking out of its hole (HevaloDeer.astro). While on screen it
+ * blinks every few seconds and occasionally twitches an ear or sniffs; the first time it fully
+ * emerges it pricks up both ears and blinks, and a tap or click triggers all of that at once (plus
+ * the tap sound when sound is on). Each action is a short CSS animation toggled by a data attribute
+ * and removed when it ends, so nothing runs in between.
  *
- * Nothing moves off screen, in a background tab, or when the visitor prefers
- * reduced motion. Its eyes are eyes.ts.
+ * Paused off-screen, in background tabs and with reduced motion. Eye tracking lives in eyes.ts.
  */
 import { play } from './sound';
 
 type Act = 'blink' | 'twitch' | 'sniff';
 
-/** How long each lasts (ms), as in HevaloDeer.astro. */
+/** Duration of each action in ms, matching HevaloDeer.astro. */
 const LENGTH: Record<Act, number> = { blink: 260, twitch: 700, sniff: 800 };
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
@@ -26,7 +23,7 @@ export function initDeer() {
   const ends = new Map<Act, number>();
   const act = (name: Act, value = '') => {
     window.clearTimeout(ends.get(name));
-    // Restart it if it is already playing.
+    // Restart if already playing.
     deer.removeAttribute(`data-${name}`);
     void deer.offsetWidth;
     deer.setAttribute(`data-${name}`, value);
@@ -36,13 +33,13 @@ export function initDeer() {
     );
   };
 
-  // Each habit repeats at random intervals while the deer can be seen.
+  // Each habit repeats at random intervals while the deer is visible.
   const habits: { every: [number, number]; run: () => void }[] = [
     {
       every: [2500, 6000],
       run: () => {
         act('blink');
-        // Now and then twice.
+        // Occasional double blink.
         if (Math.random() < 0.2) window.setTimeout(() => act('blink'), LENGTH.blink + 120);
       },
     },
@@ -85,8 +82,8 @@ export function initDeer() {
     { threshold: 0.4 },
   ).observe(deer);
 
-  // It is all the way out once the icon's middle is above 45% of the screen's
-  // height (HevaloDeer.astro): the first time, it greets you.
+  // Fully emerged once the icon's center is above 45% of the viewport height (HevaloDeer.astro);
+  // the first time, it reacts.
   const out = new IntersectionObserver(
     ([entry]) => {
       if (!entry.isIntersecting || seen) return;

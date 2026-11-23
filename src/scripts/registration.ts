@@ -1,14 +1,12 @@
 /**
- * The company's registered details in every footer: its address, its number
- * in the trade register (KvK) and its telephone number. Visitors see them, as
- * Dutch law asks; search engines are not to list them, so they are not in the
- * pages themselves. They come from /registration.json, which robots.txt asks
- * crawlers not to fetch, and are put in the footer's line here, between the
- * company's name and its email (Footer.astro).
+ * Renders the company's registration details (address, KvK number, phone) into the footer at
+ * runtime. They're required to be visible but should stay out of search results, so they aren't in
+ * the HTML: they're fetched from /registration.json, which robots.txt disallows and which is served
+ * with `X-Robots-Tag: noindex` (Footer.astro has the markup).
  */
 import type { Registration } from '../site';
 
-/** A detail kept in one piece on a narrow screen: a line breaks between details, not through them. */
+/** Non-breaking unit, so lines wrap between details rather than inside them. */
 function whole(text: string) {
   const span = document.createElement('span');
   span.className = 'site-footer__whole';
@@ -18,12 +16,12 @@ function whole(text: string) {
 
 function fill(line: HTMLElement, slot: HTMLElement, { address, kvk, vat, phone }: Registration) {
   const details: Node[][] = [];
-  // The address in two pieces: the street, then the postcode with the place.
+  // Address in two units: street, then postcode and city.
   if (address) details.push([whole(`${address.street},`), document.createTextNode(' '), whole(`${address.postalCode} ${address.city}`)]);
   if (kvk) details.push([whole(`${line.dataset.kvk} ${kvk}`)]);
   if (vat) details.push([whole(`${line.dataset.vat} ${vat}`)]);
   if (phone) {
-    // The number as registered, and a link that calls it.
+    // Phone as registered, linked for calling.
     const link = document.createElement('a');
     link.className = 'site-footer__contact site-footer__whole';
     link.href = `tel:${phone.replace(/[^+\d]/g, '')}`;
@@ -33,12 +31,12 @@ function fill(line: HTMLElement, slot: HTMLElement, { address, kvk, vat, phone }
   }
   slot.replaceChildren(
     ...details.flatMap((parts) => {
-      // The dot shows only where the details fit one line (Footer.astro).
+      // Separator dots only show where the details fit on one line (Footer.astro).
       const dot = document.createElement('span');
       dot.className = 'site-footer__dot';
       dot.setAttribute('aria-hidden', 'true');
       dot.textContent = '·';
-      // Isolated, so a right-to-left page keeps each detail in its own order.
+      // Bidi isolation keeps each detail in its own order on RTL pages.
       const bdi = document.createElement('bdi');
       bdi.append(...parts);
       return [dot, bdi];
@@ -57,6 +55,6 @@ export function initRegistration() {
       if (details) fill(line, slot, details);
     })
     .catch(() => {
-      // Offline or refused: the line still gives the company's name and email.
+      // Offline or blocked: the line still shows the company name and email.
     });
 }

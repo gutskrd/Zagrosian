@@ -1,29 +1,23 @@
 ---
 /**
- * Hevalo's book to read on the page, as a book: the cover alone, then two
- * pages side by side where the screen is wide enough and one at a time where
- * it is not, turned like paper (src/scripts/book.ts, book-turn.ts and
+ * Page-turning reader for Hevalo's book: the cover alone, then two pages side by side on wide
+ * screens or one at a time on narrow ones (behavior in src/scripts/book.ts, book-turn.ts and
  * book-zoom.ts).
  *
- * Everything is in the HTML from the start, in order: each of the book's
- * pages is an article with its number as a heading, its picture (alt="",
- * because its words follow it) and its words as text (BookPageText), Kurmanji
- * marked as such. Without JavaScript that is what the page shows: a column of
- * pages, loaded as they come into view. With it (the theme script marks the
- * page before the first paint, so the layout is final from the start), only
- * the pages open in front of the reader are displayed, so a screen reader
- * meets them and no others, and their pictures alone are downloaded. The
- * reader can also choose to scroll: the scroll view lays every page out in
- * one column again, its pictures loaded as they come near, and the text view
- * does the same with the words alone.
+ * All content is in the HTML, in order: each page is an <article> with its number as a heading, its
+ * image (alt="", since the text follows) and its text (BookPageText), with Kurmanji marked by
+ * `lang`. Without JS the page renders as a lazy-loaded column of pages. With JS (theme-init.js
+ * flags the document before first paint, so the layout is final immediately) only the open pages
+ * are displayed, so screen readers encounter only them and only their images download. The scroll
+ * view lays every page out in one column again with lazy images; the text view does the same with
+ * the text alone.
  *
- * The stage describes the physical book and runs left to right in every
- * language: page 1 is on the right, the next page is to the right, and the
- * arrows and the slider under it point the way the pages go. The rest of the
- * controls follow the page's own direction.
+ * The stage models the physical book and is always LTR: page 1 is on the right, the next page is to
+ * the right, and the arrows and slider point the reading direction. All other controls follow the
+ * page's direction.
  *
- * Styles are global (`is:global`): the reader builds the copies of pages it
- * turns with the DOM API, and they must be styled as the pages are.
+ * Styles are `is:global` because the reader creates page copies through the DOM API, and those must
+ * be styled like the pages.
  */
 import { format, i18n } from '../i18n';
 import { book, chapterName, chapters, formatNumber, pageSizes, pages, type BookPage } from '../lib/book';
@@ -36,7 +30,7 @@ import BookPageText from './BookPageText.astro';
 
 const { locale, t } = i18n(Astro.url);
 
-// The page's own digits, as the build writes numbers: the reader writes the numbers it changes with them.
+// Locale digits, as rendered at build time; the reader uses them for the numbers it updates.
 const digits = Array.from({ length: 10 }, (_, d) => formatNumber(locale, d)).join('');
 
 const label = (page: BookPage) => {
@@ -48,7 +42,7 @@ const heading = (page: BookPage) => {
   const number = format(t.book.pageLabel, { n: formatNumber(locale, page.n) });
   return page.opens ? `${number}. ${label(page)}` : number;
 };
-// The slider's chapter marks, by where each chapter begins along the book.
+// Slider chapter marks, positioned at each chapter's start.
 const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.start - 1) / (book.pageCount - 1)) * 100).toFixed(2)}%` }));
 ---
 
@@ -93,13 +87,13 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
       <span class="visually-hidden">{t.book.fit}</span>
     </button>
     <button class="book__button book__scroll-toggle" type="button" aria-pressed="false" data-book-scroll-toggle>
-      {/* a page and the top of the next under it: the pages one under the other */}
+      {/* Stacked pages: the scroll view. */}
       <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h9v7.5h-9zM5.5 17.25v-4h9v4"></path></svg>
       <span class="book__label-text" aria-hidden="true">{t.book.scrollView}</span>
       <span class="visually-hidden">{t.book.scrollView}</span>
     </button>
     <button class="book__button book__text-toggle" type="button" aria-pressed="false" data-book-text-toggle>
-      {/* a page of text, so it does not look like the contents' list */}
+      {/* A page of text; deliberately distinct from the contents icon. */}
       <svg class="book__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M5.5 2.75h6.25l3 3v11.5H5.5zM11.75 2.75v3h3M8 9.5h4.5M8 12.25h4.5M8 15h2.75"></path></svg>
       <span class="book__label-text" aria-hidden="true">{t.book.textView}</span>
       <span class="visually-hidden">{t.book.textView}</span>
@@ -219,7 +213,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
       <Arrow direction="right" />
       <span class="visually-hidden">{t.book.next}</span>
     </button>
-    {/* For a moment on a touch screen, over the bar under the book: how to turn and zoom. */}
+    {/* Brief touch hint over the bottom toolbar: how to turn and zoom. */}
     <p class="book__hint" dir="auto" data-book-hint hidden>
       <span>{t.book.swipeHint}</span>
       <span>{t.book.zoomHint}</span>
@@ -251,27 +245,25 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
 </script>
 
 <style is:global>
-  /* ==========================================================================
-     The reader (BookReader.astro)
-     ========================================================================== */
+  /* --- Book reader (BookReader.astro) --- */
 
   .book {
-    /* A page is 419.53 by 595.28 points (A5): its width over its height. */
+    /* A5 page, 419.53 x 595.28 pt: width / height. */
     --page-ratio: 0.70476;
-    /* The book's own paper, under the pictures while they load. */
+    /* Paper color behind images while they load. */
     --paper: #fbf6ec;
-    /* What the bars outside the stage take of the screen's height. */
+    /* Vertical space taken by the toolbars outside the stage. */
     --book-bars: 4.25rem;
-    /* Room above and below the pages, for a leaf that grows as it comes nearer mid-turn. */
+    /* Space above and below the pages for a leaf that grows toward the viewer mid-turn. */
     --room-y: 1.75rem;
-    /* The least the stage is tall, whatever the screen. */
+    /* Minimum stage height. */
     --stage-min: 360px;
     position: relative;
     container: reader / inline-size;
     margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
   }
 
-  /* ---- Without JavaScript: the pages in a column ---- */
+  /* --- No-JS fallback: pages in a column --- */
 
   .book__stage {
     position: relative;
@@ -305,7 +297,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     -webkit-user-drag: none;
   }
 
-  /* The paper in the dark theme: dimmed a little, never inverted. */
+  /* Dark theme: dim the paper slightly, never invert it. */
   :root[data-theme='dark'] .book__paper::after,
   :root[data-theme='dark'] .leaf__page::after,
   :root[data-theme='dark'] .book__hold-page::after {
@@ -359,7 +351,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     display: none;
   }
 
-  /* ---- The book, paged (when the reader's script can run) ---- */
+  /* --- Paged layout (JS enabled) --- */
 
   :root[data-theme] .book:not([data-book='off']) {
     --book-bars: 6.5rem;
@@ -372,7 +364,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
       'start end'
       'stage stage'
       'nav nav';
-    /* The keyboard goes through the bars and the book in the order they stand, in every layout below. */
+    /* Keyboard order follows the visual order of toolbars and book in every layout below. */
     reading-flow: grid-rows;
   }
 
@@ -407,24 +399,23 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     position: relative;
   }
 
-  /* The stage: as tall as the screen leaves under the header and the bars,
-     and a container, so the book is sized to it and two pages lie open
-     where there is room for them. */
+  /* The stage fills the height left below the header and toolbars, and is a size container so the
+     book sizes to it and opens to a spread where there's room. */
   :root[data-theme] .book:not([data-book='off']) .book__stage {
     display: flex;
     height: max(var(--stage-min), calc(100svh - var(--header-height) - var(--book-bars)));
-    /* A turning leaf may reach a little past the stage, rather than be cut off flat. */
+    /* Lets a turning leaf extend slightly past the stage instead of clipping flat. */
     overflow: clip;
     overflow-clip-margin: 1.5rem;
     container: book / size;
     touch-action: pan-y pinch-zoom;
-    /* A sideways swipe on a trackpad turns a page (book.ts), never the browser's history. */
+    /* Horizontal trackpad swipes turn pages (book.ts), never trigger history navigation. */
     overscroll-behavior-x: none;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
 
-  /* The focus is drawn round the pages open, not round the whole stage. */
+  /* Draw the focus ring around the open pages, not the whole stage. */
   :root[data-theme] .book:not([data-book='off']) .book__stage:focus-visible {
     outline: none;
   }
@@ -434,7 +425,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     position: absolute;
     z-index: 3;
     inset: -0.5rem;
-    /* closed, only the cover is there to be drawn round */
+    /* Closed: only the cover is outlined. */
     inset-inline-start: calc(var(--page-w) * var(--book-spread) * var(--closed, 0) - 0.5rem);
     border-radius: 0.375rem;
     pointer-events: none;
@@ -450,7 +441,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     visibility: visible;
   }
 
-  /* On a phone the stage hugs the page, so the bars sit close to it. */
+  /* Phones: the stage hugs the page so the toolbars sit close to it. */
   @container reader (max-width: 599.98px) {
     :root[data-theme] .book:not([data-book='off']) .book__stage {
       height: max(
@@ -472,15 +463,15 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     transition: none;
   }
 
-  /* A mouse can click a page to turn it. */
+  /* With a mouse, clicking a page turns it. */
   @media (hover: hover) and (pointer: fine) {
     :root[data-theme] .book:not([data-book='off'], [data-zoom], [data-scroll], [data-text]) .book__spread {
       cursor: pointer;
     }
   }
 
-  /* Two pages side by side: where the stage is at least 600 pixels wide and wider than it is tall (on a phone on
-     its side too, where it is not tall: each page is as tall as one alone would be). */
+  /* Spread layout: stage at least 600px wide and wider than tall. Also applies to landscape phones,
+     where each page keeps single-page height. */
   @container book (min-width: 600px) and (min-aspect-ratio: 5/4) {
     :root[data-theme] .book:not([data-book='off']) .book__spread {
       --book-spread: 1;
@@ -488,7 +479,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* The closed book: the cover alone, in the middle (it glides across as it opens). */
+  /* Closed book: the cover alone, centered (it glides into place as it opens). */
   :root[data-theme] .book[data-closed]:not([data-book='off']) .book__spread {
     transform: translateX(calc(var(--page-w) * var(--book-spread) * -0.5));
   }
@@ -517,7 +508,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     display: none;
   }
 
-  /* While a page turns, what is seen is drawn by the leaves and the copies under them; the pages stay readable to assistive technology. */
+  /* During a turn, what's visible is the leaves and the copies beneath them; the real pages stay in
+     the accessibility tree. */
   :root[data-theme] .book[data-turning]:not([data-book='off']) :is(.book__page, .book__end) {
     opacity: 0;
   }
@@ -532,7 +524,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     object-fit: cover;
   }
 
-  /* The fold in the middle: each page darkens a little towards the spine. */
+  /* Gutter shading: each page darkens slightly toward the spine. */
   :root[data-theme] .book:not([data-book='off']) .book__paper::before {
     content: '';
     position: absolute;
@@ -550,8 +542,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     background: linear-gradient(to right, rgb(0 0 0 / 0.14), rgb(0 0 0 / 0.03) 4%, transparent 9%);
   }
 
-  /* The closing card is a page of the book: its paper and its dark ink, in either theme (and dimmed like the pages in
-     the dark one). */
+  /* The end card is a book page: same paper and dark ink in both themes (dimmed like the pages in
+     dark mode). */
   :root[data-theme] .book:not([data-book='off']) .book__end,
   .leaf__page .book__end,
   .book__hold-page .book__end {
@@ -591,7 +583,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     pointer-events: none;
   }
 
-  /* The edges of the pages read and still to read, at the book's outer sides. */
+  /* Page-edge stacks on the outer sides, showing pages read and remaining. */
   :root[data-theme] .book:not([data-book='off']) .book__edges {
     display: block;
   }
@@ -605,7 +597,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.5);
   }
 
-  /* dimmed in the dark theme, as the pages are */
+  /* Dimmed in dark mode, like the pages. */
   :root[data-theme='dark'] .book__edge {
     background: repeating-linear-gradient(90deg, #cdc6b7 0 1px, #d9d4c8 1px 2px);
   }
@@ -632,7 +624,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     visibility: hidden;
   }
 
-  /* ---- The leaves ---- */
+  /* --- Leaves --- */
 
   :root[data-theme] .book:not([data-book='off']) .book__leaves {
     display: block;
@@ -687,8 +679,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     padding: clamp(1.5rem, 8%, 3rem);
   }
 
-  /* Plain paper, for the backs of pages turned one at a time and the leaves between chapters: printed lines, faintly,
-     so a riffle of them reads as pages. */
+  /* Blank paper for the backs of single pages and for intermediate leaves in chapter jumps, with
+     faint ruled lines so a riffle reads as pages. */
   .leaf__page--plain {
     background:
       linear-gradient(rgb(40 32 20 / 0.1), rgb(40 32 20 / 0.1)) 14% 11% / 38% calc(var(--page-h) * 0.012) no-repeat,
@@ -716,15 +708,16 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     background: linear-gradient(to left, rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.08) 45%, transparent 80%);
   }
 
-  /* Each leaf is drawn in 3D on its own, seen from in front of the spine, and
-     laid over the others as a flat layer (book-turn.ts orders them). */
+  /* Each leaf is rendered in 3D on its own (viewed from in front of the spine) and stacked with the
+     others as a flat layer; book-turn.ts sets the order. */
   .leaf {
     position: absolute;
     top: 0;
     left: calc(var(--page-w) * var(--book-spread));
     width: var(--page-w);
     height: 100%;
-    /* far enough that a leaf on its edge grows by a seventh, within the room above and below the pages */
+    /* Far enough that an edge-on leaf grows by about a seventh, within the vertical room around the
+       pages. */
     perspective: calc(var(--page-w) * 8);
     perspective-origin: 0 50%;
     visibility: hidden;
@@ -763,7 +756,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     transform: rotateY(180deg);
   }
 
-  /* Where each piece of a page is, within its face (see book-turn.ts). */
+  /* Position of each page segment within its face (see book-turn.ts). */
   .leaf__face[data-face='outer-front'] .leaf__page {
     left: calc(var(--page-w) * -0.6);
   }
@@ -772,7 +765,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     left: calc(var(--page-w) * -0.4);
   }
 
-  /* The light along the fold, and the shade of the page's own curve. */
+  /* Highlight along the fold and shading of the page curl. */
   .leaf__fold {
     position: absolute;
     top: 0;
@@ -784,7 +777,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     transform: translateZ(0.5px);
   }
 
-  /* ---- The controls ---- */
+  /* --- Controls --- */
 
   .book__button {
     display: inline-flex;
@@ -817,7 +810,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     color: var(--color-paper);
   }
 
-  /* Not to be used for the moment (Next on the last page), and still able to hold the focus. */
+  /* Temporarily unavailable (e.g. Next on the last page) while remaining focusable. */
   .book__button:is(:disabled, [aria-disabled='true']) {
     color: var(--color-dim);
     cursor: default;
@@ -850,7 +843,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     height: 1.125rem;
   }
 
-  /* The way the pages go: on every page, next is to the right and points right. */
+  /* Reading direction: next is always to the right and points right. */
   .book__bar--nav[dir='ltr'] .arrow {
     scale: none;
   }
@@ -879,7 +872,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     stroke-linejoin: round;
   }
 
-  /* The slider: a hairline with the chapters marked on it, in a 44-pixel target. */
+  /* Slider: a hairline with chapter marks, inside a 44px hit target. */
   .book__scrub {
     position: relative;
     flex: 1;
@@ -972,16 +965,16 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     color: var(--color-muted);
   }
 
-  /* On a narrow reader the tools are icons, each its own (the text view's a page of text, not a list like the
-     contents'); zoom is a double tap, and the download a round button. The two bars above the book share the room
-     between them, so the chapter's name has as much of it as it can. */
+  /* Narrow readers: tools are icon-only (the text view uses a page-of-text icon, distinct from the
+     contents list); zoom is a double tap and download is a round button. The two top toolbars share
+     their row so the chapter name gets as much room as possible. */
   .book__wide {
     display: none !important;
   }
 
-  /* The views' names stand beside their icons only where the bars have room for them in every language: from a
-     wide tablet's width, while the tools share the row above the book with the contents, and on a wide screen, where
-     every control shares the one bar under the book, from where that bar holds them all. */
+  /* View labels appear next to their icons only where every locale fits: from wide-tablet widths,
+     while the tools share the top row with the contents, and on wide screens once the single bottom
+     bar can hold every control. */
   @container reader (max-width: 899.98px) {
     .book__label-text {
       display: none;
@@ -1002,9 +995,9 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* On a phone the contents' button holds its words a little tighter, without its chevron (the list beside the
-     chapter's name already says what it opens); on the narrowest phones the download also leaves the bar for the foot
-     of the contents (it is above the book as well), so the chapter's name keeps its room beside the views. */
+  /* Phones: the contents button tightens and drops its chevron (the chapter name next to it already
+     says what it opens). On the narrowest phones the download moves to the contents footer (it's
+     also above the book), so the chapter name keeps its room. */
   @container reader (max-width: 419.98px) {
     .book__where {
       gap: 0.375rem;
@@ -1036,8 +1029,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     display: none;
   }
 
-  /* From a tablet's width the counter is written out, and from a little wider, the zoom and the download with its
-     name join the tools. */
+  /* From tablet width the counter is spelled out; slightly wider, zoom and the labeled download
+     join the tools. */
   @container reader (min-width: 700px) {
     .book__wide {
       display: inline-flex !important;
@@ -1062,7 +1055,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* Under a wide book, until the screen is wider still, the counter is the short one, so the slider keeps its room. */
+  /* Wide book on a not-quite-wide screen: use the short counter so the slider keeps its room. */
   @container reader (min-width: 1000px) and (max-width: 1439.98px) {
     .book__counter-long {
       display: none;
@@ -1077,7 +1070,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* Wide: one bar under the stage, in the order the controls are used. */
+  /* Wide: a single bar below the stage, in order of use. */
   @container reader (min-width: 1000px) {
     :root[data-theme] .book:not([data-book='off']) .book__body {
       grid-template-columns: minmax(min-content, 16rem) minmax(0, 1fr) auto;
@@ -1105,15 +1098,15 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* Just past the width for one bar, the contents' button gives the slider some of its room. */
+  /* Just past the single-bar breakpoint, the contents button yields some room to the slider. */
   @container reader (min-width: 1000px) and (max-width: 1199.98px) {
     :root[data-theme] .book:not([data-book='off']) .book__body {
       grid-template-columns: minmax(min-content, 12rem) minmax(0, 1fr) auto;
     }
   }
 
-  /* A phone on its side: one row of bars under the book, and the stage as tall as the screen leaves (full view leaves
-     more). Two pages lie open, each as tall as one alone would be. */
+  /* Landscape phones: one toolbar row below the book and the stage as tall as the screen allows
+     (more in full view). Shows a spread, each page at single-page height. */
   @media (orientation: landscape) and (max-height: 499.98px) {
     :root[data-theme] .book:not([data-book='off']) {
       --book-bars: 3.25rem;
@@ -1162,7 +1155,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* The keyboard's keys, shown for a few seconds when the book takes the keyboard's focus, over a page turning too. */
+  /* Keyboard shortcuts overlay, shown briefly when the book gains focus (also over a turning page). */
   :root[data-theme] .book:not([data-book='off']) .book__keys {
     display: block;
     position: absolute;
@@ -1198,8 +1191,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* For a moment on a touch screen, in the place of the bar under the book (never over the page): how to turn and
-     how to zoom. */
+  /* Brief touch hint shown in place of the bottom toolbar (never over the page): how to turn and
+     zoom. */
   .book__hint {
     position: absolute;
     z-index: 1;
@@ -1246,7 +1239,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     font-size: var(--text-sm);
   }
 
-  /* ---- Zoomed in: the pages laid out larger, panned by scrolling (a finger moves them either way) ---- */
+  /* --- Zoom: pages laid out larger, panned by scrolling --- */
 
   :root[data-theme] .book[data-zoom]:not([data-book='off']) .book__stage {
     overflow: auto;
@@ -1259,7 +1252,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     cursor: grabbing;
   }
 
-  /* ---- The whole book as one column to scroll: its pages (the scroll view) or its words (the text view) ---- */
+  /* --- Column views: scroll view (page images) and text view (page text) --- */
 
   :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__stage {
     display: block;
@@ -1296,7 +1289,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     content: none;
   }
 
-  /* The controls stay at hand while the column scrolls. */
+  /* Toolbars stay pinned while the column scrolls. */
   :root[data-theme] .book:is([data-scroll], [data-text]):not([data-book='off']) .book__bar {
     position: sticky;
     z-index: 2;
@@ -1318,8 +1311,8 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* The pages one under the other, each its own sheet of paper, as wide as a page reads well and no wider. A page
-     brought into view lands under the bars that stay above it (on a wide reader they are all below). */
+  /* Pages stacked vertically, each on its own sheet, capped at a comfortable reading width. Scroll
+     targets land below the sticky toolbars (on wide readers they're all at the bottom). */
   :root[data-theme] .book[data-scroll]:not([data-book='off']) .book__spread {
     width: min(100% - 2rem, 40rem);
     padding-block: 1rem 2rem;
@@ -1352,7 +1345,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     }
   }
 
-  /* ---- The words ---- */
+  /* --- Text view --- */
 
   .book[data-text] .book__page + .book__page {
     margin-top: 2.5rem;
@@ -1424,7 +1417,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     box-shadow: none;
   }
 
-  /* ---- Full view: the book over the whole window, and over the site's header ---- */
+  /* --- Full view: the book covers the window, including the site header --- */
 
   :root[data-theme] .book[data-full]:not([data-book='off']) {
     position: fixed;
@@ -1459,7 +1452,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     overflow: clip;
   }
 
-  /* ---- The contents, as a menu ---- */
+  /* --- Contents menu --- */
 
   .book__menu {
     position: fixed;
@@ -1511,7 +1504,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
     padding: 1rem 0.75rem 0;
   }
 
-  /* ---- Preferences ---- */
+  /* --- User preferences --- */
 
   @media (forced-colors: active) {
     .book__button,
@@ -1519,7 +1512,7 @@ const marks = chapters.map((chapter) => ({ n: chapter.number, x: `${(((chapter.s
       border: 1px solid ButtonText;
     }
 
-    /* the text view and full view, when on, in the system's own colours for a chosen item */
+    /* Active text view and full view toggles use the system highlight colors. */
     .book__button[aria-pressed='true'] {
       forced-color-adjust: none;
       background: Highlight;

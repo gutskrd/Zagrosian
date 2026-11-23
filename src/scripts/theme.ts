@@ -1,21 +1,20 @@
 /**
- * Light and dark theme. The visitor can follow their system setting (the
- * default) or choose light or dark; the choice is kept in localStorage.
+ * Light and dark themes. Visitors follow their system setting (default) or pick light or dark; the
+ * choice is stored in localStorage.
  *
- * - The control in the site menu and in the footer offers System, Light and
- *   Dark; quick navigation offers the same three.
- * - Where the browser supports view transitions, the new theme spreads out in
- *   a circle from the control that was used.
+ * - The switch in the site menu and footer offers System, Light and Dark, as does the command menu.
+ * - Where view transitions are supported, the new theme expands in a circle from the control that
+ *   was used.
  *
- * theme-init.js applies the saved theme before the page is drawn; this module
- * keeps it up to date afterwards.
+ * theme-init.js applies the stored theme before first paint; this module keeps it in sync
+ * afterwards.
  */
 
 export type Preference = 'system' | 'light' | 'dark';
 type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'theme';
-/** Browser toolbar colours, matching --color-paper. */
+/** Browser UI colors, matching --color-paper. */
 const THEME_COLORS: Record<Theme, string> = { light: '#ffffff', dark: '#0a0a0a' };
 
 const root = document.documentElement;
@@ -37,14 +36,14 @@ function savePreference(preference: Preference) {
     if (preference === 'system') localStorage.removeItem(STORAGE_KEY);
     else localStorage.setItem(STORAGE_KEY, preference);
   } catch {
-    // The choice then lasts for this page only.
+    // The choice then applies to this page only.
   }
 }
 
 const resolve = (preference: Preference): Theme =>
   preference === 'system' ? (systemDark.matches ? 'dark' : 'light') : preference;
 
-/** Applies a preference to the page and to every theme control. */
+/** Applies a preference to the document and every theme control. */
 function render(preference: Preference) {
   const theme = resolve(preference);
   root.dataset.theme = theme;
@@ -58,7 +57,7 @@ function render(preference: Preference) {
   }
 }
 
-/** The centre of an element, where the circular reveal starts. */
+/** Center of an element, where the circular reveal starts. */
 function centreOf(element: Element) {
   const rect = element.getBoundingClientRect();
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
@@ -86,7 +85,7 @@ function choose(preference: Preference, origin: { x: number; y: number }) {
       );
     })
     .catch(() => {
-      // The transition was skipped; the theme has still changed.
+      // Transition skipped; the theme has still changed.
     });
 
   transition.finished.finally(() => {
@@ -97,7 +96,7 @@ function choose(preference: Preference, origin: { x: number; y: number }) {
 /** The visitor's current choice: system, light or dark. */
 export const currentPreference = (): Preference => readPreference();
 
-/** Sets the theme from another control, such as the quick navigation menu. */
+/** Sets the theme from another control, such as the command menu. */
 export function setThemePreference(preference: Preference) {
   choose(preference, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
 }
@@ -111,12 +110,12 @@ export function initTheme() {
     });
   }
 
-  // Follow the system while the visitor has not chosen a theme.
+  // Follow the system while no explicit theme is chosen.
   systemDark.addEventListener('change', () => {
     if (readPreference() === 'system') render('system');
   });
 
-  // Keep other open tabs, and pages restored from the back/forward cache, in step.
+  // Sync other open tabs and bfcache-restored pages.
   window.addEventListener('storage', (event) => {
     if (event.key === STORAGE_KEY || event.key === null) render(readPreference());
   });

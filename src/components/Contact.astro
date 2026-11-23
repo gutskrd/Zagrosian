@@ -23,7 +23,7 @@ const { contact } = site.emails;
       </a>
 
       <div class="contact__actions">
-        {/* Shown by script only where the Clipboard API is available. */}
+        {/* Revealed by script only where the Clipboard API is available. */}
         <button
           class="contact__copy"
           type="button"
@@ -129,7 +129,7 @@ const { contact } = site.emails;
     transform: scale(0.97);
   }
 
-  /* Both labels share one grid cell, so the button keeps its width when the text changes. */
+  /* Both labels share one grid cell, so the button width doesn't change with the text. */
   .contact__copy-idle,
   .contact__copy-done {
     grid-area: 1 / 1;
@@ -146,7 +146,7 @@ const { contact } = site.emails;
     opacity: 1;
   }
 
-  /* Hover only on devices with a real pointer; on touch screens it would stick after a tap. */
+  /* Hover styles only for real pointers; on touch they'd stick after a tap. */
   @media (hover: hover) {
     .contact__copy:hover {
       border-color: var(--color-ink);

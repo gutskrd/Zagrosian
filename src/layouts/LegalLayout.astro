@@ -14,19 +14,19 @@ const { entry, headings } = Astro.props;
 const { title, description, eyebrow, updated } = entry.data;
 const { locale, t, base } = i18n(Astro.url);
 
-// In Persian, the Solar Hijri date, with the Gregorian date of the English
-// original in brackets: "۷ مهر ۱۴۰۵ (۲۹ سپتامبر ۲۰۲۶)".
+// Persian shows the Solar Hijri date followed by the Gregorian date of the English original: "۷ مهر
+// ۱۴۰۵ (۲۹ سپتامبر ۲۰۲۶)".
 const updatedLabel = formatDate(locale, updated);
 
 const sections = headings.filter((heading) => heading.depth === 2);
 
-// The title is sized so its longest word fits a phone screen: long compounds
-// such as "Datenschutzerklärung" step the size down (see .legal__title--*).
+// Size the title so its longest word fits a phone screen; long compounds like
+// "Datenschutzerklärung" step down (see .legal__title--*).
 const longestWord = Math.max(...title.split(/\s+/).map((word) => [...word].length));
 const fit = longestWord <= 15 ? undefined : longestWord <= 17 ? 'md' : 'sm';
 const isTranslation = locale !== 'en';
 
-// About 200 words a minute, the usual estimate for reading on screen.
+// ~200 words per minute, the usual estimate for on-screen reading.
 const words = (entry.body ?? '').split(/\s+/).filter(Boolean).length;
 const minutes = Math.max(1, Math.round(words / 200));
 const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale, minutes, t.legal.readingTimeUnit) });
@@ -102,7 +102,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
 </BaseLayout>
 
 <style>
-  /* A hairline under the header that fills as you read. Without JavaScript it stays empty. */
+  /* Hairline under the header that fills as you read; stays empty without JS. */
   .reading-progress {
     position: fixed;
     top: var(--header-height);
@@ -121,10 +121,9 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     transform-origin: var(--start);
   }
 
-  /* Where the browser can, it fills the bar itself, in step with the scroll;
-     elsewhere (and with reduced motion) motion.ts does it with a script.
-     Written as separate properties: the build's minifier would otherwise fold
-     the timeline into the `animation` shorthand, which browsers do not accept. */
+  /* Native scroll-driven animation where supported; elsewhere (and with reduced motion) motion.ts
+     drives it. Longhand properties, since the minifier would otherwise fold the timeline into the
+     `animation` shorthand, which browsers reject. */
   @supports (animation-timeline: scroll()) {
     @media (prefers-reduced-motion: no-preference) {
       .reading-progress span {
@@ -176,7 +175,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     color: var(--color-ink-soft);
   }
 
-  /* The padding enlarges the tap area to 24px without moving the text. */
+  /* Padding enlarges the tap target to 24px without moving the text. */
   .legal__notice a {
     padding-block: 0.1875rem;
     color: var(--color-ink);
@@ -201,13 +200,12 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     margin-inline: 0.5rem;
   }
 
-  /* On a narrow screen the reading time moves to the next line whole. */
+  /* On narrow screens the reading time wraps to the next line as a unit. */
   .legal__reading {
     white-space: nowrap;
   }
 
-  /* Shown only where the script can run, and from the first paint, so it
-     never shifts the page. */
+  /* Shown only when JS runs, from first paint, so it never shifts the layout. */
   .legal__print {
     display: none;
     align-items: center;
@@ -246,9 +244,8 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     stroke-linejoin: round;
   }
 
-  /* Copy-link buttons beside section headings (added by src/scripts/site.ts).
-     When the script can run (the theme script has set data-theme), headings
-     keep room for the button at their end from the first paint, so adding it
+  /* Copy-link buttons next to section headings (added by src/scripts/site.ts). When JS is available
+     (`data-theme` is set), headings reserve room for the button from first paint, so inserting it
      never moves the text. */
   :global(:root[data-theme]) .legal__content :global(h2) {
     position: relative;
@@ -257,7 +254,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
 
   .legal__content :global(.heading-link) {
     position: absolute;
-    /* The heading's top padding, then centred on its first line. */
+    /* The heading's top padding, then centered on its first line. */
     inset-block-start: calc(2rem + 0.25em);
     inset-inline-end: 0;
     display: grid;
@@ -282,7 +279,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     opacity: 1;
   }
 
-  /* Without a mouse to hover with, the buttons are always visible. */
+  /* Without hover, the buttons are always visible. */
   @media (hover: none) {
     .legal__content :global(.heading-link) {
       opacity: 1;
@@ -333,7 +330,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     display: none;
   }
 
-  /* A plus that turns into a minus when open. */
+  /* Plus that turns into a minus when open. */
   .legal__toc-title::after {
     content: '';
     width: 0.75rem;
@@ -347,7 +344,7 @@ const readingTime = format(t.legal.readingTime, { duration: formatMinutes(locale
     background: linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat;
   }
 
-  /* On small screens, where the list is collapsible, it opens and closes smoothly. */
+  /* Small screens, where the list is collapsible: animate opening and closing. */
   @media (max-width: 63.99rem) and (prefers-reduced-motion: no-preference) {
     .legal__toc-details::details-content {
       block-size: 0;

@@ -1,7 +1,6 @@
 /**
- * Every page in every language, at six screen sizes from a small phone to a
- * large monitor: nothing runs off the screen or is cut off, and everything a
- * visitor taps or clicks is at least 24 by 24 pixels (WCAG 2.2, 2.5.8).
+ * Every page in every locale at six viewport sizes, from a small phone to a large monitor: nothing
+ * overflows or is clipped, and every interactive target is at least 24x24px (WCAG 2.2 SC 2.5.8).
  */
 import { expect, test } from '@playwright/test';
 import { missing, pages } from './support';
@@ -17,7 +16,7 @@ const sizes = [
 
 for (const viewport of sizes) {
   test.describe(`${viewport.width} wide`, () => {
-    // Without motion, every section is where it comes to rest.
+    // Reduced motion puts every section at rest.
     test.use({ viewport, contextOptions: { reducedMotion: 'reduce' }, deviceScaleFactor: 1 });
 
     test('nothing overflows, is cut off or is too small to tap', async ({ page }) => {
@@ -29,7 +28,8 @@ for (const viewport of sizes) {
           const width = document.documentElement.clientWidth;
           const overflow = document.documentElement.scrollWidth - width;
           if (overflow > 0) out.push(`the page is ${overflow}px too wide`);
-          // Drawn art that is meant to bleed, hidden text and closed popovers.
+          // Excluded: decorative art that intentionally bleeds, visually hidden text, and closed
+          // popovers.
           const exempt = '.visually-hidden, [popover], .site-footer__mark, .lifted-logo, .showcase__art';
           for (const element of document.querySelectorAll<HTMLElement>('h1, h2, h3, p, a, button, li, dd, dt, span')) {
             const style = getComputedStyle(element);
@@ -40,7 +40,7 @@ for (const viewport of sizes) {
             if (box.right > width + 0.5 || box.left < -0.5) out.push(`${name} spans ${Math.round(box.left)} to ${Math.round(box.right)}`);
             if (element.scrollWidth > element.clientWidth + 1 && style.overflowX !== 'visible') out.push(`${name} is cut off`);
           }
-          // Links within running text are exempt from the target size.
+          // Links within running text are exempt from the target size requirement.
           for (const element of document.querySelectorAll<HTMLElement>('a, button, summary')) {
             const box = element.getBoundingClientRect();
             if (getComputedStyle(element).display === 'none' || box.width === 0) continue;

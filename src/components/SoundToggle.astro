@@ -1,14 +1,12 @@
 ---
 /**
- * Header button that switches sound on and off (src/scripts/sound.ts). Four
- * bars move like a level meter while sound is on; while it is off they dim and
- * a line crosses them.
- * The state is announced as pressed or not.
+ * Sound on/off toggle (src/scripts/sound.ts). Four bars animate like a level meter while sound is
+ * on; when off they dim and a line strikes through them. Exposed as a toggle button (aria-pressed).
  */
 import { i18n } from '../i18n';
 
 interface Props {
-  /** Show the word "Sound" beside the bars (in the mobile menu). */
+  /** Show the "Sound" label next to the bars (mobile menu). */
   labelled?: boolean;
   class?: string;
 }
@@ -30,7 +28,7 @@ const { t } = i18n(Astro.url);
 </button>
 
 <style>
-  /* Shown once theme-init.js has run; without JavaScript it could not work. */
+  /* Shown once theme-init.js has run; it can't work without JS. */
   .sound-toggle {
     display: none;
     place-items: center;
@@ -51,7 +49,7 @@ const { t } = i18n(Astro.url);
     display: inline-grid;
   }
 
-  /* With its name: a pill, bars after the word. */
+  /* Labeled variant: a pill with the bars after the word. */
   .sound-toggle--labelled {
     grid-auto-flow: column;
     gap: 0.75rem;
@@ -107,7 +105,7 @@ const { t } = i18n(Astro.url);
     transform: scaleY(0.7);
   }
 
-  /* Off: the bars dim and a line crosses them. */
+  /* Off: bars dim and a line strikes through them. */
   .sound-toggle[aria-pressed='false'] .sound-toggle__bars span {
     opacity: 0.45;
   }

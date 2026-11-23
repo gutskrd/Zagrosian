@@ -1,12 +1,10 @@
 /**
- * The paper plane under the rug: it stays there until it is found (the rug
- * lifted), and until then the proverb's sheet simply lies where it is. Found,
- * it flies over the page while the page is scrolled down to the proverb and,
- * once the sheet is in sight, lands there and opens into it, the sheet whole
- * on the screen under the header; scrolled back up, it flies home. The
- * proverb is in the page as text all the while, for screen readers and
- * search; with reduced motion the sheet simply lies there. The plane never
- * makes the page scroll sideways, and nothing goes wrong on the way.
+ * Paper plane under the rug: it stays hidden until the rug has been lifted, and until then the
+ * proverb sheet is static. Once revealed, it flies over the page while scrolling toward the
+ * proverb, lands and unfolds into the sheet once it's visible (fully on screen below the header),
+ * and flies back when scrolling up. The proverb stays in the document as text throughout, for
+ * screen readers and search; with reduced motion the sheet is static. The plane never causes
+ * horizontal scrolling or errors.
  */
 import { type Page, expect, test } from '@playwright/test';
 import { settled, watch } from './support';
@@ -16,7 +14,7 @@ const sheet = (page: Page) => page.locator('[data-sheet]');
 const flight = (page: Page) => page.locator('[data-plane]');
 const rug = (page: Page) => page.locator('[data-rug]');
 
-/** The page scrolled so the rug (0) or the sheet (1), or a share of the way between, is in the middle of the screen. */
+/** Scrolls so the rug (0), the sheet (1), or a point between them is centered in the viewport. */
 async function scrollShare(page: Page, share: number) {
   await page.evaluate((share) => {
     const middle = (selector: string) => {
@@ -24,12 +22,12 @@ async function scrollShare(page: Page, share: number) {
       return box.top + scrollY + box.height / 2 - innerHeight / 2;
     };
     const from = middle('[data-rug]');
-    // At once: the page scrolls smoothly otherwise, and would still be on its way.
+    // Instant: smooth scrolling would still be in progress.
     window.scrollTo({ top: from + (middle('[data-sheet]') - from) * share, behavior: 'instant' });
   }, share);
 }
 
-/** Lifts the rug with its button, once the 3D rug is woven and at rest. */
+/** Lifts the rug via its button once the 3D rug has loaded and settled. */
 async function lift(page: Page) {
   await expect
     .poll(() => rug(page).evaluate((element) => element.hasAttribute('data-live') && element.getAttribute('data-state') === 'resting'), {
@@ -60,7 +58,7 @@ for (const viewport of [
     await expect(flight(page), 'it flies over the page').toHaveAttribute('data-aloft', '');
     await expect(page.getByText('Dar li ser koka xwe', { exact: false }), 'the proverb is still in the page').toHaveCount(1);
 
-    // In sight, it lands and opens by itself, and the sheet fits under the header, whole.
+    // Once visible, it lands and unfolds on its own, and the sheet fits fully below the header.
     await scrollShare(page, 1);
     await expect(proverb(page), 'it lands').toHaveAttribute('data-landed', '', { timeout: 10_000 });
     await expect(sheet(page)).toHaveCSS('opacity', '1');

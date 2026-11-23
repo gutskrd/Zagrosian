@@ -1,24 +1,21 @@
 /**
- * The menus (the site menu, the language menu, the book's contents) are
- * popovers: the browser opens and closes them, with no script. Browsers from
- * before the Popover API do not (Safari before 17, on iPhones and iPads that
- * stay on iOS 15 or 16; Chrome before 114; Firefox before 125): they would
- * show every menu as part of the page, and no button would open one. There
- * the same is done here, as closely as the site needs:
+ * Popover API fallback.
  *
- * - a popover is marked `data-popover` instead of `popover`, and opened by
- *   the class `popover-open`, which the stylesheet treats as `:popover-open`
- *   (postcss.config.mjs) and which global.css hides it without; while one is
- *   open, the page has `data-popover-open`, so global.css can let it cover the
- *   screen as the browser's top layer would;
- * - a button with `popovertarget` opens, closes or toggles it, a click outside
- *   it or Escape closes it (and gives the focus back to its button), and
- *   opening one closes any other;
- * - it has `showPopover`, `hidePopover` and `togglePopover`, and tells of
- *   each change with a `toggle` event that has `newState` and `oldState`.
+ * The site menu, language menu and book contents are native popovers. Browsers without the Popover
+ * API (Safari < 17, i.e. iPhones and iPads stuck on iOS 15/16; Chrome < 114; Firefox < 125) would
+ * render every menu inline with no way to open it. This module emulates what the site needs:
  *
- * Other scripts ask through `isOpen` and `POPOVER`, which work either way.
- * Tests can set `window.__popoverFallback` to use this in any browser.
+ * - `popover` is swapped for `data-popover`, and the open state is the `popover-open` class.
+ *   postcss.config.mjs duplicates every `:popover-open` rule for that class, and global.css hides
+ *   closed popovers and, while one is open (`data-popover-open` on the root), lets it escape the
+ *   header's containing block the way the top layer would.
+ * - `popovertarget` buttons open, close or toggle their target; outside clicks and Escape close it
+ *   and return focus to the invoker; opening one closes the others.
+ * - `showPopover()`, `hidePopover()` and `togglePopover()` are provided, and changes dispatch
+ *   `toggle` events with `newState` and `oldState`.
+ *
+ * Other modules use `isOpen` and `POPOVER`, which work in both modes. Tests can force the fallback
+ * with `window.__popoverFallback`.
  */
 
 declare global {
@@ -27,10 +24,10 @@ declare global {
   }
 }
 
-/** Whether the browser itself does popovers. */
+/** Native Popover API support. */
 export const nativePopovers = !window.__popoverFallback && 'popover' in HTMLElement.prototype;
 
-/** Every popover, either way. */
+/** Selector matching popovers in either mode. */
 export const POPOVER = '[popover], [data-popover]';
 
 /** Whether a popover is open. */
@@ -47,7 +44,7 @@ function install() {
     element.removeAttribute('popover');
   }
 
-  /** The button that opened each popover, to give the focus back to. */
+  /** Invoker of each open popover, to return focus to on close. */
   const openedBy = new WeakMap<HTMLElement, HTMLElement>();
   const light = (element: Element) => element.getAttribute('data-popover') === 'auto';
 
@@ -70,7 +67,7 @@ function install() {
     for (const button of document.querySelectorAll<HTMLElement>('[popovertarget]')) {
       if (button.getAttribute('popovertarget') === element.id) button.setAttribute('aria-expanded', String(open));
     }
-    // For the stylesheet: while one is open, nothing holds it in a box of its own (global.css).
+    // Lets global.css release open popovers from the header's containing block.
     document.documentElement.toggleAttribute('data-popover-open', anyOpen());
     const event = Object.assign(new Event('toggle'), { oldState: open ? 'closed' : 'open', newState: open ? 'open' : 'closed' });
     element.dispatchEvent(event);
@@ -100,7 +97,7 @@ function install() {
       change(element, action === 'show' || (action !== 'hide' && !isOpen(element)), button);
       return;
     }
-    // A click anywhere else closes the menus it is not in.
+    // Light dismiss: an outside click closes every popover it isn't inside.
     for (const open of document.querySelectorAll<HTMLElement>('.popover-open')) {
       if (light(open) && !open.contains(target)) change(open, false);
     }

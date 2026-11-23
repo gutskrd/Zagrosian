@@ -1,13 +1,11 @@
 /* ==========================================================================
    Fonts
-   Inter, self-hosted. The optical-size axis gives tighter, sharper letterforms
-   at display sizes. Its Latin file covers English, Dutch, German, Spanish,
-   French and most of Kurmanji and Turkish; a 5 KB subset adds the rest
-   (Ğ ğ İ Ş ş; src/assets/fonts, cut with fontTools from the Latin Extended
-   file). Arabic, Sorani and Persian use Vazirmatn, a typeface designed for
-   Persian that also covers Arabic and Sorani, which Inter does not.
-   Browsers only download a face when the page uses one of its characters, so
-   English pages never load the Arabic font.
+   Self-hosted Inter (variable, with the optical-size axis for tighter display
+   type). The Latin subset covers English, Dutch, German, Spanish, French and
+   most of Kurmanji and Turkish; a 5 KB extension subset adds the rest
+   (Ğ ğ İ Ş ş; src/assets/fonts, cut with fontTools from Latin Extended).
+   Arabic, Sorani and Persian use Vazirmatn. Faces are only downloaded when
+   a page uses their unicode-range, so Latin pages never load Vazirmatn.
    ========================================================================== */
 
 @font-face {
@@ -30,7 +28,7 @@
   unicode-range: U+011E-011F, U+0130, U+015E-015F;
 }
 
-/* Arabic script, for Arabic and Sorani Kurdish (including ڕ ڵ ۆ ێ ە). */
+/* Arabic script: Arabic, Persian and Sorani (including ڕ ڵ ۆ ێ ە). */
 @font-face {
   font-family: 'Vazirmatn Variable';
   font-style: normal;
@@ -42,7 +40,7 @@
     U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
 }
 
-/* Arial adjusted to Inter's metrics, so the swap causes no layout shift. */
+/* Arial with Inter's metrics, so the font swap causes no layout shift. */
 @font-face {
   font-family: 'Inter Fallback';
   src: local('Arial');
@@ -57,8 +55,8 @@
    ========================================================================== */
 
 :root {
-  /* Colour: black and white, with a small set of neutrals. Light is the default;
-     the dark palette below applies when the visitor or their system chooses it. */
+  /* Color: black and white plus a small neutral scale. Light is the default; the dark palette below
+     applies when chosen by the user or their system. */
   --color-paper: #ffffff;
   --color-ink: #0a0a0a;
   --color-ink-soft: #3d3d3d;
@@ -68,11 +66,11 @@
   --color-surface: #f5f5f4;
   --color-underline: #c4c4c4;
   --color-solid-hover: #2b2b2b;
-  /* Not-yet-highlighted words in scroll-highlighted headings: 3.2:1 on the surface
-     colour, above the 3:1 minimum for large text. */
+  /* Inactive words in scroll-highlighted headings: 3.2:1 on the surface, above the 3:1 minimum for
+     large text. */
   --color-dim: #878785;
-  /* The one colour: late sun, where it falls (the hero, the rug, the footer). Text in it
-     is 5.8:1 on paper; --sun is its light, for washes at low opacity. */
+  /* The single accent: late sun (hero, rug, footer). Text in it is 5.8:1 on paper; --sun is its RGB
+     triplet for low-opacity washes. */
   --color-sun: #9a5212;
   --sun: 232 160 82;
   --header-bg: rgb(255 255 255 / 0.84);
@@ -81,11 +79,10 @@
 
   /* Type */
   --font-sans: 'Inter Variable', 'Vazirmatn Variable', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
-  /* Kurdish phrases use the same serif as Hevalo (hevalo.app): fonts already on the
-     device, so nothing is downloaded. */
+  /* Kurdish phrases use the same serif stack as hevalo.app: system fonts only, nothing downloaded. */
   --font-kurdish: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
-  /* Small labels: the system's monospace (nothing is downloaded); Arabic script
-     falls through to Vazirmatn. */
+  /* Small labels use the system monospace (nothing downloaded); Arabic script falls through to
+     Vazirmatn. */
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', 'Vazirmatn Variable', monospace;
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
@@ -98,9 +95,8 @@
   /* Layout */
   --container: 86rem;
   --gutter: clamp(1.25rem, 0.75rem + 2.5vw, 3rem);
-  /* 1% of the content's width, which is what `cqi` measures in a container as
-     wide as the content: for browsers without container query units (Safari
-     before 16), which read the declaration written before each `cqi` one. */
+  /* 1% of the content width, i.e. what `cqi` resolves to in a content-width container. Fallback for
+     browsers without container query units (Safari < 16), declared before each `cqi` value. */
   --cq: calc(min(100vw - 2 * var(--gutter), var(--container)) / 100);
   --section-space: clamp(6rem, 3.5rem + 10vw, 11rem);
   --header-height: 4rem;
@@ -108,26 +104,25 @@
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
-  /* A little overshoot, for things that spring back into place. */
+  /* Slight overshoot, for elements that spring into place. */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration: 0.9s;
 
   color-scheme: light;
-  /* Lets elements such as the contents list animate to and from their natural height. */
+  /* Allows animating to and from intrinsic sizes (e.g. the contents list height). */
   interpolate-size: allow-keywords;
 }
 
-/* Where a patch of sunlight lies across something (the footer's wordmark),
-   registered so it can move smoothly. */
+/* Position of a sunlight patch across an element (the footer wordmark); registered so it can be
+   transitioned. */
 @property --sun-at {
   syntax: '<percentage>';
   inherits: false;
   initial-value: 66%;
 }
 
-/* Dark theme. `data-theme` is set before the page is drawn by
-   src/scripts/theme-init.js, from the visitor's choice or, by default, their
-   system setting. Without JavaScript the site stays light. */
+/* Dark theme. `data-theme` is set before first paint by theme-init.js, from the stored choice or
+   the system setting. Without JS the site stays light. */
 :root[data-theme='dark'] {
   color-scheme: dark;
 
@@ -146,9 +141,8 @@
   --header-bg: rgb(10 10 10 / 0.8);
 }
 
-/* A part of the page in the other theme's colours: the header while the
-   homepage story shows a scene in those colours behind it (story.ts). Not
-   while the site menu is open from it: the menu is in the page's own. */
+/* Inverted-theme region: the header while the homepage story shows an inverted scene behind it
+   (story.ts). Not while the site menu is open from it, since the menu uses the page theme. */
 :root:not([data-theme='dark']) [data-inverse]:not(:has(:popover-open)) {
   --color-paper: #0a0a0a;
   --color-ink: #f2f2f2;
@@ -185,15 +179,14 @@
    Base
    ========================================================================== */
 
-/* `hidden` always hides, even on elements whose styles set a display value. */
+/* `hidden` always wins, even over components that set a display value. */
 [hidden] {
   display: none !important;
 }
 
-/* Browsers without the Popover API (src/scripts/popover.ts): a menu is
-   hidden until it is opened, as the browser would hide it, from the first
-   paint; once the script has taken over, it is opened by the class
-   "popover-open", above the sticky header, as in the browser's top layer. */
+/* Popover API fallback (src/scripts/popover.ts): hide closed popovers from first paint, as the UA
+   stylesheet would. Once the script takes over, open popovers get `.popover-open` and sit above the
+   sticky header, like the top layer. */
 @supports not selector(:popover-open) {
   [popover]:not(.popover-open) {
     display: none !important;
@@ -208,8 +201,8 @@
   z-index: 100;
 }
 
-/* The header's frosted glass would hold a fixed menu inside the header's own
-   box; the top layer would lift it out, so here the glass gives way. */
+/* The header's backdrop-filter creates a containing block that would trap a fixed popover inside
+   it; the top layer escapes it, so drop the filter while one is open. */
 html[data-popover-open] [data-site-header] {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -264,7 +257,7 @@ figure {
   margin: 0;
 }
 
-/* Display type is set large and fairly light, with tight spacing. */
+/* Display type: large, fairly light weight, tight tracking. */
 h1,
 h2,
 h3 {
@@ -272,11 +265,9 @@ h3 {
   text-wrap: balance;
 }
 
-/* Long words, such as German and Dutch compounds ("Nutzungsbedingungen",
-   "Gebruiksvoorwaarden"), must never run past the edge of a small screen.
-   Headings in those languages are hyphenated, long words only; as a last
-   resort, any word breaks rather than overflowing. Headings use `anywhere`
-   so that a grid or flex column holding one can still shrink to the screen. */
+/* Long words (German and Dutch compounds such as "Nutzungsbedingungen") must never overflow on
+   small screens. Headings hyphenate long words; as a last resort any word breaks. Headings use
+   `anywhere` so grid and flex columns containing them can still shrink. */
 body {
   overflow-wrap: break-word;
 }
@@ -340,8 +331,8 @@ svg {
   padding-block: var(--section-space);
 }
 
-/* Section labels: small monospace capitals after a dot, like a studio's
-   index. Arabic script has no capitals and keeps its own face and size. */
+/* Section labels: small monospace caps after a dot. Arabic script has no case and keeps its own
+   face and size. */
 .eyebrow {
   display: flex;
   align-items: center;
@@ -375,8 +366,8 @@ svg {
   font-weight: 400;
 }
 
-/* A small dot with a slow ring around it, like a status light. Uses the current
-   text colour, so it works on light and dark surfaces. */
+/* Small dot with a slow pulse ring, like a status light. Uses currentColor, so it works on light
+   and dark surfaces. */
 .status-dot {
   position: relative;
   flex: none;
@@ -459,10 +450,9 @@ svg {
 
 /* ==========================================================================
    Page transitions
-   In browsers with cross-document view transitions, the next page rises over
-   the last like a card laid on top, wiping up from the bottom, while the old
-   one sinks back and darkens. The header keeps its place. Other browsers
-   navigate normally.
+   Cross-document view transitions: the next page slides up over the previous
+   one like a card, while the old page recedes and darkens. The header stays
+   in place. Browsers without support navigate normally.
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
@@ -470,7 +460,7 @@ svg {
     navigation: auto;
   }
 
-  /* Quick, so that the next page is there to use without a wait. */
+  /* Short, so the next page is usable immediately. */
   ::view-transition-group(root) {
     animation-duration: 0.45s;
   }
@@ -504,9 +494,9 @@ svg {
   }
 }
 
-/* Switching theme: the new colours spread out in a circle from the control
-   that was used (src/scripts/theme.ts). The usual cross-fade is turned off,
-   and the header joins the page so the whole screen changes together. */
+/* Theme switch: the new theme expands in a circle from the control that was used
+   (src/scripts/theme.ts). The default cross-fade is disabled and the header joins the root snapshot
+   so the whole screen changes together. */
 :root[data-theme-switching]::view-transition-old(root),
 :root[data-theme-switching]::view-transition-new(root) {
   animation: none;
@@ -519,10 +509,10 @@ svg {
 
 /* ==========================================================================
    Rolling labels (src/components/RollText.astro)
-   Each letter carries a copy of itself below it (a text shadow); on hover
-   the letters slide up one after another, so the copies take their place.
-   Each word is its own mask, one line high, so a label wraps between words
-   like any text, and the copies stay hidden under their words.
+   Each letter carries a copy of itself below it (a text-shadow); on hover the
+   letters slide up in sequence so the copies take their place. Each word is
+   its own one-line mask, so labels wrap between words like normal text and
+   the copies stay hidden.
    ========================================================================== */
 
 .roll {
@@ -544,8 +534,7 @@ svg {
   text-shadow: 0 1.4em currentColor;
 }
 
-/* The letter itself comes from the attribute, so the page's text holds the
-   label only once. */
+/* The glyph comes from the attribute, so the label text appears only once in the DOM. */
 .roll__piece::before {
   content: attr(data-char);
 }
@@ -560,7 +549,7 @@ svg {
   }
 }
 
-/* One after another, 16 ms apart, across the whole label. */
+/* Staggered 16 ms apart across the whole label. */
 .roll__piece[data-i='1'] {
   transition-delay: 0.016s;
 }
@@ -721,23 +710,22 @@ svg {
    Scrolling
    ========================================================================== */
 
-/* The page holds still while a modal dialog or the site menu is open. */
+/* Lock page scroll while a modal dialog or the site menu is open. */
 html:has(dialog[open]),
 html:has(.site-menu:popover-open) {
   overflow: clip;
 }
 
 /* ==========================================================================
-   Lines that rise (src/scripts/text.ts)
-   Paragraphs marked data-lines are split into their lines as they come into
-   view; each line rises from behind its own mask, then the paragraph is put
-   back as it was.
+   Rising lines (src/scripts/text.ts)
+   Paragraphs marked data-lines are split into lines as they enter view; each
+   line rises from its own mask, then the paragraph is restored.
    ========================================================================== */
 
 .line {
   display: block;
   overflow: hidden;
-  /* Room for descenders inside the mask; the margin keeps the spacing. */
+  /* Room for descenders inside the mask; the margin preserves spacing. */
   padding-bottom: 0.12em;
   margin-bottom: -0.12em;
 }
@@ -796,8 +784,8 @@ html:has(.site-menu:popover-open) {
 /* ==========================================================================
    Motion
    Content below the fold rises in once as it enters the viewport.
-   `data-reveal="pending"` is only ever set by script, and never when the
-   visitor prefers reduced motion, so content is always visible without JS.
+   `data-reveal="pending"` is only ever set by script, and never with reduced
+   motion, so content is always visible without JS.
    ========================================================================== */
 
 [data-reveal] {
@@ -811,7 +799,7 @@ html:has(.site-menu:popover-open) {
   transform: translateY(1.25rem);
 }
 
-/* Met while scrolling back up: shown at once (src/scripts/site.ts). */
+/* Entered while scrolling up: show immediately (src/scripts/site.ts). */
 [data-reveal='instant'],
 [data-reveal='instant'] *,
 [data-reveal='instant']::before,
@@ -819,14 +807,14 @@ html:has(.site-menu:popover-open) {
   transition: none !important;
 }
 
-/* Split headings (src/components/SplitText.astro): each word rises from behind
-   its own mask. The script staggers them with the Web Animations API. */
+/* Split headings (src/components/SplitText.astro): each word rises from its own mask; the script
+   staggers them via the Web Animations API. */
 .split__word {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  /* Room inside the mask for descenders and for glyphs that overhang the
-     tight letter-spacing; the negative margins keep the layout unchanged. */
+  /* Room inside the mask for descenders and for glyphs that overhang the tight tracking; negative
+     margins keep the layout unchanged. */
   padding: 0 0.08em 0.2em;
   margin: 0 -0.08em -0.2em;
 }
@@ -854,7 +842,7 @@ html:has(.site-menu:popover-open) {
   color: var(--color-dim);
 }
 
-/* Hairline rules that draw across when their block is revealed. */
+/* Hairline rules that draw in when their block is revealed. */
 .rule {
   position: relative;
 }
@@ -888,15 +876,14 @@ html:has(.site-menu:popover-open) {
 }
 
 /* ==========================================================================
-   Right-to-left languages (Arabic, Sorani Kurdish, Persian)
-   Layout uses logical properties (margin-inline-start and so on), so it
-   mirrors by itself. What remains: the side animations start from, and
-   Arabic script, whose letters join, so it gets no letter-spacing, and whose
-   marks above and below the letters need taller lines.
+   Right-to-left languages (Arabic, Sorani, Persian)
+   Layout uses logical properties, so it mirrors automatically. What remains:
+   the animation origin side, no letter-spacing for Arabic script (its letters
+   join), and taller line-height for its marks above and below the letters.
    ========================================================================== */
 
 :root {
-  /* The side where lines start, for transform-origin; -1 flips horizontal movement. */
+  /* Inline-start side for transform-origin; --direction flips horizontal movement. */
   --start: left;
   --direction: 1;
 }
@@ -906,13 +893,13 @@ html:has(.site-menu:popover-open) {
   --direction: -1;
 }
 
-/* Arrows that point forward or back, and the external-link arrow, mirror. */
+/* Mirror directional arrows (forward/back and external-link). */
 [dir='rtl'] :is(.arrow--right, .arrow--left, .arrow--up-right) {
   scale: -1 1;
 }
 
-/* Latin text on these pages (the wordmark, "Hevalo", the Kurmanji motto,
-   email addresses) is marked lang="en" or dir="ltr" and keeps its spacing. */
+/* Latin text on these pages (wordmark, "Hevalo", the Kurmanji motto, email addresses) is marked
+   lang="en" or dir="ltr" and keeps its tracking. */
 :root:is([lang='ar'], [lang='ckb'], [lang='fa']) :not(:lang(en), [dir='ltr'], [dir='ltr'] *) {
   letter-spacing: 0 !important;
 }
@@ -926,8 +913,8 @@ html:has(.site-menu:popover-open) {
    Accessibility preferences
    ========================================================================== */
 
-/* "Increase contrast" (macOS, iOS, Windows): darker secondary text and lines,
-   and scroll-highlighted headings start fully visible. */
+/* "Increase contrast" (macOS, iOS, Windows): darker secondary text and lines, and
+   scroll-highlighted headings start fully visible. */
 @media (prefers-contrast: more) {
   :root {
     --color-ink-soft: #1f1f1f;
@@ -950,9 +937,8 @@ html:has(.site-menu:popover-open) {
   }
 }
 
-/* Forced colours (Windows High Contrast): the system replaces backgrounds, so
-   marks drawn with a background colour are redrawn in the system text colour,
-   and filled buttons get a visible outline. */
+/* Forced colors (Windows High Contrast): the system replaces backgrounds, so marks drawn with a
+   background color are redrawn in the system text color, and filled buttons get a visible outline. */
 @media (forced-colors: active) {
   .rule::before,
   .status-dot,

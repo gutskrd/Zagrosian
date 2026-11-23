@@ -13,18 +13,18 @@ import { site } from '../site';
 import '../styles/global.css';
 
 interface Props {
-  /** Full document title. Defaults to the site title in the page's language. */
+  /** Full document title. Defaults to the localized site title. */
   title?: string;
   description?: string;
-  /** Keep error pages out of search results. */
+  /** Exclude from search (error pages). */
   noindex?: boolean;
-  /** The page's name in breadcrumbs, for pages below the homepage. */
+  /** Breadcrumb label, for pages below the homepage. */
   breadcrumb?: string;
-  /** Date of the last material change (YYYY-MM-DD). */
+  /** Last material change (YYYY-MM-DD). */
   dateModified?: string;
-  /** The page's own social image; by default the site's, in the page's language (og.png, og/<language>.png). */
+  /** Page-specific social image; defaults to the localized site image (og.png, og/<locale>.png). */
   image?: { url: string; type: string; width: number; height: number; alt: string };
-  /** More structured data for this page (schema.org nodes), and the one among them the page is about. */
+  /** Extra schema.org nodes for this page, and the @id of its main entity. */
   nodes?: Record<string, unknown>[];
   mainEntity?: string;
 }
@@ -33,10 +33,10 @@ const { locale, info, t, base } = i18n(Astro.url);
 const { title = t.meta.title, description = t.meta.description, noindex = false, breadcrumb, dateModified, image, nodes, mainEntity } = Astro.props;
 
 const absolute = (path: string) => new URL(path, site.url).href;
-// Pages build to /name.html, but are served (and should be linked) as /name.
+// Pages build to /name.html but are served and linked as /name.
 const path = localizePath(locale, base);
 const canonical = absolute(path);
-// Every page except the 404 page exists in every language.
+// Every page except 404 exists in every locale.
 const alternates = noindex
   ? []
   : [
@@ -46,7 +46,7 @@ const alternates = noindex
 const ogImage = absolute(image?.url ?? (locale === defaultLocale ? '/og.png' : `/og/${locale}.png`));
 const ogSize = { width: image?.width ?? 1200, height: image?.height ?? 630 };
 const ogAlt = image?.alt ?? `${site.name}: ${t.meta.tagline}`;
-// Every indexable page also has a Markdown version: /index.md, /de/index.md, /de/privacy.md.
+// Every indexable page has a Markdown version: /index.md, /de/index.md, /de/privacy.md.
 const markdown = base === '/' ? `${path === '/' ? '' : path}/index.md` : `${path}.md`;
 const jsonLd = noindex
   ? undefined
@@ -79,7 +79,7 @@ const jsonLd = noindex
       ) : (
         <>
           <link rel="canonical" href={canonical} />
-          {/* Search engines may show large previews and full snippets. */}
+          {/* Allow large image previews and full snippets. */}
           <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         </>
       )
@@ -89,19 +89,17 @@ const jsonLd = noindex
 
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-    {/* The tab's icon: black on a light browser, white on a dark one. The SVG
-       holds both logos and shows the one for the browser's colour scheme; a
-       browser that cannot show an SVG icon takes the PNG for its scheme, and
-       the oldest the ICO (black only). The ICO is declared 32 by 32 only:
-       declared 16 by 16 as well, Chrome takes it over the SVG as an exact fit,
-       and a dark tab strip shows the black logo. */}
+    {/* Favicon that matches the browser theme: black on light, white on dark. The SVG contains both
+       and switches via prefers-color-scheme; browsers without SVG favicons get the matching PNG,
+       and the oldest the ICO (black only). The ICO is declared as 32x32 only: declaring 16x16 makes
+       Chrome prefer it over the SVG as an exact match, showing the black logo on dark tab strips. */}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon-96.png" type="image/png" sizes="96x96" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/favicon-96-dark.png" type="image/png" sizes="96x96" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    {/* The name under the icon when the site is added to a home screen (the title is too long for it). */}
+    {/* Home screen label (the title is too long for it). */}
     <meta name="application-name" content={site.name} />
     <meta name="apple-mobile-web-app-title" content={site.name} />
     <link rel="sitemap" href="/sitemap.xml" />
@@ -123,13 +121,13 @@ const jsonLd = noindex
     <meta property="og:image:height" content={String(ogSize.height)} />
     <meta property="og:image:alt" content={ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
-    {/* X takes the rest from the og: tags, but not the image's description. */}
+    {/* X reads the rest from the og: tags, but not the image alt text. */}
     <meta name="twitter:image:alt" content={ogAlt} />
 
     <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
     {
-      // Arabic-script pages (Arabic, Sorani, Persian) need Vazirmatn from the
-      // first paint; loading it late would reflow headings as the font swaps in.
+      // Arabic-script pages (Arabic, Sorani, Persian) need Vazirmatn from first paint; loading it
+      // late would reflow headings on swap.
       info.dir === 'rtl' && <link rel="preload" href={vazirmatnArabic} as="font" type="font/woff2" crossorigin />
     }
     {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}

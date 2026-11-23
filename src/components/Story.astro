@@ -1,29 +1,24 @@
 ---
 /**
- * The story under the hero: Zagrosian's three values, then the Kurdish sun
- * and motto.
+ * The story below the hero: Zagrosian's three values, then the Kurdish sun and the motto.
  *
- * Without JavaScript, with reduced motion and in print, it is a plain section:
- * the values as a heading, and the sun and the motto below them.
+ * Without JS, with reduced motion and in print it's a static section: the values as a heading, with
+ * the sun and motto below.
  *
- * With motion, it is a walkthrough pinned to the screen (src/scripts/story.ts),
- * in four chapters, in glass and in 3D:
+ * With motion it becomes a pinned, scroll-driven sequence (src/scripts/story.ts) in four acts:
  *
- * 1. The values. The glass logo comes down from the hero and settles beside
- *    them; each value flips up into place, and the logo turns a notch with
- *    each.
- * 2. The dive. The logo comes to the middle, faces the reader, and the camera
- *    flies into the glass: through the front pane and into the logo's ink,
- *    the block's layers spreading apart in perspective as it comes closer.
- * 3. The sun. In the ink, the page in the other theme's colours
- *    (`.story__scene`), the Kurdish sun rises as a thick piece of glass
- *    (GlassSun.astro), tumbling and catching the light, and comes to rest
- *    facing the reader; the motto rises under it, word by word.
- * 4. The iris. The scene closes into the sun, like an iris, and leaves the
- *    sun and the motto in the page's own colours, which then scroll on.
+ * 1. Values: the glass logo arrives from the hero and settles beside them; each value flips in and
+ *    the logo rotates a step with each.
+ * 2. Dive: the logo centers and faces the viewer, and the camera dollies through the front pane
+ *    into the logo's ink, the block's layers spreading apart in perspective.
+ * 3. Sun: inside the ink, an inverted-theme scene (`.story__scene`) where the Kurdish sun rises as
+ *    a thick piece of glass (GlassSun.astro), tumbling and catching the light, then settles facing
+ *    the viewer while the motto reveals word by word.
+ * 4. Iris: the scene closes around the sun like an iris, leaving the sun and motto in the page
+ *    theme as the section scrolls on.
  *
- * theme-init.js makes room for it before the first paint (`data-story`), so
- * nothing shifts when the script starts.
+ * theme-init.js reserves space before first paint (`data-story`), so nothing shifts when the script
+ * starts.
  */
 import { i18n } from '../i18n';
 import { kurdish } from '../site';
@@ -32,7 +27,7 @@ import Sun from './Sun.astro';
 
 const { t } = i18n(Astro.url);
 
-// The values are sized to their column: each must fit on a line.
+// Values scale with their column; each must fit on one line.
 const longest = Math.max(...t.story.values.map((value) => [...value].length));
 const fit = longest <= 10 ? undefined : longest <= 13 ? 'md' : longest <= 16 ? 'sm' : 'xs';
 
@@ -90,9 +85,7 @@ const words = kurdish.motto.split(' ');
 </section>
 
 <style>
-  /* ----------------------------------------------------------------------
-     The plain section: the values, then the sun and the motto.
-     ---------------------------------------------------------------------- */
+  /* --- Static section: the values, then the sun and motto --- */
   .story {
     padding-block: var(--section-space);
   }
@@ -102,9 +95,9 @@ const words = kurdish.motto.split(' ');
     gap: clamp(2rem, 1rem + 4vw, 4rem);
   }
 
-  /* The values are sized to their column (see `fit` above). With no container
-     around them, their `cqi` measure the window: each follows the same in
-     `vw`, for browsers without container query units (Safari before 16). */
+  /* Values scale with their column (see `fit` above). With no container around them, their `cqi`
+     resolves against the viewport, so each is preceded by the same size in `vw` for browsers
+     without container query units (Safari < 16). */
   .story__values {
     container-type: inline-size;
     margin: 0;
@@ -130,7 +123,7 @@ const words = kurdish.motto.split(' ');
     font-size: min(var(--text-display), 9cqi);
   }
 
-  /* Each value on a line of its own, behind a mask it can flip up from. */
+  /* Each value on its own line, behind a mask it flips in from. */
   .story__value {
     display: block;
     overflow: clip;
@@ -156,10 +149,9 @@ const words = kurdish.motto.split(' ');
     margin-bottom: clamp(2rem, 1.5rem + 2vw, 3rem);
   }
 
-  /* The motto is set in system serifs, whose widths vary by device. Sizes allow
-     for the widest likely fallback (DejaVu Serif): "kurdî xweştire." is at most
-     7.5em wide, the whole line at most 11.5em. Phones get two lines, wider
-     screens one. */
+  /* The motto uses system serifs, whose metrics vary by device. Sizes allow for the widest likely
+     fallback (DejaVu Serif): "kurdî xweştire." is at most 7.5em wide and the full line 11.5em. Two
+     lines on phones, one on wider screens. */
   .story__kurdish {
     margin: 0;
     font-size: calc((100vw - 2 * var(--gutter)) / 7.8);
@@ -184,16 +176,13 @@ const words = kurdish.motto.split(' ');
     display: none;
   }
 
-  /* ----------------------------------------------------------------------
-     The walkthrough: a stage pinned to the screen while the section, five
-     and a half screens tall, scrolls past it.
+  /* --- Scroll sequence ---
 
-     On a phone the address bar slides away as the page scrolls down and back
-     as it scrolls up. The stage is as tall as the screen without the bar
-     (100lvh), so its colours always reach the bottom edge, and its content
-     keeps to the part the bar never covers (100svh), so nothing moves when
-     the bar comes and goes. On other screens the two are the same.
-     ---------------------------------------------------------------------- */
+     The stage is pinned to the viewport while the section (5.5 screens tall) scrolls past. On
+     mobile, browser chrome collapses on scroll down and expands on scroll up: the stage uses the
+     large viewport height (100lvh) so its background always reaches the bottom edge, while its
+     content stays within the small viewport (100svh), so nothing moves as the chrome toggles.
+     Elsewhere both are the same. */
   :global(:root[data-story]) .story {
     height: 560svh;
     padding: 0;
@@ -211,8 +200,7 @@ const words = kurdish.motto.split(' ');
     overflow: clip;
   }
 
-  /* The values above the logo's place on phones, beside it on wide screens,
-     as in the hero. */
+  /* Values above the logo's slot on phones, beside it on wide screens, as in the hero. */
   :global(:root[data-story='on']) .story__grid {
     height: 100%;
     grid-template-rows: auto minmax(0, 1fr);
@@ -263,9 +251,8 @@ const words = kurdish.motto.split(' ');
     }
   }
 
-  /* Before the script starts (or if it cannot), the motto sits under the
-     values; once it runs, the motto is centred on the stage and waits for its
-     chapter. */
+  /* Before the script runs (or if it can't), the motto sits below the values; once active, it's
+     centered on the stage and waits for its act. */
   :global(:root[data-story]) .story__motto {
     margin-top: clamp(2rem, 1rem + 4vw, 4rem);
   }
@@ -281,12 +268,12 @@ const words = kurdish.motto.split(' ');
     visibility: hidden;
   }
 
-  /* The sun's chapter: the page in the other theme's colours, opened and
-     closed by the script with a circle around the sun (`clip-path`). */
+  /* Sun act: an inverted-theme scene, revealed and closed by the script with a circular `clip-path`
+     around the sun. */
   :global(:root[data-story='on']) .story__scene {
     position: absolute;
     inset: 0;
-    /* Above the travelling glass logo (Hero.astro), which dives into it. */
+    /* Above the traveling glass logo (Hero.astro), which dives into it. */
     z-index: 2;
     display: block;
     background: var(--color-ink);
@@ -299,8 +286,8 @@ const words = kurdish.motto.split(' ');
     opacity: 0.62;
   }
 
-  /* The glass sun keeps the flat sun's place in the layout, and is sized
-     by the script; a soft light glows behind it. */
+  /* The glass sun takes the flat sun's slot in the layout and is sized by the script; a soft glow
+     sits behind it. */
   .story__scene .story__sun {
     position: relative;
     width: 1em;
@@ -321,15 +308,14 @@ const words = kurdish.motto.split(' ');
     width: 100%;
   }
 
-  /* Laid out once at its largest (story.ts sets the width), and only moved
-     and scaled by the graphics card, which draws it again, sharp, when its
-     size has shrunk or grown by half a doubling. */
+  /* Laid out once at its largest (story.ts sets the width), then only translated and scaled on the
+     compositor, which re-rasterizes it sharp whenever the scale crosses a sqrt(2) step. */
   .story__glass-sun {
     will-change: transform;
   }
 
-  /* Soft, so the graphics card can scale its drawing as the sun settles, never
-     drawing it again. */
+  /* Soft enough that the compositor can scale the cached raster as the sun settles, without
+     re-rasterizing. */
   .story__glow {
     width: 6em;
     aspect-ratio: 1;
@@ -355,7 +341,7 @@ const words = kurdish.motto.split(' ');
     display: inline-block;
   }
 
-  /* How far the walkthrough has come, along the foot of the stage. */
+  /* Sequence progress, along the bottom of the stage. */
   :global(:root[data-story='on']) .story__progress {
     position: absolute;
     inset-inline: var(--gutter);

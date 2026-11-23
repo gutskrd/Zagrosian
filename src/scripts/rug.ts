@@ -1,30 +1,24 @@
 /**
- * Loads the 3D rug (rug-scene.ts, with its shaders) and the paper plane
- * under it (plane.ts) only when the rug (Rug.astro) comes within a screen of
- * view, so pages that never reach it, and the first paint of every page,
- * carry none of it; and sets them up when the page is still, not during a
- * swipe.
+ * Lazy-loads the WebGL rug (rug-scene.ts) and the paper plane (plane.ts) once the rug is within one
+ * viewport of the screen, so pages that never reach it pay nothing for them. Setup is deferred
+ * until scrolling stops.
  *
- * Also wires the "Lift the rug" button (Underneath.astro): with the 3D rug it
- * asks the scene to fold the corner over; without it (no WebGL, or before it
- * is ready) the flat picture is drawn back instead. Either way the label
- * follows, so it always says what pressing it will do.
+ * Also wires the "Lift the rug" button: it toggles the 3D rug when it is live and the flat fallback
+ * image otherwise, keeping the label in sync.
  */
 export function initRug() {
   const stage = document.querySelector<HTMLElement>('[data-rug]');
   if (!stage) return;
 
-  // The flat picture is shown whole, once decoded, never as the rows that
-  // have arrived so far (Rug.astro keeps it out of sight until then). Once it
-  // has come up fully, the rug covers the floor (`data-covered`): only then is
-  // the paper plane drawn under it (plane.ts), never on the bare floor.
+  // Reveal the flat image only once it is fully decoded, never progressively. `data-covered` marks
+  // it as fully visible; plane.ts waits for it before drawing the plane under the rug.
   const picture = stage.querySelector<HTMLImageElement>('.rug__flat img');
   const covered = () => stage.setAttribute('data-covered', '');
   const pictured = () => {
     stage.setAttribute('data-pictured', '');
     if (!picture) return covered();
     picture.addEventListener('transitionend', covered, { once: true });
-    // In case no transition runs (it was already shown, or styles differ).
+    // Fallback for when no transition runs (already visible, or no transition styles).
     window.setTimeout(covered, 600);
   };
   if (picture) picture.decode().then(pictured, pictured);
@@ -37,7 +31,7 @@ export function initRug() {
       button.textContent = (lifted ? button.dataset.lay : button.dataset.lift) ?? '';
     };
     button.addEventListener('click', () => {
-      // Someone has looked under the rug (the paper plane, plane.ts, then flies).
+      // Marks the rug as opened; plane.ts launches the plane on this.
       stage.setAttribute('data-looked', '');
       if (stage.hasAttribute('data-live')) {
         stage.dispatchEvent(new CustomEvent('rug:toggle'));
@@ -55,20 +49,19 @@ export function initRug() {
     (entries) => {
       if (!entries.some((entry) => entry.isIntersecting)) return;
       observer.disconnect();
-      // Fetched at once, but set up once the page is still: compiling the
-      // rug's shaders and taking its picture onto the graphics card are a
-      // heavy frame or two, which on a slower phone would catch a swipe. The
-      // flat picture, the same rug, is there until then.
+      // Fetch now, initialize once scrolling stops: shader compilation and the texture upload cost
+      // a frame or two, which would stall a swipe on low-end devices. The flat image stands in
+      // until then.
       const scene = import('./rug-scene');
       const plane = import('./plane');
       void whenStill().then(() => {
         scene
           .then(({ mountRug }) => mountRug(stage))
-          // Without it, the flat rug stays.
+          // Module failed to load: keep the flat image.
           .catch(() => undefined);
         plane
           .then(({ initPlane }) => initPlane())
-          // Without it, the proverb's sheet simply lies where it is.
+          // Module failed to load: the proverb sheet stays static.
           .catch(() => undefined);
       });
     },
@@ -77,7 +70,7 @@ export function initRug() {
   observer.observe(stage);
 }
 
-/** Resolves once the page has not scrolled for a moment (at once, if it is not scrolling). */
+/** Resolves once no scroll event has fired for `quiet` ms. */
 function whenStill(quiet = 150) {
   return new Promise<void>((resolve) => {
     let timer = 0;

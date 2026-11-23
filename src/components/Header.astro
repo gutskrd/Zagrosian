@@ -1,14 +1,12 @@
 ---
 /**
- * The site header, the same at every size, as on a studio's site: the
- * logo and wordmark, then a few controls, and the menu button (two dots)
- * that opens the full-screen menu (SiteMenu.astro), where the pages are.
+ * Site header, identical at every size: logo and wordmark, a few controls, and the menu button that
+ * opens the full-screen menu (SiteMenu.astro) where navigation lives.
  *
- * From left to right, as room allows: Visit Hevalo (from 768px), quick
- * navigation (from 1024px, with JavaScript), the world icon for languages,
- * and the menu. Nothing else: the bar is kept quiet so the page has the
- * room. Sound and the theme are settings, so they are in the menu (and in
- * quick navigation), as are the languages on the narrowest phones.
+ * Left to right, as space allows: Visit Hevalo (from 768px), the command menu (from 1024px, JS
+ * only), the language picker, and the menu button. The bar is deliberately sparse; sound and theme
+ * are settings, so they live in the menu and the command menu, as do languages on the narrowest
+ * phones.
  */
 import Arrow from './Arrow.astro';
 import LanguagePicker from './LanguagePicker.astro';
@@ -85,7 +83,7 @@ const { t, localize } = i18n(Astro.url);
     box-shadow: 0 1px 0 var(--color-line);
   }
 
-  /* For visitors who ask for less transparency, the header is solid. */
+  /* Reduced transparency: solid header. */
   @media (prefers-reduced-transparency: reduce) {
     .site-header {
       background: var(--color-paper);
@@ -121,15 +119,14 @@ const { t, localize } = i18n(Astro.url);
     gap: 0.25rem;
   }
 
-  /* Labels in the bar never wrap; the breakpoints below leave room for the
-     longest language. */
+  /* Header labels never wrap; the breakpoints below leave room for the longest locale. */
   .site-header__cta {
     flex: none;
     white-space: nowrap;
   }
 
-  /* Visit Hevalo, like the page's buttons (Cta.astro): the paper colour fills
-     in from the middle and the label rolls. */
+  /* Visit Hevalo, styled like the page buttons (Cta.astro): the paper color fills in from the
+     center and the label rolls. */
   .site-header__cta {
     position: relative;
     isolation: isolate;
@@ -146,8 +143,7 @@ const { t, localize } = i18n(Astro.url);
     font-size: var(--text-sm);
     font-weight: 500;
     text-decoration: none;
-    /* Its fill and edge ease along with the header when it turns to the other
-       theme's colours over the story's scene. */
+    /* Fill and border transition with the header when it inverts over the story's scene. */
     transition:
       color 0.5s var(--ease-out),
       background-color 0.3s ease,
@@ -189,21 +185,21 @@ const { t, localize } = i18n(Astro.url);
     }
   }
 
-  /* On the narrowest phones the languages are in the menu only. */
+  /* Narrowest phones: languages are only in the menu. */
   @media (max-width: 23.99rem) {
     .site-header__language {
       display: none !important;
     }
   }
 
-  /* The menu button stands a little apart from the other controls. */
+  /* Extra spacing before the menu button. */
   .site-header__end :global(.menu-button) {
     margin-inline-start: 0.5rem;
   }
 
-  /* Quick navigation (CommandMenu): a round icon button (Ctrl K or ⌘K opens
-     it too). It needs JavaScript, so it appears once the
-     theme script has run, and only on wider screens; phones have the menu. */
+  /* Command menu trigger (CommandMenu.astro): a round icon button; Ctrl+K / Cmd+K also opens it.
+     Requires JS, so it appears once theme-init.js has run, and only on wider screens (phones use
+     the menu). */
   .command-trigger {
     display: none;
     place-items: center;

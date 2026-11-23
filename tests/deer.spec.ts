@@ -1,22 +1,21 @@
 /**
- * Hevalo's deer (HevaloDeer.astro) comes out of the back of the page: while
- * its icon comes into view only the copy inside the hole shows, and once it
- * has climbed out only the copy in front of the page does, at full size.
- * With reduced motion it is out from the start.
+ * Hevalo's deer (HevaloDeer.astro) emerges from behind the page: while its icon enters the viewport
+ * only the copy inside the hole is visible, and once fully out only the front copy is, at full
+ * size. With reduced motion it's out from the start.
  */
 import { type Page, expect, test } from '@playwright/test';
 import { settled } from './support';
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
-/** Scrolls so the deer's top is `from` pixels above the bottom of the screen. */
+/** Scrolls so the deer's top is `from` px above the bottom of the viewport. */
 async function scrollDeerTo(page: Page, from: number) {
   await page.evaluate((from) => {
     const deer = document.querySelector('.deer')!;
     const top = deer.getBoundingClientRect().top + scrollY;
     scrollTo({ top: top - innerHeight + from, behavior: 'instant' });
   }, from);
-  // Two frames, for the scroll-driven animations to follow.
+  // Two frames for the scroll-driven animations to update.
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
@@ -36,11 +35,11 @@ test('it climbs out of the hole as it scrolls into view, and back in', async ({ 
   await settled(page.context());
   await page.goto('/', { waitUntil: 'networkidle' });
 
-  // Just coming into view: still inside the hole.
+  // Just entering view: still inside the hole.
   await scrollDeerTo(page, 20);
   expect(await state(page)).toMatchObject({ behind: 1, front: 0 });
 
-  // In the middle of the screen: out, in front of the page, at full size.
+  // Mid-viewport: fully out, in front of the page, at full size.
   await scrollDeerTo(page, 900 / 2 + 200);
   const out = await state(page);
   expect(out).toMatchObject({ behind: 0, front: 1, veil: 0 });

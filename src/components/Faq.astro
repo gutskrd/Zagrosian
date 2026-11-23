@@ -1,12 +1,9 @@
 ---
 /**
- * Questions and answers, before Contact: a list of questions, each opening to
- * its answer (native `details`, so it works with the keyboard and without
- * JavaScript, and browsers' find-in-page opens the answer it finds). The
- * answers are in the page either way, for search engines and AI assistants,
- * and the same list is in the Markdown version of the page and in its
- * structured data (src/lib/faq.ts). A line after the list says where to ask
- * anything else.
+ * FAQ, before Contact: native <details> per question, so it works with the keyboard and without JS,
+ * and find-in-page opens matching answers. Answers are always in the HTML (for search engines and
+ * assistants); the same list feeds the Markdown version and the FAQPage structured data
+ * (src/lib/faq.ts). A closing line says where to ask anything else.
  */
 import { i18n } from '../i18n';
 import { faq, faqMore } from '../lib/faq';
@@ -64,7 +61,7 @@ const more = faqMore(locale);
     border-top: 1px solid var(--color-line);
   }
 
-  /* The question: the whole row opens it, with a plus that turns into a minus. */
+  /* The question: the whole row toggles it, with a plus that turns into a minus. */
   .faq__summary {
     display: flex;
     align-items: center;
@@ -150,8 +147,8 @@ const more = faqMore(locale);
     text-wrap: pretty;
   }
 
-  /* Opening and closing slide the answer open and shut, where the browser
-     can animate to a natural height (elsewhere it simply appears). */
+  /* Animate opening and closing where the browser can transition to intrinsic height; elsewhere the
+     answer just appears. */
   @media (prefers-reduced-motion: no-preference) {
     .faq__item::details-content {
       block-size: 0;
@@ -179,7 +176,7 @@ const more = faqMore(locale);
     }
   }
 
-  /* The padding enlarges the tap area to 24px without moving the text. */
+  /* Padding enlarges the tap target to 24px without moving the text. */
   .faq :global(a) {
     padding-block: 0.125rem;
     color: var(--color-ink);

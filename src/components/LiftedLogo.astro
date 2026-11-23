@@ -1,45 +1,40 @@
 ---
 /**
- * The lifted Zagrosian logo: the two hands set in a block of clear glass, in
- * 3D, for the homepage hero (and, from there, the story under it).
+ * The lifted Zagrosian logo: the two hands set in a block of clear glass, in 3D, for the homepage
+ * hero (and from there into the story below it).
  *
- * It is drawn, not an image, so it is sharp at any size. The shapes are
- * traced from the lifted logo (src/assets/brand/zagrosian-logo-lifted-source.png)
- * and float inside the block, between its back and front faces; the block's
- * edge is a stack of thin layers, so it has real thickness when it turns.
- * The back face tints the glass and casts its shadow; the front face only
- * catches the light (a bevel, a glare and a streak), so the logo stays crisp.
- * (The glass does not blur what is behind it: a backdrop blur is costly to
- * redraw as the block turns, and what is behind it is soft already.)
+ * The logo is vector, so it stays sharp at any size. The shapes are traced from the lifted logo
+ * (src/assets/brand/zagrosian-logo-lifted-source.png) and float inside the block between its back
+ * and front faces; the edge is a stack of thin slices, so the block has real thickness when it
+ * rotates. The back face tints the glass and casts the shadow; the front face only catches light
+ * (bevel, glare and a streak), keeping the logo crisp. There's deliberately no backdrop blur: it's
+ * expensive to repaint as the block rotates, and the background is already soft.
  *
- * The soft parts, the shadow and the shading inside the front face, are
- * images (scripts/logo-shadows.mjs draws them from the CSS box shadows they
- * once were), each on a layer of its own: stretched, they look the same at any
- * size, and the browser draws them at once, where a blurred shadow is worked
- * out anew each time the logo is drawn at a new size, as when the story flies
- * into it. (As a background of a face that turns in 3D, an image would be
- * drawn anew on every frame of the turn: hence the layers of their own.)
+ * Soft elements (the shadow and the inner shading of the front face) are pre-rendered images
+ * (scripts/logo-shadows.mjs generates them from the box-shadows they replaced), each on its own
+ * layer. Scaled, they look identical at any size and rasterize instantly, whereas a box-shadow blur
+ * is recomputed whenever the logo re-rasterizes at a new size, as during the story's fly-in. (As a
+ * background on a face rotating in 3D, an image would repaint every frame, hence the separate
+ * layers.)
  *
- * On the light page the dark parts of the logo are smoked glass and the rest
- * is clear; on the dark page the light parts are frosted and the rest is
- * clear.
+ * Light theme: the logo's dark parts are smoked glass and the rest is clear. Dark theme: the light
+ * parts are frosted and the rest is clear.
  *
- * On the homepage it travels into the story under the hero as the page
- * scrolls (src/scripts/story.ts), which sets its pose in custom properties on
- * an ancestor; without them it rests as drawn.
+ * On the homepage it travels into the story as the page scrolls (src/scripts/story.ts), which
+ * drives its pose through custom properties on an ancestor; without them it renders at rest.
  */
 import type { HTMLAttributes } from 'astro/types';
 import source from '../assets/brand/zagrosian-logo-lifted.svg?raw';
 
 interface Props extends HTMLAttributes<'span'> {
-  /** Leave empty when the logo is decoration. */
+  /** Empty when the logo is decorative. */
   alt?: string;
 }
 
 const { alt = '', class: className, ...attributes } = Astro.props;
 const label = alt ? { role: 'img' as const, 'aria-label': alt } : { 'aria-hidden': 'true' as const };
 
-// The traced light shapes; the dark ones are the tile less those.
+// Traced light shapes; the dark shapes are the tile minus these.
 const light = source.match(/ d="([^"]+)"/)?.[1] ?? '';
 const dark = `M0 0H1290V1290H0Z${light}`;
 
@@ -63,7 +58,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
 
 <style>
   .lifted-logo {
-    /* In container units, so the block keeps its proportions at any size. */
+    /* Container units, so the block keeps its proportions at any size. */
     --thickness: 7cqi;
     --radius: 23%;
     --body: rgb(255 255 255 / 0.08);
@@ -92,12 +87,11 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     --seam: rgb(255 255 255 / 0.1);
   }
 
-  /* Turned a little, so the glass shows its depth even at rest. It turns
-     about its own middle, halfway through its thickness, as one solid block.
+  /* Rotated slightly at rest so the glass shows its depth. It rotates about its own center, halfway
+     through its thickness, as one rigid block.
 
-     Its pose comes from src/scripts/story.ts: how far it has turned (--turn)
-     and leaned (--tilt), and how much of the front pane is left (--front,
-     as the camera flies through it). */
+     Pose comes from src/scripts/story.ts: rotation (--turn), lean (--tilt) and how much of the
+     front pane remains (--front, as the camera passes through it). */
   .lifted-logo__body {
     position: absolute;
     inset: 0;
@@ -106,8 +100,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     transform-style: preserve-3d;
   }
 
-  /* Every layer sits at a fraction `--f` of the way through the block, from
-     the front (0) to the back (1). */
+  /* Each layer sits at depth `--f` through the block, from the front (0) to the back (1). */
   .lifted-logo__back,
   .lifted-logo__slice,
   .lifted-logo__frame,
@@ -121,15 +114,14 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     transform: translateZ(calc(var(--thickness) * var(--f) * -1));
   }
 
-  /* The glass itself, with its shadow. On the dark page it is lit from
-     behind, where the lights shine through. */
+  /* The glass body and its shadow. */
   .lifted-logo__back {
     --f: 1;
 
     background: var(--body);
   }
 
-  /* On the dark page, lit from behind. */
+  /* Dark theme: backlit, so the lights show through. */
   :global(:root[data-theme='dark']) .lifted-logo__back {
     background:
       radial-gradient(circle at 76% 24%, var(--haze), rgb(255 255 255 / 0) 66%),
@@ -137,11 +129,10 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
       var(--body);
   }
 
-  /* Its shadow, falling below it, drawn round it (the image is clear where the
-     block is): 132% of the block's width, from 16% left of it and 5% above.
-     Laid out from the block's own corner and moved into place, so that when
-     story.ts lays the block out larger, the shadow grows from that corner,
-     as everything else in the block does, and nothing shifts. */
+  /* Drop shadow below the block (the image is transparent where the block is): 132% of the block
+     width, offset 16% left and 5% up. Laid out from the block's corner and translated into place,
+     so when story.ts lays the block out larger the shadow grows from that corner like everything
+     else, with no shift. */
   .lifted-logo__back::before {
     content: '';
     position: absolute;
@@ -158,10 +149,9 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     background-image: url('../assets/brand/lifted-logo-shadow-dark.webp');
   }
 
-  /* The edge: ten thin layers through the thickness of the block, seen from
-     both sides. */
-  /* (1.5px at the size it is seen at: facing the reader, story.ts lays the
-     travelling copy out larger and scales it down, by --grow.) */
+  /* Edge: ten thin slices through the block's thickness, visible from both sides. */
+  /* (1.5px at display size: when facing the viewer, story.ts lays the traveling copy out larger and
+     scales it down by --grow.) */
   .lifted-logo__slice {
     border: calc(1.5px * var(--grow, 1)) solid var(--edge);
     opacity: 0.6;
@@ -207,10 +197,9 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     --f: 0.9091;
   }
 
-  /* The logo, inside the glass, within a thin frame as in the original (10
-     of its 215 pixels), in the same tone as the logo's dark parts, so they
-     run into it. The drawing spans the whole tile, so it is placed to line
-     up with it; a fine seam marks the frame's inner edge. */
+  /* The logo inside the glass, in a thin frame as in the original (10 of its 215px), in the same
+     tone as its dark parts so they merge. The artwork spans the whole tile, so it's aligned to it;
+     a fine seam marks the frame's inner edge. */
   .lifted-logo__frame,
   .lifted-logo__inner {
     --f: 0.45;
@@ -220,13 +209,11 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     border: 4.65cqi solid var(--dark);
   }
 
-  /* Rounded corners clip with border-radius and overflow rather than a clip
-     path: on a layer turned in 3D, a clip path is applied by the graphics
-     card as a separate mask, which can come loose for a frame when the layer
-     is laid out anew at a larger size (story.ts). Inset by 4.65% on every
-     side, laid out from the block's corner and moved into place, as is the
-     drawing inside it: laid out larger, everything grows from that corner,
-     and nothing shifts. */
+  /* Rounded corners use border-radius + overflow instead of clip-path: on a 3D-transformed layer,
+     the compositor applies clip-path as a separate mask that can desync for a frame when the layer
+     is re-laid out larger (story.ts). Inset 4.65% on every side, laid out from the block's corner
+     and translated into place, like the artwork inside, so re-layout at a larger size grows
+     everything from that corner without shift. */
   .lifted-logo__inner {
     inset: 0 auto auto 0;
     width: 90.7%;
@@ -262,12 +249,11 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     fill: var(--light);
   }
 
-  /* The front face catches the light: a bright bevel along the top and left,
-     a darker one below, a glare at the top left and a streak across. */
+  /* The front face catches the light: a bright bevel along the top and left, a darker one below, a
+     glare at the top left and a diagonal streak. */
   .lifted-logo__front {
-    /* Sized against the block (1cqi is 1% of its width; at its usual 352px,
-       0.43cqi is 1.5px), so the bevel and glow keep their proportions however
-       large the block is drawn. */
+    /* Sized relative to the block (1cqi = 1% of its width; at the usual 352px, 0.43cqi is 1.5px),
+       so the bevel and glow keep their proportions at any rendered size. */
     border: max(1px, 0.28cqi) solid var(--rim);
     overflow: hidden;
     opacity: var(--front, 1);
@@ -277,8 +263,8 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
       inset max(1px, 0.43cqi) 0 0 rgb(255 255 255 / 0.4);
   }
 
-  /* Its soft shading: darker along the foot and the right side, and a faint
-     glow all round inside (an image); then the streak across. */
+  /* Soft inner shading: darker along the bottom and right, with a faint inner glow (an image); then
+     the streak. */
   .lifted-logo__front::before,
   .lifted-logo__front::after {
     content: '';
@@ -318,7 +304,7 @@ const slices = Array.from({ length: 10 }, (_, index) => index + 1);
     }
   }
 
-  /* Printed, the logo is always at rest. */
+  /* Print: always at rest. */
   @media print {
     .lifted-logo__body {
       transform: rotateX(12deg) rotateY(-18deg);

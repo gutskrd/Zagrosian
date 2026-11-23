@@ -1,23 +1,18 @@
-// Brings an edition of Hevalo's book into the site: the folder Hevalo's own
-// export writes (`npm run book:export --workspace api -- --out <dir>` in
-// Hevalo's repository) holds the PDF, every page as WebP at 720 and 1440
-// pixels wide, the words of each page (text.json) and where everything is
-// (book.json). The book's page (src/pages/book.astro) is built from them.
+// Imports an edition of Hevalo's book. Hevalo's export (`npm run book:export --workspace api --
+// --out <dir>` in the Hevalo repo) writes the PDF, every page as WebP at 720 and 1440px wide, each
+// page's text (text.json) and a manifest (book.json); the book page (src/pages/book.astro) is built
+// from these.
 //
-// It checks the edition first, and stops at the first thing wrong: the number
-// of pages, both pictures of every page at their sizes, words on every page,
-// chapters that follow each other, the PDF against its recorded size and
-// hash, and no file over the 25 MiB Cloudflare serves. An edition whose
-// pages, words and PDF are the ones already here (its name says so: the
-// export hashes all three, the PDF without the moment it was printed)
-// changes nothing. Otherwise it replaces src/assets/book/ whole, copies the
-// PDF to public/book/, says which pages changed, and draws the social image
-// (public/og/book.jpg, a JPEG, so it stays well under the size that chat apps
-// show a preview for): the open book on the site's dark ground, with the
-// white logo, and no words in any language (the title is on the book's own
-// cover).
+// Validates the edition first and stops at the first problem: page count, both renditions of every
+// page at the right sizes, text on every page, contiguous chapters, the PDF against its recorded
+// size and hash, and no file over Cloudflare's 25 MiB limit. An edition whose pages, text and PDF
+// match what's already here (the edition name includes a content hash of all three, excluding the
+// PDF's timestamp) is a no-op. Otherwise it replaces src/assets/book/ entirely, copies the PDF to
+// public/book/, reports which pages changed, and renders the social image (public/og/book.jpg, JPEG
+// to stay well under messaging apps' preview size limits): the open book on the site's dark
+// background with the white logo, and no text in any language (the title is on the cover).
 //
-// Usage: node scripts/book.mjs <edition dir>        then: npm run build
+// Usage: node scripts/book.mjs <edition dir>, then npm run build
 import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
@@ -46,7 +41,7 @@ const fail = (message) => {
 };
 const mb = (bytes) => `${(bytes / 1e6).toFixed(1)} MB`;
 
-// ---- Checks --------------------------------------------------------------
+// --- Validation ---
 
 const book = JSON.parse(await readFile(join(dir, 'book.json'), 'utf8'));
 const textRaw = await readFile(join(dir, 'text.json'), 'utf8');
@@ -87,20 +82,20 @@ const pdfBytes = await readFile(join(dir, book.pdf.file));
 if (pdfBytes.length !== book.pdf.bytes || sha256(pdfBytes) !== book.pdf.sha256) fail(`${book.pdf.file} does not match the size and hash book.json records`);
 if (pdfBytes.length > LIMIT || Buffer.byteLength(textRaw) > LIMIT) fail('a file is over 25 MiB');
 
-// ---- Unchanged editions -------------------------------------------------
+// --- Unchanged editions ---
 
 const contentHash = (edition) => String(edition ?? '').split('.')[1];
 const installed = await readFile(join(ASSETS, 'book.json'), 'utf8')
   .then((raw) => JSON.parse(raw))
   .catch(() => null);
 const present = async (file) => stat(file).then(() => true, () => false);
-// (a run that stopped before the social image was drawn is finished the next time)
+// (A run that stopped before rendering the social image completes it next time.)
 if (installed && contentHash(installed.edition) === contentHash(book.edition) && (await present(PDF)) && (await present(OG))) {
   console.log(`unchanged: edition ${installed.edition} is already in the site`);
   process.exit(0);
 }
 
-// ---- Install -------------------------------------------------------------
+// --- Install ---
 
 const before = new Map();
 if (installed) {
@@ -126,16 +121,17 @@ for (let n = 1; n <= pageCount; n++) {
 console.log(`edition ${book.edition}: ${pageCount} pages, ${book.chapters.length} chapters, ${mb(weight)} in all (PDF ${mb(pdfBytes.length)})`);
 console.log(installed ? `pages changed: ${changed.length === 0 ? 'none (the words or the PDF did)' : changed.join(', ')}` : 'first edition');
 if (installed && changed.length === pageCount) {
-  // the same book drawn by another version of poppler or of the WebP encoder comes out a little different everywhere
+  // The same book rendered by a different poppler or WebP encoder version differs slightly on every
+  // page.
   console.log('every page changed: if the book itself did not, the export ran with other versions of poppler or sharp than the last');
 }
 
 
-// ---- Share image -----------------------------------------------------------
+// --- Social image ---
 
-// The open book, drawn as the reader shows it: the cover in front, a little
-// turned, with the first spread open behind it, on the dark ground of the
-// site's other social images, under a faint patch of the late sun.
+// The open book as the reader shows it: the cover in front, slightly rotated, with the first spread
+// open behind it, on the dark background of the other social images, under a faint patch of
+// sunlight.
 const dataUrl = async (file) => `data:image/webp;base64,${(await readFile(file)).toString('base64')}`;
 const [cover, left, right] = await Promise.all([1, 2, 3].map((n) => dataUrl(join(ASSETS, 'pages', pageFile(n, 1440)))));
 const logo = (await readFile(join(root, 'src/assets/brand/zagrosian-logo-light.svg'), 'utf8')).replace('<svg ', '<svg class="logo" ');
@@ -164,6 +160,6 @@ const png = await page.screenshot({ type: 'png' });
 await browser.close();
 await mkdir(join(root, 'public/og'), { recursive: true });
 await sharp(png).resize(1200, 630).jpeg({ quality: 85, mozjpeg: true, chromaSubsampling: '4:4:4' }).toFile(OG);
-// the share image was a PNG before it was a JPEG
+// The share image used to be a PNG.
 await rm(join(root, 'public/og/book.png'), { force: true });
 console.log(`public/og/book.jpg (${Math.round((await stat(OG)).size / 1000)} kB)`);

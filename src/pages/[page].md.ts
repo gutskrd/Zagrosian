@@ -1,7 +1,7 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { textPages } from '../lib/pages';
 
-/** The English pages as Markdown: /index.md, /privacy.md, /terms.md, /security.md. */
+/** English pages as Markdown: /index.md, /privacy.md, /terms.md, /security.md. */
 export const getStaticPaths = (async () =>
   (await textPages())
     .filter((page) => page.locale === 'en')

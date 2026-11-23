@@ -1,15 +1,13 @@
 ---
 /**
- * The download of Hevalo's book: the PDF, saved under its own name. As the
- * main action, a pill with its facts under it ("PDF · 2.6 MB · 192 pages"),
- * and under them, in an app's own browser, how to get it there (`inApp`); in
- * the reader's bar and its contents menu, a small button, and on a phone's
- * bar a round one with only its icon.
+ * Download link for Hevalo's book (the PDF, saved under its own filename). As the primary action: a
+ * pill with facts below it ("PDF · 2.6 MB · 192 pages") and, in in-app browsers, a hint on how to
+ * open it there (`inApp`). In the reader's toolbar and contents menu: a small button, round and
+ * icon-only in the phone toolbar.
  *
- * A plain link with `download`, so it works without JavaScript; the server
- * sends the file as an attachment too, for browsers that ignore the
- * attribute, and as plain bytes rather than as a PDF, so a browser that can
- * show a PDF itself saves this one instead of opening it (public/_headers).
+ * A plain link with `download`, so it works without JS. The server also sends the file as an
+ * attachment for browsers that ignore the attribute, with a generic binary type so browsers with a
+ * built-in PDF viewer save it instead of opening it (public/_headers).
  */
 import { format, i18n } from '../i18n';
 import { pageCountText, pdfSize } from '../lib/book';
@@ -18,7 +16,9 @@ import Cta from './Cta.astro';
 
 interface Props {
   variant?: 'pill' | 'small' | 'icon';
-  /** Under the pill: the line for apps' own browsers, which often cannot download (shown by book.ts). */
+  /**
+   * Hint below the pill for in-app browsers, which often can't download files (shown by book.ts).
+   */
   inApp?: boolean;
   class?: string;
 }

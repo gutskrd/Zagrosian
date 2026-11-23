@@ -1,11 +1,9 @@
 ---
 /**
- * The rug in late sun (Rug.astro), with a paper plane under it, its nose just
- * showing, that once found slips out and flies down to the proverb
- * (Proverb.astro). A pointer or a finger lifts the turned-up corner to look;
- * the button does it for everyone else, keyboard and screen reader included,
- * and with reduced motion. The section's title is for screen readers only:
- * on the page the rug speaks for itself. Text: `under` in the message files.
+ * The rug in late sun (Rug.astro), with a paper plane hidden underneath, its nose just showing;
+ * once found it slips out and flies down to the proverb (Proverb.astro). Pointer or touch lifts the
+ * curled corner; the button does the same for keyboard, screen reader and reduced-motion users. The
+ * section title is visually hidden: the rug speaks for itself. Copy: `under` in the message files.
  */
 import { i18n } from '../i18n';
 import Rug from './Rug.astro';
@@ -40,7 +38,7 @@ const { t } = i18n(Astro.url);
   .under {
     position: relative;
     overflow-x: clip;
-    /* The rug's floor already leaves room above and below it. */
+    /* The rug's floor already provides vertical spacing. */
     padding-block: calc(var(--section-space) * 0.5);
   }
 
@@ -52,7 +50,7 @@ const { t } = i18n(Astro.url);
     gap: 1rem 2rem;
   }
 
-  /* The studio-index small print, as the eyebrows. */
+  /* Small print in the same style as the eyebrows. */
   .under__hint {
     display: flex;
     align-items: center;
@@ -64,7 +62,7 @@ const { t } = i18n(Astro.url);
     color: var(--color-muted);
   }
 
-  /* A corner, turned up: the hint's mark. */
+  /* A turned-up corner as the hint's marker. */
   .under__hint::before {
     content: '';
     width: 0.75rem;
@@ -79,7 +77,7 @@ const { t } = i18n(Astro.url);
     font-size: var(--text-sm);
   }
 
-  /* Pointer or touch: the hint that fits the hand. */
+  /* Pointer- or touch-specific hint text. */
   .under__hint-touch {
     display: none;
   }
@@ -94,8 +92,8 @@ const { t } = i18n(Astro.url);
     }
   }
 
-  /* It works only with the script (rug.ts), which shows it; until then it
-     keeps its place, so nothing below moves when it appears. */
+  /* Requires JS (rug.ts reveals it); until then it reserves its space so nothing shifts when it
+     appears. */
   .under__button:not([data-ready]) {
     visibility: hidden;
   }

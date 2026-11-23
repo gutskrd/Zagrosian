@@ -1,9 +1,8 @@
 ---
 /**
- * A small note offering this page in the visitor's own language, when their
- * browser prefers one of the site's other languages. It never redirects. The
- * text for every language is in the page, written in that language; the script
- * (src/scripts/language.ts) shows the matching one, and remembers a dismissal.
+ * Small notice offering this page in the visitor's language when their browser prefers another
+ * supported locale. It never redirects. The copy for every locale is in the HTML, each written in
+ * its own language; src/scripts/language.ts shows the matching one and remembers a dismissal.
  */
 import { i18n, localizePath, locales, messages } from '../i18n';
 
@@ -39,8 +38,8 @@ const others = locales.filter(({ code }) => code !== locale);
     inset-inline-end: var(--gutter);
     z-index: 60;
     width: min(22rem, calc(100vw - 2 * var(--gutter)));
-    /* It slides up from below the edge of the screen rather than fading in,
-       so its text is never shown at reduced contrast. */
+    /* Slides up from below the viewport rather than fading in, so its text never renders at reduced
+       contrast. */
     transform: translateY(calc(100% + 2 * var(--gutter)));
     transition: transform 0.7s var(--ease-out);
   }

@@ -1,17 +1,14 @@
 ---
 /**
- * A leaf of Hevalo's book, for turning a page (src/scripts/book-turn.ts).
+ * A book leaf for page turns (src/scripts/book-turn.ts).
  *
- * It is paper in two pieces hinged together: the inner piece, 60% of the
- * page, turns about the spine, and the outer piece, the 40% at the page's
- * edge, turns a little further mid-turn and back, so the leaf bends as paper
- * does. Each piece has a front and a back face, each a box that hides what
- * runs past it (overflow, not a clip path, which is cut again on every frame
- * of a turn in 3D). A highlight runs along the fold.
+ * Two hinged segments: the inner 60% of the page rotates about the spine, and the outer 40% rotates
+ * slightly further mid-turn and back, so the leaf bends like paper. Each segment has a front and
+ * back face, each clipping its content with overflow rather than clip-path (which would be
+ * re-clipped on every frame of a 3D turn). A highlight runs along the fold.
  *
- * Its faces are empty until a turn: the script lays copies of the pages'
- * pictures into them and takes them out again after. Decoration only: the
- * leaves sit in a layer hidden from assistive technology.
+ * Faces are empty until a turn: the script inserts copies of the page images and removes them
+ * afterwards. Purely decorative; the leaves layer is hidden from assistive technology.
  */
 ---
 

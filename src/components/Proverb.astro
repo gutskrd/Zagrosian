@@ -1,18 +1,15 @@
 ---
 /**
- * A Kurdish proverb, written on a sheet of paper: the sheet the paper plane
- * from under the rug (Underneath.astro) unfolds into as it lands here
- * (src/scripts/plane.ts). The sheet keeps the plane's creases, worked out from
- * the same folds (plane-folds.ts), drawn for both ways it can lie: tall on a
- * phone, landing nose down; wide on a larger screen, landing nose first from
- * the left.
+ * A Kurdish proverb written on a sheet of paper: the sheet the paper plane from under the rug
+ * (Underneath.astro) unfolds into when it lands here (src/scripts/plane.ts). The sheet shows the
+ * plane's creases, computed from the same folds (plane-folds.ts) for both orientations: portrait on
+ * phones (landing nose down) and landscape on larger screens (landing nose first from the left).
  *
- * The sheet is never taller than the screen leaves under the header, so it
- * can always be read whole where the plane opens it, and its writing grows
- * and shrinks with it. The proverb is plain text in the page, read by screen
- * readers and search engines whatever the plane is doing; without JavaScript,
- * or with reduced motion, the sheet simply lies here. The plane's canvas is
- * hidden until the script draws on it.
+ * The sheet never exceeds the viewport height below the header, so it's always fully readable where
+ * the plane opens it, and its text scales with it. The proverb is plain text in the document,
+ * available to screen readers and search engines regardless of the animation. Without JS or with
+ * reduced motion the sheet is simply static. The plane's canvas stays hidden until the script draws
+ * on it.
  */
 import { i18n } from '../i18n';
 import { foldSheet, LENGTH } from '../scripts/plane-folds';
@@ -21,7 +18,7 @@ import { kurdish } from '../site';
 const { t } = i18n(Astro.url);
 const { creases } = foldSheet();
 const round = (value: number) => +value.toFixed(4);
-// Tall, the nose at the bottom (turned half round); wide, the nose to the right.
+// Portrait: nose at the bottom (rotated 180 degrees); landscape: nose to the right.
 const tall = creases.map(({ from, to }) => [0.5 - from[0], LENGTH - from[1], 0.5 - to[0], LENGTH - to[1]].map(round));
 const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LENGTH - to[1], 0.5 + to[0]].map(round));
 ---
@@ -52,21 +49,19 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
 </div>
 
 <style>
-  /* Whatever the plane does off to the side, the page never scrolls sideways. */
+  /* Wherever the plane flies, the page never scrolls horizontally. */
   .proverb {
     position: relative;
     overflow-x: clip;
   }
 
-  /*
-   * A sheet of A4's proportions, the same paper in either theme, as a real
-   * sheet would be: warm white, with the creases of having been a plane.
-   */
+  /* A4-proportioned sheet, the same paper in both themes like a real sheet: warm white, with the
+     creases of having been a plane. */
   .proverb__sheet {
     --paper: rgb(243 239 230);
     --paper-ink: #1f1c17;
     --paper-muted: #645e54;
-    /* The height the screen leaves under the header, with a margin. */
+    /* Available height below the header, minus a margin. */
     --room: calc(100vh - var(--header-height) - 3.5rem);
     position: relative;
     width: min(100%, 22rem, var(--room) / 1.41421);
@@ -84,7 +79,7 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
     }
   }
 
-  /* The sheet's shadow on the page, apart so it can come and go softly. */
+  /* Drop shadow as a separate layer, so it can fade in and out. */
   .proverb__sheet::after {
     content: '';
     position: absolute;
@@ -127,7 +122,7 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
     }
   }
 
-  /* The writing, sized by the sheet (container units), so it reads the same on any screen. */
+  /* Text sized by the sheet (container units), so it reads the same at any size. */
   .proverb__writing {
     position: relative;
     display: flex;
@@ -172,7 +167,7 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
       font-size: 3cqi;
     }
 
-    /* (After the credit's own rule below, so this one is the more particular.) */
+    /* (Placed after the source's own rule so this one takes precedence.) */
     .proverb__writing .proverb__source {
       font-size: max(0.75rem, 2.2cqi);
     }
@@ -199,11 +194,8 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
     font-family: var(--font-sans);
   }
 
-  /*
-   * While the plane carries it (plane.ts), the sheet is out of sight; when it
-   * lands, the paper is there at once, where the plane opened, and the writing
-   * comes up on it.
-   */
+  /* While the plane carries it (plane.ts) the sheet is hidden; on landing the paper appears where
+     the plane opened, and the text fades in on it. */
   .proverb[data-flight]:not([data-landed]) .proverb__sheet {
     opacity: 0;
   }
@@ -223,13 +215,10 @@ const wide = creases.map(({ from, to }) => [LENGTH - from[1], 0.5 + from[0], LEN
     translate: 0 0.35rem;
   }
 
-  /*
-   * The plane's canvas, over the screen, for while it moves: under the rug
-   * (below the rug's canvas, so the rug covers it) as it slides out, over the
-   * page once it flies, under the header. Lying still under the rug, it is
-   * drawn on the rug's own floor instead (Rug.astro). plane.ts draws on it
-   * only while the plane is in sight.
-   */
+  /* Plane canvas fixed over the viewport for the flight: below the rug canvas (so the rug covers
+     it) while sliding out, then above the page and below the header. At rest under the rug it's
+     drawn on the rug's floor canvas instead (Rug.astro). plane.ts only draws while the plane is
+     visible. */
   .flight {
     position: fixed;
     inset: 0;

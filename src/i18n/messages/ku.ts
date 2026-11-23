@@ -1,7 +1,7 @@
 import type { Messages } from './en';
 
-/* Kurmancî. Words shared with Hevalo's own interface (Biçe naverokê, Menû,
-   Bigire, Di rê de, Hat kopîkirin, Rûpel nehat dîtin) are kept the same. */
+/* Kurmanji. Terms shared with Hevalo's UI (Biçe naverokê, Menû, Bigire, Di rê de, Hat kopîkirin,
+   Rûpel nehat dîtin) are kept identical. */
 export const ku: Messages = {
   meta: {
     title: 'Zagrosian — Teknolojî ji bo jiyana rojane',
@@ -82,7 +82,7 @@ export const ku: Messages = {
   story: {
     values: ['Sadeyî.', 'Nepenî.', 'Zelalî.'],
   },
-  // The motto is already in Kurmancî.
+  // The motto is already in Kurmanji.
   motto: '',
   about: {
     eyebrow: 'Derbarê me de',

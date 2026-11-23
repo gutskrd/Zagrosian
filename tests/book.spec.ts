@@ -1,18 +1,14 @@
 /**
- * Hevalo's book (/book): served as a page, read as a book. The cover alone
- * in the middle, two pages open at a time on a computer and one on a phone;
- * turned with the buttons, the keys (also before the book has the focus, and
- * [ and ] with AltGr), a click, quick clicks that each count, a drag, a swipe
- * or a tap at the edge, a chapter at a time from the contents; at once with
- * reduced motion; the right way round on right-to-left pages, in the page's
- * own digits. Zoom, the scroll view (every page in a column, its bar
- * following the page being read), the text view (the same, in words) and
- * full view (over the site's header, keeping the focus); the focus stays in
- * the book on its last page; only the pages near the reader are fetched, all
- * from this site; the bars hold every control apart, and the chapter’s name
- * whole, in every language at every width; the download is the book, under its own name, from the
- * phone's bar too. Without JavaScript the pages are a column; a picture gone
- * and a reader that cannot start both leave the book readable.
+ * Book page (/book) and reader: the cover alone and centered, spreads on desktop and single pages
+ * on mobile. Covers turning via buttons, keys (also before the book has focus, and `[`/`]` with
+ * AltGr), clicks, rapid clicks that each count, drag, swipe and edge taps, chapter jumps from the
+ * contents; instant changes with reduced motion; correct direction on RTL pages with locale digits.
+ * Also zoom, the scroll view (every page in a column, toolbar tracking the page being read), the
+ * text view, and full view (over the header, trapping focus); focus stays in the book on the last
+ * page; only nearby pages are fetched, all same-origin; toolbar controls never overlap and the
+ * chapter name fits in every locale at every width; the download is the PDF under its own filename,
+ * including from the phone toolbar. Without JS the pages render as a column; a missing image or a
+ * reader that fails to start both leave the book readable.
  */
 import { readFileSync } from 'node:fs';
 import { type Page, expect, test } from '@playwright/test';
@@ -28,11 +24,11 @@ const chapter = (number: number) => manifest.chapters.find((item) => item.number
 const reader = (page: Page) => page.locator('[data-book]');
 const stage = (page: Page) => page.locator('[data-book-stage]');
 
-/** The pages open, by their number ('end' for the closing card). */
+/** Open pages by number ('end' for the end card). */
 const shown = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll<HTMLElement>('[data-book] [data-shown]')].map((element) => element.dataset.n ?? 'end'));
 
-/** Opens a page of the book, with the reader set up and no turn under way. */
+/** Opens a book page with the reader initialized and no turn in progress. */
 async function open(page: Page, path = '/book') {
   await settled(page.context());
   await page.goto(path, { waitUntil: 'networkidle' });
@@ -40,7 +36,7 @@ async function open(page: Page, path = '/book') {
   await expect(page.locator('[data-book-range]')).toHaveAttribute('aria-valuetext', /./);
 }
 
-/** Waits for the leaves to come to rest. */
+/** Waits until no leaves are moving. */
 const still = (page: Page) => expect(reader(page)).not.toHaveAttribute('data-turning', '');
 
 async function expectShown(page: Page, pages: string[]) {
@@ -180,7 +176,7 @@ test.describe('on a computer', () => {
     await open(page, '/book#page-2');
     const right = (await page.locator('#page-3').boundingBox())!;
     const y = right.y + right.height * 0.4;
-    // a short pull: the page falls back
+    // Short pull: the page falls back.
     await page.mouse.move(right.x + right.width - 40, y);
     await page.mouse.down();
     for (let i = 1; i <= 6; i++) await page.mouse.move(right.x + right.width - 40 - i * 8, y);
@@ -188,7 +184,7 @@ test.describe('on a computer', () => {
     await page.mouse.up();
     await page.waitForTimeout(900);
     await expectShown(page, ['2', '3']);
-    // past a third: it turns
+    // Past a third: it turns.
     await page.mouse.move(right.x + right.width - 40, y);
     await page.mouse.down();
     for (let i = 1; i <= 20; i++) await page.mouse.move(right.x + right.width - 40 - i * 30, y);
@@ -217,13 +213,13 @@ test.describe('on a computer', () => {
     await line.scrollIntoViewIfNeeded();
     await expect(line).toBeVisible();
     expect(await line.evaluate((element) => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16);
-    // zoom has nothing to do here
+    // Zoom is unavailable in this view.
     await expect(page.locator('[data-book-zoom="in"]')).toHaveAttribute('aria-disabled', 'true');
-    // reading on to page 14: the bar and the address follow
+    // Reading on to page 14: the toolbar and URL follow.
     await page.locator('#page-14-title').evaluate((heading) => heading.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page 14 of ${manifest.pageCount}`);
     await expect.poll(() => new URL(page.url()).hash).toBe('#page-14');
-    // the slider takes the text to its page
+    // The slider scrolls the text to its page.
     const range = page.locator('[data-book-range]');
     await range.evaluate((input: HTMLInputElement) => {
       input.value = String(Number(input.max) - 10);
@@ -243,29 +239,30 @@ test.describe('on a computer', () => {
     await toggle.click();
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
     await expect(reader(page)).toHaveAttribute('data-scroll', '');
-    // the page that was open is at the top, under the bars, and every page is there, one under the other
+    // The previously open page is at the top, below the toolbars, with every page stacked below.
     await expect.poll(() => new URL(page.url()).hash).toBe('#page-10');
     await expect(page.locator('#page-10 img')).toBeInViewport();
     const boxes = await page.locator('.book__page').evaluateAll((items) => items.map((item) => item.getBoundingClientRect()).map(({ top, height, width }) => ({ top, height, width })));
     expect(boxes).toHaveLength(manifest.pageCount);
     for (let i = 1; i < boxes.length; i++) expect(boxes[i]!.top).toBeGreaterThan(boxes[i - 1]!.top + boxes[i - 1]!.height - 1);
-    // each a whole page, its picture in proportion before it has loaded, and no wider than the screen
+    // Each page has the right aspect ratio before its image loads and is no wider than the
+    // viewport.
     for (const box of boxes) expect(box.height / box.width).toBeCloseTo(595.28 / 419.53, 1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.locator('[data-book-zoom="in"]')).toHaveAttribute('aria-disabled', 'true');
-    // scrolling on to page 14: the bar and the address follow
+    // Scrolling on to page 14: the toolbar and URL follow.
     await page.locator('#page-14').evaluate((item) => item.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page 14 of ${manifest.pageCount}`);
     await expect.poll(() => new URL(page.url()).hash).toBe('#page-14');
     await expect(page.locator('#page-14 img')).toHaveJSProperty('complete', true);
-    // the arrows and ] go from page to page and chapter to chapter, the column scrolling there
+    // Arrows and `]` step by page and chapter, scrolling the column there.
     await page.locator('[data-book-next]').click();
     await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page 15 of ${manifest.pageCount}`);
     await expect(page.locator('#page-15 img')).toBeInViewport();
     await page.keyboard.press(']');
     const next = manifest.chapters.find((item) => item.start > 15)!.start;
     await expect(page.locator('[data-book-counter-long]')).toHaveText(`Page ${next} of ${manifest.pageCount}`);
-    // from the scroll view to the text view and back to the book, at the same page
+    // Scroll view -> text view -> spreads, keeping the same page.
     await page.locator('[data-book-text-toggle]').click();
     await expect(reader(page)).toHaveAttribute('data-text', '');
     await expect(reader(page)).not.toHaveAttribute('data-scroll', '');
@@ -284,7 +281,7 @@ test.describe('on a computer', () => {
     expect(box.width).toBeGreaterThan(340);
     expect(box.width).toBeLessThanOrEqual(390);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    // the bars stay in view while the column scrolls past them
+    // Toolbars stay visible while the column scrolls.
     await page.evaluate(() => scrollBy(0, 3000));
     await expect(page.locator('[data-book-scroll-toggle]')).toBeInViewport();
     await expect(page.locator('[data-book-next]')).toBeInViewport();
@@ -296,7 +293,8 @@ test.describe('on a computer', () => {
     const toggle = page.locator('[data-book-full-toggle]');
     await toggle.click();
     await expect(reader(page)).toHaveAttribute('data-full', '');
-    // what is drawn where the header was is the book (the header, out of reach, is let be hit for the check)
+    // What renders where the header was is the book (the header is made hit-testable just for this
+    // check).
     const drawn = await page.evaluate(() => {
       const header = document.querySelector<HTMLElement>('[data-site-header]')!;
       const inert = header.closest('[inert]');
@@ -340,7 +338,7 @@ test.describe('on a computer', () => {
     expect(pictures.reduce((sum, picture) => sum + picture.bytes, 0)).toBeLessThan(1_000_000);
     expect(elsewhere).toEqual([]);
 
-    // a link within the page is no reason to fetch another document
+    // In-page links must not trigger document fetches.
     const documents: string[] = [];
     page.on('request', (request) => {
       if (request.resourceType() === 'document') documents.push(request.url());
@@ -356,7 +354,8 @@ test.describe('on a computer', () => {
     expect(download.suggestedFilename()).toBe('Reya-Kurmanci-Pirtuka-Hevalo.pdf');
     const response = await request.get('/book/reya-kurmanci.pdf');
     const headers = response.headers();
-    // plain bytes, so a browser that shows PDFs itself saves the book instead of opening it
+    // Generic binary type, so browsers with a built-in PDF viewer save the file instead of opening
+    // it.
     expect(headers['content-type']).toBe('application/octet-stream');
     expect(headers['content-disposition']).toContain('attachment');
     expect(headers['x-robots-tag']).toBe('noindex');
@@ -381,7 +380,8 @@ test.describe('the bars', () => {
               .map((child) => child.getBoundingClientRect())
               .filter((box) => box.width > 0),
           );
-          // the contents' button sits a little past its bar's edge on purpose, so a few pixels of touching are allowed
+          // The contents button intentionally overhangs its bar's edge slightly, so a few pixels of
+          // contact are allowed.
           const apart = boxes.every((one, i) =>
             boxes.slice(i + 1).every((other) => one.every((a) => other.every((b) => a.right - 10 <= b.left || b.right - 10 <= a.left || a.bottom - 1 <= b.top || b.bottom - 1 <= a.top))),
           );
@@ -415,14 +415,14 @@ test.describe('on a phone', () => {
     await page.waitForTimeout(120);
     await tap(page, at);
     await expect(reader(page)).toHaveAttribute('data-zoom', '');
-    // pan-x pan-y pinch-zoom, which the browser writes as "manipulation"
+    // pan-x pan-y pinch-zoom, which the browser serializes as "manipulation".
     expect(await stage(page).evaluate((element) => getComputedStyle(element).touchAction)).toMatch(/manipulation|pan-x/);
     const before = await stage(page).evaluate((element) => element.scrollLeft);
     await swipe(page, { x: at.x - 80, y: at.y }, { x: at.x + 80, y: at.y });
     await expect.poll(() => stage(page).evaluate((element) => element.scrollLeft)).toBeLessThan(before - 40);
   });
 
-  /** A finger drawn from one point to another, in a dozen steps. */
+  /** Drags a finger from one point to another in a dozen steps. */
   async function swipe(page: Page, from: { x: number; y: number }, to: { x: number; y: number }) {
     const cdp = await page.context().newCDPSession(page);
     const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x: number, y: number) =>
@@ -481,7 +481,7 @@ test.describe('on a narrow phone, in Kurmanji', () => {
     const { box, bar, whole } = await hint.evaluate((element) => ({
       box: element.getBoundingClientRect().toJSON() as DOMRect,
       bar: element.closest('.book__bar')!.getBoundingClientRect().toJSON() as DOMRect,
-      // every line of it is whole: nothing runs past its box, either way
+      // Every line fits: nothing overflows its box in either direction.
       whole: element.scrollHeight <= element.clientHeight + 1 && [...element.children].every((line) => line.scrollWidth <= line.clientWidth + 1),
     }));
     expect(box.left).toBeGreaterThanOrEqual(0);
@@ -489,7 +489,7 @@ test.describe('on a narrow phone, in Kurmanji', () => {
     expect(box.top).toBeGreaterThanOrEqual(bar.top - 1);
     expect(box.bottom).toBeLessThanOrEqual(bar.bottom + 1);
     expect(whole).toBe(true);
-    // and it goes after a few seconds
+    // Hides after a few seconds.
     await expect(hint).toBeHidden({ timeout: 8000 });
   });
 });
@@ -501,7 +501,7 @@ test.describe('with reduced motion', () => {
     await open(page);
     await page.locator('[data-book-next]').click();
     expect(await shown(page)).toEqual(['2', '3']);
-    // no leaf, and nothing in the book moving
+    // No leaf, and nothing in the book animating.
     await expect(reader(page)).not.toHaveAttribute('data-turning', '');
     expect(await page.locator('.leaf[data-active]').count()).toBe(0);
     expect(
@@ -527,7 +527,7 @@ test.describe('right to left', () => {
       const previous = (await page.locator('[data-book-prev]').boundingBox())!;
       const next = (await page.locator('[data-book-next]').boundingBox())!;
       expect(next.x).toBeGreaterThan(previous.x);
-      // the counter keeps the digits the page was built with, after a turn too
+      // The counter keeps the build-time digits, also after a turn.
       const digits = (await reader(page).getAttribute('data-digits'))!;
       const before = (await page.locator('[data-book-counter-long]').textContent())!;
       await stage(page).focus();
@@ -571,7 +571,7 @@ test.describe('when something fails', () => {
   test('a reader that cannot start leaves the column of pages', async ({ page }) => {
     await settled(page.context());
     await page.addInitScript(() => {
-      // the reader needs to know when its stage changes size
+      // The reader requires ResizeObserver to track its stage size.
       Object.defineProperty(window, 'ResizeObserver', { value: undefined });
     });
     await page.goto('/book', { waitUntil: 'networkidle' });

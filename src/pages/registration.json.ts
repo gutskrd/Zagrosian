@@ -1,9 +1,7 @@
 /**
- * The company's registered details (src/site.ts), for the footer to show:
- * built as /registration.json. They are not written into the pages, so that
- * search engines do not list them; robots.txt asks crawlers not to fetch this
- * file, and public/_headers marks it noindex. src/scripts/registration.ts
- * reads it and puts the details in the footer for visitors.
+ * Serves the registration details from src/site.ts as /registration.json for the footer. They're
+ * kept out of the HTML so search engines don't index them: robots.txt disallows this file and
+ * public/_headers marks it noindex. src/scripts/registration.ts renders them client-side.
  */
 import type { APIRoute } from 'astro';
 import { registration } from '../site';

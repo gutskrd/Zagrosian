@@ -1,9 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
 /**
- * The site's checks (tests/), run in Chromium against the built site, served
- * with its production headers: `npm run build`, then `npm test`. A check that
- * fails is a real failure, so nothing is retried.
+ * End-to-end tests (tests/), run in Chromium against the production build served with its real
+ * headers: `npm run build`, then `npm test`. No retries: a failure is a real failure.
  */
 export default defineConfig({
   testDir: 'tests',

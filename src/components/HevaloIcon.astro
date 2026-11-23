@@ -1,17 +1,14 @@
 ---
 /**
- * Hevalo's app icon: the deer, and from 1 December to 6 January the deer
- * dressed for Christmas. theme-init.js marks the season before the page is
- * drawn, so the icon never swaps in front of the visitor.
+ * Hevalo's app icon: the deer, or the Christmas version from Dec 1 to Jan 6. theme-init.js sets the
+ * season before first paint, so the icon never swaps visibly.
  *
- * Each comes as WebP at three sizes, so a screen downloads only the resolution
- * it needs, and only the one in season: both images are lazy, and browsers do
- * not download a lazy image that is not displayed.
+ * WebP at three sizes so each screen downloads only the resolution it needs, and only the active
+ * season's image: both are lazy, and browsers don't fetch hidden lazy images.
  *
- * The deer's pupils are not in the images: they are drawn over them
- * (HevaloEyes.astro), at the places they have in the artwork, so they can
- * follow the pointer (src/scripts/eyes.ts). The two icons share the same eyes.
- * In the products section the deer is shown in 3D instead (HevaloDeer.astro).
+ * The pupils aren't in the images; they're drawn on top (HevaloEyes.astro) at their artwork
+ * positions so they can follow the pointer (src/scripts/eyes.ts). Both seasons share the same eyes.
+ * The products section uses the 3D deer instead (HevaloDeer.astro).
  */
 import christmas96 from '../assets/brand/hevalo-christmas-96.webp';
 import christmas192 from '../assets/brand/hevalo-christmas-192.webp';
@@ -22,9 +19,9 @@ import icon288 from '../assets/brand/hevalo-288.webp';
 import HevaloEyes from './HevaloEyes.astro';
 
 interface Props {
-  /** Rendered width, as a `sizes` value, e.g. "20px". */
+  /** Rendered width as a `sizes` value, e.g. "20px". */
   sizes: string;
-  /** Leave empty when the icon sits next to the Hevalo name. */
+  /** Empty when the icon sits next to the Hevalo name. */
   alt?: string;
   class?: string;
 }
@@ -72,9 +69,8 @@ const variants = [
     height: auto;
   }
 
-  /* The Christmas deer's scarf hangs below the square (192 × 220 against
-     192 × 192). It overhangs instead of making the icon taller, so the page
-     around it is the same in every season. */
+  /* The Christmas scarf hangs below the square (192x220 vs 192x192). It overflows instead of making
+     the icon taller, so the surrounding layout is identical in every season. */
   .hevalo-icon__image[data-season='christmas'] {
     display: none;
     margin-block-end: calc(100% * (1 - 220 / 192));

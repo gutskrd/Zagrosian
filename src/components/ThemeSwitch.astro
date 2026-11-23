@@ -1,10 +1,9 @@
 ---
 /**
- * A control to follow the system theme or choose light or dark
- * (src/scripts/theme.ts), in the footer and in the site menu. Native radio
- * buttons, so arrow keys and screen readers work as usual; the sliding
- * indicator follows the `data-theme-preference` attribute on <html>. Each
- * copy has a `name` of its own, so their radio buttons are separate groups.
+ * Theme control: system, light or dark (src/scripts/theme.ts), used in the footer and the site
+ * menu. Native radio buttons, so arrow keys and screen readers work as expected; the sliding
+ * indicator follows `data-theme-preference` on <html>. Each instance has its own `name`, so their
+ * radios are separate groups.
  */
 import { i18n } from '../i18n';
 
@@ -50,7 +49,7 @@ const options = [
 </fieldset>
 
 <style>
-  /* Shown once theme-init.js has run; without JavaScript it could not work. */
+  /* Shown once theme-init.js has run; it can't work without JS. */
   .theme-switch {
     --option: 2rem;
     --inset: 0.1875rem;

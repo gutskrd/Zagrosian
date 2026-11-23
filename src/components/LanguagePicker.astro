@@ -1,18 +1,17 @@
 ---
 /**
- * Language menu in the header: a button with the world icon (and, on wider
- * screens, the language code) that opens a popover listing every language,
- * each linking to the same page in that language. Uses the Popover
- * API, so it opens, closes on Escape or an outside click, and returns focus
- * without any JavaScript.
+ * Header language menu: a button with the globe icon (plus the locale code on wider screens)
+ * opening a popover with every language, each linking to the current page in that language. Built
+ * on the Popover API, so open, close on Escape or outside click, and focus return all work without
+ * JS.
  */
 import { i18n, localizePath, locales } from '../i18n';
 import Globe from './Globe.astro';
 
 const { locale, info, t, base } = i18n(Astro.url);
 
-// The button shows the language code (DE); its accessible name also gives the
-// language in full, and includes the visible code for voice control users.
+// The button shows the locale code (DE); its accessible name spells out the language and includes
+// the visible code for voice control users.
 const buttonLabel = `${t.language.label}: ${info.name} (${locale.toUpperCase()})`;
 ---
 
@@ -34,8 +33,8 @@ const buttonLabel = `${t.language.label}: ${info.name} (${locale.toUpperCase()})
               lang={code}
               aria-current={code === locale ? 'true' : undefined}
             >
-              {/* The name keeps its own direction, but every name starts at the
-                  menu's edge, so the list reads as one aligned column. */}
+              {/* Each name keeps its own direction but starts at the menu's edge, so the list reads
+                 as one aligned column. */}
               <span dir={dir}>{name}</span>
               {code === locale && (
                 <svg class="language__check" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -87,7 +86,7 @@ const buttonLabel = `${t.language.label}: ${info.name} (${locale.toUpperCase()})
     letter-spacing: 0.02em;
   }
 
-  /* On phones, the world icon alone, in a circle like the other controls. */
+  /* Phones: globe icon only, in a circle like the other controls. */
   @media (max-width: 47.99rem) {
     .language__button {
       justify-content: center;
@@ -101,7 +100,7 @@ const buttonLabel = `${t.language.label}: ${info.name} (${locale.toUpperCase()})
     }
   }
 
-  /* The menu drops down from the header, aligned with its end edge. */
+  /* Dropdown below the header, aligned to its end edge. */
   .language__menu {
     position: fixed;
     inset: auto;

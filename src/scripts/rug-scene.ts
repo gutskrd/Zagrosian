@@ -1,38 +1,28 @@
 /**
- * The rug (Rug.astro) as a rug of wool lying on the page, seen from above,
- * that can be picked up: lift a corner and fold it over, drag it, twist it
- * round, let go and it drops and settles, as cloth does. WebGL 2.
+ * WebGL 2 rug that can be picked up, folded, dragged and dropped like cloth.
  *
- * - The cloth is rug-cloth.ts: a grid of particles. Each frame its positions
- *   and normals go to the GPU as two small float textures, and a finer mesh
- *   (four times as many rows and columns) is drawn through them with
- *   Catmull-Rom curves, so folds are round, not faceted.
- * - The wool is the rug's picture (scripts/rug.mjs), as a mipmapped texture;
- *   the shader adds the pile, a shade to each knot, and the light on each pip.
- * - The light is a large soft one from the upper left. Its shadow map (the
- *   rug's depth as the light sees it) gives the shadow the rug casts on the
- *   page, sharp where it touches and softer the higher it is lifted
- *   (percentage-closer soft shadows), and the shadow a fold casts on the rug
- *   under it.
- * - It is there from the first, lying on the floor with its nearest corner
- *   turned up, as a rug's often is. The corner is worked out before the rug
- *   is shown (a few steps at a time, so the page never waits), so nothing
- *   moves into place in front of you.
- * - Hover shows a hand; press and drag. On a touch screen, press and hold,
- *   or set off sideways, so a swipe up or down still scrolls; a tap lifts
- *   the corner, as the "Lift the rug" button does.
+ * - Simulation: rug-cloth.ts (particle grid). Positions and normals are uploaded each frame as two
+ *   small float textures; a 4x denser mesh samples them with Catmull-Rom interpolation so folds
+ *   stay smooth.
+ * - Shading: the woven image (scripts/rug.mjs) as a mipmapped texture, plus procedural pile,
+ *   per-knot variation and wool sheen.
+ * - Lighting: one large soft key light from the upper left. A shadow map gives contact-hardening
+ *   (PCSS) shadows on the floor and self-shadowing between folds.
+ * - At rest the nearest corner is slightly curled. The rest pose is simulated off-screen in small
+ *   time slices before the rug is shown, so nothing settles in view.
+ * - Input: mouse drag. On touch, a long press or a horizontal start grabs the rug so vertical
+ *   swipes still scroll; a tap lifts the corner, like the button.
  *
- * It simulates and draws only while something moves; at rest it costs
- * nothing. Played with and scrolled away, it is laid straight again. For
- * visitors who prefer reduced motion it lies still and flat.
+ * The render loop runs only while something moves. After interaction the pose is reset once the rug
+ * is out of view. Reduced motion keeps it flat and static.
  */
 import rugPicture from '../assets/rug/rug.webp?url';
 import { modest, pixelRatio } from './device';
 import { Cloth } from './rug-cloth';
 
 /**
- * The rug's picture in cells of two knots by two (scripts/rug.mjs): across,
- * along the weave, and the fringe at each end.
+ * Woven image layout in 2x2-knot cells (scripts/rug.mjs): width, length, and the fringe at each
+ * end.
  */
 const CELLS_ACROSS = 101;
 const WEAVE_ROWS = 161;
@@ -42,16 +32,15 @@ const CELLS_ALONG = WEAVE_ROWS + 2 * FRINGE;
 const ROWS = Math.round((COLUMNS - 1) * (CELLS_ALONG / CELLS_ACROSS)) + 1;
 const SUBDIVIDE = 4;
 /**
- * How much of the stage's width the rug takes, and how it lies at rest, are
- * set in CSS (`--rug-share`, `--rug-angle` on the stage in Rug.astro), so the
- * flat picture, the paper plane under it and this scene always agree.
+ * The rug's share of the stage width and its resting angle come from CSS (`--rug-share`,
+ * `--rug-angle` in Rug.astro), so the fallback image, the paper plane and this scene stay aligned.
  */
 const cssNumber = (element: HTMLElement, name: string, fallback: number) => {
   const value = parseFloat(getComputedStyle(element).getPropertyValue(name));
   return Number.isFinite(value) ? value : fallback;
 };
 const LIFT = 0.1;
-/** How high the corner that invites a hand rests, and how high it rises when one comes near. */
+/** Corner curl height at rest, and the height it rises to when the pointer approaches. */
 const CURL = 0.065;
 const CURL_NEAR = 0.11;
 const STEP = 1 / 60;
@@ -69,8 +58,7 @@ vec3 grid(highp sampler2D values, ivec2 at) {
   return texelFetch(values, clamp(at, ivec2(0), uGrid - 1), 0).xyz;
 }
 
-// The cloth at a point between its particles, through the four by four
-// nearest of them.
+// Cloth position at a point between particles: bicubic Catmull-Rom over the nearest 4x4.
 vec3 smoothly(highp sampler2D values, vec2 uv) {
   vec2 g = uv * vec2(uGrid - 1);
   ivec2 i = min(ivec2(floor(g)), uGrid - 2);
@@ -100,39 +88,32 @@ void main() {
   gl_Position = uViewProjection * vec4(world, 1.0);
 }`;
 
-// The rug's depth as the light sees it: nothing to colour.
+// Depth-only pass for the shadow map.
 const depthFragment = /* glsl */ `#version 300 es
 precision highp float;
 void main() {}`;
 
 /**
- * Dim late sun through a window, as in the photographs of Hevalo's kilims:
- * two broad beams of warm light across the floor and the rug, one after the
- * other as the window's panes let them through, the soft shadow of the bar
- * between them,
- * their edges as soft as a low sun makes them, and the whole patch brightest
- * nearest the window and fading as the light spreads. A point above the floor
- * (a lifted corner) is lit where its light crossed the window, so it is
- * traced back along the light to the floor and the beams bend over the cloth
- * as they would in a room.
+ * Late-afternoon window light: two warm, soft-edged beams split by the mullion's shadow, brightest
+ * near the window. Points above the floor are projected back along the light direction, so the
+ * beams wrap over lifted cloth.
  */
 const sunlight = /* glsl */ `
 uniform vec3 uToLight;
 float speck(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
 }
-// Soft noise, for the mottle of the wool (rugFragment).
+// Value noise for the wool mottle (rugFragment).
 float mottle(vec2 p) {
   vec2 i = floor(p);
   vec2 f = fract(p);
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(speck(i), speck(i + vec2(1.0, 0.0)), f.x), mix(speck(i + vec2(0.0, 1.0)), speck(i + vec2(1.0, 1.0)), f.x), f.y);
 }
-// x: how much of the window's patch of light this point is in; y: how much
-// of the beams' light reaches it there.
+// x: coverage by the window's light patch; y: beam intensity at that point.
 vec2 windowParts(vec3 p) {
   vec2 q = p.xz - uToLight.xz / uToLight.y * p.y;
-  // Along the light (the beams are stretched that way) and across it.
+  // Coordinates along the light (beams are stretched that way) and across it.
   vec2 along = normalize(-uToLight.xz);
   vec2 across = vec2(-along.y, along.x);
   vec2 c = q - vec2(0.02, 0.04);
@@ -148,7 +129,7 @@ float window(vec3 p) {
 }
 `;
 
-/** Sixteen points spread evenly over a disc, for soft shadows. */
+/** 16 evenly distributed sample offsets on a disc, for soft shadows. */
 const disc = /* glsl */ `
 const vec2 DISC[16] = vec2[](
   vec2(-0.94, -0.40), vec2(0.95, -0.77), vec2(-0.09, -0.93), vec2(0.34, 0.29),
@@ -180,12 +161,12 @@ void main() {
   vec3 n = normalize(vNormal);
   if (!gl_FrontFacing) {
     n = -n;
-    // The back of a pile rug: the same pattern, flatter and duller.
+    // Back side of a pile rug: same pattern, flatter and duller.
     base *= 0.78;
   }
 
-  // The pips of wool catch the light: two passes a cell over two warps, as in
-  // the texture. They fade where they are too small to see.
+  // Knot highlights: two passes per cell over two warps, matching the texture; faded out where
+  // they'd be sub-pixel.
   vec2 cell = vUv * uCells;
   float py = cell.y * 2.0;
   float pass = floor(py);
@@ -197,15 +178,14 @@ void main() {
   vec3 along = normalize(cross(n, across));
   vec3 slope = PI * cos(PI * u) * sin(PI * w) * across + PI * sin(PI * u) * cos(PI * w) * along;
   vec3 bumped = normalize(n - 0.18 * detail * slope);
-  // The pile: each knot a little lighter or darker than its neighbours, as
-  // wool is, fading out where knots are too small to see; and a fine mottle
-  // over it, a cell or so across, as tufts lie this way and that.
+  // Pile: per-knot brightness variation (faded out where knots are sub-pixel), plus a fine mottle
+  // about a cell across, as tufts lie in different directions.
   float tuft = fract(sin(dot(floor(cell * 2.0), vec2(12.9898, 78.233))) * 43758.5453);
   base *= mix(1.0, 0.88 + 0.2 * tuft, detail);
   float fine = 1.0 - smoothstep(0.7, 1.6, max(fwidth(cell.x), fwidth(cell.y)));
   base *= mix(1.0, 0.93 + 0.14 * mottle(cell * 0.85), fine);
 
-  // How much of the light reaches it, past any fold above.
+  // Self-shadowing from folds above.
   vec4 l = uLight * vec4(vWorld + n * 0.006, 1.0);
   vec3 s = l.xyz / l.w * 0.5 + 0.5;
   float lit = 0.0;
@@ -214,19 +194,17 @@ void main() {
 
   vec3 toLight = normalize(uToLight);
   vec3 v = normalize(uEye - vWorld);
-  // The sun reaches it only through the window, in its beams.
+  // Direct light only within the window beams.
   float beam = window(vWorld);
-  // Wool is matte and fuzzy: light wraps a little way round its folds
-  // instead of stopping at a hard edge, and nothing on it shines.
+  // Wrapped diffuse: wool is matte and fuzzy, so light wraps around folds and there's no specular.
   float sun = clamp(dot(bumped, toLight) * 0.85 + 0.15, 0.0, 1.0) * lit * (0.12 + 0.88 * beam);
-  // Light from the whole room, less from the floor.
+  // Hemispheric ambient: more from above than from the floor.
   float sky = 0.55 + 0.45 * bumped.y;
-  // Pile seen side-on, down a fold, shows its shadowed depths: a little darker.
+  // Grazing angles reveal the pile's shadowed depth: slightly darker.
   float pile = mix(0.8, 1.0, sqrt(max(dot(n, v), 0.0)));
-  // Late sun is warm, so the wool it falls on glows amber; the room's light,
-  // from a sky already going blue, is a little cool.
+  // Warm key light, slightly cool ambient (late-afternoon sun vs. bluish sky).
   vec3 sunColour = mix(vec3(1.0), vec3(1.0, 0.72, 0.44), beam);
-  // The room itself is dim: the beams are where the rug glows.
+  // Dim room: the beams carry most of the light.
   vec3 colour = base * (0.36 * sky * vec3(0.93, 0.95, 1.0) + sun * sunColour) * pile;
   outColor = vec4(pow(colour, vec3(1.0 / 2.2)), 1.0);
 }`;
@@ -252,7 +230,7 @@ uniform float uDepthRange;
 uniform float uTexel;
 uniform float uStrength;
 uniform float uDark;
-// The rug as the light sees it, with room round it for its softest shadow.
+// Light-space bounds of the rug, padded for the softest penumbra.
 uniform vec4 uRugBox;
 out vec4 outColor;
 ${disc}
@@ -261,8 +239,7 @@ ${sunlight}
 void main() {
   vec4 l = uLight * vec4(vWorld, 1.0);
   vec3 s = l.xyz / l.w * 0.5 + 0.5;
-  // Where the rug is, as the light sees it, and how high above the floor;
-  // looked for only near it (most of the floor is not).
+  // Blocker search in light space, only near the rug (most of the floor is clear).
   float found = 0.0;
   float depth = 0.0;
   if (all(greaterThan(s.xy, uRugBox.xy)) && all(lessThan(s.xy, uRugBox.zw))) {
@@ -279,22 +256,21 @@ void main() {
   float lit = 1.0;
   if (found > 0.5) {
     float height = (s.z - depth / found) * uDepthRange;
-    // A large light: the higher the rug, the softer its shadow.
+    // Area light: penumbra widens with blocker height (PCSS).
     float radius = uTexel * (1.5 + height * 260.0);
     lit = 0.0;
     for (int i = 0; i < 16; i++) lit += texture(uShadow, vec3(s.xy + DISC[i] * radius, s.z - 0.0005));
     lit /= 16.0;
-    // Fainter the further it falls.
+    // Attenuate with distance.
     shade = (1.0 - lit) / (1.0 + height * 4.0);
-    // And a soft dimness all round where it lies close: the room's light is hidden.
+    // Contact occlusion where the rug is close to the floor.
     near = found / 16.0 * 0.4 / (1.0 + height * 10.0);
   }
-  // The patch of sun on the floor, where the rug does not stand in its way.
+  // Sunlight patch on the floor, minus the rug's shadow.
   vec2 w = windowParts(vWorld);
   float beam = w.x * w.y * lit;
-  // On a dark page the sun is added as warm light. On a light one, where
-  // light cannot be added to white, the beams tint the page warm instead,
-  // as low sun does a white wall. The rug's shadow lies over either.
+  // Dark theme: add the sun as warm light. Light theme: light can't be added to white, so tint
+  // the beams warm instead, like low sun on a white wall. The shadow applies on top of either.
   float shadow = max(shade, near) * uStrength;
   float tint = uDark > 0.5 ? 0.0 : beam * 0.16;
   vec3 warm = uDark > 0.5 ? vec3(0.14, 0.09, 0.045) * beam : vec3(1.0, 0.84, 0.6) * tint;
@@ -326,7 +302,7 @@ const orthographic = (half: number, near: number, far: number): Matrix => {
   return new Float32Array([1 / half, 0, 0, 0, 0, 1 / half, 0, 0, 0, 0, 2 * range, 0, 0, 0, (near + far) * range, 1]);
 };
 
-/** A camera at `eye` looking at the origin, with `up` towards the top of its picture. */
+/** View matrix for a camera at `eye` looking at the origin. */
 const lookAt = (eye: number[], up: number[]): Matrix => {
   const length = (v: number[]) => Math.hypot(v[0], v[1], v[2]);
   const back = eye.map((value) => value / length(eye));
@@ -364,7 +340,7 @@ function compile(gl: WebGL2RenderingContext, vertex: string, fragment: string) {
   return { program, at };
 }
 
-/** A grid of points over the unit square, as triangles. */
+/** Triangulated grid over the unit square. */
 function mesh(gl: WebGL2RenderingContext, across: number, along: number) {
   const points = new Float32Array((across + 1) * (along + 1) * 2);
   let i = 0;
@@ -399,15 +375,15 @@ function mesh(gl: WebGL2RenderingContext, across: number, along: number) {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /**
- * Sets the rug up in the stage's canvas. Resolves false where WebGL 2 is not
- * available, and the flat picture stays.
+ * Initializes the rug in the stage's canvas. Resolves `false` when WebGL 2 is unavailable, leaving
+ * the flat image in place.
  */
 export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const canvas = stage.querySelector<HTMLCanvasElement>('.rug__canvas');
   const gl = canvas?.getContext('webgl2', {
     alpha: true,
     premultipliedAlpha: true,
-    // Smoothed edges where pixels are large; denser screens do not need it.
+    // MSAA only on low-DPR screens; high-DPR screens don't need it.
     antialias: (window.devicePixelRatio || 1) < 1.5,
     powerPreference: 'low-power',
   });
@@ -424,9 +400,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return false;
   }
 
-  // The wool: the rug's picture (scripts/rug.mjs), decoded before it is
-  // needed; the same file as the flat picture's (Rug.astro picks it for the
-  // screen), so it is not fetched twice.
+  // Reuse the flat image's resolved source (chosen by Rug.astro's srcset) so the texture isn't
+  // fetched twice, and decode it before upload.
   const picture = new Image();
   picture.src = stage.querySelector<HTMLImageElement>('.rug__flat img')?.currentSrc || rugPicture;
   try {
@@ -449,8 +424,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(anisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
   }
 
-  // The cloth's positions and normals, a texel a particle.
-  // Fewer small steps on a modest device: a little less stiff, a fifth less work.
+  // Cloth state as float textures, one texel per particle. Fewer substeps on low-end devices:
+  // slightly softer cloth, ~20% less work.
   const cloth = new Cloth(COLUMNS, ROWS, modest() ? 8 : 10);
   const floatTexture = () => {
     const texture = gl.createTexture();
@@ -463,13 +438,13 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const positionTexture = floatTexture();
   const normalTexture = floatTexture();
   const upload = new Float32Array(cloth.count * 4);
-  /** The cloth as it was before its last step: it is drawn between the two (see `loop`). */
+  /** Previous simulation state, for interpolating between steps (see `loop`). */
   const before = { position: new Float32Array(cloth.position), normal: new Float32Array(cloth.normal) };
   const keepBefore = () => {
     before.position.set(cloth.position);
     before.normal.set(cloth.normal);
   };
-  /** Sends `values` to the GPU, or a share `t` of the way to them from `from`. */
+  /** Uploads `values`, or a blend `t` of the way from `from` to `values`. */
   const send = (texture: WebGLTexture | null, values: Float32Array, from: Float32Array, t: number) => {
     for (let i = 0, j = 0; i < values.length; i += 3, j += 4) {
       upload[j] = from[i] + (values[i] - from[i]) * t;
@@ -480,8 +455,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, COLUMNS, ROWS, gl.RGBA, gl.FLOAT, upload);
   };
 
-  // The shadow map, and two ways of reading it: as depths, and compared. It
-  // is drawn only while the rug moves, so it stays this fine everywhere.
+  // Shadow map with depth and comparison samplers. Rendered only while the rug moves, so the high
+  // resolution is affordable.
   const SHADOW_SIZE = 1024;
   const shadowTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, shadowTexture);
@@ -512,7 +487,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const LIGHT_NEAR = 0.5;
   const LIGHT_FAR = 8;
 
-  // The stage in world units, and the camera above it.
+  // Stage size in world units, and the camera above it.
   const view = { width: 1, height: 1, fov: 0.42, distance: 5, tan: Math.tan(0.21), aspect: 1 };
   let viewProjection: Matrix = new Float32Array(16);
   let lightViewProjection: Matrix = new Float32Array(16);
@@ -552,7 +527,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     shadowStrength = dark ? 0.75 : 0.42;
   };
 
-  /** Where the rug is in the shadow map, with room for its softest shadow round it. */
+  /** Shadow-map bounds around the rug, padded for the softest penumbra. */
   const rugBox = () => {
     const p = cloth.position;
     const low = [Infinity, Infinity, Infinity];
@@ -581,7 +556,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return [box[0] - margin, box[1] - margin, box[2] + margin, box[3] + margin];
   };
 
-  /** Draws the rug: as it is, or a share `t` of the way to it from before its last step. */
+  /** Renders the rug at its current state, or `t` of the way from the previous step. */
   const draw = (t = 1) => {
     send(positionTexture, cloth.position, before.position, t);
     send(normalTexture, cloth.normal, before.normal, t);
@@ -596,7 +571,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, normalTexture);
 
-    // The rug as the light sees it.
+    // Shadow-map pass.
     gl.bindFramebuffer(gl.FRAMEBUFFER, shadowFramebuffer);
     gl.viewport(0, 0, SHADOW_SIZE, SHADOW_SIZE);
     gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -611,7 +586,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.drawElements(gl.TRIANGLES, rugMesh.count, gl.UNSIGNED_SHORT, 0);
     gl.disable(gl.POLYGON_OFFSET_FILL);
 
-    // The shadow on the page.
+    // Floor and cast-shadow pass.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, pixels.width, pixels.height);
     gl.clearColor(0, 0, 0, 0);
@@ -641,7 +616,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.bindVertexArray(quad.vao);
     gl.drawElements(gl.TRIANGLES, quad.count, gl.UNSIGNED_SHORT, 0);
 
-    // The rug.
+    // Rug pass.
     gl.enable(gl.DEPTH_TEST);
     gl.useProgram(rugProgram.program);
     bindCloth(rugProgram);
@@ -659,9 +634,9 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     gl.bindVertexArray(null);
   };
 
-  // --- Pointer -----------------------------------------------------------
+  // --- Pointer ---
 
-  /** Where a point on the screen meets the plane `height` above the floor. */
+  /** Intersection of a screen point's ray with the plane `height` above the floor. */
   const onPlane = (clientX: number, clientY: number, height: number) => {
     const box = canvas.getBoundingClientRect();
     const nx = ((clientX - box.left) / box.width) * 2 - 1;
@@ -671,9 +646,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
 
   /**
-   * The particle under a point on the screen, the uppermost if layers
-   * overlap; within `near` pixels of the rug's edge counts (a fingertip is
-   * wider than a mouse pointer's tip).
+   * Topmost particle under a screen point. Hits within `near` px of the edge count, since a
+   * fingertip is wider than a cursor.
    */
   const particleAt = (clientX: number, clientY: number, near = 14) => {
     const box = canvas.getBoundingClientRect();
@@ -699,30 +673,28 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     return best;
   };
 
-  // --- Motion ------------------------------------------------------------
+  // --- Motion ---
 
   let frame = 0;
   let last = 0;
   let behind = 0;
-  /** How long, in seconds, nothing has moved enough to see. */
+  /** Seconds without visible motion. */
   let quiet = 0;
-  /** How long, in seconds, since it was last let go of. */
+  /** Seconds since the last release. */
   let idle = 0;
-  /** Whether it can be picked up: once its corner is settled. */
+  /** Interactive once the corner curl has settled. */
   let ready = false;
   let disturbed = false;
   const hold = { pointer: -1, offset: [0, 0], lifted: 0, from: 0, trail: [] as { t: number; p: number[] }[] };
 
   /**
-   * The corner nearest the visitor (lowest and furthest right on screen) is
-   * turned up a little at rest, as a rug's corner often is, and rises towards
-   * a hand that comes near: an invitation to lift it. Underneath is the
-   * message (Rug.astro).
+   * Rest-pose curl: the corner nearest the viewer (bottom right on screen) is slightly lifted and
+   * rises toward an approaching pointer, hinting at the message underneath (Rug.astro).
    */
   const curl = { on: false, corner: -1, flat: [0, 0, 0], inward: [0, 0], level: 0, goal: 0 };
   /**
-   * A move made for the visitor (the "Lift the rug" button): the corner led
-   * along a path, and then let go, or, with `keep`, held where it ends.
+   * Scripted move for the "Lift the rug" button: the corner follows a path, then is released, or
+   * held at the end with `keep`.
    */
   let script: {
     from: number[];
@@ -739,7 +711,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     if (stage.dataset.state !== state) stage.dataset.state = state;
   };
 
-  /** Finds the corner nearest the visitor and where it lies flat. */
+  /** Finds the corner nearest the viewer and its flat position. */
   const findCorner = () => {
     const corners = [0, COLUMNS - 1, (ROWS - 1) * COLUMNS, ROWS * COLUMNS - 1];
     let best = corners[0];
@@ -748,8 +720,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     }
     curl.corner = best;
     curl.flat = Array.from(cloth.position.subarray(best * 3, best * 3 + 3));
-    // In towards the middle, so the turned-up corner leans over like a
-    // dog-ear and shows a little of its back.
+    // Lean the curl inward so the corner folds like a dog-ear and shows a little of its back.
     const length = Math.hypot(curl.flat[0], curl.flat[2]) || 1;
     curl.inward = [(-curl.flat[0] / length) * 0.16, (-curl.flat[2] / length) * 0.16];
   };
@@ -761,7 +732,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     cloth.target[2] = curl.flat[2] + curl.inward[1] * e;
   };
 
-  /** Turns the corner up (or, with `goal`, to a new height). */
+  /** Curls the corner up to `goal`. */
   const curlUp = (goal = CURL) => {
     if (!ready || still.matches || hold.pointer >= 0 || script || lifted) return;
     if (!curl.on) {
@@ -774,22 +745,22 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     wake();
   };
 
-  /** Lets the turned-up corner go, before a hand takes the rug or a move is made. */
+  /** Releases the corner curl before the rug is grabbed or a scripted move starts. */
   const uncurl = () => {
     if (!curl.on) return;
     curl.on = false;
     cloth.hold(null);
   };
 
-  /** One step of the cloth, and of whatever leads it: a hand, a move made for the visitor, or the corner's curl. */
+  /** Advances the simulation one step, along with whatever drives it: pointer, script or curl. */
   const advance = () => {
     if (hold.pointer >= 0) {
-      // Lift what is held, smoothly, to a hand's height.
+      // Ease the held point up to lift height.
       hold.lifted = Math.min(1, hold.lifted + STEP / 0.15);
       const eased = 1 - (1 - hold.lifted) ** 3;
       cloth.target[1] = hold.from + (LIFT - hold.from) * eased;
     } else if (script) {
-      // The corner along its path: eased, and raised in an arc on the way.
+      // Scripted path: eased, and raised in an arc along the way.
       script.t = Math.min(1, script.t + STEP / script.duration);
       const e = script.t < 0.5 ? 4 * script.t ** 3 : 1 - (-2 * script.t + 2) ** 3 / 2;
       for (let d = 0; d < 3; d++) cloth.target[d] = script.from[d] + (script.to[d] - script.from[d]) * e;
@@ -801,7 +772,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
         done();
       }
     } else if (curl.on) {
-      // The turned-up corner eases to its height, slowly, as a heavy rug's would.
+      // Ease the curl toward its goal slowly, like heavy fabric.
       curl.level += (curl.goal - curl.level) * 0.04;
       curlTo(curl.level);
     }
@@ -812,11 +783,11 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const loop = (time: number) => {
     frame = 0;
     if (document.hidden) return;
-    // Starting again: nothing to draw between yet.
+    // Restarting: no previous state to interpolate from.
     if (!last) keepBefore();
     const dt = Math.min((time - (last || time)) / 1000, 0.05);
-    // The time that has really passed: where frames are slow, the cloth falls
-    // behind it, but its rest is still counted in seconds as they pass.
+    // Real elapsed time, capped. On slow devices the simulation falls behind, but rest detection
+    // still runs in wall-clock seconds.
     const passed = Math.min((time - (last || time)) / 1000, 0.5);
     last = time;
     behind += dt;
@@ -828,24 +799,20 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     }
     idle = hold.pointer < 0 && !script ? idle + passed : 0;
     if (steps === 2) behind = 0;
-    // The cloth moves in steps of a sixtieth of a second; it is drawn between
-    // the last two, as far as the time has gone into the next, so it moves
-    // evenly on a screen of any rate (90 or 120 a second, as many phones'
-    // are), not by fits and starts.
+    // Fixed 60 Hz steps, rendered interpolated by the fraction into the next step, so motion is
+    // even at any refresh rate (90/120 Hz).
     draw(behind / STEP);
-    // At rest when nothing has moved more than about half a pixel a frame for
-    // a third of a second, or, after five seconds untouched, when nothing is
-    // visibly moving at all: folded double, the layers can keep a tremor too
-    // small to see, which is not worth a running loop. A corner turned up, once
-    // it has risen, only sags by fractions of a pixel: that, too, is rest.
+    // Rest detection: nothing moved more than ~0.5 px per frame for 1/3 s, or, 5 s after release,
+    // nothing is visibly moving. Doubled-over layers can keep a sub-pixel tremor that isn't worth a
+    // running loop, and a settled curl only sags by sub-pixel amounts, which also counts as rest.
     const easing = curl.on && Math.abs(curl.goal - curl.level) > 0.0005;
     const settled = curl.on ? 0.004 : 0.0015;
-    // Counted in time, not frames: on a slow device frames are few and far between.
+    // Accumulated in seconds, not frames, so slow devices behave the same.
     quiet = hold.pointer < 0 && !script && !easing && cloth.motion < settled ? quiet + passed : 0;
     if (quiet > 0.33 || (idle > 2.5 && cloth.motion < 0.006)) {
       last = 0;
       behind = 0;
-      // At rest, drawn as it is.
+      // At rest: draw the final state.
       draw();
       setState('resting');
       return;
@@ -861,10 +828,9 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
 
   /**
-   * Laid straight, with its corner turned up (but not with reduced motion).
-   * The corner is worked out once, out of sight, in slices of a few
-   * milliseconds so the page never waits, until it has settled; after that
-   * the rug at rest is only put back, at once.
+   * Rest pose, with the corner curled (flat under reduced motion). Computed once, off-screen, in
+   * time slices of a few ms so the main thread never blocks; afterwards the cached pose is restored
+   * instantly.
    */
   let laid: { angle: number; cloth: ReturnType<Cloth['snapshot']>; corner: number; flat: number[]; inward: number[] } | null = null;
   const rest = async () => {
@@ -906,18 +872,16 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
 
   /**
-   * The "Lift the rug" button: the corner is taken up and laid over towards
-   * the middle, so what is written under it shows; pressed again, it is put
-   * back where it was.
+   * "Lift the rug" button: folds the corner over toward the middle to reveal the message; pressing
+   * again folds it back.
    */
-  /** With reduced motion, the fold being worked out out of sight. */
+  /** Reduced motion: the fold is being simulated off-screen. */
   let folding = false;
   const toggleLift = () => {
     if (!ready || hold.pointer >= 0 || script) return;
     if (still.matches) {
-      // Without motion: laid straight again at once, or folded over in the
-      // same way, worked out out of sight (a step at a time, so the page
-      // never waits) and shown when it has settled.
+      // Reduced motion: reset instantly, or simulate the fold off-screen in time slices and show
+      // the settled result.
       if (folding) return;
       if (lifted) {
         void rest().then(() => draw());
@@ -931,7 +895,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       disturbed = true;
       setLifted(true);
       void (async () => {
-        // The move, then a second and a half for the cloth to settle.
+        // The move, then 1.5 s for the cloth to settle.
         let settle = 90;
         let slice = performance.now();
         for (let n = 0; n < 400 && (script || settle-- > 0); n++) {
@@ -951,14 +915,14 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       findCorner();
       cloth.hold(curl.corner);
       const from = Array.from(cloth.position.subarray(curl.corner * 3, curl.corner * 3 + 3));
-      // Over a little past the middle, a fold's thickness up, and held there:
-      // a rug's stiffness would otherwise turn the corner back.
+      // Just past the middle, raised by one fold's thickness, and held; the cloth's stiffness would
+      // otherwise flip it back.
       const to = [from[0] * -0.22, 0.025, from[2] * -0.22];
       script = { from, to, peak: 0.24, t: 0, duration: 1.35, keep: true, done: () => undefined };
       disturbed = true;
       setLifted(true);
     } else {
-      // Back: the folded corner (now near the middle) is carried home and set down.
+      // Back: carry the folded corner home and set it down.
       const corner = curl.corner;
       cloth.hold(corner);
       const from = Array.from(cloth.position.subarray(corner * 3, corner * 3 + 3));
@@ -978,7 +942,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
   stage.addEventListener('rug:toggle', toggleLift);
 
-  // Picking up and letting go.
+  // Grab and release.
   const lead = (event: PointerEvent) => {
     const p = onPlane(event.clientX, event.clientY, cloth.target[1]);
     const x = clamp(p[0] + hold.offset[0], cloth.bounds.left, cloth.bounds.right);
@@ -993,7 +957,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   const pickUp = (pointerId: number, clientX: number, clientY: number, particle: number) => {
     if (particle < 0 || script) return;
     uncurl();
-    // Taken in hand, a corner laid over is not held there any more.
+    // Grabbing cancels a held fold.
     if (lifted) setLifted(false);
     idle = 0;
     cloth.hold(particle);
@@ -1006,10 +970,10 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     try {
       canvas.setPointerCapture(pointerId);
     } catch {
-      // The pointer may already be gone.
+      // The pointer may already be released.
     }
     stage.setAttribute('data-holding', '');
-    // Picked up: someone has looked under it (plane.ts).
+    // Grabbing counts as opening the rug; plane.ts launches the plane.
     stage.setAttribute('data-looked', '');
     disturbed = true;
     wake();
@@ -1023,7 +987,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       const first = trail[0];
       const end = trail[trail.length - 1];
       const seconds = Math.max((end.t - first.t) / 1000, 1 / 120);
-      // Not flung far: a rug is heavy.
+      // Cap the release velocity: a rug is heavy.
       velocity = end.p.map((value, i) => clamp((value - first.p[i]) / seconds, -1.5, 1.5));
     }
     cloth.release(velocity[0], 0, velocity[2], STEP);
@@ -1033,24 +997,21 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   };
 
   /**
-   * On a touch screen a finger on the rug may mean to scroll the page, so
-   * the rug waits to see: a press that stays put picks it up after a moment
-   * (HOLD), and one that sets off sideways picks it up at once (the page
-   * never scrolls sideways); one that sets off up or down is a scroll, and
-   * the rug lets it be. A tap lifts the corner, as the button does.
+   * Touch disambiguation, since a finger on the rug may be a scroll: a stationary press grabs after
+   * HOLD ms; a horizontal start grabs immediately (the page never scrolls horizontally); a vertical
+   * start is left to the browser. A tap lifts the corner, like the button.
    */
   const HOLD = 260;
-  /** How far a finger may wander, in pixels, and still be pressing, not moving. */
+  /** Max finger travel, in px, that still counts as a stationary press. */
   const SLOP = 8;
-  /** How near the rug's edge a fingertip may land and still take hold of it. */
+  /** Touch hit slop around the rug's edge, in px. */
   const FINGER = 24;
-  /** A finger down on the rug, not yet holding it: where it came down, and where it is now. */
+  /** Pending touch press: where it started and where the finger is now. */
   let press: { id: number; x: number; y: number; nowX: number; nowY: number; timer: number } | null = null;
   let tapped = false;
   /**
-   * The fingers on it now. Two or more are a pinch, to zoom the page: the
-   * browser's to do, so the rug is not picked up (a pinch drawn out sideways
-   * would otherwise be taken for a sideways start, and held, stop the zoom).
+   * Active touch points. Two or more is a pinch-zoom, which belongs to the browser; otherwise a
+   * horizontal pinch would read as a horizontal drag and block the zoom.
    */
   const fingers = new Set<number>();
   const unpress = () => {
@@ -1061,7 +1022,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     tapped = false;
     const touch = event.pointerType === 'touch';
     if (touch) {
-      // The first finger of a new touch starts the count afresh.
+      // A new primary pointer starts a new gesture.
       if (event.isPrimary) fingers.clear();
       fingers.add(event.pointerId);
       if (fingers.size > 1) {
@@ -1070,7 +1031,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       }
     }
     if (!ready || hold.pointer >= 0 || event.button > 0) return;
-    // With reduced motion it is not picked up, but a tap still lifts it.
+    // Reduced motion: no dragging, but a tap still lifts the corner.
     if (still.matches && !touch) return;
     const particle = particleAt(event.clientX, event.clientY, touch ? FINGER : 14);
     if (particle < 0) return;
@@ -1104,7 +1065,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       if (Math.hypot(dx, dy) > SLOP) {
         const { x, y } = press;
         unpress();
-        // Sideways: taken up from where the finger came down, and led on from there.
+        // Horizontal start: grab at the touch-down point and follow the finger.
         if (Math.abs(dx) > Math.abs(dy) && !still.matches && fingers.size === 1) {
           pickUp(event.pointerId, x, y, particleAt(x, y, FINGER));
         }
@@ -1115,7 +1076,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
       wake();
     } else if (event.pointerType !== 'touch' && ready && !still.matches) {
       stage.toggleAttribute('data-over', particleAt(event.clientX, event.clientY) >= 0);
-      // A hand near the turned-up corner: it rises to meet it.
+      // Pointer near the curled corner: raise it to meet the cursor.
       if (curl.on) {
         const box = canvas.getBoundingClientRect();
         const i = curl.corner * 3;
@@ -1129,9 +1090,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     }
   });
   const end = (event: PointerEvent) => {
-    // Let go before the press became a hold, without moving: a tap (the
-    // click that follows says so; a tap that only stopped the page
-    // scrolling has none).
+    // Released before the hold timer without moving: a tap. Only a real tap is followed by a click;
+    // a tap that merely stopped a fling isn't.
     if (press && event.pointerId === press.id) tapped = event.type === 'pointerup';
     fingers.delete(event.pointerId);
     unpress();
@@ -1140,7 +1100,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   canvas.addEventListener('click', () => {
     if (!tapped) return;
     tapped = false;
-    // Someone has looked under the rug (the paper plane, plane.ts, then flies).
+    // Marks the rug as opened; plane.ts launches the plane.
     if (!lifted) stage.setAttribute('data-looked', '');
     toggleLift();
   });
@@ -1151,7 +1111,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     stage.removeAttribute('data-over');
     if (curl.on && curl.goal !== CURL) curlUp(CURL);
   });
-  // While it is held on a touch screen, the page does not scroll.
+  // Block page scrolling while the rug is held on touch.
   canvas.addEventListener(
     'touchmove',
     (event) => {
@@ -1161,15 +1121,12 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
   );
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
-  // --- Life --------------------------------------------------------------
+  // --- Lifecycle ---
 
-  // Played with and then scrolled away, it is laid straight for next time.
-  // Laying it and drawing it is a heavy frame, so not in the middle of the
-  // scroll (nor of the paper plane's landing, which takes 1.5 s): once the
-  // page has been still a moment, or at the latest as it comes near again
-  // (`coming`: on its way into sight, or brought back at a jump). Scrolled
-  // only just away and back before the page is still, it stays as it was
-  // left: it is never laid straight while someone is looking at it.
+  // After interaction, reset the pose for next time. Resetting costs a heavy frame, so never
+  // mid-scroll or during the plane's 1.5 s landing: wait until the page is idle, or at the latest
+  // until the rug approaches the viewport again (`coming`, which also covers jumps). Scrolling away
+  // and straight back keeps the current pose; it is never reset while in view.
   let relay = false;
   let relayTimer = 0;
   let inSight = true;
@@ -1201,7 +1158,7 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     ([entry]) => {
       inSight = entry.isIntersecting;
       if (inSight) return;
-      // Out of sight, nothing moves: the loop stops at once.
+      // Off-screen: stop the loop immediately.
       if (frame) {
         cancelAnimationFrame(frame);
         frame = 0;
@@ -1233,9 +1190,8 @@ export async function mountRug(stage: HTMLElement): Promise<boolean> {
     stage.removeAttribute('data-live');
   });
 
-  // Laid, and only then shown in place of the flat picture. If the flat
-  // picture was lifted (rug.ts) before this scene was ready, the rug is
-  // lifted now, so the press is not lost.
+  // Apply the rest pose, then swap it in for the flat image. If the flat image was lifted (rug.ts)
+  // before the scene was ready, apply the lift so the click isn't lost.
   const liftWanted = stage.hasAttribute('data-lifted');
   readTheme();
   layout();

@@ -1,10 +1,9 @@
-# Tells search engines that use IndexNow (Bing, and through it ChatGPT search,
-# Copilot and DuckDuckGo; also Yandex, Seznam and Naver) about every page in the
-# live sitemap, so they crawl the site soon after it changes
-# (scripts/indexnow.mjs). It runs once the checks have passed on the site's
-# branch, by which time Cloudflare has deployed the push, and can be started by
-# hand from the Actions tab. Google does not use IndexNow: the sitemap is
-# submitted to it in Google Search Console.
+# Submits every URL in the live sitemap to IndexNow (Bing, and through it
+# ChatGPT search, Copilot and DuckDuckGo; also Yandex, Seznam and Naver) so
+# changes get crawled quickly (scripts/indexnow.mjs). Runs after Checks passes on
+# the default branch, by which point Cloudflare has deployed the commit; can also
+# be triggered manually. Google doesn't support IndexNow; it reads the sitemap
+# submitted in Search Console.
 name: Search engines
 
 on:
@@ -23,8 +22,7 @@ concurrency:
 jobs:
   indexnow:
     name: IndexNow
-    # After a push to the site's branch (the repository's default branch) whose
-    # checks passed, or when started by hand.
+    # After a successful Checks run for a push to the default branch, or manually.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&

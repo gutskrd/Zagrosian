@@ -1,6 +1,6 @@
 /**
- * Every page in every language, light and dark, on a computer and on a phone,
- * against WCAG 2.2 AA and axe's best practices.
+ * axe-core audit (WCAG 2.2 AA plus best practices) of every page in every locale, light and dark,
+ * on desktop and mobile.
  */
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
@@ -14,8 +14,8 @@ const screens = [
 for (const { name, viewport } of screens) {
   for (const colorScheme of ['light', 'dark'] as const) {
     test.describe(`${name}, ${colorScheme}`, () => {
-      // axe is added to the page as a script, which the site's own policy
-      // would rightly block. Without motion, every section is at rest.
+      // axe is injected as a script, which the site's CSP would (correctly) block. Reduced motion
+      // puts every section at rest.
       test.use({ viewport, colorScheme, contextOptions: { reducedMotion: 'reduce' }, bypassCSP: true });
 
       for (const { code } of locales) {
@@ -24,11 +24,9 @@ for (const { name, viewport } of screens) {
           const failures: string[] = [];
           for (const path of [...pagesIn(code), `${prefix(code)}/no-such-page`]) {
             await page.goto(path, { waitUntil: 'networkidle' });
-            // Every part of the page as a reader sees it on reaching it: the
-            // sections that rise into view where they end up, and the sections
-            // the browser only draws as the reader nears them (content-
-            // visibility in global.css) drawn. Undrawn, axe would find no
-            // background behind their text and take it to be white.
+            // Render every section as a reader would see it: revealed sections in their final
+            // position, and `content-visibility` sections (global.css) actually rendered.
+            // Unrendered, axe finds no background behind their text and assumes white.
             await page.addStyleTag({ content: '* { content-visibility: visible !important; }' });
             await page.evaluate(async () => {
               for (const element of document.querySelectorAll<HTMLElement>('[data-reveal]')) element.dataset.reveal = 'done';
@@ -40,7 +38,7 @@ for (const { name, viewport } of screens) {
               .analyze();
             for (const violation of violations) {
               const where = violation.nodes.slice(0, 3).map((node) => {
-                // For contrast, the colours axe found, so a failure on CI can be told apart.
+                // Include the colors axe measured, so contrast failures in CI are diagnosable.
                 const data = node.any[0]?.data as { fgColor?: string; bgColor?: string; contrastRatio?: number } | undefined;
                 const colours = data?.fgColor ? ` (${data.fgColor} on ${data.bgColor}, ${data.contrastRatio}:1)` : '';
                 return `${node.target.join(' ')}${colours}`;

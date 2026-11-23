@@ -1,23 +1,22 @@
 /**
- * Hevalo's eyes follow the pointer: the mouse, or on a touch screen the
- * finger, while it touches the screen and a moment after. With nothing to
- * follow, the pupils return to where the artwork has them, turned in towards
- * each other. They are drawn over the icon (HevaloIcon.astro) and move within
- * the white of each eye, easing towards where they look.
+ * Hevalo's eyes follow the pointer: the mouse, or a finger while it touches the screen and briefly
+ * after. With nothing to follow, the pupils return to their rest position in the artwork (looking
+ * slightly inward). They are drawn over the icon (HevaloIcon.astro) and ease toward their target
+ * within each eye.
  *
- * Only icons on screen are updated, and nothing runs while the eyes are
- * still. Not used when the visitor prefers reduced motion.
+ * Only on-screen icons update, and nothing runs while the eyes are at rest. Disabled with reduced
+ * motion.
  */
 
-/** The white of an eye, and how far a pupil's centre may move from its centre (source pixels). */
+/** Eye white size, and the pupil's max travel from its center (source px). */
 const EYE = { width: 58, height: 68 };
 const REACH = { x: 13, y: 10 };
-/** Where each pupil's centre is drawn in the artwork: left eye, right eye. */
+/** Rest position of each pupil center in the artwork: left eye, right eye. */
 const REST = [
   { x: 40.6, y: 36 },
   { x: 19.3, y: 36.1 },
 ];
-/** How long the eyes keep looking at where a finger left the screen (ms). */
+/** How long the eyes keep looking where a finger left the screen, in ms. */
 const LINGER = 1500;
 
 interface Pupil {
@@ -54,7 +53,7 @@ export function initEyes() {
         if (box.width === 0) continue;
         let target = pupil.rest;
         if (pointer) {
-          // Towards the pointer, further the further away it is.
+          // Toward the pointer, proportionally to its distance.
           const dx = pointer.x - (box.left + box.width / 2);
           const dy = pointer.y - (box.top + box.height / 2);
           const distance = Math.hypot(dx, dy) || 1;
@@ -107,7 +106,7 @@ export function initEyes() {
   });
   for (const icon of icons) observer.observe(icon);
 
-  // A mouse or pen.
+  // Mouse or pen.
   window.addEventListener(
     'pointermove',
     (event) => {
@@ -117,7 +116,7 @@ export function initEyes() {
   );
   document.documentElement.addEventListener('pointerleave', rest);
 
-  // A finger: while it touches (scrolling included) and a moment after.
+  // Touch: track while the finger is down (including while scrolling) and briefly after.
   const touch = (event: TouchEvent) => {
     const point = event.touches[0];
     if (point) look(point.clientX, point.clientY);
@@ -131,6 +130,6 @@ export function initEyes() {
   window.addEventListener('touchend', lift, { passive: true });
   window.addEventListener('touchcancel', lift, { passive: true });
 
-  // The page moves under a still pointer when it scrolls.
+  // Scrolling moves the page under a stationary pointer.
   window.addEventListener('scroll', () => pointer && update(), { passive: true });
 }

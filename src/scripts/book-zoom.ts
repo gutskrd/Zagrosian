@@ -1,12 +1,9 @@
 /**
- * Zoom for Hevalo's book (the reader: book.ts): 1, 1.5, 2 and 3 times the
- * page's size. The pages are laid out larger inside the stage, which then
- * scrolls, so moving about a page is the browser's own scrolling (the wheel,
- * a trackpad, a finger, the arrow keys); with a mouse the page can also be
- * dragged. The point zoomed at stays where it was, and the zoom stays as the
- * pages turn, each new page shown from its top left. The pictures are told
- * their new size, so the sharper one loads. The browser's own pinch zoom is
- * never taken over.
+ * Zoom for the book reader (book.ts): 1x, 1.5x, 2x and 3x. The pages are laid out larger inside the
+ * stage, which then scrolls, so panning is native scrolling (wheel, trackpad, touch, arrow keys); a
+ * mouse can also drag. The zoom anchor stays fixed, the zoom persists across page turns (each new
+ * page starts at its top left), and images get updated `sizes` so the sharper candidate loads.
+ * Browser pinch-zoom is never intercepted.
  */
 
 export const ZOOM_LEVELS = [1, 1.5, 2, 3] as const;
@@ -28,7 +25,7 @@ export class Zoom {
     stage.addEventListener('pointercancel', () => this.pointerUp());
   }
 
-  /** Whether a drag to move about the page has just ended (so it is not taken as a click). */
+  /** Whether a drag-to-pan just ended, so the following click is ignored. */
   get panned() {
     return this.pan?.moved ?? false;
   }
@@ -47,19 +44,22 @@ export class Zoom {
     this.set(1);
   }
 
-  /** Whether the zoomed pages are scrolled as far as they go towards a side, so a tap or a swipe there turns the page. */
+  /**
+   * Whether the zoomed page is scrolled fully toward `side`, so a tap or swipe there turns the
+   * page.
+   */
   atEdge(side: 'left' | 'right') {
     const { scrollLeft, scrollWidth, clientWidth } = this.stage;
     return side === 'left' ? scrollLeft <= 1 : scrollLeft + clientWidth >= scrollWidth - 1;
   }
 
-  /** Still zoomed, a new page is read from its top left. */
+  /** While zoomed, show a new page from its top left. */
   toStart() {
     this.stage.scrollTo(0, 0);
     this.sharpen();
   }
 
-  /** Sets the zoom, keeping the point `at` (in the window, by default the stage's middle) where it is. */
+  /** Sets the zoom level, keeping the viewport point `at` (default: the stage's center) fixed. */
   set(level: number, at?: { x: number; y: number }) {
     if (level === this.level) return;
     const stageBox = this.stage.getBoundingClientRect();
@@ -84,7 +84,10 @@ export class Zoom {
     this.onChange(level);
   }
 
-  /** Tells the pictures on show how wide they are drawn now, so a zoomed page loads its sharper picture. */
+  /**
+   * Updates `sizes` on the visible images to their rendered width, so a zoomed page loads its
+   * sharper source.
+   */
   sharpen() {
     const width = this.spread.getBoundingClientRect().height * 0.70476;
     for (const img of this.root.querySelectorAll<HTMLImageElement>('.book__page[data-shown] img')) {
@@ -116,7 +119,7 @@ export class Zoom {
 
   private pointerUp() {
     this.stage.removeAttribute('data-panning');
-    // the pan is forgotten after the click that ends it has been seen
+    // Clear the pan flag after the click that ends it has been handled.
     const pan = this.pan;
     setTimeout(() => {
       if (this.pan === pan) this.pan = null;

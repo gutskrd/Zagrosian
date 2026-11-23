@@ -1,12 +1,10 @@
 /**
- * Paragraphs that arrive, below the fold (`data-lines`): as a paragraph comes
- * into view it is split into its lines, each line rises from behind its own
- * mask one after another, and then the paragraph is put back exactly as it
- * was, so it reflows and reads normally afterwards. Words are found with
- * Intl.Segmenter, so this works in every language, right to left included.
+ * Line-by-line reveal for paragraphs below the fold (`data-lines`): when a paragraph enters view it
+ * is split into its rendered lines, each line rises from its own mask in sequence, and the
+ * paragraph is then restored exactly so it reflows normally. Words come from Intl.Segmenter, so it
+ * works in every language, including RTL.
  *
- * Nothing runs when reduced motion is preferred. Spans are created with the
- * DOM API; no HTML is written.
+ * Disabled with reduced motion. Spans are created through the DOM API; no HTML strings.
  */
 
 import { enteredFromAbove } from './motion';
@@ -14,16 +12,14 @@ import { enteredFromAbove } from './motion';
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const belowFold = (element: Element) => element.getBoundingClientRect().top > window.innerHeight;
 
-/* -------------------------------------------------------------------------- */
-/* Lines                                                                      */
-/* -------------------------------------------------------------------------- */
+// --- Line splitting ---
 
 function splitIntoLines(paragraph: HTMLElement) {
   const text = paragraph.textContent ?? '';
   const locale = paragraph.closest('[lang]')?.getAttribute('lang') ?? undefined;
   const segments = [...new Intl.Segmenter(locale, { granularity: 'word' }).segment(text)];
 
-  // Each word with the spaces that follow it, measured where it falls.
+  // Each word plus its trailing whitespace, measured in place.
   const words: HTMLSpanElement[] = [];
   for (const { segment, isWordLike } of segments) {
     const previous = words[words.length - 1];
@@ -61,7 +57,7 @@ function splitIntoLines(paragraph: HTMLElement) {
 
 function initLines() {
   const paragraphs = [...document.querySelectorAll<HTMLElement>('[data-lines]')].filter(
-    // Plain text only, so nothing inside (a link) is lost.
+    // Plain-text paragraphs only, so nested content (links) is never lost.
     (paragraph) => paragraph.children.length === 0 && belowFold(paragraph),
   );
   if (paragraphs.length === 0) return;

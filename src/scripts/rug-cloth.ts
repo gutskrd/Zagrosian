@@ -1,32 +1,29 @@
 /**
- * The rug as cloth (rug-scene.ts): a grid of particles joined by constraints,
- * stepped with position-based dynamics (Verlet integration, then each
- * constraint nudged back towards its length, in many small steps, as in
+ * Cloth simulation for the rug (rug-scene.ts): a particle grid with distance constraints, solved
+ * with position-based dynamics (Verlet integration plus constraint projection over many substeps;
  * Macklin et al., "Small Steps in Physics Simulation", 2019).
  *
- * - Neighbours keep their distance (the weave does not stretch), diagonals
- *   resist shearing, and particles two apart resist bending, so it folds in
- *   broad, heavy curves as a wool rug does, not in creases like silk.
- * - It falls under gravity through a little air, lands on the floor and grips
- *   it (friction), so it lies where it is put and slides only when pulled.
- * - Where it folds over itself, the upper layer is kept a rug's thickness
- *   above the lower one, so a fold lies on top instead of sinking through.
- * - One particle can be held: it then goes where it is led, and the rest
- *   follows. Let go, and it keeps the speed it was moving at.
+ * - Structural constraints keep the weave from stretching, shear constraints resist skew, and bend
+ *   constraints (particles two apart) produce broad, heavy folds like wool rather than sharp
+ *   creases.
+ * - Gravity with light air drag, a floor with friction: the rug stays where it's put and only
+ *   slides when pulled.
+ * - Self-collision keeps an upper layer one rug-thickness above the lower one, so folds rest on top
+ *   instead of passing through.
+ * - One particle can be pinned and driven; on release it keeps its velocity.
  *
- * World units: the rug is 1 wide; y is up, the floor is y = 0.
+ * Units: the rug is 1 wide; y is up and the floor is y = 0.
  */
 
-// A heavy wool rug: it drops, and what moves it is soon spent (a swing is
-// all but gone within half a second), so it never wobbles like rubber; and
-// enough small steps that it never stretches like it either.
+// Tuned for heavy wool: drops quickly and damps fast (a swing is mostly gone within 0.5 s), so it
+// never wobbles like rubber, with enough substeps that it never stretches either.
 const GRAVITY = 8.5;
 const SUBSTEPS = 10;
 const AIR = 0.988;
 const THICKNESS = 0.012;
 const FLOOR = THICKNESS / 2;
 const FRICTION = 0.3;
-/** Slower than this (units a substep) against a surface, and it stops. */
+/** Velocity threshold (units per substep) below which a particle in contact comes to rest. */
 const STILL = 0.00004;
 
 export class Cloth {
@@ -42,17 +39,17 @@ export class Cloth {
   private readonly b: Uint16Array;
   private readonly rest: Float32Array;
   private readonly stiffness: Float32Array;
-  /** The floor's edges, inside which the rug is kept. */
+  /** Floor bounds the rug is kept within. */
   bounds = { left: -1, right: 1, top: -1, bottom: 1 };
-  /** The particle held, or -1, and where it is being led. */
+  /** Pinned particle index (-1 for none) and its target position. */
   held = -1;
   readonly target = new Float32Array(3);
-  /** How far the fastest particle moved in the last step, start to end. */
+  /** Max displacement of any particle over the last step. */
   motion = 0;
-  /** Small steps to each step: more is stiffer, and costs more. */
+  /** Substeps per step: more is stiffer and more expensive. */
   readonly substeps: number;
   private before = new Float32Array(0);
-  // Buckets for finding particles near each other.
+  // Spatial hash buckets for neighbor queries.
   private cellOf = new Int32Array(0);
   private start = new Int32Array(0);
   private order = new Int32Array(0);
@@ -91,7 +88,7 @@ export class Cloth {
     this.stiffness = Float32Array.from(links, (l) => l[3]);
   }
 
-  /** The cloth as it is now, to be put back exactly later (restore). */
+  /** Captures the full state for an exact `restore` later. */
   snapshot() {
     return { position: this.position.slice(), previous: this.previous.slice(), normal: this.normal.slice() };
   }
@@ -103,7 +100,10 @@ export class Cloth {
     this.motion = 0;
   }
 
-  /** Lays the rug out flat, centred on (x, z), turned by `angle`, `height` above the floor (rippled by `ripple`), still. */
+  /**
+   * Lays the rug flat and at rest, centered on (x, z), rotated by `angle`, `height` above the
+   * floor, optionally rippled.
+   */
   layFlat(x: number, z: number, angle: number, { height = 0, ripple = 0 } = {}) {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
@@ -123,7 +123,7 @@ export class Cloth {
     this.computeNormals();
   }
 
-  /** Holds particle `i`; `null` lets go. */
+  /** Pins particle `i`; `null` releases it. */
   hold(i: number | null) {
     if (this.held >= 0) this.free[this.held] = 1;
     this.held = i ?? -1;
@@ -133,7 +133,7 @@ export class Cloth {
     }
   }
 
-  /** Lets go, moving at this velocity (units a second). */
+  /** Releases the pinned particle with the given velocity (units per second). */
   release(vx: number, vy: number, vz: number, dt: number) {
     const i = this.held;
     this.hold(null);
@@ -144,7 +144,7 @@ export class Cloth {
     this.previous[i * 3 + 2] = this.position[i * 3 + 2] - vz * h;
   }
 
-  /** Advances the cloth by `dt` seconds. */
+  /** Advances the simulation by `dt` seconds. */
   step(dt: number) {
     const h = dt / this.substeps;
     const p = this.position;
@@ -152,8 +152,7 @@ export class Cloth {
     if (this.before.length !== p.length) this.before = new Float32Array(p.length);
     this.before.set(p);
     for (let s = 0; s < this.substeps; s++) {
-      // Move: each particle keeps its velocity, slowed a little by the air,
-      // and falls.
+      // Integrate: keep velocity, apply air drag and gravity.
       for (let i = 0; i < this.count; i++) {
         if (!this.free[i]) continue;
         const k = i * 3;
@@ -164,7 +163,7 @@ export class Cloth {
         }
         p[k + 1] -= GRAVITY * h * h;
       }
-      // The held particle goes where it is led, a substep's share at a time.
+      // Move the pinned particle toward its target, one substep's share at a time.
       if (this.held >= 0) {
         const k = this.held * 3;
         for (let d = 0; d < 3; d++) {
@@ -173,19 +172,18 @@ export class Cloth {
         }
       }
       this.solve();
-      // Layers are kept apart every other substep, which is enough.
+      // Self-collision every other substep is sufficient.
       if (s % 2) this.separateLayers();
       this.collide();
     }
-    // What the eye sees: how far each particle got this step, not how it
-    // trembled on the way.
+    // Visible motion: net displacement over the step, not jitter within it.
     let motion = 0;
     for (let k = 0; k < this.count * 3; k++) motion = Math.max(motion, Math.abs(p[k] - this.before[k]));
     this.motion = motion;
     this.computeNormals();
   }
 
-  /** Nudges every constraint back towards its length. */
+  /** Projects every constraint toward its rest length. */
   private solve() {
     const p = this.position;
     const { a, b, rest, stiffness, free } = this;
@@ -201,8 +199,7 @@ export class Cloth {
       const w = wi + wj;
       if (!w) continue;
       let correction = ((length - rest[n]) / length) * stiffness[n];
-      // Bending gives way more easily to being shortened (a fold) than to
-      // being stretched.
+      // Bend constraints yield more to compression (folding) than to stretching.
       if (stiffness[n] < 0.3 && length < rest[n]) correction *= 0.3;
       const ci = (correction * wi) / w;
       const cj = (correction * wj) / w;
@@ -216,9 +213,8 @@ export class Cloth {
   }
 
   /**
-   * Friction against what particle k lies on: much of its sideways movement
-   * is lost, and if it was barely moving it stops (wool on wool, or on a
-   * floor, does not creep).
+   * Contact friction: most tangential motion is lost, and slow particles stop entirely (wool on
+   * wool or on a floor doesn't creep).
    */
   private grip(k: number) {
     const p = this.position;
@@ -234,7 +230,7 @@ export class Cloth {
     }
   }
 
-  /** The floor, its friction, and the edges of the floor. */
+  /** Floor contact, friction and bounds. */
   private collide() {
     const p = this.position;
     const q = this.previous;
@@ -244,8 +240,7 @@ export class Cloth {
       const k = i * 3;
       if (p[k + 1] < FLOOR) {
         p[k + 1] = FLOOR;
-        // Its grip on the floor, as grip() but written out: this runs for
-        // every particle in every small step.
+        // Same as grip(), inlined: this runs for every particle on every substep.
         const dx = p[k] - q[k];
         const dz = p[k + 2] - q[k + 2];
         if (dx * dx + dz * dz < STILL * STILL) {
@@ -264,9 +259,8 @@ export class Cloth {
   }
 
   /**
-   * Where the rug lies over itself, keeps the upper layer a thickness above
-   * the lower: particles near each other across the floor, but not neighbours
-   * in the weave, are pushed apart upwards.
+   * Self-collision: where the rug overlaps itself, push nearby non-adjacent particles apart
+   * vertically so the upper layer stays one thickness above the lower.
    */
   private separateLayers() {
     const p = this.position;
@@ -312,13 +306,14 @@ export class Cloth {
             if (dx * dx + dz * dz > reach * reach) continue;
             const dy = p[j * 3 + 1] - p[i * 3 + 1];
             if (Math.abs(dy) >= THICKNESS) continue;
-            // The higher one goes up, the lower down (the floor stops it).
+            // Split the correction: the upper particle moves up, the lower down (the floor stops
+            // it).
             const push = (THICKNESS - Math.abs(dy)) / 2;
             const up = dy > 0 || (dy === 0 && j > i) ? j : i;
             const low = up === j ? i : j;
             if (this.free[up]) {
               p[up * 3 + 1] += push * (this.free[low] ? 1 : 2);
-              // The upper layer rests on the lower: it grips it.
+              // The upper layer rests on the lower and grips it.
               this.grip(up * 3);
             }
             if (this.free[low]) p[low * 3 + 1] -= push * (this.free[up] ? 1 : 2);
@@ -328,7 +323,7 @@ export class Cloth {
     }
   }
 
-  /** Each particle's normal, from its neighbours. */
+  /** Per-particle normals from neighboring particles. */
   computeNormals() {
     const p = this.position;
     const { columns, rows } = this;
@@ -344,7 +339,7 @@ export class Cloth {
         const bx = p[down * 3] - p[up * 3];
         const by = p[down * 3 + 1] - p[up * 3 + 1];
         const bz = p[down * 3 + 2] - p[up * 3 + 2];
-        // b × a points up for a rug lying face up.
+        // b x a points up for a face-up rug.
         let nx = by * az - bz * ay;
         let ny = bz * ax - bx * az;
         let nz = bx * ay - by * ax;

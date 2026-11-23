@@ -1,36 +1,32 @@
 /**
- * The synthesiser behind the site's sound (Web Audio). Loaded only once a
- * visitor turns sound on; sound.ts decides when, and owns the AudioContext.
+ * Web Audio synthesizer for the site's sound. Loaded only once a visitor turns sound on; sound.ts
+ * decides when and owns the AudioContext.
  *
- * Everything is synthesised in the browser: no audio files are downloaded,
- * and the Content-Security-Policy needs no media sources.
+ * Everything is synthesized at runtime: no audio files are downloaded and the CSP needs no media
+ * sources.
  *
- * - An ambient score: a slow, low chord in D Phrygian (the scale of the Kurdish
- *   maqam Kurd) that breathes in and out, wind as if across the mountains, and
- *   now and then a soft bell, all in a small generated reverb.
- * - Interface sounds: a light tick when the pointer or keyboard reaches a
- *   control, a soft tap on a click, air when a menu opens or closes, a
- *   rising or falling pair of bells when sound is switched on or off, and the
- *   paper of a page of Hevalo's book as it turns.
+ * - Ambient score: a slow, low chord in D Phrygian (the scale of maqam Kurd) that swells and
+ *   recedes, filtered wind, and an occasional soft bell, all through a small generated reverb.
+ * - UI sounds: a light tick on hover/focus, a soft tap on click, an air sweep when a menu opens or
+ *   closes, a rising or falling bell pair when sound is toggled, and a paper riffle for book page
+ *   turns.
  */
 import type { Cue } from './sound';
 
 interface Graph {
   context: AudioContext;
-  /** Everything ends here, through a gentle limiter. */
+  /** Final output, through a gentle limiter. */
   master: GainNode;
-  /** Sent to the reverb. */
+  /** Reverb send. */
   space: GainNode;
   noise: AudioBuffer;
 }
 
 let graph: Graph | undefined;
 
-/* -------------------------------------------------------------------------- */
-/* The audio graph                                                            */
-/* -------------------------------------------------------------------------- */
+// --- Audio graph ---
 
-/** A stereo reverb tail: decaying noise. */
+/** Stereo reverb impulse: decaying noise. */
 function impulse(context: AudioContext, seconds: number, decay: number) {
   const length = Math.round(context.sampleRate * seconds);
   const buffer = context.createBuffer(2, length, context.sampleRate);
@@ -41,7 +37,7 @@ function impulse(context: AudioContext, seconds: number, decay: number) {
   return buffer;
 }
 
-/** A few seconds of soft (pink) noise, looped for the wind and air sounds. */
+/** A few seconds of pink noise, looped for the wind and air sounds. */
 function pinkNoise(context: AudioContext, seconds: number) {
   const length = Math.round(context.sampleRate * seconds);
   const buffer = context.createBuffer(1, length, context.sampleRate);
@@ -86,25 +82,23 @@ export function attach(context: AudioContext) {
   graph = { context, master, space, noise: pinkNoise(context, 4) };
 }
 
-/* -------------------------------------------------------------------------- */
-/* Ambient score                                                              */
-/* -------------------------------------------------------------------------- */
+// --- Ambient score ---
 
 let score: { stop(release: number): void } | undefined;
 
-/** A slow sine that moves a parameter: value ± depth, `rate` times a second. */
+/** Slow sine LFO on a parameter: value +/- depth, at `rate` Hz. */
 function lfo(context: AudioContext, param: AudioParam, rate: number, depth: number, stopAt: (() => void)[]) {
   const oscillator = context.createOscillator();
   oscillator.frequency.value = rate;
   const amount = context.createGain();
-  // Half of them start by falling, so no two voices move together.
+  // Randomize the starting phase so voices don't move in unison.
   amount.gain.value = Math.random() < 0.5 ? depth : -depth;
   oscillator.connect(amount).connect(param);
   oscillator.start();
   stopAt.push(() => oscillator.stop());
 }
 
-/** A struck bell: a fundamental and an inharmonic partial, into the reverb. */
+/** Struck bell: a fundamental plus an inharmonic partial, into the reverb. */
 function bell(g: Graph, frequency: number, level: number, when = g.context.currentTime, into?: AudioNode) {
   const { context } = g;
   const out = context.createGain();
@@ -132,7 +126,7 @@ function bell(g: Graph, frequency: number, level: number, when = g.context.curre
   }
 }
 
-/** Starts the ambient score, if it is not already playing. It swells in over two seconds. */
+/** Starts the ambient score if it isn't already playing, fading in over two seconds. */
 export function startScore() {
   if (!graph || score) return;
   const g = graph;
@@ -148,8 +142,8 @@ export function startScore() {
   send.gain.value = 0.5;
   bus.connect(send).connect(g.space);
 
-  // The chord: D, A, D, F, A, C. Each note is two slightly detuned voices
-  // whose loudness drifts on its own slow cycle, through a darkening filter.
+  // The chord: D, A, D, F, A, C. Each note is two slightly detuned voices whose level drifts on its
+  // own slow cycle, through a darkening low-pass filter.
   const tone = context.createBiquadFilter();
   tone.type = 'lowpass';
   tone.frequency.value = 820;
@@ -178,7 +172,7 @@ export function startScore() {
     }
   });
 
-  // Wind: soft noise through a band that wanders, in slow gusts.
+  // Wind: pink noise through a wandering band-pass, in slow gusts.
   const wind = context.createBufferSource();
   wind.buffer = g.noise;
   wind.loop = true;
@@ -194,13 +188,13 @@ export function startScore() {
   wind.start(now);
   stops.push(() => wind.stop());
 
-  // Bells, now and then, from the same scale.
+  // Occasional bells from the same scale.
   const scale = [293.66, 311.13, 349.23, 392, 440, 523.25, 587.33];
   let timer = 0;
   const ring = () => {
     const frequency = scale[Math.floor(Math.random() * scale.length)];
     bell(g, frequency, 0.05 + Math.random() * 0.03, context.currentTime, bus);
-    // Sometimes a second, softer note answers.
+    // Sometimes a softer second note answers.
     if (Math.random() < 0.35) {
       const answer = scale[Math.floor(Math.random() * scale.length)];
       bell(g, answer, 0.03, context.currentTime + 0.35 + Math.random() * 0.4, bus);
@@ -230,17 +224,15 @@ export function startScore() {
   };
 }
 
-/** Fades the ambient score out, over `release` seconds. */
+/** Fades the ambient score out over `release` seconds. */
 export function stopScore(release = 1.2) {
   score?.stop(release);
   score = undefined;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Interface sounds                                                           */
-/* -------------------------------------------------------------------------- */
+// --- UI sounds ---
 
-/** A burst of filtered noise whose band sweeps from one frequency to another. */
+/** Filtered noise burst with a band-pass sweeping from `from` to `to` Hz. */
 function air(g: Graph, from: number, to: number, duration: number, level: number) {
   const { context } = g;
   const now = context.currentTime;
@@ -265,7 +257,7 @@ function air(g: Graph, from: number, to: number, duration: number, level: number
   source.stop(now + duration + 0.05);
 }
 
-/** A short tone that glides from one pitch to another. */
+/** Short tone gliding from one pitch to another. */
 function blip(g: Graph, from: number, to: number, duration: number, level: number, type: OscillatorType = 'sine', reverb = 0.15) {
   const { context } = g;
   const now = context.currentTime;
@@ -288,9 +280,8 @@ function blip(g: Graph, from: number, to: number, duration: number, level: numbe
 }
 
 /**
- * A page turning: the paper's soft rush as the leaf lifts and crosses, and the
- * small slap of it landing, from filtered noise (a riffle of a few grains, so
- * no two turns sound quite the same).
+ * Page turn: the rush of the leaf lifting and crossing, then the soft slap of it landing, from
+ * filtered noise (randomized grains, so no two turns sound identical).
  */
 function riffle(g: Graph) {
   const { context } = g;
@@ -312,7 +303,7 @@ function riffle(g: Graph) {
     source.start(at, Math.random() * 3);
     source.stop(at + 0.07);
   }
-  // the leaf lands
+  // Landing.
   const land = now + 0.5;
   const source = context.createBufferSource();
   source.buffer = g.noise;
@@ -330,7 +321,7 @@ function riffle(g: Graph) {
 
 let lastHover = 0;
 
-/** Plays one interface sound. */
+/** Plays a UI cue. */
 export function cue(name: Cue) {
   const g = graph;
   if (!g) return;

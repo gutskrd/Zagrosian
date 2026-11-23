@@ -1,40 +1,28 @@
 /**
- * The reader of Hevalo's book (BookReader.astro): which pages are open, and
- * every way to go from one to the next.
+ * Page-turning reader for Hevalo's book (BookReader.astro).
  *
- * - What is shown: the cover alone, then two pages side by side or one at a
- *   time, as the stylesheet decides from the room there is (`--book-spread`,
- *   read here on load and whenever the stage changes size). Only the pages
- *   open are displayed (`data-shown`), so a screen reader is on them alone,
- *   and the pictures of the next pages are fetched and decoded once these
- *   are in, so the next turn need not wait for them.
- * - Turning: the arrows under the book, the arrow keys (also while nothing
- *   else has the focus and the book is in view), Page Up and Down and the
- *   space bar, a sideways swipe on a trackpad, a click on a page, a tap at
- *   its edge, or the page drawn across by hand, its edge kept under the
- *   finger (book-turn.ts draws the leaf). Clicks in quick succession each
- *   count. [ and ] and the contents go from chapter to chapter, a few leaves
- *   at once; the slider goes straight there. With reduced motion, zoomed in
- *   or reading a column, pages change at once; zoomed in, the zoom stays, and
- *   a tap at the edge or a swipe beyond it turns the page once the page is
- *   scrolled to that edge.
- * - The book as one column to scroll: its pages, one under the other (the
- *   scroll view), or its words (the text view), with the bars following the
- *   page being read; full view: the book over the window; zoom (book-zoom.ts).
- * - The address follows the page (#page-12), without filling the history, so
- *   Back leaves the book; an address with #page-N or #chapter-N opens there.
- * - Numbers are written in the page's own digits, as the build wrote them
- *   (`data-digits`), whatever the browser's own formats know.
+ * - Layout: the cover alone, then one or two pages per view depending on the available width
+ *   (`--book-spread`, read on load and on resize). Only the open pages are displayed
+ *   (`data-shown`), so assistive technology stays on them; the next pages' images are fetched and
+ *   decoded in the background.
+ * - Navigation: arrow buttons and keys (also when nothing is focused and the book is in view), Page
+ *   Up/Down and Space, horizontal trackpad swipes, clicks and edge taps, and dragging the page by
+ *   hand (book-turn.ts renders the leaf). Rapid clicks queue. `[` / `]` and the contents jump
+ *   between chapters; the slider jumps directly. With reduced motion, zoom or a column view, pages
+ *   change instantly.
+ * - Column views: the scroll view (page images) and the text view (page text), with the toolbars
+ *   tracking the page being read. Full view covers the window; zoom lives in book-zoom.ts.
+ * - The URL hash tracks the page (`#page-12`) via replaceState, so Back leaves the book; `#page-N`
+ *   and `#chapter-N` deep-link.
+ * - Numbers use the locale's digits as rendered at build time (`data-digits`).
  *
- * Reading never waits for the leaves: a turn waits at most 120 ms for its
- * pictures, and if anything about turning fails, the page simply changes. A
- * control that cannot be used for the moment (Next on the last page) says so
- * (`aria-disabled`) but keeps the focus. If the reader cannot be set up at
- * all, the page goes back to the column of pages it shows without JavaScript
+ * Reading never blocks on animation: a turn waits at most 120 ms for its images, and any failure
+ * while turning falls back to an instant page change. Temporarily unavailable controls use
+ * `aria-disabled` and keep focus. If setup fails, the reader falls back to the no-JS column
  * (`data-book="off"`).
  *
- * No HTML is made here: elements are copied or built with the DOM API, and
- * styles are set through the CSSOM.
+ * No HTML strings: elements are cloned or created through the DOM API, and styles are set through
+ * the CSSOM.
  */
 import { Turner, progressForAngle, progressForReach, type Direction, type Source, type Turn, type TurnSpec } from './book-turn';
 import { Zoom } from './book-zoom';
@@ -43,29 +31,29 @@ import { play } from './sound';
 
 type Item = number | 'end';
 type View = Item[];
-/** What a column of the book holds: its pages as pictures (the scroll view), or its words (the text view). */
+/** Column view content: page images (scroll view) or page text (text view). */
 type ColumnKind = 'pages' | 'text';
 
-/** Turns asked for one after another start this far apart, so no more than three leaves are ever in the air. */
+/** Minimum spacing between queued turns, so at most three leaves are in flight. */
 const CHAIN_MS = 190;
-/** The most turns that wait their turn: every quick click counts, and a flurry does not run on for long. */
+/** Max queued turns: rapid clicks all count, but a burst doesn't run on for long. */
 const MAX_PENDING = 8;
-/** How far, in pixels, a press must move sideways to become a drag. */
+/** Horizontal travel, in px, before a press becomes a drag. */
 const DRAG_START = 8;
-/** How long the touch screen's hint stays once the book is in view. */
+/** How long the touch hint stays once the book is in view. */
 const HINT_MS = 4500;
-/** How far the corner lifts to meet the mouse, in degrees. */
+/** Corner peek angle on mouse approach, in degrees. */
 const PEEK_DEGREES = 20;
 
 const fill = (template: string, values: Record<string, string>) => template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
 
-/** Whether an element is shown: checkVisibility where the browser has it (Safari from 17.4), its boxes elsewhere. */
+/** `checkVisibility()` where supported (Safari 17.4+), a client-rects check elsewhere. */
 const visible = (element: HTMLElement) =>
   typeof element.checkVisibility === 'function'
     ? element.checkVisibility()
     : element.getClientRects().length > 0 && getComputedStyle(element).visibility !== 'hidden';
 
-/** Whether a popover or a dialog is open over the page. */
+/** Whether a popover or dialog is open over the page. */
 const somethingOpen = () => anyOpen() || document.querySelector('dialog[open]') !== null;
 
 export function initBook() {
@@ -74,7 +62,7 @@ export function initBook() {
   try {
     setUp(root);
   } catch {
-    // The column of pages, as without JavaScript: everything is still there to read.
+    // Fall back to the no-JS column layout; all content stays readable.
     root.dataset.book = 'off';
   }
 }
@@ -111,7 +99,7 @@ function setUp(root: HTMLElement) {
   const pages = [...pageList.querySelectorAll<HTMLLIElement>(':scope > .book__page')];
   const pageCount = pages.length;
   const pageOf = (n: number) => pages[n - 1]!;
-  // the page's own digits, as the build wrote them: "٤١" in Sorani wherever the browser would write "41"
+  // Locale digits as rendered at build time, e.g. "٤١" for 41 in Sorani.
   const digits = [...(root.dataset.digits ?? '0123456789')];
   const n = (value: number) => String(value).replace(/\d/g, (d) => digits[Number(d)] ?? d);
   const chapterLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-book-chapter]')];
@@ -122,14 +110,14 @@ function setUp(root: HTMLElement) {
   const fine = matchMedia('(pointer: fine) and (hover: hover)');
   const touch = matchMedia('(hover: none) and (pointer: coarse)');
 
-  /** A control that cannot be used for the moment, which keeps the focus if it has it. */
+  /** Marks a control as temporarily unavailable without moving focus off it. */
   const setDisabled = (button: HTMLElement, off: boolean) => {
     if (off) button.setAttribute('aria-disabled', 'true');
     else button.removeAttribute('aria-disabled');
   };
   const usable = (button: HTMLElement) => button.getAttribute('aria-disabled') !== 'true';
 
-  // ---- Views ---------------------------------------------------------------
+  // --- Views ---
 
   const readSpread = () => getComputedStyle(spread).getPropertyValue('--book-spread').trim() === '1';
   const viewsFor = (two: boolean): View[] => {
@@ -143,14 +131,19 @@ function setUp(root: HTMLElement) {
   let twoPages = readSpread();
   let views = viewsFor(twoPages);
   let index = 0;
-  /** The latest request to go somewhere, and where it goes: the book is heading there, even while its leaves are readied. */
+  /**
+   * Latest navigation request and its target; the book counts as heading there while its leaves are
+   * prepared.
+   */
   let requests = 0;
   let heading = 0;
   let shown = new Set<HTMLElement>([pageOf(1)]);
-  /** Whether the book is read as one column to scroll (its pages or its words) rather than turned. */
+  /** Whether the book is shown as a scrolling column (pages or text) instead of spreads. */
   let column = false;
   let columnKind: ColumnKind = 'pages';
-  /** In a column, the page being read: the last whose top is above the middle of the window. */
+  /**
+   * Column view: the page being read, i.e. the last one whose top is above the viewport's midpoint.
+   */
   let reading = 1;
   let anyTurn = false;
 
@@ -168,7 +161,7 @@ function setUp(root: HTMLElement) {
     return { left: view[0], right: view[1] };
   };
 
-  // ---- Words ---------------------------------------------------------------
+  // --- Labels ---
 
   const zoomControls = () => {
     setDisabled(zoomButtons.out, column || zoom.level === 1);
@@ -198,14 +191,15 @@ function setUp(root: HTMLElement) {
   };
 
   let announce: number | undefined;
-  /** The bars say where the reader is: the pages open, or in a column the page being read. */
+  /** Updates the toolbar labels: the open pages, or in a column the page being read. */
   const describe = () => {
     const view: View = column ? [reading] : views[index]!;
-    // both, written out and short: the stylesheet shows the one the width has room for
+    // Long and short forms; CSS shows whichever fits.
     counterShort.textContent = counterText(view, true);
     counterLong.textContent = counterText(view, false);
     const first = typeof view[0] === 'number' ? pageOf(view[0]) : pageOf(pageCount);
-    // two pages whose right one opens a chapter are where that chapter begins, so the bar and the contents name it, not the one ending on the left
+    // A spread whose right page opens a chapter is labeled with that chapter, not the one ending on
+    // the left.
     const right = view[1];
     const lead = typeof right === 'number' && chapterLinks.some((link) => Number(link.dataset.start) === right) ? pageOf(right) : first;
     where.textContent = lead.dataset.short || root.dataset.coverLabel || '';
@@ -222,13 +216,14 @@ function setUp(root: HTMLElement) {
       else link.removeAttribute('aria-current');
     }
     window.clearTimeout(announce);
-    // in a column the pages themselves are read on; turning pages, where they went is said
+    // Columns announce nothing (the reader is scrolling); turns are announced through the live
+    // region.
     if (!column) announce = window.setTimeout(() => (status.textContent = statusText(views[index]!)), 500);
   };
 
-  // ---- Showing a view ------------------------------------------------------------
+  // --- Showing a view ---
 
-  /** Moves the pages themselves to a view: what assistive technology follows. */
+  /** Moves the open pages to a view; this is what assistive technology follows. */
   const show = (to: number, options: { address?: boolean } = {}) => {
     index = Math.max(0, Math.min(views.length - 1, to));
     heading = index;
@@ -245,7 +240,10 @@ function setUp(root: HTMLElement) {
     prefetch();
   };
 
-  /** The address follows the page (the left one of two, or the one being read), without adding to the history; the cover has none. */
+  /**
+   * Syncs the URL hash to the page (the left page of a spread, or the page being read) without
+   * adding history entries. The cover has no hash.
+   */
   const address = () => {
     const page = column ? reading : firstPage(views[index]!);
     const hash = !column && index === 0 ? '' : `#page-${Math.min(page, pageCount)}`;
@@ -253,14 +251,14 @@ function setUp(root: HTMLElement) {
     try {
       history.replaceState(history.state, '', hash || `${location.pathname}${location.search}`);
     } catch {
-      // Some browsers limit how often the address may change; the page still turns.
+      // Some browsers rate-limit history updates; the page still turns.
     }
   };
 
   /**
-   * Once the open pages are in, the next two views and the one before are
-   * fetched (the next only, to save data), and the pictures the next turn
-   * either way shows are decoded, so it can start in the frame it is asked for.
+   * Once the open pages have loaded, prefetch the next two views and the previous one (only the
+   * next with Save-Data), and decode the images the next turn in either direction needs, so it can
+   * start on the frame it is requested.
    */
   let prefetched = -1;
   const prefetch = () => {
@@ -283,11 +281,11 @@ function setUp(root: HTMLElement) {
     });
   };
 
-  // ---- Turning ---------------------------------------------------------------
+  // --- Turning ---
 
   const leafMotion = () => !reduceMotion.matches && zoom.level === 1 && !column;
 
-  /** The leaves for a turn from one view to another: one, or three for a chapter away. */
+  /** Leaf configuration for a turn between views: one leaf, or three for a chapter jump. */
   const specFor = (from: number, to: number, leaves: 1 | 3): TurnSpec => {
     const direction: Direction = to > from ? 'forward' : 'back';
     const a = sides(views[from]!);
@@ -323,11 +321,11 @@ function setUp(root: HTMLElement) {
   };
 
   let lastStart = -Infinity;
-  /** Turns asked for and still to come: one page on (positive) or back (negative) for each. */
+  /** Queued turns: +1 per page forward, -1 per page back. */
   let pending = 0;
   let queued: number | undefined;
 
-  /** Goes to a view: with a leaf (or a few), or at once. The latest request wins. */
+  /** Navigates to a view, animated or instant. The latest request wins. */
   const go = async (to: number, how: 'turn' | 'chapter' | 'instant' = 'turn') => {
     to = Math.max(0, Math.min(views.length - 1, to));
     const id = ++requests;
@@ -337,7 +335,7 @@ function setUp(root: HTMLElement) {
     if (how === 'instant' || !leafMotion()) {
       turner.stopAll();
       show(to);
-      // zoomed in, the zoom stays: the new page is read from its top left
+      // Zoomed in: keep the zoom and show the new page from its top left.
       if (zoom.level > 1) zoom.toStart();
       return;
     }
@@ -348,7 +346,7 @@ function setUp(root: HTMLElement) {
     try {
       const turn = await turner.prepare(specFor(from, to, leaves));
       if (id !== requests || index !== from) {
-        // a later request, or something else, moved the book while the pictures were readied
+        // Superseded while the images were loading.
         turn.stop();
         return;
       }
@@ -368,7 +366,7 @@ function setUp(root: HTMLElement) {
     pending = 0;
   };
 
-  /** Starts the turns that wait, one after another, as far apart as the leaves allow. */
+  /** Starts queued turns one after another, CHAIN_MS apart. */
   const runQueue = () => {
     if (queued !== undefined) return;
     queued = window.setTimeout(
@@ -385,9 +383,8 @@ function setUp(root: HTMLElement) {
   };
 
   /**
-   * One page on or back. Asked for while a turn has just started, it waits
-   * its turn: each click counts, while a key held down waits for the leaves,
-   * so the book stops when the key is let go.
+   * One page forward or back. During a turn, clicks queue (each one counts), while a held key waits
+   * for the current leaf, so the book stops as soon as the key is released.
    */
   const step = (by: 1 | -1, repeat = false) => {
     if (column) return columnStep(by);
@@ -396,7 +393,7 @@ function setUp(root: HTMLElement) {
       void go(heading + by);
       return;
     }
-    // turning the other way, the turns that waited are let go
+    // Reversing direction drops the queued turns.
     if (pending !== 0 && Math.sign(pending) !== by) pending = 0;
     if (repeat && pending !== 0) return;
     if (pending === 0 && performance.now() - lastStart >= CHAIN_MS) {
@@ -407,7 +404,10 @@ function setUp(root: HTMLElement) {
     runQueue();
   };
 
-  /** To the next chapter's opening, or the one before, from where the book is heading (or, in a column, the page being read). */
+  /**
+   * Jumps to the next or previous chapter opening, relative to the current target (or, in a column,
+   * the page being read).
+   */
   const chapterStep = (by: 1 | -1) => {
     cancelQueue();
     if (column) {
@@ -420,7 +420,7 @@ function setUp(root: HTMLElement) {
     if (target !== undefined) void go(viewIndexOf(target), 'chapter');
   };
 
-  // ---- Controls ----------------------------------------------------------------
+  // --- Controls ---
 
   prevButton.addEventListener('click', () => usable(prevButton) && step(-1));
   nextButton.addEventListener('click', () => usable(nextButton) && step(1));
@@ -428,8 +428,8 @@ function setUp(root: HTMLElement) {
   zoomButtons.out.addEventListener('click', () => usable(zoomButtons.out) && zoom.zoomOut());
   zoomButtons.fit.addEventListener('click', () => usable(zoomButtons.fit) && zoom.fit());
 
-  // The slider: the way along, with where it would open in a bubble while it is dragged; it opens there at once
-  // (in a column, the column scrolls to that page).
+  // Slider: shows the target page in a bubble while dragging and navigates immediately (in a
+  // column, scrolls to that page).
   const valueToIndex = () => Number(range.value) - (twoPages ? 0 : 1);
   const placeBubble = () => {
     const i = valueToIndex();
@@ -464,8 +464,8 @@ function setUp(root: HTMLElement) {
   });
   for (const type of ['pointerup', 'pointercancel', 'blur'] as const) range.addEventListener(type, () => scrub.removeAttribute('data-dragging'));
 
-  // The contents, in the menu, in the page, and the closing card: a few leaves to the chapter, then the book has the
-  // focus. In a column, the column scrolls there.
+  // Contents links (menu, in-page list, end card): turn a few leaves to the chapter, then focus the
+  // book. In a column, scroll there.
   document.addEventListener('click', (event) => {
     const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-book-jump]') : null;
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -482,8 +482,8 @@ function setUp(root: HTMLElement) {
     stage.focus({ preventScroll: true });
   });
 
-  // "Start reading", and the cover beside the introduction: to the book, with the focus on it; in the scroll view, to
-  // its first page, since the reader chose to scroll.
+  // "Start reading" and the cover next to the intro: go to the book and focus it; in the scroll
+  // view, go to its first page.
   for (const start of document.querySelectorAll('[data-book-start-reading]')) {
     start.addEventListener('click', (event) => {
       event.preventDefault();
@@ -497,14 +497,15 @@ function setUp(root: HTMLElement) {
     });
   }
 
-  // ---- Keys ----------------------------------------------------------------
+  // --- Keyboard ---
 
   root.addEventListener('keydown', (event) => {
     if (event.key === 'Tab' && root.hasAttribute('data-full')) return keepFocus(event);
     if (event.defaultPrevented) return;
     const target = event.target as Element;
     if (target === range || target.closest(POPOVER)) return;
-    // [ and ] before the modifiers: many keyboards type them with AltGr, which reads as Ctrl and Alt held together
+    // Check `[` / `]` before modifiers: many layouts type them with AltGr, which reports as
+    // Ctrl+Alt.
     if ((event.key === ']' || event.key === '[') && !event.metaKey) {
       event.preventDefault();
       chapterStep(event.key === ']' ? 1 : -1);
@@ -532,8 +533,8 @@ function setUp(root: HTMLElement) {
     if (handled) event.preventDefault();
   });
 
-  // With nothing else focused and the book at least half in view, the arrow keys turn its pages too (and give the
-  // book the focus, for the keys after). Page Up and Down and the space bar keep scrolling the page.
+  // With nothing focused and the book at least half visible, arrow keys turn pages too (and focus
+  // the book for subsequent keys). Page Up/Down and Space keep scrolling the page.
   let stageInView = 0;
   new IntersectionObserver(
     ([entry]) => {
@@ -552,7 +553,7 @@ function setUp(root: HTMLElement) {
     step(event.key === 'ArrowRight' ? 1 : -1, event.repeat);
   });
 
-  // A sideways swipe on a trackpad turns one page for each swipe, and is not taken by the browser as Back.
+  // Horizontal trackpad swipe: one page per swipe, without triggering the browser's back gesture.
   let wheelLast = -Infinity;
   let wheelSum = 0;
   let wheelTurned = false;
@@ -561,7 +562,7 @@ function setUp(root: HTMLElement) {
     (event) => {
       if (column || zoom.level > 1 || event.ctrlKey) return;
       const now = performance.now();
-      // a pause ends a swipe, with the glide a trackpad adds after it
+      // A pause ends the swipe, including the trackpad's inertial tail.
       if (now - wheelLast > 250) {
         wheelSum = 0;
         wheelTurned = false;
@@ -578,7 +579,7 @@ function setUp(root: HTMLElement) {
     { passive: false },
   );
 
-  // ---- Pointer: click, tap, drag, swipe, and the corner that lifts ---------------
+  // --- Pointer: click, tap, drag, swipe, corner peek ---
 
   type Manual = { turn: Turn; to: number; direction: Direction; ready: boolean; progress: number };
   let press: { x: number; y: number; id: number; type: string; time: number } | null = null;
@@ -592,7 +593,7 @@ function setUp(root: HTMLElement) {
   const pageBox = () => spread.getBoundingClientRect();
   const pageWidth = () => (twoPages ? pageBox().width / 2 : pageBox().width);
 
-  /** Starts a turn moved by hand: a drag, a swipe, or the corner lifting. */
+  /** Starts a manually driven turn: drag, swipe or corner peek. */
   const manualTurn = (direction: Direction): Manual | null => {
     const to = index + (direction === 'forward' ? 1 : -1);
     if (to < 0 || to >= views.length || !leafMotion() || turner.busy || !turner.canTurn(1)) return null;
@@ -619,7 +620,7 @@ function setUp(root: HTMLElement) {
     if (state.ready) state.turn.scrub(progress);
   };
 
-  /** Lets go of a turn moved by hand: on to the next view, or back where it was. */
+  /** Ends a manual turn: complete it, or fall back to the current view. */
   const release = (state: Manual, onward: boolean) => {
     const finish = () => {
       if (onward && index === state.to - (state.direction === 'forward' ? 1 : -1)) {
@@ -632,7 +633,7 @@ function setUp(root: HTMLElement) {
     };
     if (state.ready) finish();
     else if (onward) {
-      // the leaf was not ready yet: the page simply changes
+      // Leaf not ready yet: change the page instantly.
       firstTurn();
       void go(state.to, 'instant');
     }
@@ -647,13 +648,13 @@ function setUp(root: HTMLElement) {
 
   stage.addEventListener('pointerdown', (event) => {
     if (column || event.button !== 0) return;
-    // zoomed in, a mouse moves the pages about (book-zoom.ts) and a finger scrolls them; a tap still counts
+    // Zoomed in: a mouse pans the page (book-zoom.ts) and touch scrolls it; taps still count.
     if (zoom.level > 1 && event.pointerType === 'mouse') return;
     if ((event.target as Element).closest('a, button, input')) return;
     press = { x: event.clientX, y: event.clientY, id: event.pointerId, type: event.pointerType, time: performance.now() };
     samples = [{ x: event.clientX, t: event.timeStamp }];
     if (peek) {
-      // a press on a lifted corner takes the corner in hand
+      // Pressing a peeking corner grabs it.
       manual = peek;
       peek = null;
       stage.setPointerCapture(event.pointerId);
@@ -662,7 +663,7 @@ function setUp(root: HTMLElement) {
 
   stage.addEventListener('pointermove', (event) => {
     if (!press) {
-      // the outer bottom corner lifts to meet a mouse that comes near
+      // The outer bottom corner lifts when the mouse approaches.
       if (event.pointerType !== 'mouse' || !fine.matches || event.buttons !== 0 || column) return;
       cornerLift(event);
       return;
@@ -678,7 +679,7 @@ function setUp(root: HTMLElement) {
       if (!manual) return;
       stage.setPointerCapture(event.pointerId);
     }
-    // the page's edge stays under the finger: it has come as far as the finger has
+    // Keep the page edge under the finger.
     const along = manual.direction === 'forward' ? -dx : dx;
     moveManual(manual, progressForReach(along, pageWidth(), twoPages));
   });
@@ -690,12 +691,12 @@ function setUp(root: HTMLElement) {
     if (manual) {
       const state = manual;
       manual = null;
-      // how fast it was moving as it was let go: over the last tenth of a second (a hand held still has stopped)
+      // Release velocity over the last 100 ms (a hand held still has stopped).
       const end = { x: event.clientX, t: event.timeStamp };
       const recent = samples.filter((sample) => sample.t >= end.t - 100);
       const from = recent[0];
       const velocity = from && from.t < end.t ? ((end.x - from.x) / Math.max(16, end.t - from.t)) * (state.direction === 'forward' ? -1 : 1) : 0;
-      // past a third of the way, or flicked, it goes on; otherwise it falls back
+      // Past a third of the way, or flicked: complete the turn; otherwise fall back.
       const moved = Math.abs(event.clientX - started.x) > DRAG_START;
       release(state, !cancelled && (!moved || state.progress > 1 / 3 || velocity > 0.3));
       return;
@@ -711,11 +712,12 @@ function setUp(root: HTMLElement) {
     if (event.pointerType === 'mouse' && !press) cancelPeek();
   });
 
-  /** A click or a tap on the book. */
+  /** Handles a click or tap on the book. */
   const tap = (event: PointerEvent, type: string) => {
     if (zoomedByBrowser()) return;
     const zoomed = zoom.level > 1;
-    // zoomed in, the edges are the window's onto the pages, and turn once the pages are scrolled to that edge
+    // Zoomed in: the edges are the viewport's, and turn only once the page is scrolled to that
+    // edge.
     const box = zoomed ? stage.getBoundingClientRect() : pageBox();
     const width = zoomed ? box.width : pageWidth();
     const x = event.clientX;
@@ -724,7 +726,8 @@ function setUp(root: HTMLElement) {
       step(x >= (twoPages ? box.left + width : box.left + width / 2) ? 1 : -1);
       return;
     }
-    // On a touch screen, the outer edges turn; the middle zooms (twice) or, in full view, shows and hides the bars (once).
+    // Touch: the outer edges turn; the middle zooms (double tap) or, in full view, toggles the
+    // toolbars (single tap).
     const edge = (zoomed ? 0.18 : 0.3) * width;
     if (x >= box.right - edge && x <= box.right + 16 && (!zoomed || zoom.atEdge('right'))) return step(1);
     if (x <= box.left + edge && x >= box.left - 16 && (!zoomed || zoom.atEdge('left'))) return step(-1);
@@ -741,7 +744,7 @@ function setUp(root: HTMLElement) {
     if (root.hasAttribute('data-full')) singleTap = window.setTimeout(() => root.toggleAttribute('data-bars-hidden'), 300);
   };
 
-  // Zoomed in, a finger scrolls the pages; a sideways swipe that finds them already scrolled as far as they go turns the page.
+  // Zoomed in, touch scrolls the page; a horizontal swipe that starts at the scroll limit turns it.
   let swipe: { x: number; y: number; left: number; time: number } | null = null;
   stage.addEventListener(
     'touchstart',
@@ -768,7 +771,10 @@ function setUp(root: HTMLElement) {
     { passive: true },
   );
 
-  /** The corner nearest the mouse, lifted a little: the next page's to turn on, or the last's to turn back. */
+  /**
+   * Lifts the corner nearest the mouse: the next page's to turn forward, or the previous one's to
+   * turn back.
+   */
   const cornerLift = (event: PointerEvent) => {
     if (reduceMotion.matches || zoom.level > 1 || (turner.busy && !peek)) return cancelPeek();
     const box = pageBox();
@@ -786,10 +792,10 @@ function setUp(root: HTMLElement) {
     moveManual(peek, progressForAngle(PEEK_DEGREES * closeness, twoPages));
   };
 
-  // ---- The touch screen's hint -------------------------------------------------
+  // --- Touch hint ---
 
   let hintTimer: number | undefined;
-  /** The hint goes after a while, at the first turn, or when the pages are zoomed. */
+  /** Hides the hint after a delay, on the first turn, or on zoom. */
   function hideHint() {
     window.clearTimeout(hintTimer);
     if (hint.hidden || hint.hasAttribute('data-going')) return;
@@ -797,7 +803,7 @@ function setUp(root: HTMLElement) {
     window.setTimeout(() => (hint.hidden = true), reduceMotion.matches ? 0 : 400);
   }
   if (touch.matches) {
-    // shown once the book is in view, so it is there to be read
+    // Show it only once the book is in view.
     const seen = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return;
@@ -811,18 +817,16 @@ function setUp(root: HTMLElement) {
     seen.observe(stage);
   }
 
-  // ---- A column: the scroll view and the text view ----------------------------------
+  // --- Column views: scroll and text ---
 
-  // Where each page starts in a column: in the scroll view its picture, in the text view its heading (the picture is
-  // not shown there, and the heading is).
+  // Anchor for each page in a column: its image in the scroll view, its heading in the text view
+  // (where images are hidden).
   const headings = pages.map((page) => page.querySelector<HTMLElement>('.book__page-title')!);
   const tops = () => (columnKind === 'text' ? headings : pages);
 
   /**
-   * While the column glides to a page it was sent to, the pages it passes are
-   * not the one being read: the bars keep the page it is going to until it
-   * has stopped (or a second has passed, where the end of a scroll is not
-   * told).
+   * While the column scrolls to a requested page, ignore the pages it passes: the toolbars keep the
+   * destination until scrolling stops (or for 1 s where `scrollend` is unsupported).
    */
   let gliding = 0;
   const landed = () => {
@@ -833,7 +837,7 @@ function setUp(root: HTMLElement) {
   };
   addEventListener('scrollend', landed);
 
-  /** The page whose top is the last above the middle of the window: the one being read. */
+  /** The page being read: the last one whose top is above the viewport's midpoint. */
   let readingFrame = 0;
   const followReading = () => {
     if (readingFrame || gliding) return;
@@ -859,7 +863,7 @@ function setUp(root: HTMLElement) {
     });
   };
 
-  /** In a column, to the top of a page. */
+  /** Column view: scroll to the top of a page. */
   const columnGoTo = (page: number, behavior: ScrollBehavior = reduceMotion.matches ? 'instant' : 'smooth') => {
     reading = Math.max(1, Math.min(pageCount, page));
     describe();
@@ -872,9 +876,8 @@ function setUp(root: HTMLElement) {
   };
 
   /**
-   * Into a column (its pages, or its words) or back to the book, at the same
-   * page: the one open, the one being read in the column, or from one column
-   * to the other, the one being read in it.
+   * Switches between spreads and a column (pages or text), keeping the current page: the open one,
+   * or the one being read.
    */
   const setColumn = (kind: ColumnKind | null) => {
     if (kind === null ? !column : column && kind === columnKind) return;
@@ -904,18 +907,17 @@ function setUp(root: HTMLElement) {
     address();
   };
 
-  /** In a column, the arrows go from page to page. */
+  /** In a column, the arrows step page by page. */
   const columnStep = (by: 1 | -1) => columnGoTo(reading + by);
 
   scrollButton.addEventListener('click', () => setColumn(column && columnKind === 'pages' ? null : 'pages'));
   textButton.addEventListener('click', () => setColumn(column && columnKind === 'text' ? null : 'text'));
 
-  // ---- Full view ---------------------------------------------------------------
+  // --- Full view ---
 
   /**
-   * In full view the focus goes round the book's own controls, as in a
-   * dialog, in the order they stand on the screen: the bars and the book top
-   * to bottom, and side by side in the page's own direction.
+   * Full view traps focus within the book's controls, like a dialog, in visual order: toolbars and
+   * book top to bottom, then inline in the page's direction.
    */
   const focusOrder = () => {
     const parts = [...body.children] as HTMLElement[];
@@ -932,7 +934,7 @@ function setUp(root: HTMLElement) {
       .map(({ element }) => element);
   };
   const keepFocus = (event: KeyboardEvent) => {
-    // the contents, open over the book, keep their own order
+    // The contents popover keeps its own focus order.
     if ((event.target as Element).closest(POPOVER)) return;
     const order = focusOrder();
     if (order.length === 0) return;
@@ -950,7 +952,7 @@ function setUp(root: HTMLElement) {
     root.removeAttribute('data-bars-hidden');
     fullButton.setAttribute('aria-pressed', String(on));
     if (on) {
-      // everything else on the page is out of reach until the book is closed again
+      // Make the rest of the page inert until full view closes.
       for (let node: Element | null = root; node && node !== document.body; node = node.parentElement) {
         for (const sibling of node.parentElement?.children ?? []) {
           if (sibling !== node && !sibling.hasAttribute('inert') && sibling.localName !== 'script') {
@@ -969,7 +971,7 @@ function setUp(root: HTMLElement) {
   };
   fullButton.addEventListener('click', () => setFull(!root.hasAttribute('data-full')));
 
-  // ---- The room there is ----------------------------------------------------------
+  // --- Resize ---
 
   new ResizeObserver(() => {
     const two = readSpread();
@@ -983,9 +985,10 @@ function setUp(root: HTMLElement) {
     show(page > pageCount ? views.length - 1 : viewIndexOf(page), { address: false });
   }).observe(stage);
 
-  // ---- A picture that will not load ---------------------------------------------
+  // --- Image load errors ---
 
-  // Offline, or a new edition published under the reader (its pictures have new names): a reload brings them.
+  // Offline, or a new edition deployed mid-session (image filenames are content-hashed): offer a
+  // reload.
   pageList.addEventListener(
     'error',
     (event) => {
@@ -995,7 +998,7 @@ function setUp(root: HTMLElement) {
   );
   $<HTMLButtonElement>('[data-book-reload]').addEventListener('click', () => location.reload());
 
-  // ---- Where the reader came for ----------------------------------------------------
+  // --- Deep links ---
 
   const fromHash = () => {
     const page = /^#page-(\d+)$/.exec(location.hash);
@@ -1014,7 +1017,8 @@ function setUp(root: HTMLElement) {
     else void go(viewIndexOf(page), 'instant');
   });
 
-  // Apps' own browsers often cannot download files; a line under each download says what to do.
+  // In-app browsers (Facebook, Instagram, TikTok, WeChat, Line, ...) often can't download files;
+  // show a hint under each download link.
   if (/\b(FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|TikTok|BytedanceWebview|musical_ly|Snapchat|LinkedInApp|Pinterest)\b/i.test(navigator.userAgent)) {
     for (const line of document.querySelectorAll<HTMLElement>('[data-book-inapp]')) line.removeAttribute('hidden');
   }

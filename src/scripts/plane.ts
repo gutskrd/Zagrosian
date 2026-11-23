@@ -1,29 +1,22 @@
 /**
- * The paper plane under the rug (Rug.astro). It stays there until it is
- * found: the rug lifted, by the "Lift the rug" button or by hand. Until then
- * the sheet the proverb is written on (Proverb.astro) simply lies where it is.
- * Found, and the page scrolled on, the plane slips out from under the rug's
- * corner, opens its wings and flies down the page; once the sheet is fully in
- * sight, it comes down onto it and unfolds into it, by itself, so the sheet is
- * always there to be read wherever the scrolling stops. Scrolled back, it
- * folds up again and flies home under the rug.
+ * Paper plane hidden under the rug (Rug.astro), revealed once the rug has been lifted (button or by
+ * hand). Until then the proverb sheet (Proverb.astro) stays static. After that, scrolling flies the
+ * plane out from under the corner, opens its wings and glides it down the page; once the sheet is
+ * fully visible the plane lands on it and unfolds into it, on a timer, so the sheet is readable
+ * wherever scrolling stops. Scrolling back reverses the flight.
  *
- * The plane is folded as one is by hand (plane-folds.ts). It is a flat 2D
- * drawing on a canvas: each frame its pieces are placed in 3D, seen from the
- * reader's eye (as CSS perspective would), shaded by how they face the
- * light, and painted from the furthest to the nearest. That is
- * a few dozen polygons a frame, light even for a slow phone, with nothing
- * kept on the graphics card. Its shadow on the page, an airliner's (a paper
- * plane dreaming), is drawn once and then only stamped. While it lies still
- * under the rug it is drawn once, on a canvas in the rug's place beneath the
- * rug's own, so the rug covers it, the rug's shadow falls on it and it
- * scrolls with the rug; moving, it is drawn on the canvas over the screen,
- * under the rug until it is out, then over the page, under the header.
+ * Rendering: the plane is folded from a flat sheet (plane-folds.ts) and drawn on a 2D canvas. Each
+ * frame its polygons are transformed in 3D, projected from the viewer's eye (matching CSS
+ * perspective), flat-shaded by their orientation to the light, and painted back to front: a few
+ * dozen polygons, cheap even on slow phones, with no GPU state. The ground shadow (an airliner
+ * silhouette) is pre-rendered once and stamped. At rest under the rug the plane is drawn once onto
+ * a canvas inside the rug's stage, so it scrolls with the rug and sits under the rug's own shadow;
+ * in flight it is drawn on a fixed full-viewport canvas, first under the rug, then over the page
+ * and below the header.
  *
- * The proverb is real text throughout, read by screen readers whatever the
- * plane is doing; it is only out of sight while the plane carries it. With
- * reduced motion the plane stays under the rug and the sheet simply lies
- * there.
+ * The proverb is real text throughout and is always exposed to screen readers; it is only visually
+ * hidden while the plane carries it. With reduced motion the plane stays put and the sheet is
+ * static.
  */
 import { pixelRatio } from './device';
 import { FOLDED, LENGTH, folds, foldSheet, type Piece } from './plane-folds';
@@ -31,24 +24,27 @@ import { FOLDED, LENGTH, folds, foldSheet, type Piece } from './plane-folds';
 type Matrix = Float64Array;
 type Vector = [number, number, number];
 
-/** How far apart the layers of folded paper are kept, in sheets, so none is drawn through another. */
+/** Separation between paper layers, in sheet units, to avoid z-fighting. */
 const LAYER = 0.0025;
-/** How far the reader's eye is from the page, in pixels, as CSS perspective. */
+/** Eye distance in px, as in CSS `perspective`. */
 const PERSPECTIVE = 1500;
-/** The light, from the upper left and in front, as on the rug. */
+/** Light direction: upper left and in front, matching the rug. */
 const LIGHT: Vector = normalise([-0.42, -0.55, 0.72]);
-/** The sheet's paper (Proverb.astro): lying flat and facing up, the plane is exactly this colour. */
+/** Paper color of the sheet (Proverb.astro); flat and facing up, the plane matches it exactly. */
 const PAPER: Vector = [243, 239, 230];
 
-// The scroll, from the rug centred on the screen (0) to the sheet fully in sight (1).
-/** Slid out from under the rug. */
+// Scroll progress: 0 with the rug centered in the viewport, 1 with the sheet fully visible.
+/** Fully out from under the rug. */
 const OUT = 0.14;
-/** Wings open, in the air. */
+/** Wings open, airborne. */
 const AIRBORNE = 0.26;
-/** How long landing and unfolding take, in seconds, once the sheet is in sight. */
+/** Landing and unfolding duration once the sheet is visible, in seconds. */
 const LANDING = 1.5;
 
-/** An airliner from above, nose to the right, in a 200 square: fuselage, wings, tailplane, engines. */
+/**
+ * Airliner silhouette for the shadow, top view, nose right, in a 200-unit square: fuselage, wings,
+ * tailplane, engines.
+ */
 const AIRLINER = [
   'M8 100C8 95 20 93.5 40 93.5H168C182 93.5 194 97 197 100C194 103 182 106.5 168 106.5H40C20 106.5 8 105 8 100Z',
   'M120 94 74 12H61L84 94Z',
@@ -69,7 +65,7 @@ const smooth = (from: number, to: number, value: number) => {
   return t * t * (3 - 2 * t);
 };
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
-/** The angle from a to b the short way round. */
+/** Signed shortest angle from `a` to `b`. */
 const turn = (a: number, b: number) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
 
 function normalise([x, y, z]: Vector): Vector {
@@ -83,7 +79,7 @@ const identity = (): Matrix => {
   return m;
 };
 
-/** a then b, as one: b applied after a. Column-major. */
+/** Composes two column-major matrices: `a`, then `b`. */
 const multiply = (b: Matrix, a: Matrix): Matrix => {
   const out = new Float64Array(16);
   for (let c = 0; c < 4; c++) {
@@ -110,7 +106,7 @@ const scaling = (s: number): Matrix => {
   return m;
 };
 
-/** A turn by `angle` about the line through `point` along `axis` (a unit vector), right-handed. */
+/** Right-handed rotation by `angle` about the axis through `point` along the unit vector `axis`. */
 const rotation = (point: Vector, [x, y, z]: Vector, angle: number): Matrix => {
   const c = Math.cos(angle);
   const s = Math.sin(angle);
@@ -134,35 +130,32 @@ const transform = (m: Matrix, [x, y, z]: Vector): Vector => [
   m[2] * x + m[6] * y + m[10] * z + m[14],
 ];
 
-/** Where the plane is and how it lies: page position in pixels, height above the page, and its turns. */
+/** Plane pose: page position in px, height above the page, and orientation. */
 interface Pose {
   x: number;
   y: number;
   z: number;
-  /** Which way the nose points on the page (radians from the right, clockwise). */
+  /** Nose direction on the page, in radians clockwise from the +x axis. */
   heading: number;
-  /** Nose down into the page. */
+  /** Nose-down pitch toward the page. */
   pitch: number;
-  /** Rolled about its length. */
+  /** Roll about the longitudinal axis. */
   bank: number;
-  /** Pixels to the sheet's width. */
+  /** Sheet width in px. */
   scale: number;
 }
 
-/** Each fold's angle now, from 0 (open) to its full angle (FOLDED). */
+/** Current angle of each fold, from 0 (open) to its folded angle (FOLDED). */
 type Angles = number[];
 
 interface Moment {
   pose: Pose;
   angles: Angles;
-  /** How much of its shadow shows, from 0 to 1. */
+  /** Shadow opacity, 0 to 1. */
   shadow: number;
 }
 
-/**
- * The plane as a whole: the sheet's middle (the spine's midpoint) at the
- * pose's place, its nose along the heading, its wings up off the page.
- */
+/** Body transform: the spine's midpoint at the pose position, nose along the heading, wings up. */
 const bodyOf = (pose: Pose): Matrix => {
   let r = rotation([0, 0, 0], [0, 0, 1], Math.PI / 2);
   r = multiply(rotation([0, 0, 0], [1, 0, 0], pose.bank), r);
@@ -171,7 +164,10 @@ const bodyOf = (pose: Pose): Matrix => {
   return multiply(translation(pose.x, pose.y, pose.z), multiply(r, multiply(scaling(pose.scale), translation(0, -LENGTH / 2, 0))));
 };
 
-/** Every fold's turn, at the given angles: each about its crease, where earlier folds have put it. */
+/**
+ * Rotation for every fold at the given angles, each about its crease as positioned by the folds
+ * before it.
+ */
 const foldTurns = (angles: Angles): Matrix[] => {
   const turns: Matrix[] = [];
   folds.forEach((fold, i) => {
@@ -188,7 +184,10 @@ const foldTurns = (angles: Angles): Matrix[] => {
   return turns;
 };
 
-/** A piece's place in the folded sheet: the turns of its folds, in order, after its lift off the layers under it. */
+/**
+ * A piece's transform within the folded sheet: its fold rotations in order, after its lift above
+ * the layers beneath.
+ */
 const pieceOf = (piece: Piece, turns: Matrix[], lift: number): Matrix => {
   let m = translation(0, 0, (piece.flips % 2 ? -1 : 1) * piece.layer * LAYER * lift);
   piece.moves.forEach((moves, i) => {
@@ -198,10 +197,9 @@ const pieceOf = (piece: Piece, turns: Matrix[], lift: number): Matrix => {
 };
 
 /**
- * The shadow, drawn once for each theme. On a dark page, where a shadow cannot
- * be seen, warm light with the airliner a gap in it; on a light one, a faint
- * warmth of the same light with the airliner's shadow in it, soft and warm
- * grey, as a shadow is on paper in the sun.
+ * Pre-rendered shadow sprite per theme. Dark theme: warm light with the airliner as a gap in it (a
+ * shadow wouldn't read on a dark page). Light theme: a faint warm patch with a soft warm-gray
+ * airliner shadow, like a shadow on sunlit paper.
  */
 const shadowSprite = (dark: boolean) => {
   const size = 256;
@@ -213,7 +211,7 @@ const shadowSprite = (dark: boolean) => {
     g.save();
     g.translate(size * 0.14, size * 0.14);
     g.scale((size * 0.72) / 200, (size * 0.72) / 200);
-    // Each part on its own, so where they overlap is not left out.
+    // Fill each part separately so overlaps aren't cancelled out by the fill rule.
     for (const part of AIRLINER) g.fill(new Path2D(part));
     for (const [x, y, rx, ry] of ENGINES) {
       g.beginPath();
@@ -250,7 +248,7 @@ const shadowSprite = (dark: boolean) => {
 
 type Box = [number, number, number, number];
 
-/** A canvas the plane is drawn on: where it is on the page and its size (CSS pixels), and its pixels to each. */
+/** A drawing surface: position on the page and size in CSS px, plus its pixel ratio. */
 interface Surface {
   canvas: HTMLCanvasElement;
   g: CanvasRenderingContext2D;
@@ -259,7 +257,7 @@ interface Surface {
   width: number;
   height: number;
   ratio: number;
-  /** The part drawn on last time, in its own CSS pixels: only that is cleared, not the whole canvas. */
+  /** Region drawn last frame, in CSS px; only that is cleared. */
   dirty: Box | null;
   shown: boolean;
 }
@@ -276,7 +274,7 @@ const surfaceOf = (canvas: HTMLCanvasElement, g: CanvasRenderingContext2D): Surf
   shown: false,
 });
 
-/** Gives a canvas its size, in CSS pixels and in its own; a new size clears it. */
+/** Sizes a canvas in CSS and device pixels; resizing clears it. */
 const resize = (surface: Surface, width: number, height: number, ratio: number) => {
   surface.width = Math.max(1, width);
   surface.height = Math.max(1, height);
@@ -290,7 +288,10 @@ const resize = (surface: Surface, width: number, height: number, ratio: number) 
   }
 };
 
-/** Where a point (x, y, z) on the page, z above it, is seen by the eye over (eyeX, eyeY), as CSS perspective would: in page pixels. */
+/**
+ * Projects a page point (x, y) at height z as seen by an eye above (eyeX, eyeY), matching CSS
+ * perspective; returns page px.
+ */
 const seen = (eyeX: number, eyeY: number, x: number, y: number, z: number) => {
   const f = PERSPECTIVE / (PERSPECTIVE - z);
   return [eyeX + (x - eyeX) * f, eyeY + (y - eyeY) * f];
@@ -306,40 +307,40 @@ export function initPlane() {
   const floorContext = floorCanvas?.getContext('2d');
   if (!section || !stage || !sheet || !screenCanvas || !floorCanvas || !screenContext || !floorContext) return;
   const header = document.querySelector<HTMLElement>('.site-header');
-  // Lying still under the rug, the plane is drawn on the floor: a canvas in
-  // the rug's own place (Rug.astro), which scrolls with it exactly. Moving,
-  // it is drawn on the canvas over the screen; drawn there while it lay
-  // still, it would be a frame behind the rug as the page is scrolled (the
-  // browser scrolls the page ahead of the script, and the drawing follows).
+  // At rest the plane is drawn on the floor canvas inside the rug's stage (Rug.astro), which
+  // scrolls with the rug natively. In flight it uses the fixed viewport canvas; drawing the resting
+  // plane there would lag the rug by a frame while scrolling, since scrolling runs ahead of script.
   const floor = surfaceOf(floorCanvas, floorContext);
   const screen = surfaceOf(screenCanvas, screenContext);
 
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Lying under the rug, the plane is drawn only once the rug covers it
-  // (`data-covered`, rug.ts: the flat picture fully shown; the 3D rug comes
-  // up over it). Until then (on a slow connection the picture comes after
-  // this script), the paper would lie on the bare floor.
+  // Draw the resting plane only once the rug covers it (`data-covered`, set by rug.ts when the flat
+  // image is fully shown; the 3D rug renders on top). On slow connections the image can arrive
+  // after this script, and the plane would otherwise sit on the bare floor.
   const covered = () => stage.hasAttribute('data-covered');
   const items = foldSheet().pieces.map((piece) => ({ piece, points: [] as number[], depth: 0, colour: '', edge: '' }));
   const sprites = new Map<boolean, HTMLCanvasElement>();
 
-  // Where things are on the page, measured when the layout changes, not as it scrolls.
+  // Layout measurements, refreshed on layout changes only, not on scroll.
   let rest: Pose;
   let out: Pose;
   let card: Pose;
   let start = 0;
   let end = 1;
   let measured = false;
-  /** Whether the plane has been found, and where the page was then: it sets off from there. */
+  /**
+   * Whether the plane has been revealed, and the scroll position at that moment; the flight starts
+   * from there.
+   */
   let found = false;
   let foundAt = -Infinity;
-  // Where on the screen the canvas over it is, and its middle (the eye).
+  // Viewport canvas position, and its center (the eye).
   let viewLeft = 0;
   let viewTop = 0;
   let eyeX = 0;
   let eyeY = 0;
-  // The eye the floor is seen from, on the page, and whether the plane lying there is drawn.
+  // Eye position for the floor canvas, and whether the resting plane has been drawn.
   let floorEyeX = 0;
   let floorEyeY = 0;
   let floorDrawn = false;
@@ -357,13 +358,13 @@ export function initPlane() {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
     const local = (x: number, y: number) => [cx + (x * cos - y * sin) * rug, cy + (x * sin + y * cos) * rug];
-    // Under the corner that turns up, nose towards it and just out from under
-    // it, as if slid there and forgotten; as long as the rug is two fifths wide.
+    // Under the curled corner, nose toward it and just poking out, as if slid there and forgotten
+    // (assumes the rug is at least 40% of the stage width).
     const [rx, ry] = local(0.36, 0.7);
     const heading = Math.atan2(0.5 * sin + 0.8 * cos, 0.5 * cos - 0.8 * sin);
     rest = { x: rx, y: ry, z: 0, heading, pitch: 0, bank: 0, scale: (rug * 0.42) / LENGTH };
-    // Out past the corner, onto the open floor: on a narrow screen, only just
-    // clear of the rug, so it stays in sight.
+    // Clear of the corner onto the open floor; on narrow screens only just clear of the rug, so it
+    // stays visible.
     const room = Math.cos(heading) > 0.1 ? (scrollX + window.innerWidth - 40 - rx) / Math.cos(heading) : Infinity;
     const slide = clamp(room, rug * 0.42, rug * 0.6);
     out = { ...rest, x: rx + Math.cos(heading) * slide, y: ry + Math.sin(heading) * slide };
@@ -374,16 +375,16 @@ export function initPlane() {
       x: paper.left + scrollX + paper.width / 2,
       y: paper.top + scrollY + paper.height / 2,
       z: 0,
-      // Wide, it lands nose to the right; tall, nose down the page.
+      // Landing orientation: nose right on wide screens, nose down the page on tall ones.
       heading: wide ? 0 : Math.PI / 2,
       pitch: 0,
       bank: 0,
       scale: wide ? paper.width / LENGTH : paper.width,
     };
 
-    // From the rug in the middle of the screen to the sheet in sight: its
-    // foot a little above the screen's, never further than in the middle of
-    // what the header leaves. The sheet is never taller than that (Proverb.astro).
+    // Flight range: from the rug centered in the viewport to the sheet in view, its bottom slightly
+    // above the viewport's, never lower than the middle of the space below the header. The sheet
+    // never exceeds that height (Proverb.astro).
     const top = header?.getBoundingClientRect().height ?? 64;
     const inSight = paper.bottom + scrollY - window.innerHeight + 40;
     const centred = card.y - (top + window.innerHeight) / 2;
@@ -398,9 +399,8 @@ export function initPlane() {
     eyeX = view.left + screen.width / 2;
     eyeY = view.top + screen.height / 2;
 
-    // The floor's canvas, just round the plane lying there, seen from where
-    // the eye over the screen will be when it sets off: it looks the same
-    // when it goes from one canvas to the other.
+    // The floor canvas is drawn from the eye position the viewport canvas will have at takeoff, so
+    // the handoff between canvases is seamless.
     floorEyeX = scrollX + eyeX;
     floorEyeY = start + eyeY;
     const [l, t, r, b] = shape(flying(0), floorEyeX, floorEyeY);
@@ -422,13 +422,16 @@ export function initPlane() {
     measured = true;
   };
 
-  /** The way down: a curve from the floor by the rug to just short of the sheet, coming in the way it will lie. */
+  /**
+   * Flight path: a curve from the floor beside the rug to just short of the sheet, arriving in its
+   * landing orientation.
+   */
   const path = (u: number) => {
     const length = Math.hypot(card.x - out.x, card.y - out.y);
     const arrive = [card.x - Math.cos(card.heading) * card.scale * 0.6, card.y - Math.sin(card.heading) * card.scale * 0.6 - length * 0.06];
     const away = [Math.cos(rest.heading), Math.sin(rest.heading)];
-    // Out over the open side of the page first, then round; on a narrow
-    // screen, turning back before it leaves it.
+    // Swing out over the open side of the page first, then curve back; on narrow screens, turn back
+    // before leaving it.
     const left = window.scrollX + window.innerWidth * 0.22;
     const right = window.scrollX + window.innerWidth * 0.78;
     const p0 = [out.x, out.y];
@@ -441,14 +444,14 @@ export function initPlane() {
     return { x: at(0), y: at(1), heading: Math.atan2(slope(1), slope(0)) };
   };
 
-  /** In flight, at t of the scroll: under the rug (0) to over the sheet (1). */
+  /** In-flight state at scroll progress `t`: under the rug (0) to over the sheet (1). */
   const flying = (t: number): Moment => {
     const angles = [...FOLDED];
-    // Pressed flat-ish under the rug; it opens as it takes to the air.
+    // Mostly flat under the rug; opens up as it takes off.
     const opening = smooth(OUT, AIRBORNE, t);
     angles[4] = angles[5] = mix(0.52, FOLDED[4], opening);
     angles[6] = angles[7] = mix(0.49, FOLDED[6], opening);
-    // It comes nearer as it flies; the sheet's full size comes as it opens.
+    // Grows as it approaches; reaches the sheet's full size as it opens.
     const scale = mix(rest.scale, card.scale * 0.62, smooth(OUT, 1, t));
     if (t <= OUT) {
       const s = smooth(0, OUT, t);
@@ -458,7 +461,7 @@ export function initPlane() {
     const p = path(u);
     const ahead = path(Math.min(1, u + 0.02));
     const behind = path(Math.max(0, u - 0.02));
-    // Into the turns, rocking a little as paper does, nose down and up as it glides.
+    // Bank into turns, with a slight rock and pitch oscillation like a gliding paper plane.
     const bank = clamp(turn(behind.heading, ahead.heading) * -6, -0.8, 0.8) + 0.2 * Math.sin(u * Math.PI * 3);
     const airborne = smooth(OUT, AIRBORNE, t);
     return {
@@ -476,7 +479,9 @@ export function initPlane() {
     };
   };
 
-  /** Landing, `land` of the way: down onto the sheet's place, turned flat, and opened out. */
+  /**
+   * Landing state at progress `land`: descends onto the sheet's position, levels out and unfolds.
+   */
   const landing = (from: Moment, land: number): Moment => {
     if (land <= 0) return from;
     const settle = smooth(0, 0.62, land);
@@ -502,8 +507,8 @@ export function initPlane() {
   };
 
   /**
-   * Places the plane's pieces as the eye at (eyeX, eyeY) on the page sees
-   * them, in page pixels, and shades them; returns the box they take up.
+   * Projects and shades the plane's pieces as seen from (eyeX, eyeY), in page px; returns their
+   * bounding box.
    */
   const shape = ({ pose, angles }: Moment, eyeX: number, eyeY: number) => {
     const lift = clamp((angles[0] + angles[1] + angles[2] + angles[3]) / (2 * Math.PI));
@@ -528,29 +533,32 @@ export function initPlane() {
         bottom = Math.max(bottom, sy);
       }
       item.depth = depth / item.piece.outline.length;
-      // Shaded by the side that faces up, the back a touch greyer than the front.
+      // Shade by the upward-facing side; the back is slightly grayer than the front.
       const n = normalise([m[8], m[9], m[10]]);
       const up = n[2] >= 0 ? 1 : -1;
       const light = Math.max(0, up * (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]));
       const brightness = Math.min(1.05, ((0.66 + 0.34 * light) / (0.66 + 0.34 * LIGHT[2])) * (up > 0 ? 1 : 0.97));
       item.colour = `rgb(${PAPER.map((value) => Math.min(255, Math.round(value * brightness))).join(',')})`;
-      // Its edges a shade darker: the creases, and the paper's edge.
+      // Slightly darker edges: creases and the paper's edge.
       item.edge = `rgb(${PAPER.map((value) => Math.round(value * brightness * 0.93)).join(',')})`;
     }
     return [left, top, right, bottom];
   };
 
-  /** Draws the plane and its shadow on a canvas, seen from (eyeX, eyeY); false when none of it is on the canvas. */
+  /**
+   * Draws the plane and its shadow on a surface, seen from (eyeX, eyeY). Returns false if nothing
+   * lands on the canvas.
+   */
   const paint = (moment: Moment, surface: Surface, eyeX: number, eyeY: number) => {
     const { pose, shadow } = moment;
     const [left, top, right, bottom] = shape(moment, eyeX, eyeY);
 
-    // The shadow on the page below, cast by the window's light: larger than a paper plane's.
+    // Ground shadow from the window light, larger than the plane itself.
     const span = pose.scale * LENGTH * 1.6 * (1 + pose.z / 900);
     const dark = document.documentElement.dataset.theme === 'dark';
     const opacity = (dark ? 0.22 : 0.42) * shadow * smooth(20, 90, pose.z);
     const [gx, gy] = seen(eyeX, eyeY, pose.x + pose.z * 0.32, pose.y + pose.z * 0.5, 0);
-    // From here on, in the canvas's own pixels.
+    // From here on, coordinates are in canvas pixels.
     const ox = surface.left;
     const oy = surface.top;
     const margin = 40;
@@ -564,8 +572,8 @@ export function initPlane() {
     const last = surface.dirty;
     if (last) g.clearRect(last[0], last[1], last[2] - last[0], last[3] - last[1]);
     else g.clearRect(0, 0, surface.width, surface.height);
-    // What this drawing covers: the paper (and its edges' width), and the
-    // shadow's sprite, turned, so its half diagonal.
+    // Dirty region: the paper (plus stroke width) and the rotated shadow sprite, i.e. its
+    // half-diagonal.
     const reach = span * 0.71;
     const dirty: Box = [left - 2 - ox, top - 2 - oy, right + 2 - ox, bottom + 2 - oy];
     if (shadowSeen) {
@@ -589,7 +597,7 @@ export function initPlane() {
       g.drawImage(sprite, -span / 2, -span / 2, span, span);
       g.restore();
     }
-    // Furthest first; paper lying on paper in the order it is stacked.
+    // Back to front; stacked paper in layer order.
     items.sort((a, b) => a.depth - b.depth || a.piece.layer - b.piece.layer);
     g.lineJoin = 'round';
     g.lineWidth = 0.75;
@@ -608,9 +616,8 @@ export function initPlane() {
   };
 
   /**
-   * Shows or hides a canvas. Hidden, the one over the screen is cleared (it
-   * is drawn on again, clearing only where it drew last); the floor keeps the
-   * plane lying there, which does not change.
+   * Shows or hides a surface. Hiding clears the viewport canvas (it only clears its last dirty
+   * region when redrawn); the floor canvas keeps the static resting plane.
    */
   const show = (surface: Surface, value: boolean) => {
     if (value === surface.shown) return;
@@ -636,16 +643,17 @@ export function initPlane() {
     if (!measured) measure();
     const flies = found && !still;
     const t = flies ? clamp((window.scrollY - start) / (end - start)) : 0;
-    // Landing once the sheet is in sight; taking off again only when scrolled
-    // a little way back, so it does not flutter at the threshold.
+    // Land once the sheet is visible; take off again only after scrolling back a bit, to avoid
+    // flicker at the threshold.
     if (flies && t >= 1) target = 1;
     else if (t < 0.9) target = 0;
     if (first) {
-      // Arriving at a page already scrolled past, the sheet is simply there.
+      // Arriving already scrolled past the sheet: show it unfolded immediately.
       land = target;
       first = false;
     } else if (land !== target) {
-      // In seconds, as they pass: on a slow device it lands in the same time, in fewer frames.
+      // Wall-clock seconds, capped: on slow devices the landing takes the same time in fewer
+      // frames.
       const dt = previous ? Math.min(0.25, (time - previous) / 1000) : 0;
       land = target > land ? Math.min(1, land + dt / LANDING) : Math.max(0, land - dt / LANDING);
     }
@@ -656,7 +664,7 @@ export function initPlane() {
       landed = land >= 1;
       section.toggleAttribute('data-landed', landed);
     }
-    // Out from under the rug, it flies over the page.
+    // Out from under the rug: switch to the viewport canvas.
     if ((t > OUT || land > 0) !== aloft) {
       aloft = t > OUT || land > 0;
       screen.canvas.toggleAttribute('data-aloft', aloft);
@@ -667,7 +675,7 @@ export function initPlane() {
       return;
     }
     if (t <= 0 && land <= 0) {
-      // Lying still under the rug: on the floor, drawn once.
+      // At rest under the rug: draw once on the floor canvas.
       if (!floorDrawn) floorDrawn = paint(flying(0), floor, floorEyeX, floorEyeY);
       show(floor, true);
       show(screen, false);
@@ -687,9 +695,8 @@ export function initPlane() {
     schedule();
   };
 
-  // Found once someone has looked under the rug (`data-looked`, which stays:
-  // rug.ts and rug-scene.ts set it when the rug is lifted or picked up), even
-  // before this script came: from then on, it flies.
+  // Revealed once the rug has been opened (`data-looked`, set by rug.ts and rug-scene.ts and never
+  // removed), even if that happened before this module loaded.
   const find = () => {
     if (found || still || !stage.hasAttribute('data-looked')) return;
     found = true;
@@ -697,8 +704,8 @@ export function initPlane() {
     section.setAttribute('data-flight', '');
     remeasure();
   };
-  // The shadow's sprite (blurred, so not free) is made ahead, while the page
-  // is idle, not in the first frame of the flight.
+  // Pre-render the blurred shadow sprite during idle time rather than on the first frame of the
+  // flight.
   const warm = () => {
     const dark = document.documentElement.dataset.theme === 'dark';
     if (!sprites.has(dark)) sprites.set(dark, shadowSprite(dark));
@@ -709,7 +716,7 @@ export function initPlane() {
   new MutationObserver(find).observe(stage, { attributes: true, attributeFilter: ['data-looked'] });
   new MutationObserver(schedule).observe(stage, { attributes: true, attributeFilter: ['data-covered'] });
   find();
-  // Both start hidden; the floor's canvas is so from its styles (Rug.astro).
+  // Both canvases start hidden; the floor canvas via CSS (Rug.astro).
   screen.canvas.hidden = false;
   screen.shown = true;
   show(screen, false);

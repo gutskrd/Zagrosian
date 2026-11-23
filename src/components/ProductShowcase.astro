@@ -13,9 +13,8 @@ const { t, localize } = i18n(Astro.url);
     <p class="eyebrow" data-reveal>{t.hevalo.eyebrow}</p>
 
     <div class="showcase__body">
-      {/* Hevalo's app icon as a hole in the page, the deer coming out of it
-          from behind the page (HevaloDeer.astro): that is its entrance.
-          Decoration: the name beside it says what it is. */}
+      {/* Hevalo's icon as a hole in the page with the deer emerging (HevaloDeer.astro), which
+         doubles as its entrance animation. Decorative: the name next to it labels it. */}
       <div class="showcase__art" aria-hidden="true">
         <HevaloDeer
           widths={[
@@ -37,7 +36,7 @@ const { t, localize } = i18n(Astro.url);
             <Cta href={localize('/book')} variant="link" arrow="right" label={t.hevalo.readBook} />
           </div>
         </div>
-        {/* The facts at a glance, as the FAQ and the hero's notice give them. */}
+        {/* Key facts, consistent with the FAQ and the hero announcement. */}
         <dl class="showcase__facts rule" data-reveal>
           <div>
             <dt>{t.hevalo.dialectsLabel}</dt>
@@ -58,12 +57,11 @@ const { t, localize } = i18n(Astro.url);
 </section>
 
 <style>
-  /* A tinted band that sets the products apart. Like the rest of the page, it
-     follows the light or dark theme. */
+  /* Tinted band that sets the products apart; follows the light/dark theme. */
   .showcase {
     position: relative;
     isolation: isolate;
-    /* The icon's glow may spread past a narrow screen's edge. */
+    /* The icon's glow may extend past the edge on narrow screens. */
     overflow-x: clip;
     padding-block: var(--section-space) clamp(3rem, 2rem + 3vw, 4.5rem);
     background: var(--color-surface);
@@ -75,19 +73,19 @@ const { t, localize } = i18n(Astro.url);
     margin-top: clamp(3rem, 2rem + 4vw, 6rem);
   }
 
-  /* ---- The icon ----
-     A hole in the page in the shape of the app icon, with the deer coming
-     out of it (HevaloDeer.astro). */
+  /* --- Icon ---
+
+     A hole in the page shaped like the app icon, with the deer emerging (HevaloDeer.astro). */
   .showcase__art {
     position: relative;
     justify-self: center;
     width: 14rem;
     aspect-ratio: 1;
-    /* In units of the icon's own width (cqi), so it keeps its proportions. */
+    /* Sized in container units of the icon width (cqi) to keep its proportions. */
     container-type: inline-size;
   }
 
-  /* ---- The name and the text ---- */
+  /* --- Name and copy --- */
   .showcase__name {
     font-size: clamp(4.5rem, 1.75rem + 13vw, 9.5rem);
     font-weight: 600;
@@ -97,8 +95,8 @@ const { t, localize } = i18n(Astro.url);
     margin-inline-start: -0.05em;
   }
 
-  /* Right to left, the word ends at the edge instead: the tight letter-spacing
-     leaves the last letter's ink about 0.03em outside its box, so it moves in. */
+  /* RTL: the word ends at the edge instead; the tight tracking pushes the last glyph's ink ~0.03em
+     outside its box, so nudge it in. */
   :global([dir='rtl']) .showcase__name {
     margin-inline-start: 0.03em;
   }
@@ -117,7 +115,7 @@ const { t, localize } = i18n(Astro.url);
     margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
   }
 
-  /* The visit, and under it the book. */
+  /* Visit link, with the book link below. */
   .showcase__actions {
     display: grid;
     justify-items: start;
@@ -131,7 +129,7 @@ const { t, localize } = i18n(Astro.url);
     letter-spacing: -0.011em;
   }
 
-  /* The facts: small, in three columns under a hairline, as in About. */
+  /* Facts: small, in three columns below a hairline, as in About. */
   .showcase__facts {
     display: grid;
     gap: 1.25rem;

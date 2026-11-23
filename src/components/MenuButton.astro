@@ -1,21 +1,20 @@
 ---
 /**
- * The menu button: two dots beside a label, nothing around them.
+ * Menu button: two dots next to a label, no chrome.
  *
- * - Hover: the dots flip across to each other's side, and the label rolls
- *   with them.
- * - Open: the dots stretch into an X; the menu (SiteMenu.astro) has its own
- *   button, in the same place, that shows the X and closes it, and it takes
- *   focus when the menu opens. Closing turns the X back into the dots.
+ * - Hover: the dots swap sides and the label rolls with them.
+ * - Open: the dots stretch into an X. The menu (SiteMenu.astro) has its own close button in the
+ *   same position, showing the X, which receives focus on open. Closing morphs the X back into
+ *   dots.
  *
- * It uses the Popover API, so it works without JavaScript. On narrow phones
- * only the dots show; the label stays as the button's name.
+ * Built on the Popover API, so it works without JS. On narrow phones only the dots show; the label
+ * remains the accessible name.
  */
 import { i18n } from '../i18n';
 import RollText from './RollText.astro';
 
 interface Props {
-  /** `open` in the header; `close` inside the menu. */
+  /** `open` in the header, `close` inside the menu. */
   action?: 'open' | 'close';
 }
 
@@ -58,7 +57,7 @@ const { t } = i18n(Astro.url);
     cursor: pointer;
   }
 
-  /* The two dots, side by side, in a small square they turn within. */
+  /* Two dots side by side, in a small square they rotate within. */
   .menu-button__icon {
     position: relative;
     flex: none;
@@ -87,7 +86,7 @@ const { t } = i18n(Astro.url);
     translate: calc(-50% + 5px) -50%;
   }
 
-  /* Hover: the pair turns half a circle, so each dot flips to the other side. */
+  /* Hover: rotate the pair 180 degrees so the dots swap sides. */
   @media (hover: hover) {
     .menu-button:hover .menu-button__icon {
       rotate: 180deg;
@@ -98,9 +97,8 @@ const { t } = i18n(Astro.url);
     rotate: 180deg;
   }
 
-  /* Open: the dots meet in the middle and stretch into an X. This is the
-     menu's own button, and the header's underneath it, which turns back
-     into dots as the menu lifts. */
+  /* Open: the dots meet in the middle and stretch into an X. Applies to the menu's own button and
+     to the header button beneath it, which morphs back into dots as the menu closes. */
   .menu-button--close .menu-button__dot,
   :global(.site-header:has(.site-menu:popover-open)) .menu-button--open .menu-button__dot {
     width: 20px;
@@ -115,7 +113,7 @@ const { t } = i18n(Astro.url);
     rotate: -45deg;
   }
 
-  /* The X turns a quarter under the pointer. */
+  /* The X rotates 90 degrees on hover. */
   @media (hover: hover) {
     .menu-button--close:hover .menu-button__icon {
       rotate: 90deg;
@@ -126,8 +124,8 @@ const { t } = i18n(Astro.url);
     rotate: 90deg;
   }
 
-  /* The menu's button arrives as two dots, then becomes the X, a moment
-     after the menu starts to drop. */
+  /* The menu's button arrives as two dots, then morphs into the X shortly after the menu starts
+     dropping. */
   .menu-button--close .menu-button__dot {
     transition-delay: 0.2s;
   }
@@ -146,7 +144,7 @@ const { t } = i18n(Astro.url);
     }
   }
 
-  /* The header's button turns back into dots as the menu lifts away. */
+  /* The header button morphs back into dots as the menu lifts away. */
   .menu-button--open .menu-button__dot {
     transition-delay: 0.25s;
   }
@@ -162,7 +160,7 @@ const { t } = i18n(Astro.url);
     }
   }
 
-  /* On narrow phones, the dots alone. */
+  /* Narrow phones: dots only. */
   @media (max-width: 29.99rem) {
     .menu-button__label :global(.roll__track) {
       display: none;

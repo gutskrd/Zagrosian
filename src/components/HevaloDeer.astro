@@ -1,40 +1,36 @@
 ---
 /**
- * Hevalo's app icon as a hole in the page, and the deer coming out of it from
- * behind the page, for the products section (ProductShowcase.astro). The page
- * is cut in the icon's shape; through it is the purple space behind the page.
+ * Hevalo's app icon as a hole cut into the page, with the deer emerging through it (used by
+ * ProductShowcase.astro). Behind the hole is the icon's purple backdrop.
  *
- * As the section scrolls into view, the deer comes up from deep in that space,
- * small and hazed with its purple, its ears laid back, and pushes forward
- * through the hole until its head is out in front of the page: there its ears
- * spring up, it casts its shade on the page round the hole, and it comes to
- * rest as the icon has it, its neck going back into the hole. Scrolling back
- * takes it back in.
+ * As the section scrolls into view, the deer rises from deep inside, small and hazed in purple with
+ * its ears laid back, and pushes through the hole until its head is in front of the page. There its
+ * ears spring up, it casts a shadow around the hole, and it settles into the icon's pose with its
+ * neck going back into the hole. Scrolling back reverses it.
  *
- * Behind the page it is clipped by the hole; in front, it is not. Each part
- * goes from one to the other (two copies, one in the hole and one in front,
- * the one swapped for the other) at the moment it crosses the page, when it is
- * well inside the hole, so the swap cannot be seen and nothing is ever cut by
- * the hole's edge: the ears lie back to pass through and only open out once
- * they are in front. Everything that moves is scaled, moved, turned or faded
- * on the graphics card in step with the scroll (no script, no 3D scene, no
- * masks), so it stays smooth on any device, scrolling down or up. The deer is
- * taken apart for this by scripts/deer-layers.cjs.
+ * Behind the page each part is clipped by the hole; in front it isn't. Every part has two copies
+ * (inside the hole and in front) that swap at the exact scroll position where the part crosses the
+ * page plane, while it is well inside the hole outline, so the swap is invisible and nothing is
+ * ever cut by the hole's edge (the ears stay laid back until they're through). Everything is
+ * transform/opacity animation on scroll-driven CSS timelines (no JS, no 3D scene, no masks), so it
+ * stays smooth on any device in either direction. The layers are produced by
+ * scripts/deer-layers.cjs.
  *
- * It is alive, never busy: it blinks, now and then twitches an ear or sniffs,
- * and answers a tap or click with all three (src/scripts/deer.ts). Its eyes
- * follow the pointer (src/scripts/eyes.ts). With reduced motion, or where the
- * browser cannot tie animation to the scroll, it is simply out of its hole.
+ * Idle life (blinks, ear twitches, sniffs, and all three on tap) is src/scripts/deer.ts;
+ * pointer-following eyes are src/scripts/eyes.ts. With reduced motion, or without scroll-driven
+ * animation support, the deer is simply shown out of its hole.
  *
- * Like the flat icon (HevaloIcon.astro), it comes in two seasons, and only the
- * one in season is downloaded (the images are lazy). Sizes are in `cqi`, so it
- * must sit in an inline-size container (the showcase's art).
+ * Like HevaloIcon.astro it has seasonal variants, and only the active one is downloaded (lazy
+ * images). Sizes are in `cqi`, so it must sit inside an inline-size container (the showcase art).
  */
 import type { ImageMetadata } from 'astro';
 import HevaloEyes from './HevaloEyes.astro';
 
 interface Props {
-  /** The icon's rendered width, widest screens first, e.g. [['(min-width: 64rem)', 21], [null, 14]] (rem). */
+  /**
+   * Rendered icon width per breakpoint, widest first, e.g. [['(min-width: 64rem)', 21], [null, 14]]
+   * (rem).
+   */
   widths: [string | null, number][];
 }
 
@@ -47,7 +43,10 @@ const image = (name: string) => {
   return file.default;
 };
 
-/** Each layer's width, as a fraction of the icon's (from its box in deer-layers.cjs), and its seasons. */
+/**
+ * Layer widths as a fraction of the icon width (from deer-layers.cjs boxes), and their seasonal
+ * variants.
+ */
 const layers = {
   snow: { width: 330 / 360, frames: [288, 576], seasons: ['christmas'] },
   shade: { width: 360 / 360, frames: [144], seasons: ['everyday', 'christmas'] },
@@ -63,7 +62,7 @@ type Layer = keyof typeof layers;
 
 const prefixes: Record<string, string> = { everyday: 'hevalo', christmas: 'hevalo-christmas', shared: 'hevalo' };
 
-/** A layer's images: one per season (the neck serves both). */
+/** Image sources for a layer, one per season (the neck is shared). */
 const images = (layer: Layer) => {
   const { width, frames, seasons } = layers[layer];
   const sizes = widths.map(([query, rem]) => `${query ? `${query} ` : ''}${(rem * width).toFixed(2)}rem`).join(', ');
@@ -83,14 +82,14 @@ const images = (layer: Layer) => {
   });
 };
 
-/** The parts that come out, back to front. */
+/** Emerging parts, back to front. */
 const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
 ---
 
 <span class="deer" data-deer data-hevalo-eyes>
   <span class="deer__glow"></span>
 
-  {/* The hole: the purple space behind the page, and the deer while it is behind the page. */}
+  {/* The hole: the purple backdrop, and the deer while it's behind the page. */}
   <span class="deer__hole">
     <span class="deer__back">
       {
@@ -126,7 +125,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
   </span>
   <span class="deer__rim"></span>
 
-  {/* In front of the page: the deer's shade on it, and the deer. */}
+  {/* In front of the page: the deer's shadow on it, and the deer. */}
   <span class="deer__body deer__body--shade">
     <span class="deer__shade">
       {
@@ -154,12 +153,10 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
 
 <style>
   .deer {
-    /* Which way the reader's eye is across, as the section is laid out: in
-       the middle on narrow screens; on wide ones the icon is to the right of
-       the middle (to the left, right to left). The purple far behind slides
-       a little towards it. */
+    /* Horizontal viewing direction across the section layout: centered on narrow screens; on wide
+       ones the icon sits right of center (left in RTL). The backdrop parallaxes slightly toward it. */
     --look: 0;
-    /* The purple behind the page: the icon's own, light at the bottom left. */
+    /* Backdrop purple, matching the icon (lighter toward the bottom left). */
     --purple-from: #db7df5;
     --purple-to: #9a6cf1;
     --purple-haze: #b775f3;
@@ -168,7 +165,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     inset: 0;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    /* It is artwork: forced colours keep its colours. */
+    /* Artwork: keep its colors in forced-colors mode. */
     forced-color-adjust: none;
   }
 
@@ -206,7 +203,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     display: block;
   }
 
-  /* A little of the purple's light on the page round the hole. */
+  /* Faint purple glow on the page around the hole. */
   .deer__glow {
     position: absolute;
     inset: -22%;
@@ -214,10 +211,10 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     background: radial-gradient(closest-side, rgb(176 112 242 / 0.16), rgb(176 112 242 / 0));
   }
 
-  /* ---- The hole ----
-     The icon's outline, measured on the artwork: 13.72 to 346.08 across, 0.27
-     to 358.8 down (of 360), corners of 72.6. Everything in it is behind the
-     page, so it is clipped to it. */
+  /* --- Hole ---
+
+     Icon outline measured from the artwork: x 13.72-346.08, y 0.27-358.8 (of 360), corner radius
+     72.6. Everything inside is behind the page and clipped to it. */
   .deer__hole,
   .deer__rim {
     position: absolute;
@@ -229,17 +226,15 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     overflow: clip;
   }
 
-  /* Its cut edge: the page's edge throws a shade inside the hole, deepest
-     under its top edge, where the light comes from. It falls on the deer too,
-     while it is behind the page. */
+  /* Cut edge: the page casts an inner shadow into the hole, deepest under the top edge (where the
+     light comes from). It also falls on the deer while it's behind the page. */
   .deer__rim {
     box-shadow:
       inset 0 1.4cqi 3cqi rgb(28 6 58 / 0.32),
       inset 0 0 0 0.35cqi rgb(28 6 58 / 0.08);
   }
 
-  /* Far behind the page, the purple, larger than the hole so that it fills it
-     however far it slides. */
+  /* Far backdrop, larger than the hole so it still fills it at full parallax. */
   .deer__back {
     --dx: calc(var(--look) * 2.5cqi);
     --dy: 7cqi;
@@ -252,7 +247,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
       linear-gradient(to top right, var(--purple-from) 12%, var(--purple-to) 88%);
   }
 
-  /* 15, 0; 330 wide, within it. */
+  /* Offset 15, 0; 330 wide within the backdrop. */
   .deer__snow {
     position: absolute;
     left: 11.93%;
@@ -260,7 +255,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     width: 76.18%;
   }
 
-  /* The haze of that space, over the deer while it is far in it. */
+  /* Depth haze over the deer while it's deep inside. */
   .deer__veil {
     position: absolute;
     inset: 0;
@@ -268,10 +263,10 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     opacity: 0;
   }
 
-  /* ---- The deer ----
-     Each copy of the deer is drawn in the icon's square (inside the hole,
-     offset by the hole's own inset), and moves in depth as one about its
-     middle. At rest it is in front of the page, as the icon has it. */
+  /* --- Deer ---
+
+     Each copy is drawn in the icon's square (inside the hole, offset by the hole's inset) and moves
+     in depth as one unit about its center. At rest it's in front of the page, as in the icon. */
   .deer__body {
     position: absolute;
     left: 0;
@@ -300,17 +295,16 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     display: block;
   }
 
-  /* Each part at its place in the icon's 360 px square (the boxes from
-     deer-layers.cjs). */
+  /* Each part's position in the icon's 360px square (boxes from deer-layers.cjs). */
 
-  /* 105, 290; 150 wide, going back into the hole, below its edge. */
+  /* 105, 290; 150 wide. Extends back into the hole, below its edge. */
   .deer__neck {
     left: 29.1667%;
     top: 80.5556%;
     width: 41.6667%;
   }
 
-  /* 0, 15; 360 wide: its shade, on the page and in the hole. */
+  /* 0, 15; 360 wide: the shadow, on the page and inside the hole. */
   .deer__shade {
     position: absolute;
     left: 0;
@@ -322,14 +316,14 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     opacity: 0.7;
   }
 
-  /* 25, 15; 300 wide */
+  /* 25, 15; 300 wide. */
   .deer__antlers {
     left: 6.9444%;
     top: 4.1667%;
     width: 83.3333%;
   }
 
-  /* 0 and 250, 90; 110 wide. Each turns about where it meets the head. */
+  /* 0 and 250, 90; 110 wide. Each rotates about its base. */
   .deer__ear-left,
   .deer__ear-right {
     top: 25%;
@@ -354,14 +348,14 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     transform-origin: 20% 69.6%;
   }
 
-  /* 65, 110; 230 wide (305 tall, for the Christmas scarf) */
+  /* 65, 110; 230 wide (305 tall, for the Christmas scarf). */
   .deer__head {
     left: 18.0556%;
     top: 30.5556%;
     width: 63.8889%;
   }
 
-  /* 145, 270; 70 wide. It sniffs from its middle. */
+  /* 145, 270; 70 wide. Sniffs from its center. */
   .deer__nose {
     left: 40.2778%;
     top: 75%;
@@ -373,10 +367,9 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    /* Coming out, from when the icon is part way into the screen until it is
-       just past the middle. Separate properties, so the minifier cannot fold
-       the timeline into the `animation` shorthand (which browsers do not
-       accept). */
+    /* Emergence runs from when the icon is partly in view until just past the viewport middle.
+       Longhand properties, so the minifier can't fold the timeline into the `animation` shorthand
+       (which browsers reject). */
     @supports (animation-timeline: view()) {
       .deer {
         view-timeline-name: --deer;
@@ -392,7 +385,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
         animation-range: entry 40% cover 55%;
       }
 
-      /* The purple slides across the icon's whole way over the screen. */
+      /* The backdrop parallaxes across the icon's whole path through the viewport. */
       .deer__back {
         animation-name: deer-back;
         animation-timing-function: linear;
@@ -441,7 +434,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
       }
     }
 
-    /* Life (deer.ts sets these for the length of each). */
+    /* Idle actions (deer.ts sets each attribute for the action's duration). */
     :global([data-blink]) :global(.lid__skin) {
       animation: deer-blink 0.26s var(--ease-in-out);
     }
@@ -461,8 +454,8 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* As the icon crosses the screen, the purple far behind slides, from as
-     seen from above (the icon low on the screen) to as seen from below. */
+  /* Backdrop parallax as the icon crosses the viewport: from seen-from-above (icon low on screen)
+     to seen-from-below. */
   @keyframes deer-back {
     from {
       translate: var(--dx) calc(var(--dy) * -1);
@@ -473,9 +466,9 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* From deep in the hole (smaller, a little lower) to in front of the page.
-     It crosses the page at 70% of its size, 35.34% of the way, where every
-     part is well inside the hole (checked against the artwork). */
+  /* From deep inside (smaller, slightly lower) to in front of the page. It crosses the page plane
+     at 70% scale, 35.34% through the animation, where every part is well inside the hole (verified
+     against the artwork). */
   @keyframes deer-depth {
     from {
       scale: 0.42;
@@ -488,7 +481,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* At the crossing, the copy in the hole gives way to the copy in front. */
+  /* At the crossing, the inside copy hands over to the front copy. */
   @keyframes deer-behind {
     0%,
     35.3% {
@@ -513,7 +506,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* Its shade comes onto the page as it comes out. */
+  /* The shadow appears on the page as the deer emerges. */
   @keyframes deer-shade {
     0%,
     35.34% {
@@ -526,7 +519,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* The haze clears as it nears the page. */
+  /* The haze clears as it approaches the page. */
   @keyframes deer-veil {
     0% {
       opacity: 0.6;
@@ -542,8 +535,7 @@ const parts = ['antlers', 'ear-left', 'ear-right', 'head', 'nose'] as const;
     }
   }
 
-  /* Laid back to pass through; out in front, they spring up, past where
-     they rest, and settle. */
+  /* Laid back to pass through; in front they spring up, overshoot and settle. */
   @keyframes deer-ear-left {
     0%,
     35.34% {

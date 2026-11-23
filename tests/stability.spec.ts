@@ -1,15 +1,14 @@
 /**
- * Nothing jumps: no layout shift while the homepage or Hevalo's book loads
- * (as on a first visit), and none while it is scrolled all the way down with a mouse wheel
- * and back up again, through the story and the deer, left to right and right
- * to left (where the browser measures from the right); and the page keeps its
- * length all the while, so the reader's place never moves when they turn
- * round (Safari does not keep it when content above changes size).
+ * No layout shift while the homepage or the book loads (as on a first visit), nor while scrolling
+ * all the way down with a mouse wheel and back up, through the story and the deer, in LTR and RTL
+ * (where the browser measures from the right). The document height also stays constant throughout,
+ * so the reader's position never jumps on scroll reversal (Safari doesn't preserve it when content
+ * above resizes).
  */
 import { type Page, expect, test } from '@playwright/test';
 import { settled } from './support';
 
-/** Adds up every layout shift on the page from its next navigation on. */
+/** Accumulates every layout shift from the next navigation on. */
 async function measureShifts(page: Page) {
   await page.addInitScript(() => {
     const record = window as unknown as { shifts: { value: number; at: number; source: string }[] };
@@ -40,12 +39,12 @@ for (const { name, ...screen } of screens) {
   test.describe(`loading, on a ${name}`, () => {
     test.use(screen);
 
-    // The homepage, and Hevalo's book, whose reader starts as the page opens.
+    // The homepage, and the book page, whose reader initializes on load.
     for (const path of ['/', '/fa', '/de', '/book', '/ar/book']) {
       test(path, async ({ page }) => {
         const shifts = await measureShifts(page);
         await page.goto(path, { waitUntil: 'networkidle' });
-        // Until the hero's entrance has played and the page has settled.
+        // Until the hero entrance has played and the page has settled.
         await page.waitForTimeout(5000);
         const { total, where } = await shifts();
         expect(total, where.join('\n')).toBeLessThan(0.01);

@@ -1,6 +1,6 @@
 import type { Messages } from './en';
 
-/* French typography: a no-break space ( ) comes before ":" and the like. */
+/* French typography: a no-break space ( ) precedes ":" and similar punctuation. */
 export const fr: Messages = {
   meta: {
     title: 'Zagrosian — La technologie au quotidien',
