@@ -1,11 +1,11 @@
 {
-  "edition": "2026-11-17.b87b0f17907a",
-  "date": "2026-11-17",
+  "edition": "2026-11-24.2796e7dcd72b",
+  "date": "2026-11-24",
   "title": {
     "ku": "Rêya Kurmancî",
     "en": "The Kurmanji Road"
   },
-  "pageCount": 202,
+  "pageCount": 195,
   "pagePt": {
     "w": 419.53,
     "h": 595.28
@@ -16,8 +16,8 @@
   ],
   "pdf": {
     "file": "Reya-Kurmanci-Pirtuka-Hevalo.pdf",
-    "bytes": 3320864,
-    "sha256": "25592d220466c1e9b694cbd62e24c6b3329e169368cc7818f47e4b457403a0a0"
+    "bytes": 3279538,
+    "sha256": "62f5f6a00cf5cc64e4bffb3350e532ea1fb993c4472bdaee30ff5fa6261b3649"
   },
   "sections": [
     {
@@ -52,23 +52,23 @@
     },
     {
       "key": "answers",
-      "start": 189,
-      "end": 192
+      "start": 182,
+      "end": 185
     },
     {
       "key": "words",
-      "start": 193,
-      "end": 200
+      "start": 186,
+      "end": 193
     },
     {
       "key": "author",
-      "start": 201,
-      "end": 201
+      "start": 194,
+      "end": 194
     },
     {
       "key": "farewell",
-      "start": 202,
-      "end": 202
+      "start": 195,
+      "end": 195
     }
   ],
   "chapters": [
@@ -130,7 +130,7 @@
       "titleKu": "Mal û gund",
       "titleEn": "House and village",
       "start": 35,
-      "end": 49,
+      "end": 48,
       "parts": [
         {
           "titleKu": "Ev mala me ye",
@@ -142,11 +142,11 @@
         },
         {
           "titleKu": "Li ku ye?",
-          "start": 41
+          "start": 40
         },
         {
           "titleKu": "Gundê me",
-          "start": 44
+          "start": 43
         }
       ]
     },
@@ -155,24 +155,24 @@
       "cefr": "A1",
       "titleKu": "Bazar",
       "titleEn": "The market",
-      "start": 50,
-      "end": 63,
+      "start": 49,
+      "end": 61,
       "parts": [
         {
           "titleKu": "Em diçin bazarê",
-          "start": 51
+          "start": 50
         },
         {
           "titleKu": "Çi dixwazî?",
-          "start": 53
+          "start": 52
         },
         {
           "titleKu": "Bi çend e?",
-          "start": 55
+          "start": 54
         },
         {
           "titleKu": "Na, naxwazim",
-          "start": 58
+          "start": 56
         }
       ]
     },
@@ -181,24 +181,24 @@
       "cefr": "A2",
       "titleKu": "Roj û dem",
       "titleEn": "Days and time",
-      "start": 64,
-      "end": 78,
+      "start": 62,
+      "end": 75,
       "parts": [
         {
           "titleKu": "Rojên hefteyê",
-          "start": 65
+          "start": 63
         },
         {
           "titleKu": "Meh û sal",
-          "start": 67
+          "start": 65
         },
         {
           "titleKu": "Demjimêr çend e?",
-          "start": 69
+          "start": 67
         },
         {
           "titleKu": "Her roj",
-          "start": 72
+          "start": 69
         }
       ]
     },
@@ -207,24 +207,24 @@
       "cefr": "A2",
       "titleKu": "Bajar",
       "titleEn": "The city",
-      "start": 79,
-      "end": 93,
+      "start": 76,
+      "end": 89,
       "parts": [
         {
           "titleKu": "Li bajêr",
-          "start": 80
+          "start": 77
         },
         {
           "titleKu": "Werin, rûnin!",
-          "start": 82
+          "start": 79
         },
         {
           "titleKu": "Divê em biçin",
-          "start": 85
+          "start": 82
         },
         {
           "titleKu": "Bi çi diçî?",
-          "start": 87
+          "start": 84
         }
       ]
     },
@@ -233,24 +233,24 @@
       "cefr": "A2",
       "titleKu": "Hewa û Newroz",
       "titleEn": "Weather and Newroz",
-      "start": 94,
-      "end": 109,
+      "start": 90,
+      "end": 104,
       "parts": [
         {
           "titleKu": "Hewa çawa ye?",
-          "start": 95
+          "start": 91
         },
         {
           "titleKu": "Ez ê biçim",
-          "start": 97
+          "start": 93
         },
         {
           "titleKu": "Govend",
-          "start": 100
+          "start": 96
         },
         {
           "titleKu": "Newroz pîroz be!",
-          "start": 102
+          "start": 98
         }
       ]
     },
@@ -259,24 +259,24 @@
       "cefr": "A2",
       "titleKu": "Laş û tenduristî",
       "titleEn": "Body and health",
-      "start": 110,
-      "end": 125,
+      "start": 105,
+      "end": 120,
       "parts": [
         {
           "titleKu": "Serê min diêşe",
-          "start": 111
+          "start": 106
         },
         {
           "titleKu": "Ez te dibînim",
-          "start": 113
+          "start": 108
         },
         {
           "titleKu": "Mezintir, herî mezin",
-          "start": 116
+          "start": 110
         },
         {
           "titleKu": "Ez ditirsim",
-          "start": 118
+          "start": 113
         }
       ]
     },
@@ -285,24 +285,24 @@
       "cefr": "A2",
       "titleKu": "Duh",
       "titleEn": "Yesterday",
-      "start": 126,
-      "end": 141,
+      "start": 121,
+      "end": 135,
       "parts": [
         {
           "titleKu": "Duh çi bû?",
-          "start": 127
+          "start": 122
         },
         {
           "titleKu": "Berê",
-          "start": 129
+          "start": 124
         },
         {
           "titleKu": "Pêşî, paşê",
-          "start": 132
+          "start": 126
         },
         {
           "titleKu": "Wê rojê",
-          "start": 134
+          "start": 129
         }
       ]
     },
@@ -311,24 +311,24 @@
       "cefr": "B1",
       "titleKu": "Zozan",
       "titleEn": "The summer pastures",
-      "start": 142,
-      "end": 157,
+      "start": 136,
+      "end": 151,
       "parts": [
         {
           "titleKu": "Min nan xwar",
-          "start": 143
+          "start": 137
         },
         {
           "titleKu": "Jiyana zozanê",
-          "start": 145
+          "start": 139
         },
         {
           "titleKu": "Min dixwar, ez diçûm",
-          "start": 148
+          "start": 142
         },
         {
           "titleKu": "Me çi kir?",
-          "start": 151
+          "start": 145
         }
       ]
     },
@@ -337,24 +337,24 @@
       "cefr": "B1",
       "titleKu": "Kar û xwendin",
       "titleEn": "Work and school",
-      "start": 158,
-      "end": 173,
+      "start": 152,
+      "end": 166,
       "parts": [
         {
           "titleKu": "Karê te çi ye?",
-          "start": 159
+          "start": 153
         },
         {
           "titleKu": "Me sêv berhev kirine",
-          "start": 161
+          "start": 155
         },
         {
           "titleKu": "Ji ber ku…",
-          "start": 164
+          "start": 158
         },
         {
           "titleKu": "Planên me",
-          "start": 166
+          "start": 160
         }
       ]
     },
@@ -363,24 +363,24 @@
       "cefr": "B1",
       "titleKu": "Çîrok û stran",
       "titleEn": "Stories and songs",
-      "start": 174,
-      "end": 188,
+      "start": 167,
+      "end": 181,
       "parts": [
         {
           "titleKu": "Şengê û Pengê",
-          "start": 175
+          "start": 168
         },
         {
           "titleKu": "Mêvan hatin",
-          "start": 177
+          "start": 170
         },
         {
           "titleKu": "Gotinên pêşiyan",
-          "start": 179
+          "start": 173
         },
         {
           "titleKu": "Rêya te vekirî be!",
-          "start": 182
+          "start": 175
         }
       ]
     }
