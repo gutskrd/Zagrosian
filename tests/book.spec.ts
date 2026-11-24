@@ -21,6 +21,14 @@ const manifest = JSON.parse(readFileSync(new URL('../src/assets/book/book.json',
 };
 const chapter = (number: number) => manifest.chapters.find((item) => item.number === number)!;
 
+// The last two spreads on desktop: with an even page count the last page sits beside the end card;
+// with an odd one the last two pages share a spread and the end card follows alone.
+const even = manifest.pageCount % 2 === 0;
+const lastSpread = even ? [String(manifest.pageCount), 'end'] : ['end'];
+const spreadBeforeLast = even
+  ? [String(manifest.pageCount - 2), String(manifest.pageCount - 1)]
+  : [String(manifest.pageCount - 1), String(manifest.pageCount)];
+
 const reader = (page: Page) => page.locator('[data-book]');
 const stage = (page: Page) => page.locator('[data-book-stage]');
 
@@ -91,7 +99,7 @@ test.describe('desktop', () => {
     await expectShown(page, ['1']);
     expect(new URL(page.url()).hash).toBe('');
     await page.keyboard.press('End');
-    await expectShown(page, [String(manifest.pageCount), 'end']);
+    await expectShown(page, lastSpread);
   });
 
   test('jumps by chapter with ] and the contents, and marks the current chapter', async ({ page }) => {
@@ -152,17 +160,17 @@ test.describe('desktop', () => {
   });
 
   test('keeps focus in the book on the last page and still turns back', async ({ page }) => {
-    await open(page, `/book#page-${manifest.pageCount - 2}`);
+    await open(page, `/book#page-${spreadBeforeLast[0]}`);
     const next = page.locator('[data-book-next]');
     await next.focus();
     await page.keyboard.press('Enter');
-    await expectShown(page, [String(manifest.pageCount), 'end']);
+    await expectShown(page, lastSpread);
     await expect(next).toHaveAttribute('aria-disabled', 'true');
     await expect(next).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(next).toBeFocused();
     await page.keyboard.press('ArrowLeft');
-    await expectShown(page, [String(manifest.pageCount - 2), String(manifest.pageCount - 1)]);
+    await expectShown(page, spreadBeforeLast);
   });
 
   test('opens the page or chapter in the URL fragment', async ({ page }) => {

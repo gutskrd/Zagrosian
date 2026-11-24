@@ -182,11 +182,11 @@ export const es: Messages = {
   book: {
     metaTitle: 'Rêya Kurmancî: el libro gratuito de kurmanji de Hevalo — Zagrosian',
     metaDescription:
-      'El libro ilustrado de Hevalo para aprender kurmanji, con Hamo, Xezal y Hevalo y el inglés junto a cada línea. Léelo aquí página a página o descarga el PDF gratis.',
+      'El libro ilustrado de Hevalo para aprender kurmanji, con Hamo, Xezo y Hevalo y el inglés junto a cada línea. Léelo aquí página a página o descarga el PDF gratis.',
     shareAlt: 'Rêya Kurmancî, el libro de Hevalo, abierto por sus primeras páginas',
     eyebrow: 'Libro gratuito',
     subtitle: 'El camino del kurmanji · el libro de Hevalo',
-    lead: 'Un libro de curso en kurmanji, con el inglés junto a cada línea. Aprende con Hamo, Xezal y Hevalo, desde el primer hola hasta cuentos y canciones: léelo aquí página a página o descárgalo para imprimirlo y guardarlo.',
+    lead: 'Un libro de curso en kurmanji, con el inglés junto a cada línea. Aprende con Hamo, Xezo y Hevalo, desde el primer hola hasta cuentos y canciones: léelo aquí página a página o descárgalo para imprimirlo y guardarlo.',
     startReading: 'Empezar a leer',
     download: 'Descargar el libro',
     downloadShort: 'Descargar',

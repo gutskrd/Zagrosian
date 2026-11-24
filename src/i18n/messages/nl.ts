@@ -182,11 +182,11 @@ export const nl: Messages = {
   book: {
     metaTitle: 'Rêya Kurmancî: het gratis Kurmanji-boek van Hevalo — Zagrosian',
     metaDescription:
-      'Het geïllustreerde lesboek Kurmanji van Hevalo, met Hamo, Xezal en Hevalo en Engels naast elke regel. Lees het hier pagina voor pagina of download de gratis pdf.',
+      'Het geïllustreerde lesboek Kurmanji van Hevalo, met Hamo, Xezo en Hevalo en Engels naast elke regel. Lees het hier pagina voor pagina of download de gratis pdf.',
     shareAlt: 'Rêya Kurmancî, het boek van Hevalo, opengeslagen bij de eerste pagina’s',
     eyebrow: 'Gratis boek',
     subtitle: 'De weg van het Kurmanji · het boek van Hevalo',
-    lead: 'Een lesboek in het Kurmanji, met Engels naast elke regel. Leer met Hamo, Xezal en Hevalo, van het eerste hallo tot verhalen en liedjes: lees het hier pagina voor pagina, of download het om te printen en te bewaren.',
+    lead: 'Een lesboek in het Kurmanji, met Engels naast elke regel. Leer met Hamo, Xezo en Hevalo, van het eerste hallo tot verhalen en liedjes: lees het hier pagina voor pagina, of download het om te printen en te bewaren.',
     startReading: 'Begin met lezen',
     download: 'Download het boek',
     downloadShort: 'Downloaden',

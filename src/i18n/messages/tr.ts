@@ -182,11 +182,11 @@ export const tr: Messages = {
   book: {
     metaTitle: 'Rêya Kurmancî: Hevalo’nun ücretsiz Kurmanci kitabı — Zagrosian',
     metaDescription:
-      'Hevalo’nun resimli Kurmanci ders kitabı: Hamo, Xezal ve Hevalo ile, her satırın yanında İngilizcesiyle. Burada sayfa sayfa okuyun ya da ücretsiz PDF’i indirin.',
+      'Hevalo’nun resimli Kurmanci ders kitabı: Hamo, Xezo ve Hevalo ile, her satırın yanında İngilizcesiyle. Burada sayfa sayfa okuyun ya da ücretsiz PDF’i indirin.',
     shareAlt: 'Rêya Kurmancî, Hevalo’nun kitabı, ilk sayfalarında açık',
     eyebrow: 'Ücretsiz kitap',
     subtitle: 'Kurmanci yolu · Hevalo’nun kitabı',
-    lead: 'Kurmanci bir ders kitabı; her satırın yanında İngilizcesi var. İlk merhabadan masallara ve şarkılara kadar Hamo, Xezal ve Hevalo ile öğrenin: burada sayfa sayfa okuyun ya da yazdırıp saklamak için indirin.',
+    lead: 'Kurmanci bir ders kitabı; her satırın yanında İngilizcesi var. İlk merhabadan masallara ve şarkılara kadar Hamo, Xezo ve Hevalo ile öğrenin: burada sayfa sayfa okuyun ya da yazdırıp saklamak için indirin.',
     startReading: 'Okumaya başlayın',
     download: 'Kitabı indirin',
     downloadShort: 'İndir',
