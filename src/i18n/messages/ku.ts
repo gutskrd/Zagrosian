@@ -186,11 +186,11 @@ export const ku: Messages = {
   book: {
     metaTitle: 'Rêya Kurmancî: pirtûka belaş a Hevalo — Zagrosian',
     metaDescription:
-      'Pirtûka dersan a Hevalo, bi wêne: kurmancî bi Hamo, Xezal û Hevalo re, û li kêleka her rêzê îngilîziya wê. Li vir rûpel bi rûpel bixwîne, an PDF-ê belaş daxe.',
+      'Pirtûka dersan a Hevalo, bi wêne: kurmancî bi Hamo, Xezo û Hevalo re, û li kêleka her rêzê îngilîziya wê. Li vir rûpel bi rûpel bixwîne, an PDF-ê belaş daxe.',
     shareAlt: 'Rêya Kurmancî, pirtûka Hevalo, li rûpelên xwe yên pêşîn vekirî',
     eyebrow: 'Pirtûka belaş',
     subtitle: 'Pirtûka Hevalo',
-    lead: 'Pirtûkeke dersan a kurmancî ye, û li kêleka her rêzê îngilîziya wê heye. Bi Hamo, Xezal û Hevalo re fêr bibe, ji silava yekem heta çîrok û stranan: li vir rûpel bi rûpel bixwîne, an jî daxe, çap bike û li cem xwe bihêle.',
+    lead: 'Pirtûkeke dersan a kurmancî ye, û li kêleka her rêzê îngilîziya wê heye. Bi Hamo, Xezo û Hevalo re fêr bibe, ji silava yekem heta çîrok û stranan: li vir rûpel bi rûpel bixwîne, an jî daxe, çap bike û li cem xwe bihêle.',
     startReading: 'Dest bi xwendinê bike',
     download: 'Pirtûkê daxe',
     downloadShort: 'Daxe',

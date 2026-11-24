@@ -225,7 +225,7 @@ export const en = {
     metaTitle: 'Rêya Kurmancî: Hevalo’s free Kurmanji book — Zagrosian',
     /** Max 170 characters in every locale. */
     metaDescription:
-      'Hevalo’s illustrated Kurmanji course book, with Hamo, Xezal and Hevalo and English beside every line. Read it here page by page, or download the free PDF.',
+      'Hevalo’s illustrated Kurmanji course book, with Hamo, Xezo and Hevalo and English beside every line. Read it here page by page, or download the free PDF.',
     /** Alt text for the social image (public/og/book.jpg). */
     shareAlt: 'Rêya Kurmancî, Hevalo’s book, open at its first pages',
     eyebrow: 'Free book',
@@ -234,7 +234,7 @@ export const en = {
      * Hevalo".
      */
     subtitle: 'The Kurmanji Road · Hevalo’s book',
-    lead: 'A course book in Kurmanji, with English beside every line. Learn with Hamo, Xezal and Hevalo, from the first hello to stories and songs: read it here, page by page, or download it to print and keep.',
+    lead: 'A course book in Kurmanji, with English beside every line. Learn with Hamo, Xezo and Hevalo, from the first hello to stories and songs: read it here, page by page, or download it to print and keep.',
     startReading: 'Start reading',
     download: 'Download the book',
     downloadShort: 'Download',

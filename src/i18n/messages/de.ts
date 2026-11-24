@@ -182,11 +182,11 @@ export const de: Messages = {
   book: {
     metaTitle: 'Rêya Kurmancî: Hevalos kostenloses Kurmandschi-Buch — Zagrosian',
     metaDescription:
-      'Hevalos illustriertes Lehrbuch für Kurmandschi, mit Hamo, Xezal und Hevalo und Englisch neben jeder Zeile. Hier Seite für Seite lesen oder als PDF laden.',
+      'Hevalos illustriertes Lehrbuch für Kurmandschi, mit Hamo, Xezo und Hevalo und Englisch neben jeder Zeile. Hier Seite für Seite lesen oder als PDF laden.',
     shareAlt: 'Rêya Kurmancî, Hevalos Buch, aufgeschlagen auf den ersten Seiten',
     eyebrow: 'Kostenloses Buch',
     subtitle: 'Der Weg ins Kurmandschi · Hevalos Buch',
-    lead: 'Ein Lehrbuch auf Kurmandschi, mit Englisch neben jeder Zeile. Lernen Sie mit Hamo, Xezal und Hevalo, vom ersten Hallo bis zu Geschichten und Liedern: Lesen Sie es hier Seite für Seite, oder laden Sie es herunter, um es zu drucken und zu behalten.',
+    lead: 'Ein Lehrbuch auf Kurmandschi, mit Englisch neben jeder Zeile. Lernen Sie mit Hamo, Xezo und Hevalo, vom ersten Hallo bis zu Geschichten und Liedern: Lesen Sie es hier Seite für Seite, oder laden Sie es herunter, um es zu drucken und zu behalten.',
     startReading: 'Jetzt lesen',
     download: 'Buch herunterladen',
     downloadShort: 'Herunterladen',
