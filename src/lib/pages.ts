@@ -1,32 +1,20 @@
 /**
- * Plain-text versions of the site for machines: every page as Markdown in every
- * language (/index.md, /privacy.md, /de/index.md, /de/privacy.md, …) and the
- * /llms.txt summary. The homepage text comes from the same messages as the HTML
- * page (src/i18n/messages); the legal pages are served from their Markdown
- * source (src/content/legal). Hevalo's book (/book.md) is its introduction,
- * its contents and, in English, its whole text page by page, from the same
- * edition as the page (src/lib/book.ts); the other languages introduce it in
- * their own words and link to that text.
+ * Plain-text versions of the site for machines: every page as Markdown in every locale (/index.md,
+ * /privacy.md, /de/index.md, ...) plus /llms.txt. Homepage text comes from the same messages as the
+ * HTML (src/i18n/messages); legal pages are served from their Markdown source (src/content/legal).
+ * The book (/book.md) contains its introduction and contents, plus the full page-by-page text in
+ * English, from the same edition as the HTML (src/lib/book.ts); other locales introduce it and link
+ * to the English text.
  */
 import { getCollection } from 'astro:content';
-import {
-  defaultLocale,
-  format,
-  legalSlugs,
-  localizePath,
-  locales,
-  messages,
-  navigation,
-  type LegalSlug,
-  type Locale,
-} from '../i18n';
+import { defaultLocale, format, legalSlugs, localizePath, locales, messages, navigation, type LegalSlug, type Locale } from '../i18n';
 import { book as bookSite, hevalo, kurdish, site, socialProfiles } from '../site';
 import { book, chapterName, chapters, editionDate, pageCountText, pages as bookPages, pdfSize, sections, type TextBlock } from './book';
 import { answerMarkdown, faq, faqMore } from './faq';
 
 export interface TextPage {
   locale: Locale;
-  /** `index` for the homepage, `book` for Hevalo's book, otherwise the legal page. */
+  /** `index` for the homepage, `book` for Hevalo's book, otherwise a legal page. */
   slug: 'index' | 'book' | LegalSlug;
   title: string;
   description: string;
@@ -34,10 +22,10 @@ export interface TextPage {
   url: string;
   /** URL of the Markdown version. */
   markdownUrl: string;
-  /** Date of the last material change, where the page records one. */
+  /** Last material change, where the page records one. */
   updated?: string;
   markdown: string;
-  /** A shorter version for llms-full.txt, where the whole page would be too long. */
+  /** Shorter version for llms-full.txt, where the full page would be too long. */
   summary?: string;
 }
 
@@ -45,7 +33,7 @@ const absolute = (path: string) => new URL(path, site.url).href;
 const isoDate = (date: Date) => date.toISOString().slice(0, 10);
 
 /** /index.md, /privacy.md, /de/index.md, /de/privacy.md */
-export function markdownPath(locale: Locale, slug: TextPage['slug']): string {
+function markdownPath(locale: Locale, slug: TextPage['slug']): string {
   if (slug !== 'index') return `${localizePath(locale, `/${slug}`)}.md`;
   return locale === defaultLocale ? '/index.md' : `/${locale}/index.md`;
 }
@@ -115,14 +103,17 @@ ${legal.join('\n')}
 `;
 }
 
-/** A page of the book's words as Markdown: its headings, who speaks, and its Kurmanji and English as they are. */
+/**
+ * One book page's text as Markdown: headings, speakers, and the Kurmanji and English lines
+ * verbatim.
+ */
 function blocksMarkdown(blocks: TextBlock[]): string {
   const text = (block: TextBlock) => block.spans.map((span) => span.text).join('');
   const out: string[] = [];
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i]!;
     const next = blocks[i + 1];
-    // the book's numbered badges, as on the page (BookPageText.astro)
+    // Skip numbered badges, as on the page (BookPageText.astro).
     if (block.kind === 'label' && /^[\d\s]+$/.test(text(block))) continue;
     if (block.kind === 'speaker' && next?.kind === 'text') {
       out.push(`**${text(block)}** ${text(next)}`);
@@ -134,7 +125,9 @@ function blocksMarkdown(blocks: TextBlock[]): string {
   return out.join('\n\n');
 }
 
-/** Hevalo's book: its introduction, its contents and (in English) its whole text; the summary leaves the text out. */
+/**
+ * Book Markdown: introduction, contents and (in English) the full text. The summary omits the text.
+ */
 function bookMarkdown(locale: Locale): { markdown: string; summary: string } {
   const t = messages(locale);
   const page = (n: number) => absolute(`${localizePath(locale, '/book')}#page-${n}`);
@@ -174,7 +167,7 @@ ${[matter('answers'), matter('words'), matter('author')].join('\n')}
   return { markdown: `${intro}\n## ${t.book.readerTitle}\n\n${text.join('\n\n')}\n`, summary: intro };
 }
 
-/** Every page with a Markdown version, in every language. */
+/** Every page with a Markdown version, in every locale. */
 export async function textPages(): Promise<TextPage[]> {
   const legal = await getCollection('legal');
 
@@ -195,7 +188,7 @@ export async function textPages(): Promise<TextPage[]> {
       const entry = legal.find((item) => item.id === `${locale}/${slug}`);
       if (!entry) throw new Error(`Missing translation: src/content/legal/${locale}/${slug}.md`);
       const { title, description, updated } = entry.data;
-      // Site-relative links become absolute, so the text works on its own.
+      // Make site-relative links absolute so the text stands alone.
       const body = (entry.body ?? '').trim().replace(/\]\((\/[^)]*)\)/g, (_, path: string) => `](${absolute(path)})`);
       const notice = locale === defaultLocale ? '' : `> ${t.legal.translationNotice}\n\n`;
 
@@ -228,7 +221,7 @@ export async function textPages(): Promise<TextPage[]> {
   });
 }
 
-/** /llms.txt: a short, structured overview for language models (https://llmstxt.org), in English. */
+/** /llms.txt: a short structured overview for language models (https://llmstxt.org), in English. */
 export async function llmsTxt(): Promise<string> {
   const t = messages(defaultLocale);
   const english = (await textPages()).filter((page) => page.locale === defaultLocale);
@@ -278,7 +271,7 @@ ${languages.join('\n')}
 `;
 }
 
-/** /llms-full.txt: the Markdown of every English page, in one file. */
+/** /llms-full.txt: the Markdown of every English page in one file. */
 export async function llmsFullTxt(): Promise<string> {
   const english = (await textPages()).filter((page) => page.locale === defaultLocale);
   return english.map((page) => (page.summary ?? page.markdown).trim()).join('\n\n---\n\n') + '\n';

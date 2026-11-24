@@ -1,0 +1,11 @@
+---
+/** 404 page in the URL's locale. Cloudflare serves the nearest 404.html for unknown paths. */
+import { i18n } from '../i18n';
+import NoticeLayout from '../layouts/NoticeLayout.astro';
+
+const { t } = i18n(Astro.url);
+---
+
+<NoticeLayout title={t.notFound.title} eyebrow="404" heading={t.notFound.heading} description={t.notFound.description}>
+  <p>{t.notFound.body}</p>
+</NoticeLayout>

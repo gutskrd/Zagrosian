@@ -1,0 +1,25 @@
+---
+/**
+ * A book leaf for page turns (src/scripts/book/turn.ts).
+ *
+ * Two hinged segments: the inner 60% of the page rotates about the spine, and the outer 40% rotates
+ * slightly further mid-turn and back, so the leaf bends like paper. Each segment has a front and
+ * back face, each clipping its content with overflow rather than clip-path (which would be
+ * re-clipped on every frame of a 3D turn). A highlight runs along the fold.
+ *
+ * Faces are empty until a turn: the script inserts copies of the page images and removes them
+ * afterwards. Purely decorative; the leaves layer is hidden from assistive technology.
+ */
+---
+
+<div class="leaf" data-leaf>
+  <div class="leaf__inner" data-leaf-inner>
+    <div class="leaf__face leaf__face--front" data-face="inner-front"></div>
+    <div class="leaf__face leaf__face--back" data-face="inner-back"></div>
+    <div class="leaf__outer" data-leaf-outer>
+      <div class="leaf__face leaf__face--front" data-face="outer-front"></div>
+      <div class="leaf__face leaf__face--back" data-face="outer-back"></div>
+    </div>
+    <span class="leaf__fold" data-leaf-fold></span>
+  </div>
+</div>

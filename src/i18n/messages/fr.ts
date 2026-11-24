@@ -1,6 +1,6 @@
 import type { Messages } from './en';
 
-/* French typography: a no-break space ( ) comes before ":" and the like. */
+/* French typography: a no-break space ( ) precedes ":" and similar punctuation. */
 export const fr: Messages = {
   meta: {
     title: 'Zagrosian — La technologie au quotidien',
@@ -117,13 +117,11 @@ export const fr: Messages = {
       },
       {
         question: 'Quels dialectes kurdes Hevalo enseigne-t-il ?',
-        answer:
-          'Hevalo commence par le kurmandji. D’autres dialectes sont prévus.',
+        answer: 'Hevalo commence par le kurmandji. D’autres dialectes sont prévus.',
       },
       {
         question: 'Hevalo est-il disponible sur iOS et Android ?',
-        answer:
-          'Pas encore. Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
+        answer: 'Pas encore. Les applications natives sont en cours de développement et seront disponibles sur l’App Store et Google Play.',
       },
       {
         question: 'zagrosian.com collecte-t-il des données personnelles ?',
@@ -162,8 +160,7 @@ export const fr: Messages = {
     eyebrow: 'Informations légales',
     updated: 'Dernière mise à jour',
     contents: 'Sur cette page',
-    translationNotice:
-      'Ceci est une traduction. En cas de divergence avec la version anglaise, la version anglaise prévaut.',
+    translationNotice: 'Ceci est une traduction. En cas de divergence avec la version anglaise, la version anglaise prévaut.',
     readEnglish: 'Lire la version anglaise',
     readingTime: '{duration} de lecture',
     readingTimeUnit: 'short',
@@ -191,8 +188,7 @@ export const fr: Messages = {
     shareAlt: 'Rêya Kurmancî, le livre de Hevalo, ouvert à ses premières pages',
     eyebrow: 'Livre gratuit',
     subtitle: 'La route du kurmandji · le livre de Hevalo',
-    lead:
-      'Un manuel en kurmandji, avec l’anglais à côté de chaque ligne. Apprenez avec Hamo, Xezal et Hevalo, du premier bonjour aux contes et aux chansons : lisez-le ici page par page, ou téléchargez-le pour l’imprimer et le garder.',
+    lead: 'Un manuel en kurmandji, avec l’anglais à côté de chaque ligne. Apprenez avec Hamo, Xezal et Hevalo, du premier bonjour aux contes et aux chansons : lisez-le ici page par page, ou téléchargez-le pour l’imprimer et le garder.',
     startReading: 'Commencer la lecture',
     download: 'Télécharger le livre',
     downloadShort: 'Télécharger',

@@ -1,21 +1,16 @@
 /**
- * schema.org structured data (JSON-LD) for every page. Each page describes
- * itself as a WebPage, in its own language, that belongs to the WebSite, which
- * is published by the Organization. The nodes reference each other by @id, so
- * search engines and other machines can join them into one description of the
- * company. The Organization and WebSite are described in English on every page,
- * so they are identical wherever they appear.
+ * schema.org structured data (JSON-LD) for every page. Each page is a WebPage in its own language,
+ * part of the WebSite, which is published by the Organization. Nodes reference each other by @id so
+ * consumers can merge them into one graph. The Organization and WebSite nodes are always in
+ * English, so they're identical on every page.
  */
 import { locales, messages, type Locale } from '../i18n';
-import { book as bookSite, hevalo, kurdish, registration, site, socialProfiles } from '../site';
+import { book as bookSite, hevalo, kurdish, site, socialProfiles } from '../site';
 import { answerText, faq } from './faq';
 
 const english = messages('en');
 
 const home = `${site.url}/`;
-
-/** The company's registered details, those that are filled in (src/site.ts). */
-const { address, kvk, vat, phone } = registration;
 
 const ids = {
   website: `${home}#website`,
@@ -25,20 +20,20 @@ const ids = {
 };
 
 export interface PageData {
-  /** Canonical URL of the page. */
+  /** Canonical URL. */
   url: string;
   title: string;
   description: string;
   locale: Locale;
-  /** The homepage in the page's language, as the first breadcrumb. */
+  /** Homepage in the page's locale, as the first breadcrumb. */
   home: { name: string; url: string };
-  /** The page's name in breadcrumbs; set for pages below the homepage. */
+  /** Breadcrumb label; set for pages below the homepage. */
   breadcrumb?: string;
-  /** Date of the last material change (YYYY-MM-DD). */
+  /** Last material change (YYYY-MM-DD). */
   dateModified?: string;
-  /** More nodes for the page's graph, such as the book on the book's page. */
+  /** Extra nodes for the page's graph, e.g. the Book on /book. */
   nodes?: Record<string, unknown>[];
-  /** The @id of the node the page is about. */
+  /** @id of the page's main entity. */
   mainEntity?: string;
 }
 
@@ -67,14 +62,9 @@ export function structuredData(page: PageData) {
       description: english.meta.description,
       slogan: english.meta.tagline,
       email: site.emails.contact,
-      ...(phone && { telephone: phone }),
-      address: {
-        '@type': 'PostalAddress',
-        ...(address && { streetAddress: address.street, postalCode: address.postalCode, addressLocality: address.city }),
-        addressCountry: site.country,
-      },
-      ...(kvk && { identifier: { '@type': 'PropertyValue', propertyID: 'KvK', value: kvk } }),
-      ...(vat && { vatID: vat }),
+      // Country only: the registered address, KvK number and phone are shown to visitors but kept
+      // out of search (see `registration` in src/site.ts).
+      address: { '@type': 'PostalAddress', addressCountry: site.country },
       areaServed: 'Worldwide',
       knowsLanguage: locales.map((locale) => locale.code),
       contactPoint: [
@@ -92,8 +82,8 @@ export function structuredData(page: PageData) {
       logo: hevalo.logo,
       description: english.hevalo.description,
     },
-    // Hevalo itself: the app. Where it runs is left out: its site is
-    // hevalo.app, and the native apps for iOS and Android are coming.
+    // Hevalo, the app. Platforms are omitted: it's on hevalo.app, with native iOS and Android apps
+    // upcoming.
     {
       '@type': 'SoftwareApplication',
       '@id': ids.hevaloApp,
@@ -131,7 +121,7 @@ export function structuredData(page: PageData) {
     ...(page.nodes ?? []),
   ];
 
-  // The homepage's questions and answers (Faq.astro), in its language.
+  // Homepage FAQ (Faq.astro), in the page's locale.
   if (isHome) {
     graph.push({
       '@type': 'FAQPage',
@@ -162,11 +152,9 @@ export function structuredData(page: PageData) {
 }
 
 /**
- * Hevalo's book (the book's page, /book): an e-book in Kurmanji and English,
- * free, with its PDF and its chapters, published by the company. In English
- * on every language's page, like the company itself. It came out on the day
- * of its first edition here (`book.published` in src/site.ts); each edition
- * since is a modification, named by its date.
+ * Hevalo's book (/book): a free Kurmanji/English e-book with its PDF and chapters, published by the
+ * company. Always in English, like the Organization. `datePublished` is the first edition on the
+ * site (`book.published` in src/site.ts); later editions set `dateModified`.
  */
 export function bookNode(edition: {
   date: string;
@@ -212,5 +200,8 @@ export function bookNode(edition: {
   };
 }
 
-/** JSON for a <script type="application/ld+json"> element; `<` is escaped so the data can never end the element. */
+/**
+ * Serializes JSON for a `<script type="application/ld+json">` element, escaping `<` so the data
+ * can't close the element.
+ */
 export const toJsonLd = (data: object) => JSON.stringify(data).replace(/</g, '\\u003c');

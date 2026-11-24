@@ -1,5 +1,5 @@
 ---
-import Cta from '../components/Cta.astro';
+import Cta from '../components/ui/Cta.astro';
 import { i18n } from '../i18n';
 import { site } from '../site';
 import BaseLayout from './BaseLayout.astro';
@@ -20,7 +20,9 @@ const { t, localize } = i18n(Astro.url);
   <section class="notice" aria-labelledby="notice-title">
     <div class="container">
       <p class="eyebrow">{eyebrow}</p>
-      <h1 id="notice-title" class="notice__title">{heading}</h1>
+      <h1 id="notice-title" class="notice__title">
+        {heading}
+      </h1>
       <div class="notice__body lead">
         <slot />
       </div>

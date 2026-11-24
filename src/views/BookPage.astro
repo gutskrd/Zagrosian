@@ -1,0 +1,326 @@
+---
+/**
+ * Book page (src/pages/book.astro and [lang]/book.astro): a short intro with the download (plus, on
+ * wide screens, the cover, which opens the reader), the reader itself (BookReader), the contents
+ * (BookContents), the download again, and a note on the edition and license.
+ *
+ * The title, Rêya Kurmancî, is the page's h1 in every locale, kept in Kurmanji like the motto, with
+ * its meaning and author line below.
+ */
+import { format, i18n } from '../i18n';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { book, chapters, editionDate, levels, pageSizes, pages } from '../lib/book';
+import { bookNode } from '../lib/structured-data';
+import { book as bookSite, hevalo, kurdish, site } from '../site';
+import BookContents from '../components/book/BookContents.astro';
+import BookDownload from '../components/book/BookDownload.astro';
+import BookReader from '../components/book/BookReader.astro';
+
+const { locale, t } = i18n(Astro.url);
+const node = bookNode({
+  date: book.date,
+  edition: book.edition,
+  pageCount: book.pageCount,
+  levels,
+  cover: pages[0]!.images[720].src,
+  pdfBytes: book.pdf.bytes,
+  chapters,
+});
+const pdfUrl = new URL(bookSite.pdf, site.url).href;
+const cover = pages[0]!.images;
+---
+
+<BaseLayout
+  title={t.book.metaTitle}
+  description={t.book.metaDescription}
+  breadcrumb={t.nav.book}
+  dateModified={book.date}
+  image={{ url: bookSite.shareImage, type: 'image/jpeg', width: 1200, height: 630, alt: t.book.shareAlt }}
+  nodes={[node]}
+  mainEntity={node['@id']}
+>
+  <div class="book-page">
+    <header class="container book-intro">
+      <div class="book-intro__sun" aria-hidden="true"></div>
+      <p class="eyebrow">{t.book.eyebrow}</p>
+      <h1 class="book-intro__title">
+        <span lang="ku" dir="ltr" class="kurdish">
+          {kurdish.book}
+        </span>
+      </h1>
+      <p class="book-intro__subtitle">{t.book.subtitle}</p>
+      <p class="book-intro__lead">{t.book.lead}</p>
+      <div class="book-intro__actions">
+        <BookDownload inApp />
+        <a class="book-intro__start" href="#reader" data-book-start-reading>
+          {t.book.startReading}
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M8 2.5v11M3.5 9 8 13.5 12.5 9"></path>
+          </svg>
+        </a>
+      </div>
+      {/* Cover next to the intro on wide screens: the same image the reader opens with (same source
+         choice, so it's fetched once), as a mouse entry point. "Start reading" is the entry point
+         for keyboard and screen reader users. */}
+      <a class="book-intro__cover" href="#reader" tabindex="-1" aria-hidden="true" data-book-start-reading>
+        <img
+          src={cover[720].src}
+          srcset={`${cover[720].src} 720w, ${cover[1440].src} 1440w`}
+          sizes={pageSizes}
+          width="720"
+          height={cover[720].height}
+          alt=""
+          decoding="async"
+          draggable="false"
+        />
+      </a>
+    </header>
+
+    <BookReader />
+
+    <section class="container book-inside" aria-labelledby="book-inside-title">
+      <h2 id="book-inside-title" class="book-inside__title">
+        {t.book.inside}
+      </h2>
+      <BookContents variant="section" />
+    </section>
+
+    <div class="container book-again">
+      <BookDownload inApp />
+    </div>
+
+    <div class="container book-note">
+      <p>{format(t.book.edition, { date: editionDate(locale) })}</p>
+      <p>{t.book.licence}</p>
+      <p>
+        <a href={hevalo.url} class="book-note__link">
+          {t.book.hearHamo}
+        </a>
+      </p>
+      <p class="book-note__print">{format(t.book.printNote, { url: pdfUrl })}</p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .book-page {
+    position: relative;
+    isolation: isolate;
+    /* The sunlight patch extends past the window's edge. */
+    overflow-x: clip;
+    padding-block: clamp(4.5rem, 2.5rem + 6vw, 7rem) var(--section-space);
+  }
+
+  /* In full view the book covers the whole window including the site header, so nothing here may
+     create a stacking context above it. */
+  .book-page:has(:global(.book[data-full])) {
+    isolation: auto;
+  }
+
+  /* --- Intro: compact, so the book sits right below it --- */
+  .book-intro {
+    position: relative;
+    display: grid;
+    justify-items: start;
+  }
+
+  /* Cover next to the intro on wide screens, angled slightly toward the text, in the late sun. */
+  .book-intro__cover {
+    display: none;
+  }
+
+  @media (min-width: 64rem) and (min-height: 40rem) {
+    .book-intro {
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
+    }
+
+    .book-intro > :not(.book-intro__cover, .book-intro__sun) {
+      grid-column: 1;
+    }
+
+    .book-intro__cover {
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / span 6;
+      align-self: center;
+      width: clamp(13rem, 6rem + 11vw, 17.5rem);
+      margin-inline-end: clamp(0rem, -4rem + 6vw, 4rem);
+      perspective: 1600px;
+      cursor: pointer;
+    }
+
+    .book-intro__cover img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 2px 5px 5px 2px;
+      background: #fbf6ec;
+      box-shadow:
+        0 1px 2px rgb(0 0 0 / 0.1),
+        -10px 26px 50px -18px rgb(0 0 0 / 0.5);
+      transform: rotateY(-10deg) rotateZ(1.5deg);
+      transform-origin: 0 50%;
+      transition: transform 0.6s var(--ease-out);
+      user-select: none;
+    }
+
+    @media (hover: hover) {
+      .book-intro__cover:hover img {
+        transform: rotateY(-16deg) rotateZ(1deg) translateY(-4px);
+      }
+    }
+
+    :global(:root[data-theme='dark']) .book-intro__cover img {
+      filter: brightness(0.88);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-intro__cover img {
+      transition: none;
+    }
+  }
+
+  /* Faint, static sunlight on the wall behind the book (as behind the hero logo). */
+  .book-intro__sun {
+    --sun-a: 0.08;
+    position: absolute;
+    z-index: -1;
+    inset: -4rem -10% -40rem 20%;
+    pointer-events: none;
+    background: linear-gradient(
+      40deg,
+      transparent 14%,
+      rgb(var(--sun) / var(--sun-a)) 30% 38%,
+      transparent 52%,
+      rgb(var(--sun) / calc(var(--sun-a) * 0.8)) 60% 64%,
+      transparent 76%
+    );
+    mask-image: radial-gradient(50% 40% at 60% 55%, #000 15%, transparent 100%);
+  }
+
+  :global(:root[data-theme='dark']) .book-intro__sun {
+    --sun-a: 0.065;
+  }
+
+  @media (forced-colors: active) {
+    .book-intro__sun {
+      display: none;
+    }
+  }
+
+  .book-intro__title {
+    margin-top: 1rem;
+    font-size: clamp(2.75rem, 1.6rem + 5vw, 5.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+  }
+
+  /* Kurmanji is LTR but aligns with the page's start side. */
+  :global(:root[dir='rtl']) .book-intro__title {
+    text-align: right;
+  }
+
+  .book-intro__subtitle {
+    margin-top: 0.5rem;
+    font-size: var(--text-lead);
+    color: var(--color-muted);
+  }
+
+  .book-intro__lead {
+    max-width: 38rem;
+    margin-top: 1.25rem;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+  }
+
+  .book-intro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.75rem 1.75rem;
+    margin-top: 1.75rem;
+  }
+
+  .book-intro__start {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3.375rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .book-intro__start svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (hover: hover) {
+    .book-intro__start:hover {
+      text-decoration: underline;
+      text-decoration-color: var(--color-underline);
+    }
+  }
+
+  /* --- Contents --- */
+  .book-inside {
+    margin-top: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .book-inside__title {
+    margin-bottom: 2rem;
+    font-size: var(--text-h2);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+
+  .book-inside :global(.contents) {
+    max-width: 52rem;
+  }
+
+  /* --- Second download and edition note --- */
+  .book-again {
+    margin-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
+  }
+
+  .book-note {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    font-size: var(--text-sm);
+    color: var(--color-muted);
+  }
+
+  .book-note__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    color: var(--color-ink);
+    text-decoration-color: var(--color-underline);
+  }
+
+  .book-note__print {
+    display: none;
+  }
+
+  @media print {
+    .book-note__print {
+      display: block;
+      color: #000;
+    }
+
+    .book-intro__actions,
+    .book-intro__cover,
+    .book-again {
+      display: none;
+    }
+  }
+</style>

@@ -1,8 +1,7 @@
 /**
- * The site's languages: Hevalo's nine, in the same order, and Persian. English is
- * the default and lives at the root (/, /privacy); every other language has
- * its own prefix (/de, /de/privacy). `intl` is the locale used to format
- * dates and numbers: the site's English is British ("29 September 2026").
+ * Supported locales: Hevalo's nine, in the same order, plus Persian. English is the default and
+ * unprefixed (/, /privacy); every other locale is prefixed (/de, /de/privacy). `intl` is the locale
+ * used for dates and numbers; the site's English is British ("29 September 2026").
  */
 export const locales = [
   { code: 'ku', name: 'Kurdî (Kurmancî)', englishName: 'Kurmanji Kurdish', dir: 'ltr', ogLocale: 'ku_TR', intl: 'ku' },
@@ -22,10 +21,9 @@ export type LocaleInfo = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'en';
 
-/** Every language except English, which has no URL prefix. */
+/** Every locale except English (which has no URL prefix). */
 export const prefixedLocales = locales.filter((locale) => locale.code !== defaultLocale).map((locale) => locale.code);
 
-export const isLocale = (value: string | undefined): value is Locale =>
-  locales.some((locale) => locale.code === value);
+export const isLocale = (value: string | undefined): value is Locale => locales.some((locale) => locale.code === value);
 
 export const localeInfo = (code: Locale): LocaleInfo => locales.find((locale) => locale.code === code)!;

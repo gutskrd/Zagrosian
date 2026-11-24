@@ -1,22 +1,20 @@
-// Sets the theme before the page is drawn, so it never flashes the wrong
-// colours. Loaded as a small blocking script in <head> (an inline script would
-// break the Content-Security-Policy). The controls are in theme.ts.
+// Render-blocking script in <head> (an inline script would violate the CSP). Runs before first
+// paint:
 //
-// When motion is welcome, it makes room before the first paint for the
-// homepage's pinned story (story.ts), so nothing shifts when it starts. It
-// notes when a page slides in from another page of the site (global.css), so
-// the homepage does not play its own entrance on top. And it holds the
-// homepage's entrance for a moment, until its typeface and the logo's images
-// are in, so the page appears once, whole: never in a stand-in font that
-// changes as it rises, nor with the logo arriving in pieces.
-// And from 1 December to 6 January, Hevalo's icon is its Christmas version
-// (HevaloIcon.astro).
+// - applies the stored theme, avoiding a flash of the wrong one (controls live in theme.ts);
+// - when motion is allowed, reserves space for the homepage story (story.ts) so nothing shifts when
+//   it starts;
+// - flags arrivals via a same-site view transition (global.css), so the homepage skips its own
+//   entrance;
+// - holds the homepage entrance until the font and the logo images are ready, so the page appears
+//   once, complete, rather than swapping fonts mid-animation;
+// - from Dec 1 to Jan 6, switches Hevalo's icon to the Christmas version (HevaloIcon.astro).
 (function () {
   var preference = 'system';
   try {
     var stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') preference = stored;
-  } catch (error) {
+  } catch {
     // Storage can be unavailable (private browsing, blocked cookies).
   }
   var dark = preference === 'dark' || (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
@@ -33,9 +31,8 @@
   if (motion) root.dataset.story = 'ready';
 
   if (motion) {
-    // Hero.astro pauses the entrance while this is set. It is let go when the
-    // fonts and images are ready, 0.6 s after the page is read at the latest,
-    // and in any case 2.5 s after the page was opened.
+    // Hero.astro pauses the entrance while this is set. Released when fonts and images are ready,
+    // at most 0.6 s after DOMContentLoaded, and 2.5 s after navigation at the latest.
     root.dataset.entrance = 'waiting';
     var release = function () {
       delete root.dataset.entrance;
@@ -66,8 +63,7 @@
     });
   }
 
-  // Fired just before the page is first drawn, also for a page Chrome prepared
-  // in advance.
+  // Fires just before first render, including for pages Chrome prerendered.
   addEventListener('pagereveal', function (event) {
     if (event.viewTransition) {
       root.dataset.arrival = 'slide';

@@ -1,15 +1,12 @@
-// Draws the glass logo's soft shading (LiftedLogo.astro) once, as images: the
-// shadow the block casts (one for each theme) and the soft shading inside its
-// front face. They are the CSS box shadows the logo was first drawn with,
-// rendered by Chromium and saved as they are, so the logo looks the same. As
-// images, the browser only stretches them when the logo grows: a blurred box
-// shadow is worked out again every time the logo is drawn at a new size,
-// which, as the homepage story flies into the logo, made the page stutter.
+// Pre-renders the glass logo's soft shading (LiftedLogo.astro) as images: the drop shadow (one per
+// theme) and the inner shading of the front face. They're the original CSS box-shadows rendered by
+// Chromium, so the result is identical. As images they're simply scaled when the logo grows,
+// whereas a blurred box-shadow is recomputed every time the logo re-rasterizes at a new size, which
+// made the homepage story's fly-in stutter.
 //
-// The shadow is saved on a canvas 132% of the block's width, from 16% left of
-// it and 5% above it (where LiftedLogo.astro places it); the shading at the
-// size of the front face (inside its hairline border, which is too thin to
-// matter). Each in units of the block's width (cqi), as in CSS.
+// The shadow canvas is 132% of the block width, offset 16% left and 5% up (matching
+// LiftedLogo.astro); the shading matches the front face (inside its hairline border, which is too
+// thin to matter). Units are block widths (cqi), as in the CSS.
 //
 // Usage: node scripts/logo-shadows.mjs (after `npm install`)
 import { fileURLToPath } from 'node:url';
@@ -24,9 +21,10 @@ const shadows = {
   light: '0 10cqi 15.9cqi -5.45cqi rgb(0 0 0 / 0.36), 0 2.7cqi 5.45cqi -2.7cqi rgb(0 0 0 / 0.22)',
   dark: '0 10.9cqi 18.2cqi -5.45cqi rgb(0 0 0 / 0.9)',
 };
-// The front face's soft shading: darker along its foot and right side, and a
-// faint glow all round inside. (Its sharp bevel stays in CSS, crisp at any size.)
-const shading = 'inset 0 -0.57cqi 0.85cqi rgb(0 0 0 / 0.18), inset -0.57cqi 0 0.85cqi rgb(0 0 0 / 0.08), inset 0 0 6.8cqi rgb(255 255 255 / 0.12)';
+// Front-face shading: darker along the bottom and right, with a faint inner glow. (The sharp bevel
+// stays in CSS, crisp at any size.)
+const shading =
+  'inset 0 -0.57cqi 0.85cqi rgb(0 0 0 / 0.18), inset -0.57cqi 0 0.85cqi rgb(0 0 0 / 0.08), inset 0 0 6.8cqi rgb(255 255 255 / 0.12)';
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ deviceScaleFactor: 1 });
@@ -39,7 +37,9 @@ async function render(css, clip, file) {
   </style><div class="frame"><div class="block"></div></div>`);
   await page.setViewportSize({ width: BLOCK + 600, height: BLOCK + 600 });
   const png = await page.screenshot({ clip, omitBackground: true });
-  await sharp(png).webp({ lossless: true, effort: 6 }).toFile(OUT + file);
+  await sharp(png)
+    .webp({ lossless: true, effort: 6 })
+    .toFile(OUT + file);
   console.log(file);
 }
 

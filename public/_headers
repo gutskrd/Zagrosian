@@ -1,14 +1,12 @@
-# Cloudflare response headers for the static assets (Workers and Pages use
-# the same format).
+# Response headers for static assets (same format for Workers and Pages):
 # https://developers.cloudflare.com/workers/static-assets/headers/
 #
-# Cloudflare joins a header with a comma when more than one matching rule sets
-# it, which would corrupt policies such as the CSP. Each security header is
-# therefore defined exactly once, in the /* rule.
+# When multiple rules match, Cloudflare joins duplicate headers with a comma,
+# which would corrupt policies like the CSP, so each security header is defined
+# exactly once, in the /* rule.
 #
-# Content-Security-Policy: the site only loads its own files and runs no inline
-# code. Adding a third-party script (analytics, embeds, Cloudflare Web
-# Analytics) requires listing it here, or it will be blocked.
+# CSP: same-origin resources only, no inline code. Any third-party script
+# (analytics, embeds, Cloudflare Web Analytics) must be allowlisted here.
 
 /*
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types 'none'
@@ -25,9 +23,9 @@
   Content-Language: en
   ! Access-Control-Allow-Origin
 
-# Plain-text and XML files: browsers display these with built-in viewers that
-# use inline styles, which the page policy above would block. They get their
-# own policy instead: sandboxed, no scripts, only the viewer's styling.
+# Plain-text and XML files render in the browser's built-in viewers, which use
+# inline styles the page CSP would block. They get a sandboxed policy instead:
+# no scripts, viewer styling only.
 /robots.txt
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
@@ -44,15 +42,21 @@
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
-# The SVG favicon switches between the black and the white logo with the
-# browser's colour scheme, through a <style> inside it. It holds no script.
+# The SVG favicon switches between the black and white logo via an internal
+# <style> (prefers-color-scheme). It contains no script.
 /favicon.svg
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
 
-# Plain-text versions for machines: each page as Markdown and the llms.txt
-# summary. Search results should show the HTML pages, so these are noindex;
-# AI assistants and other tools can still read them.
+# Registration details for the footer (src/pages/registration.json.ts): shown
+# to visitors, kept out of search. Also disallowed in robots.txt.
+/registration.json
+  ! Content-Security-Policy
+  Content-Security-Policy: sandbox; default-src 'none'
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+# Machine-readable versions (Markdown pages, llms.txt): noindex so search
+# results show the HTML pages, while still readable by assistants and tools.
 /*.md
   ! Content-Security-Policy
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
@@ -68,9 +72,8 @@
   Content-Security-Policy: sandbox; default-src 'none'; style-src 'unsafe-inline'
   X-Robots-Tag: noindex
 
-# The language of each page (English unless the address starts with another
-# language), matching the lang attribute of its HTML. The same codes as
-# src/i18n/locales.ts.
+# Content-Language per locale (English unless the path has a locale prefix),
+# matching each page's lang attribute. Codes as in src/i18n/locales.ts.
 /ku
   ! Content-Language
   Content-Language: ku
@@ -143,14 +146,12 @@
   ! Content-Language
   Content-Language: fa
 
-# Hevalo's book, as a file to keep (BookDownload.astro also asks for the
-# download): saved under its own name, kept out of search results like the
-# Markdown versions (the book's page is what is indexed), and in the book's
-# two languages, Kurmanji and English. It is sent as plain bytes rather than
-# as a PDF: a browser that can show a PDF itself (Safari on a phone, Firefox,
-# most browsers on an iPhone) tends to open one in its viewer even when asked
-# to save it, and a file it cannot show it saves. The name ends in .pdf, so
-# the phone or computer opens the saved file as the PDF it is.
+# Hevalo's book PDF: downloaded under its own filename (BookDownload.astro also
+# sets `download`), noindex like the Markdown versions (the book page is what
+# gets indexed), in Kurmanji and English. Served as application/octet-stream:
+# browsers with a built-in PDF viewer (mobile Safari, Firefox, most iOS
+# browsers) tend to open PDFs even when asked to save them. The .pdf extension
+# still makes the OS open the saved file as a PDF.
 /book/reya-kurmanci.pdf
   ! Content-Type
   Content-Type: application/octet-stream
@@ -159,17 +160,17 @@
   ! Content-Language
   Content-Language: ku, en
 
-# Prerender same-site pages when a visitor hovers or taps a link, so they open
-# instantly (Chrome and Edge). Sent as a header so no inline script is needed.
+# Prerender same-site pages on hover or tap so they open instantly (Chrome and
+# Edge). Delivered as a header, so no inline script is needed.
 /speculation-rules.json
   ! Content-Type
   Content-Type: application/speculationrules+json
 
-# Fingerprinted build assets never change.
+# Content-hashed build assets are immutable.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Keep Cloudflare's own addresses out of search results, so Google only indexes
-# zagrosian.com: the Worker's *.workers.dev address and its preview URLs.
+# Keep Cloudflare's hostnames (*.workers.dev and preview URLs) out of search
+# so only zagrosian.com is indexed.
 https://:worker.:account.workers.dev/*
   X-Robots-Tag: noindex

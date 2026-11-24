@@ -1,8 +1,7 @@
 import type { Messages } from './en';
 
-/* فارسی. Written in formal Persian (شما), with Persian letters (ی، ک), zero-width
-   non-joiners where Persian needs them (می‌کنیم، داده‌ها) and the ezafe hamza
-   (صفحهٔ). Brand and product names stay in Latin script. */
+/* Persian. Formal register (شما), Persian letterforms (ی، ک), ZWNJ where required (می‌کنیم،
+   داده‌ها) and the ezafe hamza (صفحهٔ). Brand and product names stay in Latin script. */
 export const fa: Messages = {
   meta: {
     title: 'Zagrosian — فناوری برای زندگی روزمره',
@@ -86,8 +85,7 @@ export const fa: Messages = {
   motto: 'زندگی به زبان کردی شیرین‌تر است.',
   about: {
     eyebrow: 'دربارهٔ ما',
-    mission:
-      'مأموریت ما ساختن نرم‌افزاری است که مردم هر روز با لذت از آن استفاده کنند: ساده، حافظ حریم خصوصی و روشن.',
+    mission: 'مأموریت ما ساختن نرم‌افزاری است که مردم هر روز با لذت از آن استفاده کنند: ساده، حافظ حریم خصوصی و روشن.',
     approach: 'Zagrosian شرکتی خصوصی است. ما محصولاتمان را خودمان طراحی و توسعه می‌دهیم.',
     headquartersLabel: 'دفتر مرکزی',
     headquarters: 'هلند',
@@ -119,13 +117,11 @@ export const fa: Messages = {
       },
       {
         question: 'Hevalo کدام گویش‌های کردی را آموزش می‌دهد؟',
-        answer:
-          'Hevalo با کرمانجی آغاز می‌کند و گویش‌های دیگر نیز در برنامه است.',
+        answer: 'Hevalo با کرمانجی آغاز می‌کند و گویش‌های دیگر نیز در برنامه است.',
       },
       {
         question: 'آیا Hevalo برای iOS و Android در دسترس است؟',
-        answer:
-          'هنوز نه. اپلیکیشن‌های بومی در حال توسعه‌اند و در App Store و Google Play عرضه خواهند شد.',
+        answer: 'هنوز نه. اپلیکیشن‌های بومی در حال توسعه‌اند و در App Store و Google Play عرضه خواهند شد.',
       },
       {
         question: 'آیا zagrosian.com داده‌های شخصی جمع‌آوری می‌کند؟',
@@ -192,8 +188,7 @@ export const fa: Messages = {
     shareAlt: 'Rêya Kurmancî، کتاب Hevalo، گشوده بر نخستین صفحه‌هایش',
     eyebrow: 'کتاب رایگان',
     subtitle: 'راه کرمانجی · کتاب Hevalo',
-    lead:
-      'کتابی درسی به کرمانجی، با ترجمهٔ انگلیسی کنار هر سطر. با Hamo و Xezal و Hevalo یاد بگیرید، از نخستین سلام تا قصه‌ها و ترانه‌ها: اینجا صفحه‌به‌صفحه بخوانید، یا آن را دانلود کنید تا چاپش کنید و نگهش دارید.',
+    lead: 'کتابی درسی به کرمانجی، با ترجمهٔ انگلیسی کنار هر سطر. با Hamo و Xezal و Hevalo یاد بگیرید، از نخستین سلام تا قصه‌ها و ترانه‌ها: اینجا صفحه‌به‌صفحه بخوانید، یا آن را دانلود کنید تا چاپش کنید و نگهش دارید.',
     startReading: 'شروع خواندن',
     download: 'دانلود کتاب',
     downloadShort: 'دانلود',

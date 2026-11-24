@@ -1,0 +1,131 @@
+---
+/**
+ * The deer's eyes, drawn over Hevalo's icon (HevaloIcon.astro) and over the 3D deer's head
+ * (HevaloDeer.astro), so both always match. The images have no pupils of their own: these are
+ * positioned where the artwork has them and follow the pointer (src/scripts/hevalo/eyes.ts).
+ *
+ * `frame` sets the coordinate space: the icon's square or the 3D deer's head layer. `lids` adds
+ * eyelids, which close when the deer blinks (src/scripts/hevalo/deer.ts).
+ */
+interface Props {
+  frame: 'icon' | 'head';
+  lids?: boolean;
+}
+
+const { frame, lids = false } = Astro.props;
+---
+
+<span class="eye eye--left" data-frame={frame} aria-hidden="true">
+  <span class="pupil" data-pupil></span>
+</span>
+<span class="eye eye--right" data-frame={frame} aria-hidden="true">
+  <span class="pupil" data-pupil></span>
+</span>
+{lids && (
+  <>
+    <span class="lid lid--left" aria-hidden="true">
+      <span class="lid__skin" />
+    </span>
+    <span class="lid lid--right" aria-hidden="true">
+      <span class="lid__skin" />
+    </span>
+  </>
+)}
+
+<style>
+  /* Eyes measured on the icon's 360px square: each eye white is 58x68px (keeping the pupil inside),
+     centered at x 97 and 202, y 186; pupils are 31x48px, with a highlight that moves with them. At
+     rest the pupils sit as drawn, angled slightly inward. */
+  .eye {
+    position: absolute;
+    top: 51.667%;
+    width: 16.111%;
+    height: 18.889%;
+    clip-path: ellipse(50% 50% at 50% 50%);
+    pointer-events: none;
+  }
+
+  .eye--left {
+    left: 26.944%;
+  }
+
+  .eye--right {
+    left: 56.111%;
+  }
+
+  /* Same eyes within the 3D deer's head layer, which is the 230x305px region of the square at (65,
+     110). */
+  .eye[data-frame='head'] {
+    top: 24.918%;
+    width: 25.217%;
+    height: 22.295%;
+  }
+
+  .eye--left[data-frame='head'] {
+    left: 13.913%;
+  }
+
+  .eye--right[data-frame='head'] {
+    left: 59.565%;
+  }
+
+  .pupil {
+    position: absolute;
+    top: 17.7%;
+    width: 53.79%;
+    height: 70.59%;
+    border-radius: 50%;
+    background: #532e28;
+    /* Keep in forced-colors mode too: the images have no pupils of their own. */
+    forced-color-adjust: none;
+  }
+
+  .eye--left .pupil {
+    left: 43.1%;
+  }
+
+  .eye--right .pupil {
+    left: 6.38%;
+  }
+
+  .pupil::after {
+    content: '';
+    position: absolute;
+    top: 8.96%;
+    left: -2.24%;
+    width: 46.15%;
+    height: 30%;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  /* Eyelids in the fur color around the eyes, with a dark lash line, slightly larger than the eye
+     white (whose soft edge is 59x75 and 65x75px at x 123.5 and 230.5, y 220). Open, they wait above
+     the eye, outside its outline; a blink sweeps them down and up. */
+  .lid {
+    position: absolute;
+    top: 22.6%;
+    height: 26.885%;
+    clip-path: ellipse(50% 50% at 50% 50%);
+    pointer-events: none;
+    forced-color-adjust: none;
+  }
+
+  .lid--left {
+    left: 11.087%;
+    width: 28.696%;
+  }
+
+  .lid--right {
+    left: 56.739%;
+    width: 30.435%;
+  }
+
+  .lid__skin {
+    position: absolute;
+    inset: 0;
+    border-radius: 0 0 50% 50% / 0 0 22% 22%;
+    background: linear-gradient(to bottom, #e0b68a, #d4a273 86%, #7a4a2c 86%, #5b3424);
+    translate: 0 -101%;
+  }
+</style>

@@ -1,13 +1,16 @@
-# Search engines and AI assistants are welcome to read this site, and to use it
-# for search results and for answers.
+# Search engines and AI assistants are welcome to crawl this site and use it
+# for search results and answers.
 #
-# Easiest to read, for language models and other tools:
-# - https://zagrosian.com/llms.txt       an overview, with links to every page
-# - https://zagrosian.com/llms-full.txt  the full text of every page
-# - Every page also comes as Markdown: add .md to its address
+# Machine-readable versions:
+# - https://zagrosian.com/llms.txt       overview, with links to every page
+# - https://zagrosian.com/llms-full.txt  full text of every page
+# - Every page as Markdown: append .md to its URL
 #   (https://zagrosian.com/index.md, https://zagrosian.com/de/privacy.md).
 
 User-agent: *
 Allow: /
+# Registered address, KvK number and phone: shown in every footer (loaded from
+# this file) but not for search results or AI answers.
+Disallow: /registration.json
 
 Sitemap: https://zagrosian.com/sitemap.xml

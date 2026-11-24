@@ -1,14 +1,10 @@
 /**
- * The rug on the homepage: drawn in 3D, without errors, simply
- * lying there (never woven or settling in front of you) and at rest; a
- * corner can be picked up with the mouse and folded over, and it stays folded
- * when let go; scrolled away and back, it lies straight again. On a touch
- * screen a swipe up or down over it still scrolls the page; pressing and
- * holding, or setting off sideways, picks it up instead, a tap lifts the
- * corner and lays it back, and two fingers still zoom the page. With reduced
- * motion it lies still and cannot be picked up, but lifting it (a tap, or
- * the button) still folds the corner over, at once. Its box never changes
- * size, so nothing around it moves.
+ * Homepage rug: renders in 3D without errors, already at rest (never settling in view); a corner
+ * can be grabbed with the mouse and folded over, and stays folded on release; scrolling away and
+ * back resets it. On touch, vertical swipes still scroll; a long press or a horizontal start grabs
+ * it; a tap lifts the corner and lays it back; pinch still zooms. With reduced motion it's static
+ * and can't be grabbed, but a tap or the button still folds the corner instantly. Its box never
+ * changes size, so nothing around it shifts.
  */
 import { type Page, expect, test } from '@playwright/test';
 import sharp from 'sharp';
@@ -16,21 +12,23 @@ import { settled, watch } from './support';
 
 const rug = (page: Page) => page.locator('[data-rug]');
 
-/** Waits until the rug has come to rest (the software renderer the tests use is slow). */
+/** Waits until the rug is at rest (the software renderer used in tests is slow). */
 const resting = (page: Page) =>
   expect.poll(() => rug(page).getAttribute('data-state'), { timeout: 30_000, intervals: [250] }).toBe('resting');
 
-/** The rug's box on the screen, as pixels. */
+/** Screenshot of the rug's on-screen box, as raw pixels. */
 async function picture(page: Page) {
   const box = (await rug(page).boundingBox())!;
   const view = page.viewportSize()!;
   const top = Math.max(0, box.y);
   const clip = { x: box.x, y: top, width: box.width, height: Math.min(box.y + box.height, view.height) - top };
-  const { data, info } = await sharp(await page.screenshot({ clip })).raw().toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(await page.screenshot({ clip }))
+    .raw()
+    .toBuffer({ resolveWithObject: true });
   return { data, info, clip };
 }
 
-/** How different two pictures are, from 0 (the same) to 1. */
+/** Pixel difference between two screenshots, 0 (identical) to 1. */
 function difference(a: Awaited<ReturnType<typeof picture>>, b: Awaited<ReturnType<typeof picture>>) {
   let sum = 0;
   const length = Math.min(a.data.length, b.data.length);
@@ -39,9 +37,8 @@ function difference(a: Awaited<ReturnType<typeof picture>>, b: Awaited<ReturnTyp
 }
 
 /**
- * A point on the screen just inside the rug's lower left corner, found in the
- * picture: the rug is dyed wool, and the floor, with the light and shade on
- * it, is not, so the rug is where the colour is.
+ * A point just inside the rug's lower-left corner, found in the screenshot: the rug is saturated
+ * dyed wool while the floor isn't, so the rug is where the color is.
  */
 async function corner(page: Page) {
   const { data, info, clip } = await picture(page);
@@ -66,17 +63,17 @@ async function corner(page: Page) {
   };
 }
 
-/** Brings the rug into view and waits for its 3D scene, at rest. */
+/** Scrolls the rug into view and waits for the 3D scene to be ready and at rest. */
 async function arrive(page: Page) {
   await rug(page).scrollIntoViewIfNeeded();
   await expect(rug(page)).toHaveAttribute('data-live', '');
   await resting(page);
 }
 
-test.describe('with a mouse', () => {
+test.describe('mouse', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test('it lies there, a corner can be folded over, and it is laid straight again', async ({ page }) => {
+  test('folds a corner on drag and lies flat again after scrolling away', async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -96,7 +93,7 @@ test.describe('with a mouse', () => {
     const folded = difference(before, await picture(page));
     expect(folded, 'let go, it stays folded').toBeGreaterThan(0.03);
 
-    // Away (to the foot of the page: the rug is at its top) and back: straight again.
+    // Away (to the bottom of the page) and back: reset.
     await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await expect.poll(() => rug(page).getAttribute('data-state')).toBe('resting');
     await rug(page).scrollIntoViewIfNeeded();
@@ -107,7 +104,7 @@ test.describe('with a mouse', () => {
     expect(problems).toEqual([]);
   });
 
-  test('with reduced motion, it lies still and cannot be picked up', async ({ page }) => {
+  test('stays still and cannot be picked up with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -123,10 +120,10 @@ test.describe('with a mouse', () => {
   });
 });
 
-test.describe('on a touch screen', () => {
+test.describe('touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
-  /** A tap: a finger down at a point and up again at once. */
+  /** Tap: touch down and up immediately. */
   async function tap(page: Page, at: { x: number; y: number }) {
     const cdp = await page.context().newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: at.x, y: at.y, id: 1 }] });
@@ -135,9 +132,8 @@ test.describe('on a touch screen', () => {
   }
 
   /**
-   * A finger: down at `from`, held for `hold` ms (and, if given, until `held`
-   * is met: the page's own hold timer may run late on a busy machine), then
-   * drawn to `to`, and up.
+   * Touch gesture: down at `from`, held for `hold` ms (and until `held` resolves, if given, since
+   * the page's hold timer can fire late on a busy machine), then dragged to `to`, and up.
    */
   async function finger(
     page: Page,
@@ -162,8 +158,8 @@ test.describe('on a touch screen', () => {
   }
 
   /**
-   * Where the page is scrolled, once it has stopped: a swipe's fling can
-   * still be coasting when a test moves on.
+   * Scroll position once scrolling has stopped; a swipe's fling may still be coasting when the test
+   * moves on.
    */
   async function scrolled(page: Page) {
     let last = NaN;
@@ -182,16 +178,15 @@ test.describe('on a touch screen', () => {
   }
 
   /**
-   * That the page has not scrolled since `still`. Scrolled with the finger, it
-   * would move by the stroke's height (here 10 to 150 pixels); one pixel is
-   * the browser rounding a position that falls between two (the page's
-   * layout is in fractions of a pixel), as CI's browser now and then does.
+   * Asserts the page hasn't scrolled since `still`. Scrolling with the finger would move it by the
+   * stroke height (10-150px here); 1px is the browser rounding a fractional scroll position (layout
+   * uses subpixels), which CI's browser occasionally does.
    */
   async function stayedPut(page: Page, still: number) {
     expect(Math.abs((await page.evaluate(() => scrollY)) - still), 'and the page stays put').toBeLessThanOrEqual(1);
   }
 
-  test('a swipe over it scrolls the page; pressing and holding picks it up', async ({ page }) => {
+  test('a vertical swipe scrolls the page; a long press picks the rug up', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
@@ -221,7 +216,7 @@ test.describe('on a touch screen', () => {
     await stayedPut(page, still);
   });
 
-  test('set off sideways, it is picked up at once; a tap lifts the corner and lays it back', async ({ page }) => {
+  test('a horizontal drag picks it up at once; a tap lifts the corner and lays it back', async ({ page }) => {
     await settled(page.context());
     const problems = await watch(page);
     await page.goto('/', { waitUntil: 'networkidle' });
@@ -240,18 +235,18 @@ test.describe('on a touch screen', () => {
     await expect(button).toHaveText('Lay it back');
     await resting(page);
     await tap(page, (await corner(page)).middle);
-    // Laid back once the corner is home: a second's move, which the slow
-    // software renderer the tests use draws in far fewer frames.
+    // Laid back once the corner returns: a one-second animation that the slow software renderer
+    // draws in far fewer frames.
     await expect(rug(page), 'and another lays it back').not.toHaveAttribute('data-lifted', '', { timeout: 30_000 });
     await expect(button).toHaveText('Lift the rug');
     expect(problems).toEqual([]);
   });
 
-  // Whether the page then zooms is the browser's to do, and not every test
-  // browser emulates a pinch: what is checked is that the rug lets it, and,
-  // with two fingers on it drawn apart sideways (sent to it directly, as a
-  // browser that does not take the pinch itself would), is not picked up.
-  test('two fingers on it are left to zoom the page', async ({ page }) => {
+  // Whether the page actually zooms is up to the browser, and not every test browser emulates
+  // pinch. So this checks that the rug allows it, and that two fingers drawn apart horizontally
+  // (dispatched to the rug directly, as a browser that doesn't handle the pinch itself would) don't
+  // grab it.
+  test('leaves two-finger gestures to page zoom', async ({ page }) => {
     await settled(page.context());
     await page.goto('/', { waitUntil: 'networkidle' });
     await arrive(page);
@@ -270,7 +265,7 @@ test.describe('on a touch screen', () => {
         send('pointermove', 2, x + apart);
         await new Promise((resolve) => setTimeout(resolve, 16));
       }
-      // Longer than a press takes to become a hold.
+      // Longer than the press-to-hold delay.
       await new Promise((resolve) => setTimeout(resolve, 400));
       const holding = canvas.parentElement!.hasAttribute('data-holding');
       send('pointerup', 1, x - 100);
@@ -280,7 +275,7 @@ test.describe('on a touch screen', () => {
     expect(held, 'a pinch does not pick it up').toBe(false);
   });
 
-  test('with reduced motion, a tap still lifts it, at once', async ({ page }) => {
+  test('a tap lifts it instantly with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await settled(page.context());
     const problems = await watch(page);

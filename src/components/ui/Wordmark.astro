@@ -1,0 +1,20 @@
+---
+/** The Zagrosian wordmark, set in Inter. In the header it sits next to the logo (Logo.astro). */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['wordmark', className]}>Zagrosian</span>
+
+<style>
+  .wordmark {
+    font-size: 1.1875rem;
+    font-weight: 620;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+</style>

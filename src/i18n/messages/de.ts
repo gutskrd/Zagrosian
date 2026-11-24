@@ -83,8 +83,7 @@ export const de: Messages = {
   motto: 'Auf Kurdisch ist das Leben süßer.',
   about: {
     eyebrow: 'Über uns',
-    mission:
-      'Unsere Mission ist es, Software zu entwickeln, die Menschen jeden Tag gern nutzen: einfach, datensparsam und klar.',
+    mission: 'Unsere Mission ist es, Software zu entwickeln, die Menschen jeden Tag gern nutzen: einfach, datensparsam und klar.',
     approach: 'Zagrosian befindet sich in Privatbesitz. Wir gestalten und entwickeln unsere Produkte selbst.',
     headquartersLabel: 'Hauptsitz',
     headquarters: 'Niederlande',
@@ -116,13 +115,11 @@ export const de: Messages = {
       },
       {
         question: 'Welche kurdischen Dialekte lehrt Hevalo?',
-        answer:
-          'Hevalo beginnt mit Kurmandschi. Weitere Dialekte sind geplant.',
+        answer: 'Hevalo beginnt mit Kurmandschi. Weitere Dialekte sind geplant.',
       },
       {
         question: 'Gibt es Hevalo für iOS und Android?',
-        answer:
-          'Noch nicht. Die nativen Apps befinden sich in der Entwicklung und erscheinen im App Store und bei Google Play.',
+        answer: 'Noch nicht. Die nativen Apps befinden sich in der Entwicklung und erscheinen im App Store und bei Google Play.',
       },
       {
         question: 'Erhebt zagrosian.com personenbezogene Daten?',
@@ -161,8 +158,7 @@ export const de: Messages = {
     eyebrow: 'Rechtliches',
     updated: 'Zuletzt aktualisiert',
     contents: 'Auf dieser Seite',
-    translationNotice:
-      'Dies ist eine Übersetzung. Weicht sie von der englischen Fassung ab, gilt die englische Fassung.',
+    translationNotice: 'Dies ist eine Übersetzung. Weicht sie von der englischen Fassung ab, gilt die englische Fassung.',
     readEnglish: 'Englische Fassung lesen',
     readingTime: '{duration} Lesezeit',
     readingTimeUnit: 'short',
@@ -190,8 +186,7 @@ export const de: Messages = {
     shareAlt: 'Rêya Kurmancî, Hevalos Buch, aufgeschlagen auf den ersten Seiten',
     eyebrow: 'Kostenloses Buch',
     subtitle: 'Der Weg ins Kurmandschi · Hevalos Buch',
-    lead:
-      'Ein Lehrbuch auf Kurmandschi, mit Englisch neben jeder Zeile. Lernen Sie mit Hamo, Xezal und Hevalo, vom ersten Hallo bis zu Geschichten und Liedern: Lesen Sie es hier Seite für Seite, oder laden Sie es herunter, um es zu drucken und zu behalten.',
+    lead: 'Ein Lehrbuch auf Kurmandschi, mit Englisch neben jeder Zeile. Lernen Sie mit Hamo, Xezal und Hevalo, vom ersten Hallo bis zu Geschichten und Liedern: Lesen Sie es hier Seite für Seite, oder laden Sie es herunter, um es zu drucken und zu behalten.',
     startReading: 'Jetzt lesen',
     download: 'Buch herunterladen',
     downloadShort: 'Herunterladen',

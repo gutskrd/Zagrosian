@@ -1,7 +1,7 @@
-# On every push: the site is built (with its type checks), then checked as it
-# will be served, with its production headers: the tests in tests/ (security,
-# accessibility, layout, search metadata, stability, the controls) and
-# Lighthouse. A push that breaks any of them fails here, before it is deployed.
+# Runs on every push: lint and formatting, then a production build (including type
+# checks) tested as it will be served, with production headers: the Playwright
+# suites in tests/ and Lighthouse. Any failure blocks the change before it
+# reaches production.
 name: Checks
 
 on:
@@ -19,10 +19,24 @@ env:
   WRANGLER_SEND_METRICS: 'false'
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+
   tests:
     name: Tests
-    # Not ubuntu-latest: that became Ubuntu 26.04, which the Playwright here
-    # (1.56.1) cannot install Chromium on. Move up with Playwright.
+    # Pinned: ubuntu-latest is Ubuntu 26.04, which Playwright 1.56.1 can't install
+    # Chromium on. Bump together with Playwright.
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -55,7 +69,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      # Thresholds and pages in lighthouserc.json.
+      # Thresholds and URLs live in lighthouserc.json.
       - run: npx --yes @lhci/cli@0.15.1 autorun
       - name: Keep the reports
         if: always()

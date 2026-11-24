@@ -1,17 +1,14 @@
-// Draws the rug (Rug.astro, rug-scene.ts) and saves it as
-// src/assets/rug/rug.webp, and smaller as rug-small.webp for phones and
-// ordinary screens (so the rug is there sooner on a slow connection): a pile rug after those of Bijar and Senneh, Kurdish
-// weaving towns in the Zagros. A madder-red field with a lobed indigo
-// medallion at its heart, pendants on stems at either end, ivory corners
-// scalloped like the medallion; flowers, palmettes and leaves on a running
-// vine all over the field; an indigo main border of rosettes on a vine
-// between narrow guards; and the warp left as a fringe at both ends. It is
-// symmetrical about both axes, as such rugs are. The design is our own, drawn
-// from the conventions of the type.
+// Generates the rug texture (Rug.astro, src/scripts/rug/scene.ts) as src/assets/rug/rug.webp, plus
+// rug-small.webp for phones and standard-DPI screens (so it arrives sooner on slow connections). A
+// pile rug in the style of Bijar and Senneh, Kurdish weaving towns in the Zagros: madder-red field
+// with a lobed indigo medallion, pendants on stems at either end, scalloped ivory corners; flowers,
+// palmettes and leaves on a running vine across the field; an indigo main border of rosettes on a
+// vine between narrow guard stripes; and the warp left as fringe at both ends. Symmetric about both
+// axes, like the originals. The design is original, following the conventions of the type.
 //
-// It is drawn on a canvas in a headless browser (Playwright, as the tests
-// use), so what is saved is what a browser draws. The 3D rug lays its pile
-// and its light over it; where there is no 3D, the picture is shown as it is.
+// Rendered on a canvas in headless Chromium (Playwright, as in the tests), so the output is exactly
+// what a browser draws. The 3D rug adds pile and lighting on top; without 3D the image is shown as
+// is.
 //
 // Usage: node scripts/rug.mjs
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -19,15 +16,15 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
 const OUT = fileURLToPath(new URL('../src/assets/rug/', import.meta.url));
-/** In knots of two by two, as rug-scene.ts lays it out: across, along, and the fringe at each end. */
+/** Size in 2x2-knot cells, matching rug/scene.ts: width, length, and fringe at each end. */
 const ACROSS = 101;
 const ALONG = 161;
 const FRINGE = 6;
-/** Pixels to a cell: about as fine as the rug is ever seen; and for the smaller picture. */
+/** Pixels per cell: about as fine as the rug is ever displayed; and for the small variant. */
 const SCALE = 10;
 const SMALL_SCALE = 6;
 
-/** Runs in the browser: the whole drawing, in cells, then the picture as WebP. */
+/** Runs in the browser: draws the whole rug in cell units and returns WebP. */
 function draw({ across: W, along: H, fringe, scale }) {
   const canvas = document.createElement('canvas');
   canvas.width = W * scale;
@@ -35,7 +32,7 @@ function draw({ across: W, along: H, fringe, scale }) {
   const g = canvas.getContext('2d');
   const TAU = Math.PI * 2;
 
-  // The same rug every time.
+  // Fixed seed, so the rug is identical on every run.
   let seed = 1919;
   const random = () => {
     seed = (seed + 0x6d2b79f5) | 0;
@@ -45,7 +42,7 @@ function draw({ across: W, along: H, fringe, scale }) {
   };
   const between = (a, b) => a + (b - a) * random();
 
-  // Madder, indigo, undyed ivory, and the few colours dyed from them.
+  // Madder, indigo, undyed ivory, and the few colors derived from them.
   const C = {
     red: '#982b1e',
     redDeep: '#6f1d15',
@@ -66,41 +63,41 @@ function draw({ across: W, along: H, fringe, scale }) {
     points.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     g.closePath();
   };
-  const fill = (colour) => {
-    g.fillStyle = colour;
+  const fill = (color) => {
+    g.fillStyle = color;
     g.fill();
   };
-  const stroke = (colour, width) => {
-    g.strokeStyle = colour;
+  const stroke = (color, width) => {
+    g.strokeStyle = color;
     g.lineWidth = width;
     g.lineJoin = 'round';
     g.lineCap = 'round';
     g.stroke();
   };
-  const circle = (x, y, r, colour) => {
+  const circle = (x, y, r, color) => {
     g.beginPath();
     g.arc(x, y, r, 0, TAU);
-    fill(colour);
+    fill(color);
   };
 
   /**
-   * A flower seen from above: `petals` petals round its heart, each outlined
-   * in a darker wool as woven flowers are, then rings of [share of r, colour].
+   * Top-down flower: `petals` petals around the center, each outlined in a darker wool as in woven
+   * flowers, then rings of [fraction of r, color].
    */
-  const rosette = (x, y, r, petals, colours, rings = [], turn = 0) => {
+  const rosette = (x, y, r, petals, colors, rings = [], turn = 0) => {
     const tangential = r * Math.sin(Math.PI / petals) * 0.8;
     for (let i = 0; i < petals; i++) {
       const a = turn + (i / petals) * TAU;
       g.beginPath();
       g.ellipse(x + Math.cos(a) * r * 0.55, y + Math.sin(a) * r * 0.55, r * 0.47, tangential, a, 0, TAU);
-      fill(colours[i % colours.length]);
+      fill(colors[i % colors.length]);
       stroke('rgb(44 20 16 / 0.5)', Math.max(0.12, r * 0.05));
     }
-    for (const [share, colour] of rings) circle(x, y, r * share, colour);
+    for (const [share, color] of rings) circle(x, y, r * share, color);
   };
 
-  /** A leaf from (x, y), `length` long along `angle`, with a vein if given. */
-  const leaf = (x, y, length, width, angle, colour, vein) => {
+  /** Leaf from (x, y), `length` long along `angle`, with an optional vein. */
+  const leaf = (x, y, length, width, angle, color, vein) => {
     g.save();
     g.translate(x, y);
     g.rotate(angle);
@@ -108,7 +105,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     g.moveTo(0, 0);
     g.quadraticCurveTo(length * 0.45, -width, length, 0);
     g.quadraticCurveTo(length * 0.45, width, 0, 0);
-    fill(colour);
+    fill(color);
     if (vein) {
       g.beginPath();
       g.moveTo(length * 0.12, 0);
@@ -118,14 +115,14 @@ function draw({ across: W, along: H, fringe, scale }) {
     g.restore();
   };
 
-  /** A palmette: a cup with a fan of five leaves, pointing along `angle`. */
-  const palmette = (x, y, size, angle, colour, cup) => {
-    for (let i = -2; i <= 2; i++) leaf(x, y, size * (1 - Math.abs(i) * 0.14), size * 0.2, angle + i * 0.38, colour);
+  /** Palmette: a cup with a fan of five leaves, pointing along `angle`. */
+  const palmette = (x, y, size, angle, color, cup) => {
+    for (let i = -2; i <= 2; i++) leaf(x, y, size * (1 - Math.abs(i) * 0.14), size * 0.2, angle + i * 0.38, color);
     circle(x, y, size * 0.32, cup);
   };
 
-  /** A star of `points` points, `inner` its waist as a share of r. */
-  const star = (x, y, r, inner, points, colour, turn = -Math.PI / 2) => {
+  /** Star with `points` points; `inner` is the waist as a fraction of r. */
+  const star = (x, y, r, inner, points, color, turn = -Math.PI / 2) => {
     const pts = [];
     for (let i = 0; i < points * 2; i++) {
       const rr = i % 2 ? r * inner : r;
@@ -133,10 +130,13 @@ function draw({ across: W, along: H, fringe, scale }) {
       pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr]);
     }
     shape(pts);
-    fill(colour);
+    fill(color);
   };
 
-  /** Draws `draw` four times about (cx, cy), mirrored, as the rug is: the same chances each time. */
+  /**
+   * Draws `draw` four times about (cx, cy), mirrored like the rug, with the same random sequence
+   * each time.
+   */
   const four = (cx, cy, draw) => {
     const start = seed;
     for (const sx of [1, -1]) {
@@ -151,7 +151,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     }
   };
 
-  /** Points in a quarter, no two closer than `gap`, where `free` allows. */
+  /** Points in one quadrant, at least `gap` apart, where `free` allows. */
   const scatter = (width, height, gap, free, taken = []) => {
     const points = [...taken];
     for (let tries = 0; tries < 2400; tries++) {
@@ -164,8 +164,8 @@ function draw({ across: W, along: H, fringe, scale }) {
     return points.slice(taken.length);
   };
 
-  /** A thin vine from each point to its nearest neighbours, curving as it goes. */
-  const vines = (points, colour, width) => {
+  /** Thin curved vines from each point to its nearest neighbors. */
+  const vines = (points, color, width) => {
     for (const p of points) {
       const near = points
         .filter((q) => q !== p)
@@ -180,14 +180,14 @@ function draw({ across: W, along: H, fringe, scale }) {
         g.beginPath();
         g.moveTo(p.x, p.y);
         g.quadraticCurveTo(mx, my, q.x, q.y);
-        stroke(colour, width);
+        stroke(color, width);
         // A small leaf where the vine bends.
         if (random() < 0.5) leaf(mx, my, 1.5, 0.5, Math.atan2(q.y - p.y, q.x - p.x) + 0.7, C.green);
       }
     }
   };
 
-  /** A scalloped outline: the polygon `corners`, its edges bowed out in `lobes` lobes each. */
+  /** Scalloped outline: polygon `corners` with each edge bowed out into `lobes` lobes. */
   const lobed = (corners, lobes, depth, cx, cy) => {
     const pts = [];
     for (let i = 0; i < corners.length; i++) {
@@ -196,7 +196,7 @@ function draw({ across: W, along: H, fringe, scale }) {
       const length = Math.hypot(bx - ax, by - ay);
       let nx = (by - ay) / length;
       let ny = -(bx - ax) / length;
-      // Outwards, away from the centre.
+      // Bow outward, away from the center.
       if (nx * ((ax + bx) / 2 - cx) + ny * ((ay + by) / 2 - cy) < 0) {
         nx = -nx;
         ny = -ny;
@@ -210,29 +210,29 @@ function draw({ across: W, along: H, fringe, scale }) {
     return pts;
   };
 
-  /** The same outline, drawn in towards (cx, cy) by `by`. */
+  /** Same outline inset toward (cx, cy) by `by`. */
   const inset = (pts, cx, cy, by) =>
     pts.map(([x, y]) => {
       const d = Math.hypot(x - cx, y - cy) || 1;
       return [x - ((x - cx) / d) * by, y - ((y - cy) / d) * by];
     });
 
-  // --- The weave, in cells ------------------------------------------------
+  // --- Weave (in cells) ---
   g.setTransform(scale, 0, 0, scale, 0, fringe * scale);
   const cx = W / 2;
   const cy = H / 2;
-  // The field, inside the borders.
+  // Field, inside the borders.
   const EDGE = 20.5;
   const hx = cx - EDGE;
   const hy = cy - EDGE;
-  // The medallion's half width and half length.
+  // Medallion half-width and half-length.
   const a = 19;
   const b = 31;
 
   g.fillStyle = C.red;
   g.fillRect(0, 0, W, H);
 
-  // The field: flowers, palmettes and leaves on a vine, in one quarter, mirrored.
+  // Field: flowers, palmettes and leaves on a vine, laid out in one quadrant and mirrored.
   const freeInField = (x, y) =>
     x > 2.3 &&
     y > 2.3 &&
@@ -242,7 +242,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     !(x < 5 && y < b + 15) &&
     !(y < 5.5 && x < a + 10) &&
     ((hx - x) / 18) ** 2 + ((hy - y) / 24.5) ** 2 > 1;
-  // Large leaves first, the way the reference rugs lean them towards the heart.
+  // Large leaves first, leaning toward the center as in the reference rugs.
   const feathers = [
     { x: 21.5, y: 21, angle: -2.2, gap: 5.5 },
     { x: 9.5, y: 44, angle: -1.75, gap: 5.5 },
@@ -260,9 +260,31 @@ function draw({ across: W, along: H, fringe, scale }) {
     }
     for (const f of flowers) {
       if (f.kind < 0.38) {
-        rosette(f.x, f.y, between(1.15, 1.5), 8, [C.ivory, C.rose], [[0.42, C.navy], [0.2, C.gold]], f.kind * 9);
+        rosette(
+          f.x,
+          f.y,
+          between(1.15, 1.5),
+          8,
+          [C.ivory, C.rose],
+          [
+            [0.42, C.navy],
+            [0.2, C.gold],
+          ],
+          f.kind * 9,
+        );
       } else if (f.kind < 0.58) {
-        rosette(f.x, f.y, between(1.0, 1.3), 6, [C.navy], [[0.4, C.ivory], [0.2, C.red]], f.kind * 7);
+        rosette(
+          f.x,
+          f.y,
+          between(1.0, 1.3),
+          6,
+          [C.navy],
+          [
+            [0.4, C.ivory],
+            [0.2, C.red],
+          ],
+          f.kind * 7,
+        );
       } else if (f.kind < 0.74) {
         palmette(f.x, f.y, 1.9, Math.atan2(f.y, f.x), C.gold, C.navy);
       } else if (f.kind < 0.88) {
@@ -277,7 +299,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     }
   });
 
-  // The corners: ivory spandrels, scalloped, with indigo inside them.
+  // Corners: scalloped ivory spandrels with indigo inside.
   four(cx, cy, () => {
     const arc = (rx, ry) => {
       const pts = [[hx + 2, hy + 2]];
@@ -302,10 +324,32 @@ function draw({ across: W, along: H, fringe, scale }) {
       const phi = (Math.PI / 2) * ((k + 0.5) / 3);
       const x = hx - 8.2 * Math.cos(phi);
       const y = hy - 11.6 * Math.sin(phi);
-      rosette(x, y, 1.35, 8, [C.red, C.rose], [[0.4, C.ivory], [0.18, C.navy]], k);
+      rosette(
+        x,
+        y,
+        1.35,
+        8,
+        [C.red, C.rose],
+        [
+          [0.4, C.ivory],
+          [0.18, C.navy],
+        ],
+        k,
+      );
       leaf(x, y, 2, 0.55, -phi - 0.6, C.green);
     }
-    rosette(hx - 3.4, hy - 4.6, 1.8, 10, [C.rose, C.red], [[0.45, C.ivory], [0.24, C.red], [0.1, C.gold]]);
+    rosette(
+      hx - 3.4,
+      hy - 4.6,
+      1.8,
+      10,
+      [C.rose, C.red],
+      [
+        [0.45, C.ivory],
+        [0.24, C.red],
+        [0.1, C.gold],
+      ],
+    );
     // Small red flowers along the ivory.
     for (let k = 1; k < 9; k++) {
       const phi = (Math.PI / 2) * (k / 9);
@@ -313,7 +357,7 @@ function draw({ across: W, along: H, fringe, scale }) {
     }
   });
 
-  // The medallion: a lobed indigo diamond with a knob at each tip.
+  // Medallion: a lobed indigo diamond with a knob at each tip.
   const diamond = lobed(
     [
       [cx, cy - b],
@@ -340,7 +384,7 @@ function draw({ across: W, along: H, fringe, scale }) {
   stroke(C.ivory, 1);
   shape(inset(diamond, cx, cy, 1.4));
   stroke(C.redLight, 0.35);
-  // Pendants on stems, along the rug's length.
+  // Pendants on stems along the rug's length.
   for (const sy of [1, -1]) {
     g.beginPath();
     g.moveTo(cx, cy + sy * (b + 3.6));
@@ -362,9 +406,19 @@ function draw({ across: W, along: H, fringe, scale }) {
     shape(drop);
     fill(C.navy);
     stroke(C.ivory, 0.6);
-    rosette(cx, py, 1.6, 8, [C.red, C.rose], [[0.42, C.ivory], [0.2, C.red]]);
+    rosette(
+      cx,
+      py,
+      1.6,
+      8,
+      [C.red, C.rose],
+      [
+        [0.42, C.ivory],
+        [0.2, C.red],
+      ],
+    );
   }
-  // And a small lozenge at either side.
+  // A small lozenge on either side.
   for (const sx of [1, -1]) {
     const px = cx + sx * (a + 6.5);
     shape([
@@ -379,20 +433,27 @@ function draw({ across: W, along: H, fringe, scale }) {
     circle(px, cy, 0.45, C.red);
   }
   // Flowers inside the medallion.
-  const inMedallion = scatter(
-    a,
-    b,
-    2.7,
-    (x, y) => x > 1.6 && y > 1.6 && x / a + y / b < 0.84 && (x / 12) ** 2 + (y / 15) ** 2 > 1,
-  );
+  const inMedallion = scatter(a, b, 2.7, (x, y) => x > 1.6 && y > 1.6 && x / a + y / b < 0.84 && (x / 12) ** 2 + (y / 15) ** 2 > 1);
   four(cx, cy, () => {
     vines(inMedallion, C.gold, 0.28);
     for (const p of inMedallion) {
-      if (random() < 0.6) rosette(p.x, p.y, 1.05, 8, [C.red, C.rose], [[0.4, C.ivory], [0.18, C.gold]], p.x);
+      if (random() < 0.6)
+        rosette(
+          p.x,
+          p.y,
+          1.05,
+          8,
+          [C.red, C.rose],
+          [
+            [0.4, C.ivory],
+            [0.18, C.gold],
+          ],
+          p.x,
+        );
       else leaf(p.x, p.y, 2.1, 0.6, Math.atan2(p.y, p.x), C.ivory, C.gold);
     }
   });
-  // The inner medallion, ivory, eight-lobed, and the flower at the heart.
+  // Inner medallion: ivory, eight-lobed, with a flower at the center.
   const heart = [];
   for (let k = 0; k < 160; k++) {
     const t = (k / 160) * TAU;
@@ -406,23 +467,33 @@ function draw({ across: W, along: H, fringe, scale }) {
     const t = (k / 8) * TAU;
     leaf(cx + Math.cos(t) * 5.6, cy + Math.sin(t) * 7, 4, 1.1, t, k % 2 ? C.navy : C.red, k % 2 ? C.sky : C.rose);
   }
-  rosette(cx, cy, 5.4, 16, [C.red, C.redDeep], [
-    [0.52, C.ivory],
-    [0.4, C.navy],
-    [0.24, C.red],
-    [0.1, C.gold],
-  ]);
+  rosette(
+    cx,
+    cy,
+    5.4,
+    16,
+    [C.red, C.redDeep],
+    [
+      [0.52, C.ivory],
+      [0.4, C.navy],
+      [0.24, C.red],
+      [0.1, C.gold],
+    ],
+  );
 
-  // --- The borders, from the field out --------------------------------------
+  // --- Borders, from the field outward ---
   /** Fills the band between two insets from the edge. */
-  const band = (from, to, colour) => {
+  const band = (from, to, color) => {
     g.beginPath();
     g.rect(from, from, W - 2 * from, H - 2 * from);
     g.rect(to, to, W - 2 * to, H - 2 * to);
-    g.fillStyle = colour;
+    g.fillStyle = color;
     g.fill('evenodd');
   };
-  /** Points every `step` or so along the line `at` in from the edge, corners first, with which side each is on. */
+  /**
+   * Points every ~`step` along the line `at` inset from the edge, corners first, each with its
+   * side.
+   */
   const along = (at, step) => {
     const pts = [];
     const sides = [
@@ -434,7 +505,15 @@ function draw({ across: W, along: H, fringe, scale }) {
     for (const [x0, y0, x1, y1] of sides) {
       const length = Math.hypot(x1 - x0, y1 - y0);
       const n = Math.max(1, Math.round(length / step));
-      for (let k = 0; k < n; k++) pts.push({ x: x0 + ((x1 - x0) * k) / n, y: y0 + ((y1 - y0) * k) / n, corner: k === 0, dx: (x1 - x0) / length, dy: (y1 - y0) / length, step: length / n });
+      for (let k = 0; k < n; k++)
+        pts.push({
+          x: x0 + ((x1 - x0) * k) / n,
+          y: y0 + ((y1 - y0) * k) / n,
+          corner: k === 0,
+          dx: (x1 - x0) / length,
+          dy: (y1 - y0) / length,
+          step: length / n,
+        });
     }
     return pts;
   };
@@ -450,22 +529,22 @@ function draw({ across: W, along: H, fringe, scale }) {
   band(19.3, 19.9, C.ivory);
   band(19.9, 20.5, C.navy);
 
-  // The outer guard: small ivory flowers and indigo dots, by turns.
+  // Outer guard: alternating small ivory flowers and indigo dots.
   along(3.2, 2.6).forEach((p, i) => {
     if (i % 2) circle(p.x, p.y, 0.55, C.navy);
     else rosette(p.x, p.y, 1.05, 4, [C.ivory], [[0.3, C.red]], Math.PI / 4);
   });
-  // The inner guard: ivory flowers with red hearts, indigo dots between.
+  // Inner guard: ivory flowers with red centers, indigo dots between.
   along(18, 2.8).forEach((p) => {
     rosette(p.x, p.y, 1.1, 4, [C.ivory], [[0.32, C.redDeep]]);
     circle(p.x + p.dx * 1.4, p.y + p.dy * 1.4, 0.35, C.navy);
   });
-  // The main border: rosettes on a vine that winds between them.
+  // Main border: rosettes on a vine winding between them.
   const main = along(11, 11.5);
   main.forEach((p, i) => {
     const nx = -p.dy;
     const ny = p.dx;
-    // The vine, to the next rosette, a wave across the band.
+    // Vine to the next rosette, waving across the band.
     const q = { x: p.x + p.dx * p.step, y: p.y + p.dy * p.step };
     const swing = (i % 2 ? 1 : -1) * 2.8;
     g.beginPath();
@@ -496,16 +575,49 @@ function draw({ across: W, along: H, fringe, scale }) {
   main.forEach((p, i) => {
     if (p.corner) {
       star(p.x, p.y, 4.5, 0.62, 8, C.ivory, Math.PI / 8);
-      rosette(p.x, p.y, 3, 10, [C.red, C.rose], [[0.45, C.ivory], [0.22, C.navy]]);
+      rosette(
+        p.x,
+        p.y,
+        3,
+        10,
+        [C.red, C.rose],
+        [
+          [0.45, C.ivory],
+          [0.22, C.navy],
+        ],
+      );
     } else if (i % 2) {
-      rosette(p.x, p.y, 3.6, 10, [C.rose, C.red], [[0.5, C.ivory], [0.34, C.red], [0.15, C.navy]]);
+      rosette(
+        p.x,
+        p.y,
+        3.6,
+        10,
+        [C.rose, C.red],
+        [
+          [0.5, C.ivory],
+          [0.34, C.red],
+          [0.15, C.navy],
+        ],
+      );
     } else {
-      rosette(p.x, p.y, 3.4, 8, [C.ivory, C.ivoryDeep], [[0.48, C.red], [0.3, C.gold], [0.13, C.ivory]], Math.PI / 8);
+      rosette(
+        p.x,
+        p.y,
+        3.4,
+        8,
+        [C.ivory, C.ivoryDeep],
+        [
+          [0.48, C.red],
+          [0.3, C.gold],
+          [0.13, C.ivory],
+        ],
+        Math.PI / 8,
+      );
     }
   });
 
-  // Abrash: dye lots changing as the weaving went on, in bands across.
-  for (let y = 0; y < H; ) {
+  // Abrash: color shifts between dye lots, in bands across the rug.
+  for (let y = 0; y < H;) {
     const h = between(2, 8);
     g.globalCompositeOperation = random() < 0.5 ? 'multiply' : 'screen';
     g.fillStyle = `rgb(${g.globalCompositeOperation === 'multiply' ? '205 200 195' : '40 34 30'})`;
@@ -516,7 +628,7 @@ function draw({ across: W, along: H, fringe, scale }) {
   g.globalAlpha = 1;
   g.globalCompositeOperation = 'source-over';
 
-  // --- The fringe: the warp, two threads to a cell, knotted in fours --------
+  // --- Fringe: warp threads, two per cell, knotted in fours ---
   for (const end of [-1, 1]) {
     const from = end < 0 ? 0 : H;
     for (let k = 0; k < W * 2; k++) {
@@ -545,6 +657,8 @@ for (const [name, scale] of [
   const picture = await page.evaluate(draw, { across: ACROSS, along: ALONG, fringe: FRINGE, scale });
   const bytes = Buffer.from(picture.slice(picture.indexOf(',') + 1), 'base64');
   writeFileSync(`${OUT}${name}`, bytes);
-  console.log(`Wrote ${name} (${ACROSS * scale} by ${(ALONG + 2 * FRINGE) * scale}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`);
+  console.log(
+    `Wrote ${name} (${ACROSS * scale} by ${(ALONG + 2 * FRINGE) * scale}, ${Math.round(bytes.length / 1024)} KB) to src/assets/rug/`,
+  );
 }
 await browser.close();

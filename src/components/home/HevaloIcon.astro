@@ -1,0 +1,84 @@
+---
+/**
+ * Hevalo's app icon: the deer, or the Christmas version from Dec 1 to Jan 6. theme-init.js sets the
+ * season before first paint, so the icon never swaps visibly.
+ *
+ * WebP at three sizes so each screen downloads only the resolution it needs, and only the active
+ * season's image: both are lazy, and browsers don't fetch hidden lazy images.
+ *
+ * The pupils aren't in the images; they're drawn on top (HevaloEyes.astro) at their artwork
+ * positions so they can follow the pointer (src/scripts/hevalo/eyes.ts). Both seasons share the
+ * same eyes. The products section uses the 3D deer instead (HevaloDeer.astro).
+ */
+import christmas96 from '../../assets/brand/hevalo-christmas-96.webp';
+import christmas192 from '../../assets/brand/hevalo-christmas-192.webp';
+import christmas288 from '../../assets/brand/hevalo-christmas-288.webp';
+import icon96 from '../../assets/brand/hevalo-96.webp';
+import icon192 from '../../assets/brand/hevalo-192.webp';
+import icon288 from '../../assets/brand/hevalo-288.webp';
+import HevaloEyes from './HevaloEyes.astro';
+
+interface Props {
+  /** Rendered width as a `sizes` value, e.g. "20px". */
+  sizes: string;
+  /** Empty when the icon sits next to the Hevalo name. */
+  alt?: string;
+  class?: string;
+}
+
+const { sizes, alt = '', class: className } = Astro.props;
+
+const variants = [
+  { season: 'everyday', images: [icon96, icon192, icon288] },
+  { season: 'christmas', images: [christmas96, christmas192, christmas288] },
+];
+---
+
+<span class:list={['hevalo-icon', className]} data-hevalo-eyes>
+  {variants.map(({ season, images }) => (
+    <img
+      class="hevalo-icon__image"
+      data-season={season}
+      src={images[1].src}
+      srcset={images.map((image) => `${image.src} ${image.width}w`).join(', ')}
+      sizes={sizes}
+      width={images[1].width}
+      height={images[1].height}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      draggable="false"
+    />
+  ))}
+  <HevaloEyes frame="icon" />
+</span>
+
+<style>
+  .hevalo-icon {
+    position: relative;
+    display: flow-root;
+    flex: none;
+    user-select: none;
+  }
+
+  .hevalo-icon__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* The Christmas scarf hangs below the square (192x220 vs 192x192). It overflows instead of making
+     the icon taller, so the surrounding layout is identical in every season. */
+  .hevalo-icon__image[data-season='christmas'] {
+    display: none;
+    margin-block-end: calc(100% * (1 - 220 / 192));
+  }
+
+  :global(:root[data-season='christmas']) .hevalo-icon__image[data-season='everyday'] {
+    display: none;
+  }
+
+  :global(:root[data-season='christmas']) .hevalo-icon__image[data-season='christmas'] {
+    display: block;
+  }
+</style>

@@ -1,0 +1,194 @@
+---
+import { format, i18n } from '../../i18n';
+import { site } from '../../site';
+import Arrow from '../ui/Arrow.astro';
+import SplitText from '../ui/SplitText.astro';
+
+const { t, localize } = i18n(Astro.url);
+const { contact } = site.emails;
+---
+
+<section id="contact" class="contact section" aria-labelledby="contact-title">
+  <div class="container contact__grid">
+    <div>
+      <p class="eyebrow" data-reveal>
+        {t.contact.eyebrow}
+      </p>
+      <SplitText id="contact-title" class="heading-2 contact__title" text={t.contact.title} />
+      <p class="contact__text lead" data-lines>
+        {t.contact.lead}
+      </p>
+    </div>
+
+    <address class="contact__panel" data-reveal>
+      <a class="contact__email" href={`mailto:${contact}`}>
+        <span dir="ltr">{contact}</span>
+        <Arrow class="contact__arrow" />
+      </a>
+
+      <div class="contact__actions">
+        {/* Revealed by script only where the Clipboard API is available. */}
+        <button
+          class="contact__copy"
+          type="button"
+          data-copy={contact}
+          data-copied-message={format(t.contact.copiedStatus, { email: contact })}
+          data-copy-failed-message={format(t.contact.copyFailed, { email: contact })}
+          hidden
+        >
+          <span class="contact__copy-idle">{t.contact.copy}</span>
+          <span class="contact__copy-done" aria-hidden="true">
+            {t.contact.copied}
+          </span>
+        </button>
+        <p class="visually-hidden" role="status" data-copy-status></p>
+      </div>
+
+      <p class="contact__note">
+        {t.contact.security.before} <a href={localize('/security')}>{t.contact.security.link}</a>
+        {t.contact.security.after}
+      </p>
+    </address>
+  </div>
+</section>
+
+<style>
+  .contact__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+  }
+
+  .contact__title {
+    margin-top: 1.25rem;
+  }
+
+  .contact__text {
+    margin-top: 1.25rem;
+  }
+
+  .contact__panel {
+    display: grid;
+    font-style: normal;
+    align-content: end;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .contact__email {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.875rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    text-decoration: none;
+  }
+
+  .contact__email span {
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--color-line-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: text-decoration-color 0.25s ease;
+  }
+
+  .contact__email:hover span {
+    text-decoration-color: currentColor;
+  }
+
+  .contact__email :global(.contact__arrow) {
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .contact__email:hover :global(.contact__arrow) {
+    transform: translateX(3px);
+  }
+
+  .contact__actions {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .contact__actions:has(.contact__copy[hidden]) {
+    display: none;
+  }
+
+  .contact__copy {
+    display: inline-grid;
+    min-height: 2.75rem;
+    padding: 0 1.125rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s var(--ease-out);
+  }
+
+  .contact__copy:active {
+    transform: scale(0.97);
+  }
+
+  /* Both labels share one grid cell, so the button width doesn't change with the text. */
+  .contact__copy-idle,
+  .contact__copy-done {
+    grid-area: 1 / 1;
+    align-self: center;
+    transition: opacity 0.2s ease;
+  }
+
+  .contact__copy-done,
+  .contact__copy[data-copied] .contact__copy-idle {
+    opacity: 0;
+  }
+
+  .contact__copy[data-copied] .contact__copy-done {
+    opacity: 1;
+  }
+
+  /* Hover styles only for real pointers; on touch they'd stick after a tap. */
+  @media (hover: hover) {
+    .contact__copy:hover {
+      border-color: var(--color-ink);
+    }
+  }
+
+  .contact__note {
+    font-size: var(--text-sm);
+    line-height: 1.8;
+    color: var(--color-muted);
+  }
+
+  .contact__note a {
+    color: var(--color-ink);
+    text-decoration-color: var(--color-underline);
+  }
+
+  .contact__note a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  @media (min-width: 64rem) {
+    .contact__grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 2rem;
+      align-items: end;
+    }
+
+    .contact__grid > :first-child {
+      grid-column: 1 / span 6;
+    }
+
+    .contact__panel {
+      --reveal-delay: 0.12s;
+      grid-column: 8 / -1;
+    }
+  }
+</style>

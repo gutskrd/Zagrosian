@@ -1,13 +1,14 @@
 /**
- * Tells search engines that support IndexNow (Bing, and through it ChatGPT
- * search, Copilot and DuckDuckGo; also Yandex, Seznam and Naver) about every
- * page in the live sitemap, so they crawl them soon. Run it after a deploy:
+ * Submits every URL in the live sitemap to IndexNow (Bing, and through it ChatGPT search, Copilot
+ * and DuckDuckGo; also Yandex, Seznam and Naver). Runs in CI after each deploy
+ * (.github/workflows/indexnow.yml), or manually:
  *
- *   npm run indexnow
+ * ```
+ * npm run indexnow
+ * ```
  *
- * The key is in src/site.ts and public/<key>.txt, which proves the site is
- * ours. Google does not use IndexNow: submit the sitemap in Google Search
- * Console instead.
+ * The key is in src/site.ts and public/<key>.txt, which proves domain ownership. Google doesn't
+ * support IndexNow; submit the sitemap in Search Console instead.
  */
 import { readFileSync } from 'node:fs';
 

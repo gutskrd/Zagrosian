@@ -2,9 +2,8 @@ import type { APIRoute } from 'astro';
 import { site } from '../../site';
 
 /**
- * RFC 9116 security.txt. `Expires` is set 180 days after each build; the
- * Worker in front of the site (worker/index.ts) moves it to 180 days after the
- * day it is served, so the file never lapses between builds.
+ * RFC 9116 security.txt. `Expires` is set 180 days after the build; the Worker (worker/index.ts)
+ * rewrites it to 180 days after the request date, so it never lapses between deploys.
  */
 const EXPIRES_AFTER_DAYS = 180;
 

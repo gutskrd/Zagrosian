@@ -1,6 +1,6 @@
 /**
- * Company details that are the same in every language: names, addresses and
- * links. Text for visitors is in src/i18n/messages/<language>.ts.
+ * Locale-independent site configuration: company details, identifiers and links. User-facing copy
+ * lives in src/i18n/messages/<locale>.ts.
  */
 
 export interface SocialProfile {
@@ -10,77 +10,71 @@ export interface SocialProfile {
   icon: 'instagram' | 'tiktok';
 }
 
-/** A registered address, in the Dutch order: street and number, postcode, place. */
+/** Registered address in Dutch order: street and number, postcode, city. */
 export interface PostalAddress {
   /** Street and house number. */
   street: string;
-  /** Postcode: four digits and two letters, such as "1234 AB". */
+  /** Postcode: four digits and two letters, e.g. "1234 AB". */
   postalCode: string;
-  /** Place. */
+  /** City. */
   city: string;
 }
 
-/** The company's registration, as the registers have issued it. */
+/** Company registration details, exactly as issued. */
 export interface Registration {
-  /** The registered address (the one in the trade register). */
+  /** Registered address (as in the trade register). */
   address?: PostalAddress;
-  /** The number in the Dutch trade register (the KvK number): eight digits. */
+  /** Dutch trade register (KvK) number: eight digits. */
   kvk?: string;
-  /** The VAT identification number (btw-id), such as "NL000000000B01". */
+  /** VAT identification number (btw-id), e.g. "NL000000000B01". */
   vat?: string;
-  /** The telephone number in the trade register, written in international form ("+31 6 12345678"). */
+  /** Registered phone number in international format, e.g. "+31 6 12345678". */
   phone?: string;
 }
 
 export const site = {
   name: 'Zagrosian',
-  /** Name used in legal documents: the trade name in the trade register (KvK). */
+  /** Legal name: the trade name as registered with the KvK. */
   legalName: 'Zagrosian',
   url: 'https://zagrosian.com',
   /**
-   * Date of the homepage's last material change (YYYY-MM-DD), for the sitemap.
-   * Update it when the homepage's text changes.
+   * Last material change to the homepage (YYYY-MM-DD), used as its sitemap `lastmod`. Bump it when
+   * the homepage copy changes.
    */
   updated: '2026-11-17',
   /**
-   * IndexNow key, which lets the site tell search engines about changed pages
-   * (`npm run indexnow`). It is public by design: public/<key>.txt holds it, to
-   * show the site owns it.
+   * IndexNow key (`npm run indexnow`). Public by design: public/<key>.txt proves ownership of the
+   * domain.
    */
   indexNowKey: '7c9302be7e61891041f0aa00b0435b84',
-  /** Headquarters, as an ISO 3166 country code. */
+  /** Headquarters country (ISO 3166-1 alpha-2). */
   country: 'NL',
-  /** The headquarters' time zone, for the local time shown in About. */
+  /** Headquarters time zone, for the local time shown in About. */
   timeZone: 'Europe/Amsterdam',
   /**
-   * The address shown on the site. Every address the site gives is one somebody
-   * reads: this one, for everything (general, partnerships, press, legal
-   * questions, job applications and security reports), and privacy@, which
-   * appears only in the privacy policy (src/content/legal), where it is written
-   * out, because a request about personal data has a deadline in law.
+   * Public email addresses. Only monitored inboxes are listed: contact@ for everything (general,
+   * partnerships, press, legal, jobs, security reports), and privacy@, which appears only in the
+   * privacy policy (src/content/legal) because data-subject requests have a statutory deadline.
    */
   emails: {
-    /** Main contact: shown in the Contact section and used for security reports. */
+    /** Primary contact, shown in the Contact section and used for security reports. */
     contact: 'contact@zagrosian.com',
   },
 };
 
 /**
- * The company's registration. A company in the EU that offers services online
- * shows its registered address, trade register number and VAT number on its
- * site (Directive 2000/31/EC, article 5; in the Netherlands, Burgerlijk Wetboek
- * 3:15d). Each detail is shown in every footer (Footer.astro) and added to the
- * structured data (src/lib/structured-data.ts) as soon as it is filled in here;
- * until then nothing is shown. Fill in only what the Chamber of Commerce (KVK)
- * and the tax office have issued, and update `site.legalName` to the registered
- * name with them.
+ * Company registration. EU businesses offering online services must display their registered
+ * address, trade register number and VAT number (Directive 2000/31/EC art. 5; Dutch Civil Code
+ * 3:15d). Each field appears in the footer once set here.
  *
- * Zagrosian is a sole proprietorship (eenmanszaak) in the trade register, with
- * Zagrosian and Hevalo as its trade names; these are its registered address
- * and number. The tax office has not issued the VAT identification number
- * (btw-id) yet, so it is left out until it has. Should the address one day be
- * shielded in the register, this must change with it to the public postal
- * address registered in its place.
+ * These details are shown to visitors but kept out of search: they're not in the HTML or the
+ * structured data. The footer loads them from /registration.json (src/scripts/registration.ts),
+ * which robots.txt disallows. Only enter what the KvK and the tax office have issued, and keep
+ * `site.legalName` in sync.
+ *
+ * Zagrosian is registered as a sole proprietorship (eenmanszaak) with the trade names Zagrosian and
+ * Hevalo. The VAT ID hasn't been issued yet. If the address is ever shielded in the register,
+ * replace it here with the registered public postal address.
  */
 export const registration: Registration = {
   address: { street: 'Westerengstraat 7', postalCode: '6669 BE', city: 'Dodewaard' },
@@ -89,11 +83,10 @@ export const registration: Registration = {
 };
 
 /**
- * Hevalo's book on this site: its page, the PDF under the name it is saved
- * with (the same name hevalo.app gives it), its social image (drawn by
- * scripts/book.mjs) and the day its first edition came out here, which later
- * editions keep (the structured data's `datePublished`). The edition itself is
- * in src/assets/book/ (scripts/book.mjs brings it in; src/lib/book.ts reads it).
+ * Hevalo's book: page path, PDF path and download filename (matching hevalo.app), share image
+ * (rendered by scripts/book.mjs), and the first-publication date, which later editions keep
+ * (`datePublished` in structured data). The edition itself lives in src/assets/book/ (imported by
+ * scripts/book.mjs, read by src/lib/book.ts).
  */
 export const book = {
   path: '/book',
@@ -107,27 +100,24 @@ export const hevalo = {
   name: 'Hevalo',
   url: 'https://hevalo.app',
   domain: 'hevalo.app',
-  /** Hevalo's own logo, for structured data. */
+  /** Hevalo's logo, for structured data. */
   logo: 'https://hevalo.app/logo.png',
 };
 
-/**
- * Kurdish phrases that belong to the brand and stay in Kurmanji in every
- * language, each with a translation in the message files.
- */
+/** Brand phrases kept in Kurmanji in every locale; translations live in the message files. */
 export const kurdish = {
-  /** Hevalo's motto, "Life is sweeter in Kurdish": the end of the homepage story (`motto`). */
+  /** Hevalo's motto, "Life is sweeter in Kurdish"; closes the homepage story (`motto`). */
   motto: 'Jiyan bi kurdî xweştire.',
-  /** "Thank you", literally "may your home prosper": the footer (`footer.thanks`). */
+  /** "Thank you" (literally "may your home prosper"); footer (`footer.thanks`). */
   thanks: 'Mala we ava.',
   /**
-   * A proverb, written on the sheet a paper plane from under the rug unfolds
-   * into (Proverb.astro), with its translation (`hevalo.proverb`).
+   * Proverb written on the sheet the paper plane unfolds into (Proverb.astro); translation in
+   * `hevalo.proverb`.
    */
   proverb: 'Dar li ser koka xwe, mirov li ser zimanê xwe şîn dibe.',
-  /** "Proverb" (literally "a saying of the forebears"), the proverb's credit. */
+  /** Attribution for the proverb: "a saying of the forebears". */
   proverbSource: 'Gotina pêşiyan',
-  /** The title of Hevalo's book, "The Kurmanji Road": the book's page (`book.subtitle`). */
+  /** Title of Hevalo's book, "The Kurmanji Road" (`book.subtitle`). */
   book: 'Rêya Kurmancî',
 };
 

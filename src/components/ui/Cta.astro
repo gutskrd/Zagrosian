@@ -1,0 +1,175 @@
+---
+/**
+ * Call-to-action link: a pill for the primary action, or (like Apple's "Learn more") a plain link
+ * with an arrow for secondary ones.
+ *
+ * On hover the pill's color fills in from the center, the label rolls letter by letter (RollText)
+ * and the arrow slides out as a copy slides in behind it. The link variant animates the same way
+ * without the pill.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Arrow, { type ArrowDirection } from './Arrow.astro';
+import RollText from './RollText.astro';
+
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+  label: string;
+  /** `solid` for the primary action; `outline` or `link` for secondary ones. */
+  variant?: 'solid' | 'outline' | 'link';
+  arrow?: ArrowDirection;
+}
+
+const { label, variant = 'solid', arrow = 'right', class: className, ...attrs } = Astro.props;
+---
+
+<a class:list={['cta', `cta--${variant}`, `cta--${arrow}`, className]} {...attrs}>
+  <span class="cta__pour" aria-hidden="true"></span>
+  <span class="cta__content">
+    <RollText text={label} />
+    <span class="cta__arrows" aria-hidden="true">
+      <Arrow direction={arrow} class="cta__arrow" />
+      <Arrow direction={arrow} class="cta__arrow cta__arrow--next" />
+    </span>
+  </span>
+</a>
+
+<style>
+  .cta {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    min-height: 3.375rem;
+    padding: 0 1.625rem;
+    overflow: hidden;
+    border: 1px solid var(--color-ink);
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.006em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      color 0.5s var(--ease-out),
+      border-color 0.5s var(--ease-out),
+      scale 0.3s var(--ease-out);
+  }
+
+  .cta:active {
+    scale: 0.97;
+  }
+
+  .cta--solid {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  .cta--outline {
+    border-color: var(--color-line-strong);
+    color: var(--color-ink);
+  }
+
+  /* Plain link: no pill, but still a full-size target. */
+  .cta--link {
+    min-height: 2.75rem;
+    padding: 0;
+    border-color: transparent;
+    border-radius: 0;
+    color: var(--color-ink);
+  }
+
+  .cta--link .cta__content {
+    gap: 0.5rem;
+  }
+
+  .cta__content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Hover fill, expanding from the center. */
+  .cta__pour {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: 260%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    translate: -50% -50%;
+    scale: 0;
+    transition: scale 0.7s var(--ease-out);
+  }
+
+  .cta--solid .cta__pour {
+    background: var(--color-paper);
+  }
+
+  .cta--outline .cta__pour {
+    background: var(--color-ink);
+  }
+
+  /* The arrow exits in the direction it points; its copy follows it in. */
+  .cta__arrows {
+    display: inline-grid;
+    width: 1em;
+    height: 1em;
+    /* A clip, not a scroll container: the waiting arrow must not count as overflow. */
+    clip-path: inset(0);
+  }
+
+  .cta__arrows :global(.cta__arrow) {
+    grid-area: 1 / 1;
+    transition: translate 0.55s var(--ease-out);
+  }
+
+  .cta {
+    --arrow-x: calc(var(--direction) * 130%);
+    --arrow-y: 0%;
+  }
+
+  .cta--left {
+    --arrow-x: calc(var(--direction) * -130%);
+  }
+
+  .cta--down {
+    --arrow-x: 0%;
+    --arrow-y: 130%;
+  }
+
+  .cta--up-right {
+    --arrow-y: -130%;
+  }
+
+  .cta__arrows :global(.cta__arrow--next) {
+    translate: calc(-1 * var(--arrow-x)) calc(-1 * var(--arrow-y));
+  }
+
+  @media (hover: hover) {
+    .cta:hover .cta__pour {
+      scale: 1;
+    }
+
+    .cta--solid:hover {
+      color: var(--color-ink);
+    }
+
+    .cta--outline:hover {
+      border-color: var(--color-ink);
+      color: var(--color-paper);
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .cta:is(:hover, :focus-visible) .cta__arrows :global(.cta__arrow) {
+      translate: var(--arrow-x) var(--arrow-y);
+    }
+
+    .cta:is(:hover, :focus-visible) .cta__arrows :global(.cta__arrow--next) {
+      translate: 0 0;
+      transition-delay: 0.08s;
+    }
+  }
+</style>

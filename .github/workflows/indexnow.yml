@@ -1,0 +1,38 @@
+# Submits every URL in the live sitemap to IndexNow (Bing, and through it
+# ChatGPT search, Copilot and DuckDuckGo; also Yandex, Seznam and Naver) so
+# changes get crawled quickly (scripts/indexnow.mjs). Runs after Checks passes on
+# the default branch, by which point Cloudflare has deployed the commit; can also
+# be triggered manually. Google doesn't support IndexNow; it reads the sitemap
+# submitted in Search Console.
+name: Search engines
+
+on:
+  workflow_run:
+    workflows: [Checks]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: true
+
+jobs:
+  indexnow:
+    name: IndexNow
+    # After a successful Checks run for a push to the default branch, or manually.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+      - run: npm run indexnow

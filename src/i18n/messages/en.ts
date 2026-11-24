@@ -1,12 +1,11 @@
 /**
- * English text for the site. Every other language file has the same shape (the
- * `Messages` type), so a missing translation is a type error. The page, its
- * Markdown version and llms.txt are all built from these files.
+ * English copy. Every other locale implements the same `Messages` shape, so a missing translation
+ * is a type error. The HTML pages, their Markdown versions and llms.txt are all built from these
+ * files.
  *
- * Kurdish phrases that are part of the brand (the motto and the footer line)
- * stay in Kurmanji in every language; see src/site.ts.
+ * Brand phrases in Kurmanji (motto, footer line) are the same in every locale; see src/site.ts.
  */
-/** Text for a count, in each plural form a language uses (Intl.PluralRules): `other` always. */
+/** Pluralized string per Intl.PluralRules category; `other` is required. */
 export type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 
 export const en = {
@@ -30,7 +29,7 @@ export const en = {
   nav: {
     home: 'Home',
     hevalo: 'Hevalo',
-    /** The page with Hevalo's book (/book). Never just "Book", which reads as a verb. */
+    /** Book page (/book). Never just "Book", which reads as a verb. */
     book: 'Hevalo’s book',
     about: 'About',
     faq: 'FAQ',
@@ -47,30 +46,30 @@ export const en = {
     dark: 'Dark',
   },
   sound: {
-    /** The button in the site menu that switches sound on and off (announced as pressed or not). */
+    /** Sound toggle in the site menu (announced as pressed or not). */
     label: 'Sound',
     on: 'Turn sound on',
     off: 'Turn sound off',
-    /** Offered once to first-time visitors, with the `on` and `dismiss` buttons. */
+    /** One-time prompt for first-time visitors, with the `on` and `dismiss` buttons. */
     prompt: 'Best experienced with sound.',
     dismiss: 'No thanks',
   },
   share: {
-    /** In the site menu: the system's share sheet, or the link copied where there is none. */
+    /** Site menu: opens the native share sheet, or copies the link where unavailable. */
     button: 'Share this page',
     copied: 'Link copied',
     copiedStatus: 'Link copied to the clipboard.',
   },
   language: {
     label: 'Language',
-    /** Offered to visitors whose browser prefers this language (written in this language). */
+    /** Shown to visitors whose browser prefers this locale; written in that locale. */
     suggestion: 'This page is also available in English.',
     switchTo: 'Read in English',
     dismiss: 'Dismiss',
   },
   hero: {
     notice: 'Hevalo is coming to iOS and Android',
-    /** One entry per line of the headline. */
+    /** One entry per headline line. */
     headline: ['Technology for', 'everyday life.'],
     lead: 'Zagrosian is an independent technology company based in the Netherlands. We design and build consumer products, starting with Hevalo, an app for learning Kurdish.',
     products: 'Our products',
@@ -83,20 +82,26 @@ export const en = {
     description:
       'An app for learning Kurdish through short lessons and games played with friends. Available first in Kurmanji, with more dialects planned.',
     visit: 'Visit hevalo.app',
-    /** The link from the products section to the book's page. */
+    /** Link from the products section to the book page. */
     readBook: 'Read Hevalo’s book, free',
     website: 'Website',
     comingSoon: 'Coming soon',
-    /** The facts under Hevalo's description: its dialects, and its native apps (shown with `comingSoon`). */
+    /** Facts under Hevalo's description: dialects, and native apps (shown with `comingSoon`). */
     dialectsLabel: 'Dialects',
     dialects: 'Kurmanji first, more planned',
     platformsLabel: 'iOS and Android',
-    /** Translation of the Kurmanji proverb (`kurdish.proverb` in src/site.ts, shown by Proverb.astro). Empty in Kurmanji. */
+    /**
+     * Translation of the Kurmanji proverb (`kurdish.proverb` in src/site.ts, rendered by
+     * Proverb.astro). Empty in Kurmanji.
+     */
     proverb: 'A tree thrives through its roots; a person through their language.',
     /** Shown after "Gotina pêşiyan" (Kurmanji for "proverb"). Empty in Kurmanji. */
     proverbSource: 'Kurdish proverb',
   },
-  /** The rug in late sun (Underneath.astro). The title is for screen readers; the hint and button are seen. */
+  /**
+   * Rug section (Underneath.astro). The title is for screen readers only; the hint and button are
+   * visible.
+   */
   under: {
     title: 'Lift a corner.',
     hintPointer: 'Lift the corner',
@@ -104,7 +109,7 @@ export const en = {
     lift: 'Lift the rug',
     lay: 'Lay it back',
   },
-  /** Zagrosian's three values, shown one by one in the story under the hero. */
+  /** The three company values, revealed one by one in the story below the hero. */
   story: {
     values: ['Simplicity.', 'Privacy.', 'Clarity.'],
   },
@@ -117,14 +122,13 @@ export const en = {
     headquartersLabel: 'Headquarters',
     headquarters: 'Netherlands',
     productsLabel: 'Products',
-    /** Shown with the headquarters: the current time there. */
+    /** Local time at headquarters. */
     localTime: '{time} local time',
   },
   /**
-   * Questions and answers, before Contact (Faq.astro), also in the Markdown
-   * version and as FAQPage structured data. Answers may contain {hevalo},
-   * {privacy}, {contact} and {security}, which become links:
-   * {privacy} reads `privacyLink`, {security} reads `contact.security.link`.
+   * FAQ (Faq.astro), also used for the Markdown version and FAQPage structured data. Answers may
+   * contain {hevalo}, {privacy}, {contact} and {security}, which become links ({privacy} uses
+   * `privacyLink`, {security} uses `contact.security.link`).
    */
   faq: {
     eyebrow: 'FAQ',
@@ -140,18 +144,15 @@ export const en = {
       },
       {
         question: 'What is Hevalo?',
-        answer:
-          'Hevalo is an app for learning Kurdish through short lessons and games played with friends. You can find it at {hevalo}.',
+        answer: 'Hevalo is an app for learning Kurdish through short lessons and games played with friends. You can find it at {hevalo}.',
       },
       {
         question: 'Which Kurdish dialects does Hevalo teach?',
-        answer:
-          'Hevalo starts with Kurmanji. More dialects are planned.',
+        answer: 'Hevalo starts with Kurmanji. More dialects are planned.',
       },
       {
         question: 'Is Hevalo available on iOS and Android?',
-        answer:
-          'Not yet. The native apps are in development and will be available on the App Store and Google Play.',
+        answer: 'Not yet. The native apps are in development and will be available on the App Store and Google Play.',
       },
       {
         question: 'Does zagrosian.com collect personal data?',
@@ -181,7 +182,7 @@ export const en = {
     about: ['Independent technology company', 'based in the Netherlands.'],
     /** Translation of the Kurmanji "Mala we ava." (thank you). Empty in Kurmanji. */
     thanks: 'Thank you. Literally: may your home prosper.',
-    /** Before the trade register (KvK) and VAT numbers, once they are filled in (src/site.ts). */
+    /** Labels for the trade register (KvK) and VAT numbers in the footer. */
     kvk: 'KvK',
     vat: 'VAT',
   },
@@ -192,14 +193,14 @@ export const en = {
     /** Shown on translated legal pages only. */
     translationNotice: 'This is a translation. If it differs from the English version, the English version applies.',
     readEnglish: 'Read the English version',
-    /** {duration} is a number of minutes, written with the unit style below. */
+    /** {duration} is a number of minutes, formatted with the unit style below. */
     readingTime: '{duration} read',
     readingTimeUnit: 'short' as 'short' | 'long',
     print: 'Print',
     copyLink: 'Copy link to this section',
     linkCopied: 'Link copied to the clipboard.',
   },
-  /** The quick navigation menu (Ctrl K or ⌘K). */
+  /** Command menu (Ctrl+K / Cmd+K). */
   command: {
     open: 'Search',
     title: 'Quick navigation',
@@ -214,39 +215,40 @@ export const en = {
     hintClose: 'to close',
   },
   /**
-   * The page with Hevalo's book (BookPage.astro and the reader). The book is
-   * in Kurmanji with English beside every line, and its title, Rêya Kurmancî,
-   * stays in Kurmanji in every language (`kurdish.book` in src/site.ts).
-   * Templates: {size} and {pages} are formatted for the language; {a}, {b},
-   * {n} and {total} are page numbers; {where} is a counter and {chapter} a
-   * chapter's or section's name.
+   * Book page (BookPage.astro) and reader. The book is in Kurmanji with English alongside every
+   * line; its title, Rêya Kurmancî, stays in Kurmanji in every locale (`kurdish.book` in
+   * src/site.ts). Placeholders: {size} and {pages} are localized; {a}, {b}, {n} and {total} are
+   * page numbers; {where} is a counter and {chapter} a chapter or section name.
    */
   book: {
-    /** Within 70 characters, in every language. */
+    /** Max 70 characters in every locale. */
     metaTitle: 'Rêya Kurmancî: Hevalo’s free Kurmanji book — Zagrosian',
-    /** Within 170 characters, in every language. */
+    /** Max 170 characters in every locale. */
     metaDescription:
       'Hevalo’s illustrated Kurmanji course book, with Hamo, Xezal and Hevalo and English beside every line. Read it here page by page, or download the free PDF.',
-    /** The social image's description (public/og/book.jpg). */
+    /** Alt text for the social image (public/og/book.jpg). */
     shareAlt: 'Rêya Kurmancî, Hevalo’s book, open at its first pages',
     eyebrow: 'Free book',
-    /** Under the Kurmanji title: what it means, and whose book it is. In Kurmanji only "Pirtûka Hevalo". */
+    /**
+     * Below the Kurmanji title: its meaning and whose book it is. In Kurmanji only "Pirtûka
+     * Hevalo".
+     */
     subtitle: 'The Kurmanji Road · Hevalo’s book',
     lead: 'A course book in Kurmanji, with English beside every line. Learn with Hamo, Xezal and Hevalo, from the first hello to stories and songs: read it here, page by page, or download it to print and keep.',
     startReading: 'Start reading',
     download: 'Download the book',
     downloadShort: 'Download',
-    /** Under the download: "PDF · 2.6 MB · 192 pages". */
+    /** Below the download: "PDF · 2.6 MB · 192 pages". */
     facts: 'PDF · {size} · {pages}',
-    /** A number of pages, in each plural form the language has (Intl.PluralRules); `other` is required. */
+    /** Page count per plural category (Intl.PluralRules); `other` is required. */
     pageCount: { one: '{n} page', other: '{n} pages' } as Plural,
     edition: 'Edition of {date}',
     licence: 'Free to download, print and share for learning, but not for sale.',
     hearHamo: 'Hear Hamo say every line in Hevalo',
     inside: 'Inside the book',
-    /** The reader's heading, for screen readers. */
+    /** Reader heading, for screen readers. */
     readerTitle: 'Read the book',
-    /** The slider's name, for screen readers: what it moves through. */
+    /** Accessible name of the page slider. */
     slider: 'Page',
     contents: 'Contents',
     previous: 'Previous page',
@@ -254,14 +256,14 @@ export const en = {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
     fit: 'Fit to screen',
-    /** The whole book as one column of pages, to scroll through. */
+    /** The whole book as one scrolling column of pages. */
     scrollView: 'Scroll',
     /** The whole book as continuous text. */
     textView: 'Text',
     fullView: 'Full view',
     /** Shown while the book has keyboard focus. */
     keysHint: 'Arrow keys turn the pages; [ and ] go to the previous or next chapter; + and − zoom in and out.',
-    /** Shown for a few seconds on touch screens, in place of the bar under the book, with `zoomHint` under it. */
+    /** Shown briefly on touch devices in place of the bottom toolbar, with `zoomHint` below it. */
     swipeHint: 'Tap the edges or swipe to turn',
     zoomHint: 'Double-tap to zoom',
     counterSpread: 'Pages {a} and {b} of {total}',
@@ -271,7 +273,7 @@ export const en = {
     chapterLabel: 'Chapter {n}: {name}',
     /** Announced after a turn: "Pages 12 and 13 of 192. Chapter 1: Hello." */
     status: '{where}. {chapter}.',
-    /** The parts of the book outside its chapters. */
+    /** Parts of the book outside the chapters. */
     sections: {
       cover: 'Cover',
       letter: 'A letter from Hamo',
@@ -284,7 +286,9 @@ export const en = {
       author: 'About the author',
       farewell: 'The last page',
     },
-    /** The chapters' names, in order; in English they must be the book's own (src/lib/book.ts checks). */
+    /**
+     * Chapter names, in order; the English ones must match the book (checked in src/lib/book.ts).
+     */
     chapters: [
       'Hello',
       'Family',
@@ -299,16 +303,18 @@ export const en = {
       'Work and school',
       'Stories and songs',
     ],
-    /** The card after the last page. */
+    /** End card after the last page. */
     endTitle: 'That’s the whole book.',
     endLearn: 'Learn with Hevalo',
     backToStart: 'Back to the cover',
-    /** Shown when a page's picture does not load: offline, or a new edition published under the reader. */
+    /**
+     * Shown when a page image fails to load: offline, or a new edition was deployed mid-session.
+     */
     loadFailed: 'Some pages could not be loaded.',
     reload: 'Reload',
-    /** For apps' own browsers, which often cannot download files. */
+    /** For in-app browsers, which often can't download files. */
     inAppHint: 'Download not starting? Open this page in your browser.',
-    /** Printed instead of the reader; {url} is the PDF's address. */
+    /** Printed in place of the reader; {url} is the PDF's URL. */
     printNote: 'To print the book, download the PDF from {url}.',
   },
   notFound: {

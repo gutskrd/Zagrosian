@@ -1,10 +1,9 @@
 /**
- * The questions and answers (Faq.astro), in a language, with the links in the
- * answers resolved. The same list feeds the page, its Markdown version and the
- * FAQPage structured data, so the three always say the same thing.
+ * FAQ entries (Faq.astro) for a locale, with links resolved. The same list feeds the page, its
+ * Markdown version and the FAQPage structured data, so all three stay in sync.
  *
- * Answers (and the closing line, `faq.more`) in the message files may contain
- * {hevalo}, {privacy}, {contact} and {security}; each becomes a link.
+ * Answers (and `faq.more`) may contain the placeholders {hevalo}, {privacy}, {contact} and
+ * {security}, which become links.
  */
 import { localizePath, messages, type Locale } from '../i18n';
 import { hevalo, site } from '../site';
@@ -12,7 +11,7 @@ import { hevalo, site } from '../site';
 export interface FaqLink {
   text: string;
   href: string;
-  /** Latin text (an address) that reads left to right on every page. */
+  /** LTR Latin text (an address) on every page. */
   ltr?: boolean;
 }
 
@@ -23,7 +22,7 @@ export interface FaqItem {
   answer: FaqPart[];
 }
 
-/** Turns the placeholders in a message into links. */
+/** Replaces placeholders in a message with links. */
 function linker(locale: Locale) {
   const t = messages(locale);
   const links: Record<string, FaqLink> = {
@@ -51,14 +50,12 @@ export function faq(locale: Locale): FaqItem[] {
   return messages(locale).faq.items.map(({ question, answer }) => ({ question, answer: link(answer) }));
 }
 
-/** The line after the questions, which says where to ask another. */
+/** Closing line after the questions, pointing to where to ask more. */
 export const faqMore = (locale: Locale) => linker(locale)(messages(locale).faq.more);
 
-/** An answer as plain text, for structured data. */
+/** Answer as plain text, for structured data. */
 export const answerText = (answer: FaqPart[]) => answer.map((part) => (typeof part === 'string' ? part : part.text)).join('');
 
-/** An answer as Markdown, with absolute links. */
+/** Answer as Markdown with absolute links. */
 export const answerMarkdown = (answer: FaqPart[]) =>
-  answer
-    .map((part) => (typeof part === 'string' ? part : `[${part.text}](${new URL(part.href, site.url).href})`))
-    .join('');
+  answer.map((part) => (typeof part === 'string' ? part : `[${part.text}](${new URL(part.href, site.url).href})`)).join('');

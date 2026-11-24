@@ -1,0 +1,27 @@
+---
+/**
+ * The 21-ray sun of the Kurdish flag in currentColor, generated from its geometry (src/lib/sun.ts)
+ * so it's sharp at any size. Decorative, so aria-hidden.
+ */
+import { sunPath } from '../../lib/sun';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg class:list={['sun', className]} viewBox="-100 -100 200 200" aria-hidden="true" focusable="false">
+  <path d={sunPath}></path>
+</svg>
+
+<style>
+  .sun {
+    display: block;
+    flex: none;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
+</style>

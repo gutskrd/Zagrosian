@@ -83,8 +83,7 @@ export const tr: Messages = {
   motto: 'Hayat Kürtçe daha tatlı.',
   about: {
     eyebrow: 'Hakkımızda',
-    mission:
-      'Misyonumuz, insanların her gün kullanmaktan keyif aldığı yazılımlar geliştirmek: sade, gizliliğe saygılı ve net.',
+    mission: 'Misyonumuz, insanların her gün kullanmaktan keyif aldığı yazılımlar geliştirmek: sade, gizliliğe saygılı ve net.',
     approach: 'Zagrosian özel bir şirkettir. Ürünlerimizi kendi bünyemizde tasarlıyor ve geliştiriyoruz.',
     headquartersLabel: 'Merkez',
     headquarters: 'Hollanda',
@@ -116,13 +115,11 @@ export const tr: Messages = {
       },
       {
         question: 'Hevalo hangi Kürtçe lehçelerini öğretiyor?',
-        answer:
-          'Hevalo, Kurmanci ile başlıyor. Diğer lehçeler de planlanıyor.',
+        answer: 'Hevalo, Kurmanci ile başlıyor. Diğer lehçeler de planlanıyor.',
       },
       {
         question: 'Hevalo iOS ve Android’de var mı?',
-        answer:
-          'Henüz değil. Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
+        answer: 'Henüz değil. Yerel uygulamalar geliştirme aşamasında ve App Store ile Google Play’de yayınlanacak.',
       },
       {
         question: 'zagrosian.com kişisel veri topluyor mu?',
@@ -189,8 +186,7 @@ export const tr: Messages = {
     shareAlt: 'Rêya Kurmancî, Hevalo’nun kitabı, ilk sayfalarında açık',
     eyebrow: 'Ücretsiz kitap',
     subtitle: 'Kurmanci yolu · Hevalo’nun kitabı',
-    lead:
-      'Kurmanci bir ders kitabı; her satırın yanında İngilizcesi var. İlk merhabadan masallara ve şarkılara kadar Hamo, Xezal ve Hevalo ile öğrenin: burada sayfa sayfa okuyun ya da yazdırıp saklamak için indirin.',
+    lead: 'Kurmanci bir ders kitabı; her satırın yanında İngilizcesi var. İlk merhabadan masallara ve şarkılara kadar Hamo, Xezal ve Hevalo ile öğrenin: burada sayfa sayfa okuyun ya da yazdırıp saklamak için indirin.',
     startReading: 'Okumaya başlayın',
     download: 'Kitabı indirin',
     downloadShort: 'İndir',

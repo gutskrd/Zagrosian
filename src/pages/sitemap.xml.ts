@@ -2,9 +2,8 @@ import type { APIRoute } from 'astro';
 import { textPages } from '../lib/pages';
 
 /**
- * Every indexable page in every language. Each entry lists all of its language
- * versions (hreflang), so search engines show visitors the right one. The 404
- * pages are `noindex` and left out.
+ * Sitemap of every indexable page in every locale. Each entry lists all its language alternates
+ * (hreflang) so search engines serve the right one. 404 pages are `noindex` and excluded.
  */
 export const GET: APIRoute = async () => {
   const pages = await textPages();
