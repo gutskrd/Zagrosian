@@ -62,7 +62,7 @@ const registered = !!(address || kvk || vat || phone);
       </div>
     </div>
 
-    <div class="site-footer__mark" aria-hidden="true" data-rise dir="ltr">
+    <div class="site-footer__mark" aria-hidden="true" data-rise data-footer-mark dir="ltr">
       <span>
         <span>{site.name}</span>
         {/* Late sunlight through a window, falling across the letters. */}
@@ -71,15 +71,7 @@ const registered = !!(address || kvk || vat || phone);
     </div>
 
     <div class="site-footer__bottom">
-      <div class="site-footer__meta">
-        <p>
-          <small>
-            &copy; {year} {site.legalName}
-          </small>
-        </p>
-        <ThemeSwitch />
-      </div>
-      <nav aria-label={t.common.legalNav}>
+      <nav class="site-footer__legal-nav" aria-label={t.common.legalNav}>
         <ul class="site-footer__legal">
           {nav.legal.map((link) => (
             <li>
@@ -88,32 +80,40 @@ const registered = !!(address || kvk || vat || phone);
               </a>
             </li>
           ))}
-          <li>
-            <a class="site-footer__link" href="#top">
-              {t.common.backToTop}
-              <Arrow direction="up" />
-            </a>
-          </li>
         </ul>
       </nav>
-    </div>
 
-    {registered && (
-      <div data-nosnippet>
-        <address class="site-footer__registration" data-registration data-kvk={t.footer.kvk} data-vat={t.footer.vat}>
-          <span>{site.legalName}</span>
-          <span class="site-footer__details" data-registration-details />
-          <span class="site-footer__dot" aria-hidden="true">
-            ·
-          </span>
-          <bdi>
-            <a class="site-footer__contact site-footer__whole" href={`mailto:${site.emails.contact}`} dir="ltr">
-              {site.emails.contact}
-            </a>
-          </bdi>
-        </address>
+      <div class="site-footer__theme">
+        <ThemeSwitch />
       </div>
-    )}
+
+      <a class="site-footer__link site-footer__back" href="#top">
+        {t.common.backToTop}
+        <Arrow direction="up" />
+      </a>
+
+      {/* The company's legal line: its name once, then the registration details and email. */}
+      <div class="site-footer__fine" data-nosnippet>
+        <p>
+          <small>
+            &copy; {year} {site.legalName}
+          </small>
+        </p>
+        {registered && (
+          <address class="site-footer__registration" data-registration data-kvk={t.footer.kvk} data-vat={t.footer.vat}>
+            <span class="site-footer__details" data-registration-details />
+            <span class="site-footer__dot" aria-hidden="true">
+              ·
+            </span>
+            <bdi>
+              <a class="site-footer__contact site-footer__whole" href={`mailto:${site.emails.contact}`} dir="ltr">
+                {site.emails.contact}
+              </a>
+            </bdi>
+          </address>
+        )}
+      </div>
+    </div>
   </div>
 </footer>
 
@@ -157,11 +157,13 @@ const registered = !!(address || kvk || vat || phone);
     gap: 0.5rem;
   }
 
+  /* On phones, the links and social profiles share two even columns, so no label is left alone on
+     a row. */
   .site-footer__links,
   .site-footer__social {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1.75rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
   }
 
   .site-footer__social .site-footer__link {
@@ -321,68 +323,34 @@ const registered = !!(address || kvk || vat || phone);
     }
   }
 
+  /* Bottom: legal links, theme and back to top, then the company's legal line. The visual order
+     matches the DOM order at every width, so keyboard focus moves the way the eye reads. */
   .site-footer__bottom {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'legal legal'
+      'theme top'
+      'fine fine';
     align-items: center;
-    justify-content: space-between;
-    gap: 0 2rem;
-    padding-top: 1rem;
+    gap: 0.25rem 1.5rem;
+    padding-top: 0.75rem;
     border-top: 1px solid var(--color-line);
     color: var(--color-muted);
   }
 
-  .site-footer__meta {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    min-height: 2.75rem;
+  .site-footer__legal-nav {
+    grid-area: legal;
   }
 
-  .site-footer__bottom small {
-    font-size: inherit;
+  .site-footer__theme {
+    grid-area: theme;
+    justify-self: start;
   }
 
-  /* Registration line: each detail kept whole and separated by spacing; separator dots appear only
-     where everything fits on one line, so wrapped lines never start or end with a dot. */
-  .site-footer__registration {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.125rem 0.875rem;
-    padding-top: 0.5rem;
-    color: var(--color-muted);
-    font-style: normal;
-  }
-
-  /* `:global` because the details are injected by src/scripts/registration.ts and lack Astro's
-     scope attribute. */
-  .site-footer__registration :global(.site-footer__details) {
-    display: contents;
-  }
-
-  .site-footer__registration :global(.site-footer__dot) {
-    display: none;
-  }
-
-  .site-footer__registration :global(.site-footer__whole) {
-    white-space: nowrap;
-  }
-
-  /* Phone and email links: muted like the line, with a comfortable tap height, highlighted on
-     hover. */
-  .site-footer__registration :global(.site-footer__contact) {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.5rem;
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .site-footer__registration :global(.site-footer__contact:hover) {
-    color: var(--color-ink);
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+  .site-footer__back {
+    grid-area: top;
+    justify-self: end;
   }
 
   .site-footer__legal {
@@ -391,20 +359,84 @@ const registered = !!(address || kvk || vat || phone);
     gap: 0 1.5rem;
   }
 
-  .site-footer__legal .site-footer__link {
+  .site-footer__legal .site-footer__link,
+  .site-footer__back {
     color: var(--color-muted);
   }
 
-  .site-footer__legal .site-footer__link:hover {
+  .site-footer__legal .site-footer__link:hover,
+  .site-footer__back:hover {
     color: var(--color-ink);
   }
 
+  /* The legal line, as fine print: the company's name once, then its registration details and
+     email. Each detail is kept whole; separator dots appear only where the line fits on one row,
+     so a wrapped row never starts or ends with a dot. */
+  .site-footer__fine {
+    grid-area: fine;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.875rem;
+    margin-top: 0.75rem;
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+
+  .site-footer__fine small {
+    font-size: inherit;
+  }
+
+  /* On narrow screens the name heads the block on a row of its own. */
+  .site-footer__fine > p {
+    flex-basis: 100%;
+  }
+
+  /* The details take part in the line's layout. `:global` because they're injected by
+     src/scripts/registration.ts and lack Astro's scope attribute. */
+  .site-footer__registration,
+  .site-footer__registration :global(.site-footer__details) {
+    display: contents;
+  }
+
+  .site-footer__registration {
+    font-style: normal;
+  }
+
+  .site-footer__fine :global(.site-footer__dot) {
+    display: none;
+  }
+
+  .site-footer__fine :global(.site-footer__whole) {
+    white-space: nowrap;
+  }
+
+  /* Phone and email links: muted like the line, highlighted on hover. */
+  .site-footer__fine :global(.site-footer__contact) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .site-footer__fine :global(.site-footer__contact:hover) {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
   @media (min-width: 64rem) {
-    .site-footer__registration {
+    .site-footer__fine {
       column-gap: 0.5rem;
     }
 
-    .site-footer__registration :global(.site-footer__dot) {
+    .site-footer__fine > p {
+      flex-basis: auto;
+    }
+
+    .site-footer__fine :global(.site-footer__dot) {
       display: inline;
     }
   }
@@ -426,8 +458,18 @@ const registered = !!(address || kvk || vat || phone);
 
     .site-footer__links,
     .site-footer__social {
+      display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
       gap: 0 2.25rem;
+    }
+
+    .site-footer__bottom {
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      grid-template-areas:
+        'legal theme top'
+        'fine fine fine';
+      column-gap: 2rem;
     }
 
     .site-footer__links .site-footer__link,

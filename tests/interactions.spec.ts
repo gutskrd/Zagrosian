@@ -1,6 +1,4 @@
-/**
- * User-facing controls: the language menu, language suggestion, mobile site menu, theme and Share.
- */
+/** User-facing controls: language menu and suggestion, site menu, theme, Share and the footer. */
 import { expect, test } from '@playwright/test';
 
 /** Sound off. */
@@ -118,5 +116,32 @@ test.describe('section links', () => {
     await page.locator('.site-footer a[href="/#faq"]').click();
     await page.waitForURL('**/#faq');
     await expect.poll(() => offset(page, 'faq'), { timeout: 6000 }).toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe('footer', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, contextOptions: { reducedMotion: 'reduce' } });
+
+  test('names the company once, and the header shows only the logo beside the footer wordmark', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-registration]')).toHaveAttribute('data-registered', '');
+
+    // Visible text only: the large wordmark is decorative (aria-hidden) and the email is lowercase.
+    const mentions = await page.locator('footer').evaluate((footer) => {
+      const walker = document.createTreeWalker(footer, NodeFilter.SHOW_TEXT);
+      let text = '';
+      while (walker.nextNode()) {
+        if (!walker.currentNode.parentElement?.closest('[aria-hidden="true"]')) text += ` ${walker.currentNode.textContent}`;
+      }
+      return text.match(/\bZagrosian\b/g)?.length ?? 0;
+    });
+    expect(mentions).toBe(1);
+
+    const wordmark = page.locator('[data-site-header] .site-header__wordmark');
+    await expect(wordmark).toHaveCSS('opacity', '1');
+    await page.locator('[data-footer-mark]').scrollIntoViewIfNeeded();
+    await expect(wordmark).toHaveCSS('opacity', '0');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(wordmark).toHaveCSS('opacity', '1');
   });
 });

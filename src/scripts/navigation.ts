@@ -4,10 +4,18 @@
  */
 import { isOpen } from './utils/popover';
 
-/** Adds a hairline under the sticky header once the page has scrolled. */
+/**
+ * Adds a hairline under the sticky header once the page has scrolled, and marks when the footer's
+ * wordmark is on screen, where the header shows only the logo mark (Header.astro).
+ */
 export function initHeader() {
   const header = document.querySelector<HTMLElement>('[data-site-header]');
   if (!header) return;
+
+  const footerMark = document.querySelector('[data-footer-mark]');
+  if (footerMark && 'IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => header.toggleAttribute('data-footer-visible', entry.isIntersecting)).observe(footerMark);
+  }
 
   let queued = false;
 
